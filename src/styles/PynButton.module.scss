@@ -1,0 +1,55 @@
+.pynButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pyn-accent);
+    outline-offset: 2px;
+  }
+}
+
+.primary {
+  color: var(--pyn-on-accent);
+  background: var(--pyn-accent);
+  border-color: transparent;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+}
+
+.secondary {
+  color: var(--pyn-text);
+  background: var(--pyn-surface-raised);
+
+  &:hover:not(:disabled) {
+    background: var(--pyn-hover);
+  }
+}
+
+.danger {
+  color: var(--pyn-danger);
+  background: var(--pyn-danger-bg);
+  border-color: transparent;
+
+  &:hover:not(:disabled) {
+    border-color: var(--pyn-danger);
+  }
+}
