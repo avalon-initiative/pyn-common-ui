@@ -1,0 +1,18 @@
+/* Base page styles. Imported once per app entry point, after tokens.css. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--pyn-bg);
+  color: var(--pyn-text);
+  font-family: var(--pyn-font);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--pyn-accent);
+}
