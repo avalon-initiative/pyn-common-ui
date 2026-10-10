@@ -1,0 +1,185 @@
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--pyn-accent);
+    outline-offset: 2px;
+  }
+}
+
+// Narrow screens; each component owns its responsive behaviour.
+@mixin narrow {
+  @media (max-width: 40rem) {
+    @content;
+  }
+}
+
+@mixin card {
+  background: var(--pyn-surface);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+@mixin list {
+  @include card;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@mixin item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-4);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+
+  & + & {
+    border-top: 1px solid var(--pyn-border);
+  }
+
+  @include narrow {
+    flex-wrap: wrap;
+  }
+}
+
+@mixin form {
+  @include card;
+  max-width: 40rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-4);
+}
+
+@mixin field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  color: var(--pyn-text-muted);
+  font-size: 0.875rem;
+}
+
+@mixin input {
+  padding: var(--pyn-space-2) var(--pyn-space-3);
+  color: var(--pyn-text);
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  font: inherit;
+
+  @include focus-ring;
+}
+
+@mixin button($color: var(--pyn-text)) {
+  padding: var(--pyn-space-1) var(--pyn-space-3);
+  color: $color;
+  background: none;
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  font: inherit;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+
+  @include focus-ring;
+}
+
+@mixin button-primary {
+  @include button(var(--pyn-on-accent));
+  align-self: flex-start;
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  background: var(--pyn-accent);
+  border: 0;
+  font-weight: 600;
+}
+
+@mixin muted {
+  margin: 0;
+  color: var(--pyn-text-muted);
+  font-size: 0.875rem;
+}
+
+@mixin error {
+  margin: 0;
+  padding: var(--pyn-space-2) var(--pyn-space-3);
+  color: var(--pyn-danger);
+  background: var(--pyn-danger-bg);
+  border-radius: var(--pyn-radius);
+  font-size: 0.875rem;
+}
+
+@mixin pill {
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-text-muted);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius-pill);
+  font-size: 0.75rem;
+}
+
+// highlight.js token classes are global names in the markup it produces.
+@mixin syntax {
+  :global(.hljs-keyword),
+  :global(.hljs-built_in),
+  :global(.hljs-literal),
+  :global(.hljs-selector-tag),
+  :global(.hljs-meta) {
+    color: var(--pyn-syntax-keyword);
+  }
+
+  :global(.hljs-string),
+  :global(.hljs-regexp),
+  :global(.hljs-addition),
+  :global(.hljs-attr),
+  :global(.hljs-selector-class) {
+    color: var(--pyn-syntax-string);
+  }
+
+  :global(.hljs-comment),
+  :global(.hljs-quote) {
+    color: var(--pyn-syntax-comment);
+    font-style: italic;
+  }
+
+  :global(.hljs-number),
+  :global(.hljs-symbol),
+  :global(.hljs-variable),
+  :global(.hljs-deletion) {
+    color: var(--pyn-syntax-number);
+  }
+
+  :global(.hljs-title),
+  :global(.hljs-type),
+  :global(.hljs-name),
+  :global(.hljs-section),
+  :global(.hljs-tag) {
+    color: var(--pyn-syntax-name);
+  }
+}
+
+@mixin tab-nav {
+  display: flex;
+  gap: var(--pyn-space-1);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--pyn-border);
+}
+
+@mixin tab {
+  flex: none;
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  color: var(--pyn-text-muted);
+  border-bottom: 2px solid transparent;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--pyn-text);
+  }
+
+  &[aria-current='page'] {
+    color: var(--pyn-text);
+    border-bottom-color: var(--pyn-accent);
+  }
+
+  @include focus-ring;
+}

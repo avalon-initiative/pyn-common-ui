@@ -1,11 +1,32 @@
 import type { Preview } from '@storybook/vue3'
 import '../src/styles/tokens.css'
 import '../src/styles/global.css'
+import { applyTheme } from '../src/state/theme.state'
+import type { ThemeChoice } from '../src/state/theme.state'
 
 const preview: Preview = {
-  parameters: {
-    backgrounds: { default: 'pyn', options: { pyn: { name: 'pyn', value: '#0b0f16' } } },
+  parameters: { layout: 'padded' },
+  globalTypes: {
+    theme: {
+      description: 'Color theme',
+      toolbar: {
+        title: 'Theme',
+        icon: 'circlehollow',
+        dynamicTitle: true,
+        items: [
+          { value: 'system', title: 'System' },
+          { value: 'light', title: 'Light' },
+          { value: 'dark', title: 'Dark' },
+        ],
+      },
+    },
   },
-  initialGlobals: { backgrounds: { value: 'pyn' } },
+  initialGlobals: { theme: 'system' },
+  decorators: [
+    (story, context) => {
+      applyTheme(context.globals.theme as ThemeChoice)
+      return story()
+    },
+  ],
 }
 export default preview
