@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install build typecheck lint test smoke storybook build-storybook check pack clean \
+.PHONY: help install build typecheck lint test smoke storybook build-storybook check pack watch clean \
 	release-checks release release-skip-tests
 
 help: ## List available targets
@@ -36,6 +36,9 @@ check: lint typecheck test smoke ## Everything a pull request must pass except t
 
 pack: build ## Produce the publishable tarball without publishing
 	npm pack
+
+watch: build ## Rebuild dist/ on change, for an app linked to this checkout
+	npx vite build --watch
 
 clean: ## Remove build output
 	rm -rf dist storybook-static *.tgz

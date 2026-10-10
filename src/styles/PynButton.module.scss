@@ -1,3 +1,5 @@
+@use 'mixins' as m;
+
 .pynButton {
   display: inline-flex;
   align-items: center;
@@ -19,10 +21,7 @@
     cursor: not-allowed;
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--pyn-accent);
-    outline-offset: 2px;
-  }
+  @include m.focus-ring;
 }
 
 .primary {

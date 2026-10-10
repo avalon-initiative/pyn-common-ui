@@ -22,8 +22,14 @@ auth token with `read:packages` even for public packages. Map the scope in your
 npm install @avalon-initiative/pyn-common-ui
 ```
 
-`vue` (^3.5) is a peer dependency. The long-term distribution target is still
-open.
+Locally, `NODE_AUTH_TOKEN` is a personal access token with `read:packages`
+(`export NODE_AUTH_TOKEN=$(gh auth token)` works once `gh auth refresh -s read:packages`
+has been run). In GitHub Actions, give the job `permissions: packages: read`, set
+`registry-url: https://npm.pkg.github.com` and `scope: '@avalon-initiative'` on
+`actions/setup-node`, and pass `NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}` to the
+install step.
+
+`vue` (^3.5) is a peer dependency.
 
 ## Use
 
@@ -41,11 +47,18 @@ Colors, spacing and radii come from the `--pyn-*` tokens in `tokens.css`
 (dark by default, light by OS preference or `data-theme`); components never
 hardcode a color.
 
+Theme handling is exported for the app to wire to its own control:
+`themeChoices`, `loadTheme()`, `saveTheme(choice)` and `applyTheme(choice)`
+(`system` removes the `data-theme` pin so the OS preference decides). Pure
+helpers are exported too: `formatDate`, `formatDateTime`, `formatWait`,
+`formatLease`, `lockState` and `EXPIRING_SOON_MS`.
+
 ## Develop
 
 ```bash
 make install         # npm ci
 make storybook       # Storybook on http://localhost:6006
+make watch           # rebuild dist/ on change, for a linked app
 make check           # lint, type-check, component tests, build, smoke test
 make build-storybook # static Storybook build
 make help            # everything else
@@ -54,8 +67,9 @@ make help            # everything else
 Conventions:
 
 - `src/components/` holds only `.vue` files; `src/styles/` holds only
-  `.module.scss` (CSS Modules, one per component, bound with `:class`) plus
-  the plain `tokens.css` and `global.css`; `src/stories/` holds `.stories.ts`;
+  `.module.scss` (CSS Modules, one per component, bound with `:class`), the
+  plain `tokens.css` and `global.css`, and `_mixins.scss` (library-internal,
+  pulled in with `@use 'mixins' as m;` and never shipped on its own); `src/stories/` holds `.stories.ts`;
   `src/types/` holds `*.types.ts`; `src/state/` holds extracted script logic
   that is not markup; `src/utils/` holds pure helpers.
 - Components are named `Pyn<Name>`.
@@ -73,7 +87,26 @@ Conventions:
   (`break-word` does not reduce min-content width).
 - Every component has a story and a render test in `tests/ui-components.test.ts`.
 
-### Trying a change in an app before releasing
+### Working on the library from an app (dev link)
+
+For day-to-day work, link the checkout into the app instead of releasing:
+
+```bash
+# in pyn-common-ui
+make watch                                  # builds dist/, then rebuilds on every change
+npm link                                    # once
+
+# in the app (pyn-web)
+npm link @avalon-initiative/pyn-common-ui
+```
+
+The app's Vite config needs `resolve: { dedupe: ['vue'] }` so the linked copy
+and the app share one `vue`. Run `npm install` in the app (or
+`npm unlink @avalon-initiative/pyn-common-ui && npm install`) to go back to
+the published version; never commit a linked dependency. Component work that
+needs no app belongs in Storybook (`make storybook`).
+
+### Trying a packed build in an app
 
 ```bash
 make pack                                   # produces avalon-initiative-pyn-common-ui-<version>.tgz
