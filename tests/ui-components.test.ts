@@ -54,6 +54,12 @@ import {
   PynTeamList,
   PynTopBar,
   PynTree,
+  PynViewAction,
+  PynViewError,
+  PynViewGroup,
+  PynViewHeader,
+  PynViewStack,
+  PynViewSummary,
   blobPath,
   breadcrumbs,
   canRemove,
@@ -1617,5 +1623,37 @@ describe('PynTeamGrant', () => {
     const w = mount(PynTeamGrant, { props: { teams: [], roles: ['reader'] } })
     expect(w.find('button').exists()).toBe(false)
     expect(w.text()).toContain('already has a role')
+  })
+})
+
+describe('view layout components', () => {
+  it('header renders the title and wraps actions only when given', () => {
+    expect(mount(PynViewHeader, { props: { title: 'Orgs' } }).find('span').exists()).toBe(false)
+    const w = mount(PynViewHeader, {
+      props: { title: 'Repositories' },
+      slots: { default: '<a href="/x">New</a>' },
+    })
+    expect(w.find('h1').text()).toBe('Repositories')
+    expect(w.find('span a').text()).toBe('New')
+  })
+
+  it('action renders a link, primary or secondary', () => {
+    const primary = mount(PynViewAction, { props: { href: '/_/new', primary: true }, slots: { default: 'New' } })
+    const secondary = mount(PynViewAction, { props: { href: '/_/locks' }, slots: { default: 'Locks' } })
+    expect(primary.attributes('href')).toBe('/_/new')
+    expect(secondary.text()).toBe('Locks')
+    expect(primary.classes()).not.toEqual(secondary.classes())
+  })
+
+  it('error is an alert and summary is plain text', () => {
+    expect(mount(PynViewError, { slots: { default: 'Boom' } }).attributes('role')).toBe('alert')
+    expect(mount(PynViewSummary, { slots: { default: 'Hello' } }).text()).toBe('Hello')
+  })
+
+  it('group titles its content and stack holds its children', () => {
+    const g = mount(PynViewGroup, { props: { title: 'Audit' }, slots: { default: '<p>body</p>' } })
+    expect(g.find('h2').text()).toBe('Audit')
+    expect(g.find('p').text()).toBe('body')
+    expect(mount(PynViewStack, { slots: { default: '<i>a</i><i>b</i>' } }).findAll('i')).toHaveLength(2)
   })
 })
