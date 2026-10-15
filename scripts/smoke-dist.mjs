@@ -25,6 +25,10 @@ if (built.formatWait(90) !== '2 minutes') throw new Error('formatWait did not ru
 const html = await renderToString(createSSRApp({ render: () => h(built.PynButton, { label: 'Smoke' }) }))
 if (!html.includes('Smoke')) throw new Error(`PynButton did not render its label: ${html}`)
 
+const notFound = await renderToString(createSSRApp({ render: () => h(built.PynRepoNotFound, { slug: 'a/b' }) }))
+if (!notFound.includes('Repository not found')) throw new Error(`PynRepoNotFound did not render: ${notFound}`)
+if (built.matchRepos(['a/b', 'c/d'], 'c')[0] !== 'c/d') throw new Error('matchRepos did not run from dist')
+
 const targets = Object.values(pkg.exports).flatMap((v) => (typeof v === 'string' ? [v] : Object.values(v)))
 const absent = targets.filter((t) => !existsSync(t))
 if (absent.length > 0) throw new Error(`package.json exports point at missing files: ${absent.join(', ')}`)

@@ -135,7 +135,7 @@ Published versions are immutable; ship a fix as a new version.
 
 ## Components
 
-`PynButton` is the seed component; the rest arrive from the pyn web UI.
+`PynButton` is the seed component; the rest arrive from the pyn web UI. Received so far: the primitives (`PynIcon`, `PynLockIcon`, `PynModeChip`, `PynLockBadge`, `PynMenu`, `PynSearch`, `PynBreadcrumb`, `PynPageNotFound`, `PynRepoNotFound`, `PynAccountNotice`, `PynResendForm`).
 
 ## License
 
