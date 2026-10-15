@@ -1,0 +1,9 @@
+@use 'mixins' as m;
+
+.nav {
+  @include m.tab-nav;
+}
+
+.tab {
+  @include m.tab;
+}

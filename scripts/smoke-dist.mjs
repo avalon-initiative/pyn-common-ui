@@ -29,6 +29,16 @@ const notFound = await renderToString(createSSRApp({ render: () => h(built.PynRe
 if (!notFound.includes('Repository not found')) throw new Error(`PynRepoNotFound did not render: ${notFound}`)
 if (built.matchRepos(['a/b', 'c/d'], 'c')[0] !== 'c/d') throw new Error('matchRepos did not run from dist')
 
+const side = await renderToString(
+  createSSRApp({ render: () => h(built.PynSideNav, { account: 'alice', items: built.mainNav, current: 'home', repos: [{ owner: 'alice', name: 'game' }] }) }),
+)
+if (!side.includes('alice/game')) throw new Error(`PynSideNav did not render: ${side}`)
+const orgHeader = await renderToString(
+  createSSRApp({ render: () => h(built.PynOrgHeader, { name: 'studio', createdAt: '2026-09-02T08:00:00Z', role: 'owner' }) }),
+)
+if (!orgHeader.includes('studio')) throw new Error(`PynOrgHeader did not render: ${orgHeader}`)
+if (built.repoTabs(['read'], false).length !== 3) throw new Error('repoTabs did not run from dist')
+
 const targets = Object.values(pkg.exports).flatMap((v) => (typeof v === 'string' ? [v] : Object.values(v)))
 const absent = targets.filter((t) => !existsSync(t))
 if (absent.length > 0) throw new Error(`package.json exports point at missing files: ${absent.join(', ')}`)
