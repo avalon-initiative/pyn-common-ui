@@ -18,6 +18,7 @@ import {
   PynFileView,
   PynHistory,
   PynIcon,
+  PynIdentities,
   PynInvites,
   PynKeys,
   PynLockBadge,
@@ -48,6 +49,7 @@ import {
   PynResendForm,
   PynRoles,
   PynSearch,
+  PynSetup,
   PynShell,
   PynSignIn,
   PynSideNav,
@@ -56,6 +58,7 @@ import {
   PynTeamForm,
   PynTeamGrant,
   PynTeamList,
+  PynTokens,
   PynTopBar,
   PynTree,
   PynVerifyEmail,
@@ -75,6 +78,7 @@ import {
   clickLine,
   contentUrl,
   entryAt,
+  expiryFromDate,
   externalSignInUrl,
   fileBody,
   fileCrumbs,
@@ -96,6 +100,7 @@ import {
   orgTabs,
   ownerChoices,
   parseLockLimit,
+  parseRepos,
   personGrantees,
   readmeEntry,
   renderMarkdown,
@@ -107,17 +112,18 @@ import {
   sourceNote,
   splitPath,
   splitRepo,
+  stepComplete,
   teamCandidates,
   teamGrantees,
   teamPath,
   treePath,
   ungrantedTeams,
 } from '../src'
+import type { SetupForm } from '../src'
 import { accounts } from '../src/stories/admin-data'
 import { codeText, fileEntry, imageSrc, lockedEntry, readmeText } from '../src/stories/file-data'
 import { orgMembers, orgs, repoPolicy, repoTeams, teams } from '../src/stories/org-data'
 import { folderListing, repo, rootEntries, rootListing, summary } from '../src/stories/landing-data'
-
 
 const now = new Date('2026-10-08T12:00:00Z')
 const r = { owner: 'acme', name: 'castle-quest' }
@@ -151,8 +157,16 @@ describe('PynButton', () => {
 
 describe('PynIcon and PynLockIcon', () => {
   it('draws a known icon and nothing for an unknown name', () => {
-    expect(mount(PynIcon, { props: { name: 'repo' } }).find('path').attributes('d')).toBeTruthy()
-    expect(mount(PynIcon, { props: { name: 'nope' } }).find('path').attributes('d')).toBe('')
+    expect(
+      mount(PynIcon, { props: { name: 'repo' } })
+        .find('path')
+        .attributes('d'),
+    ).toBeTruthy()
+    expect(
+      mount(PynIcon, { props: { name: 'nope' } })
+        .find('path')
+        .attributes('d'),
+    ).toBe('')
   })
 
   it('opens the lock shackle', () => {
@@ -339,7 +353,9 @@ describe('PynSideNav', () => {
   })
 
   it('says when there are no repositories', () => {
-    const w = mount(PynSideNav, { props: { account: 'alice', items: mainNav, current: '', repos: [] } })
+    const w = mount(PynSideNav, {
+      props: { account: 'alice', items: mainNav, current: '', repos: [] },
+    })
     expect(w.text()).toContain('None yet')
   })
 
@@ -619,7 +635,6 @@ describe('line state', () => {
     expect(clickLine({ start: 5, end: 5 }, 9, true)).toEqual({ start: 5, end: 9 })
     expect(clickLine({ start: 5, end: 9 }, 2, true)).toEqual({ start: 2, end: 5 })
   })
-
 })
 
 describe('file components', () => {
@@ -945,8 +960,8 @@ describe('files state', () => {
   it('groups rows by top-level folder, keeping order', () => {
     const rows = [
       { path: 'Content/a.umap', mode: 'exclusive' as const },
-      { path: 'README.md', mode: 'shared' as const, },
-      { path: 'Content/b.umap', mode: 'exclusive' as const, },
+      { path: 'README.md', mode: 'shared' as const },
+      { path: 'Content/b.umap', mode: 'exclusive' as const },
     ]
     const groups = groupByTopLevel(rows)
     expect(groups.map((g) => [g.name, g.rows.length])).toEqual([
@@ -965,7 +980,7 @@ describe('PynFileList', () => {
           {
             path: 'Content/a.umap',
             mode: 'exclusive',
-           
+
             revision: 3,
             lock: lock('bob', 60),
           },
@@ -986,7 +1001,7 @@ describe('PynFileList', () => {
           {
             path: 'Content/World/Main.umap',
             mode: 'exclusive',
-           
+
             revision: null,
             lock: null,
           },
@@ -1927,7 +1942,11 @@ describe('PynAccounts', () => {
 
 describe('view layout components', () => {
   it('header renders the title and wraps actions only when given', () => {
-    expect(mount(PynViewHeader, { props: { title: 'Orgs' } }).find('span').exists()).toBe(false)
+    expect(
+      mount(PynViewHeader, { props: { title: 'Orgs' } })
+        .find('span')
+        .exists(),
+    ).toBe(false)
     const w = mount(PynViewHeader, {
       props: { title: 'Repositories' },
       slots: { default: '<a href="/x">New</a>' },
@@ -1937,8 +1956,14 @@ describe('view layout components', () => {
   })
 
   it('action renders a link, primary or secondary', () => {
-    const primary = mount(PynViewAction, { props: { href: '/_/new', primary: true }, slots: { default: 'New' } })
-    const secondary = mount(PynViewAction, { props: { href: '/_/locks' }, slots: { default: 'Locks' } })
+    const primary = mount(PynViewAction, {
+      props: { href: '/_/new', primary: true },
+      slots: { default: 'New' },
+    })
+    const secondary = mount(PynViewAction, {
+      props: { href: '/_/locks' },
+      slots: { default: 'Locks' },
+    })
     expect(primary.attributes('href')).toBe('/_/new')
     expect(secondary.text()).toBe('Locks')
     expect(primary.classes()).not.toEqual(secondary.classes())
@@ -1953,6 +1978,201 @@ describe('view layout components', () => {
     const g = mount(PynViewGroup, { props: { title: 'Audit' }, slots: { default: '<p>body</p>' } })
     expect(g.find('h2').text()).toBe('Audit')
     expect(g.find('p').text()).toBe('body')
-    expect(mount(PynViewStack, { slots: { default: '<i>a</i><i>b</i>' } }).findAll('i')).toHaveLength(2)
+    expect(
+      mount(PynViewStack, { slots: { default: '<i>a</i><i>b</i>' } }).findAll('i'),
+    ).toHaveLength(2)
+  })
+})
+
+const identityProvider = { name: 'Acme SSO', sign_in_url: '/v1/oidc/authorize' }
+const linkedIdentities = [
+  {
+    id: 'aaaaaaaaaaaa',
+    issuer: 'https://id.acme.example',
+    subject: 'u-1',
+    email: 'wendy@acme.example',
+    created_at: '2026-10-08T09:00:00Z',
+    last_sign_in_at: null,
+  },
+]
+
+describe('PynIdentities', () => {
+  it('lists links and offers unlink and link', async () => {
+    const w = mount(PynIdentities, {
+      props: { identities: linkedIdentities, provider: identityProvider },
+    })
+    expect(w.text()).toContain('wendy@acme.example')
+    expect(w.text()).toContain('never used')
+    await w.findAll('button')[0].trigger('click')
+    expect(w.emitted('unlink')?.[0]).toEqual(['aaaaaaaaaaaa'])
+    await w.findAll('button')[1].trigger('click')
+    expect(w.emitted('link')).toHaveLength(1)
+  })
+
+  it('says so when nothing is linked and shows an error', () => {
+    const w = mount(PynIdentities, {
+      props: { identities: [], provider: identityProvider, error: 'only way in' },
+    })
+    expect(w.text()).toContain('Nothing linked yet')
+    expect(w.find('[role=alert]').text()).toBe('only way in')
+  })
+})
+
+const tokenList = [
+  {
+    id: 'aaaaaaaaaaaa',
+    user: 'alice',
+    name: 'ci',
+    repos: ['acme/game'],
+    permissions: ['read', 'lock'],
+    created_at: '2026-10-08T09:00:00Z',
+    expires_at: null,
+    last_used_at: null,
+  },
+  {
+    id: 'bbbbbbbbbbbb',
+    user: 'alice',
+    name: 'old',
+    repos: [],
+    permissions: ['read'],
+    created_at: '2026-10-01T09:00:00Z',
+    revoked_at: '2026-10-02T09:00:00Z',
+  },
+]
+
+describe('token state', () => {
+  it('splits and de-duplicates repositories', () => {
+    expect(parseRepos('a/b, c/d\na/b  e/f')).toEqual(['a/b', 'c/d', 'e/f'])
+    expect(parseRepos('')).toEqual([])
+  })
+
+  it('turns a date into an end-of-day expiry', () => {
+    expect(expiryFromDate('2027-01-01')).toBe('2027-01-01T23:59:59Z')
+    expect(expiryFromDate('')).toBeNull()
+  })
+})
+
+describe('PynTokens', () => {
+  it('lists tokens and only offers revoke for live ones', () => {
+    const w = mount(PynTokens, { props: { tokens: tokenList } })
+    expect(w.text()).toContain('acme/game')
+    expect(w.text()).toContain('no expiry')
+    expect(w.text()).toContain('revoked')
+    expect(w.findAll('button').filter((b) => b.text() === 'Revoke')).toHaveLength(1)
+  })
+
+  it('says so when there are no tokens', () => {
+    expect(mount(PynTokens, { props: { tokens: [] } }).text()).toContain('No tokens yet')
+  })
+
+  it('emits the form and resets it', async () => {
+    const w = mount(PynTokens, { props: { tokens: [] } })
+    await w.find('input').setValue(' ci ')
+    await w.find('textarea').setValue('acme/game acme/tools')
+    await w.find('input[type=date]').setValue('2027-01-01')
+    await w.find('input[value=lock]').setValue(true)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('create')?.[0]).toEqual([
+      {
+        name: 'ci',
+        repos: ['acme/game', 'acme/tools'],
+        permissions: ['read', 'lock'],
+        expires_at: '2027-01-01T23:59:59Z',
+      },
+    ])
+    expect((w.find('textarea').element as HTMLTextAreaElement).value).toBe('')
+  })
+
+  it('shows the secret once and the error', async () => {
+    const w = mount(PynTokens, { props: { tokens: [], secret: 'pyn_abc', error: 'nope' } })
+    expect(w.text()).toContain('pyn_abc')
+    expect(w.find('[role=alert]').text()).toBe('nope')
+    await w.find('[role=status] button').trigger('click')
+    expect(w.emitted('dismiss')).toHaveLength(1)
+  })
+
+  it('emits the id to revoke', async () => {
+    const w = mount(PynTokens, { props: { tokens: tokenList } })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Revoke')!
+      .trigger('click')
+    expect(w.emitted('revoke')?.[0]).toEqual(['aaaaaaaaaaaa'])
+  })
+})
+
+const blank: SetupForm = {
+  token: '',
+  username: '',
+  password: '',
+  email: '',
+  server_name: '',
+  public_url: '',
+  registration: 'closed',
+}
+
+describe('setup state', () => {
+  it('requires the token and the administrator credentials', () => {
+    expect(stepComplete('token', blank)).toBe(false)
+    expect(stepComplete('token', { ...blank, token: ' abc ' })).toBe(true)
+    expect(stepComplete('admin', { ...blank, username: 'root' })).toBe(false)
+    expect(stepComplete('admin', { ...blank, username: 'root', password: 'pw' })).toBe(true)
+    expect(stepComplete('server', blank)).toBe(true)
+  })
+})
+
+describe('PynSetup', () => {
+  const next = (w: ReturnType<typeof mount>) => w.find('form').trigger('submit')
+
+  it('walks every step and emits the form on finish', async () => {
+    const w = mount(PynSetup, { props: { registration: 'closed', publicUrl: 'http://x' } })
+    expect(w.text()).toContain('Step 1 of 6')
+    await next(w)
+    await w.find('input').setValue('tok')
+    await next(w)
+    const [user, pass] = w.findAll('input')
+    await user.setValue('root')
+    await pass.setValue('pw')
+    await next(w)
+    await w.find('input').setValue('Studio')
+    await next(w)
+    expect(w.text()).toContain('written to the server log')
+    await w.find('input[value=invite]').setValue(true)
+    await next(w)
+    expect(w.text()).toContain('root')
+    expect(w.text()).toContain('Invitation only')
+    await next(w)
+    expect(w.emitted('finish')?.[0]).toEqual([
+      {
+        token: 'tok',
+        username: 'root',
+        password: 'pw',
+        email: '',
+        server_name: 'Studio',
+        public_url: 'http://x',
+        registration: 'invite',
+      },
+    ])
+  })
+
+  it('stays on the token step until one is entered', async () => {
+    const w = mount(PynSetup, { props: { registration: 'closed' } })
+    await next(w)
+    await next(w)
+    expect(w.text()).toContain('Step 2 of 6')
+  })
+
+  it('goes back and shows an error', async () => {
+    const w = mount(PynSetup, { props: { registration: 'closed', error: 'bad token' } })
+    await next(w)
+    expect(w.find('[role=alert]').text()).toBe('bad token')
+    await w.find('button[type=button]').trigger('click')
+    expect(w.text()).toContain('Step 1 of 6')
+  })
+
+  it('offers sign-in once finished', async () => {
+    const w = mount(PynSetup, { props: { registration: 'closed', done: true } })
+    await w.find('button').trigger('click')
+    expect(w.emitted('signIn')).toHaveLength(1)
   })
 })

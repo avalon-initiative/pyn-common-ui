@@ -29,3 +29,29 @@ export interface SshKey {
   created_at: string
   last_used_at?: string | null
 }
+
+export interface ExternalIdentity {
+  id: string
+  issuer: string
+  subject: string
+  email?: string | null
+  created_at: string
+  last_sign_in_at?: string | null
+}
+
+export interface SetupForm {
+  token: string
+  username: string
+  password: string
+  email: string
+  server_name: string
+  public_url: string
+  registration: RegistrationMode
+}
+
+export interface SetupStatus {
+  initialised: boolean
+  public_url: string
+  registration: RegistrationMode
+  server_name?: string | null
+}
