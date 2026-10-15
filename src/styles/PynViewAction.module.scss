@@ -1,0 +1,11 @@
+@use 'mixins' as m;
+
+.primary {
+  @include m.button-primary;
+  text-decoration: none;
+}
+
+.secondary {
+  @include m.button;
+  text-decoration: none;
+}

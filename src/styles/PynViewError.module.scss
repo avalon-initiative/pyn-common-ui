@@ -1,0 +1,6 @@
+@use 'mixins' as m;
+
+.error {
+  @include m.error;
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+}
