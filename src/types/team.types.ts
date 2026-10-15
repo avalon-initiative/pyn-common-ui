@@ -1,5 +1,29 @@
 export type MemberSource = 'direct' | 'team' | 'org_owner'
 
+/** A repository where a team holds a role. */
+export interface TeamRepo {
+  /** `owner/name`. */
+  repo: string
+  role: string
+}
+
+export interface TeamInfo {
+  /** ISO 8601 timestamp. */
+  created_at: string
+  description: string
+  members: string[]
+  name: string
+  repos: TeamRepo[]
+  slug: string
+}
+
+/** What the team form emits; `slug` is only present when creating. */
+export interface TeamFormValue {
+  slug?: string
+  name: string
+  description: string
+}
+
 /** A team's role in a repository. */
 export interface RepoTeam {
   slug: string

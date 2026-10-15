@@ -70,6 +70,19 @@ if (!members.includes('/studio/-/teams/artists')) throw new Error(`PynMembers di
 const locks = await renderToString(createSSRApp({ render: () => h(built.PynMyLocks, { locks: [] }) }))
 if (!locks.includes('You hold no locks')) throw new Error(`PynMyLocks did not render: ${locks}`)
 if (built.parseLockLimit('7') !== 7) throw new Error('parseLockLimit did not run from dist')
+const teamList = await renderToString(
+  createSSRApp({
+    render: () =>
+      h(built.PynTeamList, {
+        org: 'studio',
+        teams: [{ slug: 'qa', name: 'qa', description: '', created_at: '2026-09-12T14:30:00Z', members: [], repos: [] }],
+      }),
+  }),
+)
+if (!teamList.includes('/studio/-/teams/qa')) throw new Error(`PynTeamList did not render: ${teamList}`)
+const orgList = await renderToString(createSSRApp({ render: () => h(built.PynOrgList, { orgs: [] }) }))
+if (!orgList.includes('not in any organization')) throw new Error(`PynOrgList did not render: ${orgList}`)
+if (built.ruleSubjects('role', 'deny', [], []).join() !== 'member') throw new Error('ruleSubjects did not run from dist')
 
 const targets = Object.values(pkg.exports).flatMap((v) => (typeof v === 'string' ? [v] : Object.values(v)))
 const absent = targets.filter((t) => !existsSync(t))
