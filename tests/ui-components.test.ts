@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   PynAccountNotice,
   PynActivity,
+  PynAddPerson,
+  PynAudit,
   PynBranchBar,
   PynBreadcrumb,
   PynButton,
@@ -14,21 +16,29 @@ import {
   PynFileView,
   PynHistory,
   PynIcon,
+  PynInvites,
   PynLockBadge,
   PynLockIcon,
   PynLockedFiles,
+  PynLocks,
   PynMarkdown,
+  PynMembers,
   PynMenu,
   PynModeChip,
+  PynMyLocks,
   PynOrgHeader,
   PynPageNotFound,
   PynReadme,
+  PynRepoDelete,
   PynRepoDetails,
+  PynRepoForm,
   PynRepoHeader,
   PynRepoLanding,
+  PynRepoList,
   PynRepoNav,
   PynRepoNotFound,
   PynResendForm,
+  PynRoles,
   PynSearch,
   PynShell,
   PynSideNav,
@@ -47,19 +57,30 @@ import {
   groupByTopLevel,
   highlightLines,
   historyLink,
+  isEditable,
   languageFor,
   lineHash,
   mainNav,
   matchRepos,
+  myLockKey,
   parseLineHash,
+  parseLockLimit,
+  personGrantees,
   readmeEntry,
   renderMarkdown,
   repoTabs,
   resolveRelative,
+  sourceNote,
   splitPath,
+  splitRepo,
+  teamCandidates,
+  teamGrantees,
+  teamPath,
   treePath,
+  ungrantedTeams,
 } from '../src'
 import { codeText, fileEntry, imageSrc, lockedEntry, readmeText } from '../src/stories/file-data'
+import { repoTeams } from '../src/stories/org-data'
 import { folderListing, repo, rootEntries, rootListing, summary } from '../src/stories/landing-data'
 
 
@@ -945,5 +966,396 @@ describe('PynFileList', () => {
 
   it('renders an empty state', () => {
     expect(mount(PynFileList, { props: { rows: [] } }).text()).toContain('No files')
+  })
+})
+
+describe('PynRepoList', () => {
+  const listed = (owner: string, name: string, role?: string) => ({
+    owner,
+    name,
+    visibility: 'private' as const,
+    lease_hours: 8,
+    created_at: '2026-10-01T09:00:00Z',
+    role,
+  })
+
+  it('lists owner, name, visibility and role with a link to the repository', () => {
+    const w = mount(PynRepoList, {
+      props: { repos: [listed('alice', 'game', 'admin')] },
+    })
+    expect(w.text()).toContain('alice/game')
+    expect(w.text()).toContain('private')
+    expect(w.find('[data-role]').text()).toBe('admin')
+    expect(w.find('a').attributes('href')).toBe('/alice/game')
+  })
+
+  it('offers to create one when empty', () => {
+    expect(
+      mount(PynRepoList, { props: { repos: [] } })
+        .find('a')
+        .attributes('href'),
+    ).toBe('/_/new')
+    expect(mount(PynRepoList, { props: { repos: [], empty: 'None here.' } }).text()).toBe(
+      'None here.',
+    )
+  })
+})
+
+describe('PynRepoForm', () => {
+  it('emits the settings to create', async () => {
+    const w = mount(PynRepoForm, { props: { owner: 'alice' } })
+    await w.find('input').setValue(' game ')
+    await w.find('select').setValue('public')
+    await w.find('input[type=number]').setValue('24')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0]).toEqual([
+      { name: 'game', visibility: 'public', lease_hours: 24 },
+    ])
+  })
+
+  it('starts from the existing settings when editing', () => {
+    const w = mount(PynRepoForm, {
+      props: {
+        owner: 'alice',
+        repo: { name: 'game', visibility: 'public', lease_hours: 12 },
+      },
+    })
+    expect((w.find('input').element as HTMLInputElement).value).toBe('game')
+    expect(w.find('button').text()).toBe('Save changes')
+  })
+
+  it('hides the picker without a choice and emits the picked owner', async () => {
+    const solo = mount(PynRepoForm, {
+      props: { owner: 'alice', owners: ['alice'] },
+    })
+    expect(solo.findAll('select')).toHaveLength(1)
+    const w = mount(PynRepoForm, {
+      props: { owner: 'alice', owners: ['alice', 'studio'] },
+    })
+    await w.findAll('select')[0].setValue('studio')
+    expect(w.findAll('select')).toHaveLength(2)
+    expect(w.emitted('update:owner')?.[0]).toEqual(['studio'])
+  })
+})
+
+describe('PynRepoForm lock limit', () => {
+  const base = { name: 'game', visibility: 'public' as const, lease_hours: 12 }
+  const mountEdit = (extra: object, effective = 10) =>
+    mount(PynRepoForm, {
+      props: {
+        owner: 'alice',
+        repo: { ...base, ...extra },
+        effectiveMaxLocks: effective,
+      },
+    })
+  const limit = (w: ReturnType<typeof mount>) => w.findAll('input[type=number]')[1]
+
+  it('emits the typed limit on create and nothing when empty', async () => {
+    const w = mount(PynRepoForm, { props: { owner: 'alice' } })
+    await w.find('input').setValue('game')
+    await limit(w).setValue('5')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0][0]).toMatchObject({
+      max_locks_per_user: 5,
+    })
+    await limit(w).setValue('')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[1][0]).not.toHaveProperty('max_locks_per_user')
+  })
+
+  it('shows the stored setting and clears it with null when emptied', async () => {
+    const w = mountEdit({ max_locks_per_user_setting: 5 }, 5)
+    expect((limit(w).element as HTMLInputElement).value).toBe('5')
+    await limit(w).setValue('')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0][0]).toMatchObject({
+      max_locks_per_user: null,
+    })
+    expect(limit(w).attributes('placeholder')).toBe('Server default (5)')
+  })
+
+  it('is read-only with a note and sends no limit while the policy file sets it', async () => {
+    const w = mountEdit({ max_locks_per_user_setting: 5, max_locks_set_by_policy: true }, 3)
+    expect((limit(w).element as HTMLInputElement).value).toBe('3')
+    expect(limit(w).attributes('readonly')).toBeDefined()
+    expect(w.text()).toContain('.pyn/pyn.toml')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0][0]).not.toHaveProperty('max_locks_per_user')
+  })
+
+  it('parses lock limits', () => {
+    expect(parseLockLimit('7')).toBe(7)
+    expect(parseLockLimit('')).toBeNull()
+    expect(parseLockLimit(null)).toBeNull()
+    expect(parseLockLimit('1.5')).toBeNaN()
+  })
+})
+
+describe('PynRepoDelete', () => {
+  it('stays disabled until the full name is typed', async () => {
+    const w = mount(PynRepoDelete, { props: { slug: 'alice/game' } })
+    expect(w.find('button').attributes('disabled')).toBeDefined()
+    await w.find('input').setValue('alice/game')
+    expect(w.find('button').attributes('disabled')).toBeUndefined()
+    await w.find('form').trigger('submit')
+    expect(w.emitted('remove')).toHaveLength(1)
+  })
+})
+
+describe('PynLocks', () => {
+  const locks = [
+    {
+      path: 'a.umap',
+      owner: 'bob',
+      acquired_at: '',
+      expires_at: '2026-10-08T15:00:00Z',
+    },
+  ]
+
+  it('hides force unlock without the permission', () => {
+    const w = mount(PynLocks, { props: { locks, now } })
+    expect(w.text()).toContain('bob')
+    expect(w.text()).toContain('3h 0m')
+    expect(w.text()).not.toContain('Force unlock')
+  })
+
+  it('asks for a reason before emitting', async () => {
+    const w = mount(PynLocks, { props: { locks, now, canForce: true } })
+    await w.find('button').trigger('click')
+    await w.find('input').setValue('  left the studio ')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('forceUnlock')?.[0]).toEqual([{ path: 'a.umap', reason: 'left the studio' }])
+  })
+
+  it('says when nothing is held', () => {
+    expect(mount(PynLocks, { props: { locks: [], now } }).text()).toContain('No locks are held')
+  })
+})
+
+describe('PynAudit', () => {
+  const entries = [
+    {
+      id: 1,
+      at: '2026-10-08T11:00:00Z',
+      actor: 'alice',
+      hash: 'a'.repeat(64),
+      action: 'repo_created',
+      detail: 'alice/game',
+    },
+  ]
+
+  it('shows the repository audit actions and emits the filter and load-more', async () => {
+    const w = mount(PynAudit, {
+      props: {
+        entries,
+        filter: { path: '', actor: '', action: '' },
+        hasMore: true,
+      },
+    })
+    expect(w.text()).toContain('repo_created')
+    expect(w.findAll('option').map((o) => o.text())).toEqual(
+      expect.arrayContaining(['repo_created', 'repo_updated', 'repo_deleted']),
+    )
+    await w.find('select').setValue('repo_updated')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('filter')?.[0]).toEqual([{ path: '', actor: '', action: 'repo_updated' }])
+    await w
+      .findAll('button')
+      .find((b) => b.text().startsWith('Load older'))!
+      .trigger('click')
+    expect(w.emitted('more')).toHaveLength(1)
+  })
+
+  it('hides the filter form when plain', () => {
+    const w = mount(PynAudit, { props: { entries, plain: true } })
+    expect(w.find('form').exists()).toBe(false)
+    expect(w.text()).toContain('Oct 08 2026')
+  })
+})
+
+describe('PynMembers', () => {
+  const grantees = [
+    { name: 'bob', role: 'writer', source: 'direct' as const },
+    { name: 'carol', role: 'admin', source: 'org_owner' as const },
+    { name: 'dave', role: 'reader', source: 'team' as const },
+  ]
+  const roles = ['reader', 'writer']
+
+  it('emits a role change for a direct grant only and explains the others', async () => {
+    const w = mount(PynMembers, { props: { grantees, roles } })
+    expect(w.findAll('select')).toHaveLength(1)
+    await w.find('select').setValue('reader')
+    expect(w.emitted('setRole')?.[0]).toEqual([{ name: 'bob', role: 'reader' }])
+    expect(w.findAll('[data-role]').map((e) => e.text())).toEqual(['admin', 'reader'])
+    const notes = w.findAll('[data-source]').map((e) => e.text())
+    expect(notes[0]).toContain('owning the organization')
+    expect(notes[1]).toContain('team')
+  })
+
+  it('revokes team grants and links the team', async () => {
+    const w = mount(PynMembers, {
+      props: {
+        grantees: teamGrantees('studio', repoTeams),
+        roles,
+        kind: 'team',
+        revocable: true,
+      },
+    })
+    expect(w.find('a').attributes('href')).toBe('/studio/-/teams/artists')
+    await w.find('button').trigger('click')
+    expect(w.emitted('revoke')?.[0]).toEqual(['artists'])
+    expect(
+      mount(PynMembers, {
+        props: { grantees: [], roles, kind: 'team' },
+      }).text(),
+    ).toBe('No teams.')
+  })
+})
+
+describe('team state', () => {
+  it('derives rows and decides what can be edited', () => {
+    expect(personGrantees([{ user: 'bob', role: 'writer', source: 'team' }])[0]).toEqual({
+      name: 'bob',
+      role: 'writer',
+      source: 'team',
+    })
+    expect(isEditable({ name: 'a', role: 'r' })).toBe(true)
+    expect(isEditable({ name: 'a', role: 'r', source: 'direct' })).toBe(true)
+    expect(isEditable({ name: 'a', role: 'r', source: 'team' })).toBe(false)
+    expect(sourceNote('direct')).toBe('')
+    expect(sourceNote(undefined)).toBe('')
+  })
+
+  it('lists candidates and ungranted teams and splits a repository address', () => {
+    expect(teamCandidates(['carol', 'alice', 'bob'], ['bob'])).toEqual(['alice', 'carol'])
+    expect(ungrantedTeams([{ slug: 'artists' }, { slug: 'devs' }], repoTeams)).toEqual(['devs'])
+    expect(splitRepo('studio/core/engine')).toEqual({
+      owner: 'studio',
+      name: 'core/engine',
+    })
+    expect(teamPath('studio')).toBe('/studio/-/teams')
+  })
+})
+
+describe('PynAddPerson', () => {
+  it('emits a new person and clears the form', async () => {
+    const w = mount(PynAddPerson, { props: { roles: ['reader', 'writer'] } })
+    const inputs = w.findAll('input')
+    await inputs[0].setValue('wendy')
+    await inputs[1].setValue('a long password')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('addUser')?.[0]).toEqual([
+      { username: 'wendy', password: 'a long password', role: 'reader' },
+    ])
+    expect((inputs[0].element as HTMLInputElement).value).toBe('')
+  })
+})
+
+describe('PynRoles', () => {
+  const grants = [{ role: 'reader', permissions: ['read'] }]
+
+  it('emits the edited permissions', async () => {
+    const w = mount(PynRoles, { props: { grants, canEdit: true } })
+    await w.find('input[value=view_audit]').setValue(true)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('save')?.[0]).toEqual([
+      { role: 'reader', permissions: ['read', 'view_audit'] },
+    ])
+  })
+
+  it('is read only without manage_roles', () => {
+    const w = mount(PynRoles, { props: { grants } })
+    expect(w.find('input').attributes('disabled')).toBeDefined()
+    expect(w.find('button').exists()).toBe(false)
+  })
+})
+
+describe('PynInvites', () => {
+  const invites = [
+    {
+      id: 'i1',
+      role: 'writer',
+      created_by: 'alice',
+      created_at: '',
+      expires_at: '2026-10-11T09:00:00Z',
+    },
+    {
+      id: 'i2',
+      role: 'reader',
+      created_by: 'alice',
+      created_at: '',
+      expires_at: '',
+      used_by: 'wendy',
+    },
+  ]
+
+  it('shows the one-time code, revokes only open invitations and creates', async () => {
+    const w = mount(PynInvites, {
+      props: { invites, roles: ['reader', 'writer'], code: 'pyni_x' },
+    })
+    expect(w.find('[role=status]').text()).toContain('pyni_x')
+    expect(w.text()).toContain('used by wendy')
+    const revoke = w.findAll('button').filter((b) => b.text() === 'Revoke')
+    expect(revoke).toHaveLength(1)
+    await revoke[0].trigger('click')
+    expect(w.emitted('revoke')?.[0]).toEqual(['i1'])
+    await w.find('input[type=number]').setValue('24')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('create')?.[0]).toEqual([{ role: 'reader', hours: 24 }])
+  })
+})
+
+describe('PynMyLocks', () => {
+  const mine = [
+    {
+      owner: 'alice',
+      name: 'game',
+      path: 'a.umap',
+      acquired_at: '',
+      expires_at: '2026-10-08T15:00:00Z',
+    },
+    {
+      owner: 'bob',
+      name: 'tools',
+      path: 'b.psd',
+      acquired_at: '',
+      expires_at: '2026-10-08T12:20:00Z',
+    },
+  ]
+
+  it('shows repository, path, time left and the full expiry on hover', () => {
+    const w = mount(PynMyLocks, { props: { locks: mine, now } })
+    expect(w.text()).toContain('alice/game')
+    expect(w.text()).toContain('a.umap')
+    expect(w.text()).toContain('3h 0m')
+    expect(w.find('[title^="Expires"]').attributes('title')).toContain('Oct 08 2026')
+    expect(w.find('a').attributes('href')).toBe('/alice/game')
+  })
+
+  it('emits release for one lock', async () => {
+    const w = mount(PynMyLocks, { props: { locks: mine, now } })
+    await w.findAll('li button')[1].trigger('click')
+    expect(w.emitted('release')?.[0]).toEqual([mine[1]])
+  })
+
+  it('asks before releasing all and can be cancelled', async () => {
+    const w = mount(PynMyLocks, { props: { locks: mine, now } })
+    await w.find('button').trigger('click')
+    expect(w.emitted('releaseAll')).toBeUndefined()
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Cancel')!
+      .trigger('click')
+    await w.find('button').trigger('click')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('releaseAll')).toHaveLength(1)
+  })
+
+  it('shows a per-lock failure and the empty state', () => {
+    const failures = [{ lock: mine[0], message: 'denied' }]
+    const w = mount(PynMyLocks, { props: { locks: mine, failures, now } })
+    expect(w.findAll('[role="alert"]').map((a) => a.text())).toEqual(['denied'])
+    expect(mount(PynMyLocks, { props: { locks: [] } }).text()).toContain('You hold no locks')
+    expect(myLockKey(mine[0])).toBe('alice/game:a.umap')
   })
 })

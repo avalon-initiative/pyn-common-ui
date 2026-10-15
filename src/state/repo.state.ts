@@ -1,3 +1,31 @@
+export const PERMISSIONS = [
+  'read',
+  'lock',
+  'checkin',
+  'restore',
+  'force_unlock',
+  'edit_policy',
+  'manage_users',
+  'manage_roles',
+  'view_audit',
+] as const
+
+export const AUDIT_ACTIONS = [
+  'checkout',
+  'release',
+  'checkin',
+  'restore',
+  'force_unlock',
+  'member_added',
+  'role_changed',
+  'role_permissions_changed',
+  'token_created',
+  'token_revoked',
+  'repo_created',
+  'repo_updated',
+  'repo_deleted',
+] as const
+
 export const repoSlug = (r: { owner: string; name: string }) => `${r.owner}/${r.name}`
 
 /** The app route of a repository page; `section` is empty for the files page. */
@@ -25,4 +53,14 @@ export function repoTabs(permissions: string[], isOwner: boolean): RepoTab[] {
   if (has('manage_users')) tabs.push({ section: 'invites', label: 'Invites' })
   if (isOwner && has('manage_roles')) tabs.push({ section: 'settings', label: 'Settings' })
   return tabs
+}
+
+export const MAX_LOCKS_MIN = 1
+export const MAX_LOCKS_MAX = 10000
+
+/** A lock-limit input as a number; null when empty, NaN when not a whole number. */
+export function parseLockLimit(text: string | number | null): number | null {
+  const t = String(text ?? '').trim()
+  if (t === '') return null
+  return /^\d+$/.test(t) ? Number(t) : NaN
 }
