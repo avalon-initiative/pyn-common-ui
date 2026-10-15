@@ -1,0 +1,6 @@
+@use 'mixins' as m;
+
+.summary {
+  @include m.muted;
+  margin: var(--pyn-space-1) 0 var(--pyn-space-4);
+}

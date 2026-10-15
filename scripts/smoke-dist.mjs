@@ -38,6 +38,13 @@ const orgHeader = await renderToString(
 )
 if (!orgHeader.includes('studio')) throw new Error(`PynOrgHeader did not render: ${orgHeader}`)
 if (built.repoTabs(['read'], false).length !== 3) throw new Error('repoTabs did not run from dist')
+const viewHeader = await renderToString(
+  createSSRApp({ render: () => h(built.PynViewHeader, { title: 'Repositories' }, { default: () => h(built.PynViewAction, { href: '/_/new', primary: true }, { default: () => 'New' }) }) }),
+)
+if (!viewHeader.includes('Repositories') || !viewHeader.includes('href="/_/new"')) throw new Error(`PynViewHeader did not render: ${viewHeader}`)
+for (const name of ['PynViewError', 'PynViewGroup', 'PynViewStack', 'PynViewSummary']) {
+  if (!built[name]) throw new Error(`${name} is not exported from dist`)
+}
 
 const tree = await renderToString(
   createSSRApp({
