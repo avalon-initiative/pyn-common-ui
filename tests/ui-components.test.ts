@@ -26,7 +26,12 @@ import {
   PynMenu,
   PynModeChip,
   PynMyLocks,
+  PynOrgDelete,
+  PynOrgForm,
   PynOrgHeader,
+  PynOrgList,
+  PynOrgMembers,
+  PynOrgRepoPolicy,
   PynPageNotFound,
   PynReadme,
   PynRepoDelete,
@@ -42,10 +47,16 @@ import {
   PynSearch,
   PynShell,
   PynSideNav,
+  PynTeamDelete,
+  PynTeamDetail,
+  PynTeamForm,
+  PynTeamGrant,
+  PynTeamList,
   PynTopBar,
   PynTree,
   blobPath,
   breadcrumbs,
+  canRemove,
   clickLine,
   contentUrl,
   entryAt,
@@ -55,21 +66,27 @@ import {
   folderParam,
   formatAgo,
   groupByTopLevel,
+  hasRule,
   highlightLines,
   historyLink,
   isEditable,
+  isOrgOwner,
   languageFor,
   lineHash,
   mainNav,
   matchRepos,
   myLockKey,
   parseLineHash,
+  orgTabs,
+  ownerChoices,
   parseLockLimit,
   personGrantees,
   readmeEntry,
   renderMarkdown,
   repoTabs,
   resolveRelative,
+  ruleSubjects,
+  sortOrgs,
   sourceNote,
   splitPath,
   splitRepo,
@@ -80,7 +97,7 @@ import {
   ungrantedTeams,
 } from '../src'
 import { codeText, fileEntry, imageSrc, lockedEntry, readmeText } from '../src/stories/file-data'
-import { repoTeams } from '../src/stories/org-data'
+import { orgMembers, orgs, repoPolicy, repoTeams, teams } from '../src/stories/org-data'
 import { folderListing, repo, rootEntries, rootListing, summary } from '../src/stories/landing-data'
 
 
@@ -1357,5 +1374,248 @@ describe('PynMyLocks', () => {
     expect(w.findAll('[role="alert"]').map((a) => a.text())).toEqual(['denied'])
     expect(mount(PynMyLocks, { props: { locks: [] } }).text()).toContain('You hold no locks')
     expect(myLockKey(mine[0])).toBe('alice/game:a.umap')
+  })
+})
+
+describe('organization helpers', () => {
+  it('orders organizations, picks owners and checks roles', () => {
+    expect(sortOrgs(orgs).map((o) => o.name)).toEqual(['modding-club', 'studio'])
+    expect(ownerChoices('alice', orgs)).toEqual(['alice', 'modding-club', 'studio'])
+    expect(isOrgOwner(orgs[0])).toBe(true)
+    expect(isOrgOwner(orgs[1])).toBe(false)
+    expect(orgTabs('member').map((t) => t.section)).toEqual(['', 'members', 'teams'])
+    expect(canRemove(orgMembers[1], 'bob', false)).toBe(true)
+    expect(canRemove(orgMembers[1], 'carol', false)).toBe(false)
+  })
+
+  it('offers rule subjects and spots an existing rule', () => {
+    expect(ruleSubjects('role', 'deny', [], [])).toEqual(['member'])
+    expect(ruleSubjects('role', 'allow', [], [])).toEqual(['member', 'owner'])
+    expect(ruleSubjects('team', 'allow', ['qa'], ['bob'])).toEqual(['qa'])
+    expect(hasRule(repoPolicy.rules, { effect: 'deny', kind: 'user', subject: 'carol' })).toBe(true)
+    expect(hasRule(repoPolicy.rules, { effect: 'allow', kind: 'user', subject: 'carol' })).toBe(
+      false,
+    )
+  })
+})
+
+describe('PynOrgForm', () => {
+  it('emits the trimmed name and shows an error', async () => {
+    const w = mount(PynOrgForm, { props: { error: 'taken' } })
+    await w.find('input').setValue(' studio ')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0]).toEqual(['studio'])
+    expect(w.find('[role=alert]').text()).toBe('taken')
+  })
+})
+
+describe('PynOrgList', () => {
+  it('links each organization with its role and date', () => {
+    const w = mount(PynOrgList, { props: { orgs } })
+    expect(w.find('a').attributes('href')).toBe('/studio')
+    expect(w.find('[data-role]').text()).toBe('owner')
+    expect(w.text()).toContain('Sep 02 2026')
+  })
+
+  it('offers to create one when empty', () => {
+    expect(
+      mount(PynOrgList, { props: { orgs: [] } })
+        .find('a')
+        .attributes('href'),
+    ).toBe('/_/new-org')
+  })
+})
+
+describe('PynOrgMembers', () => {
+  const props = { members: orgMembers, self: 'alice', owner: true }
+  const buttons = (w: ReturnType<typeof mount>, text: string) =>
+    w.findAll('button').filter((b) => b.text().startsWith(text))
+
+  it('lets an owner add a member with a role', async () => {
+    const w = mount(PynOrgMembers, { props })
+    const form = w.findAll('form').at(-1)!
+    await form.find('input').setValue(' dave ')
+    await form.find('select').setValue('owner')
+    await form.trigger('submit')
+    expect(w.emitted('add')?.[0]).toEqual([{ user: 'dave', role: 'owner' }])
+  })
+
+  it('emits a role change', async () => {
+    const w = mount(PynOrgMembers, { props })
+    await w.find('select[aria-label="Role of bob"]').setValue('owner')
+    expect(w.emitted('setRole')?.[0]).toEqual([{ user: 'bob', role: 'owner' }])
+  })
+
+  it('confirms before removing and before leaving', async () => {
+    const w = mount(PynOrgMembers, { props })
+    await buttons(w, 'Remove')[0].trigger('click')
+    expect(w.emitted('remove')).toBeUndefined()
+    await w.find('form').trigger('submit')
+    expect(w.emitted('remove')?.[0]).toEqual(['bob'])
+  })
+
+  it('gives a plain member only a Leave button on their own row', () => {
+    const w = mount(PynOrgMembers, { props: { ...props, self: 'bob', owner: false } })
+    expect(w.findAll('select')).toHaveLength(0)
+    expect(w.findAll('button').map((b) => b.text())).toEqual(['Leave'])
+    expect(w.text()).not.toContain('Add an existing account')
+  })
+
+  it('shows the server error', () => {
+    const w = mount(PynOrgMembers, { props: { ...props, error: 'last owner' } })
+    expect(w.find('[role=alert]').text()).toBe('last owner')
+  })
+})
+
+describe('PynOrgDelete', () => {
+  it('enables deletion only once the name is typed', async () => {
+    const w = mount(PynOrgDelete, { props: { name: 'studio' } })
+    const button = w.find('button')
+    expect(button.attributes('disabled')).toBeDefined()
+    await w.find('input').setValue('studio')
+    expect(button.attributes('disabled')).toBeUndefined()
+    await w.find('form').trigger('submit')
+    expect(w.emitted('remove')).toHaveLength(1)
+  })
+})
+
+describe('PynOrgRepoPolicy', () => {
+  const props = { policy: repoPolicy, teams: teams.map((t) => t.slug), members: ['bob', 'carol'] }
+
+  it('lists rules with effect, kind, subject and scope', () => {
+    const w = mount(PynOrgRepoPolicy, { props })
+    expect(w.findAll('li')).toHaveLength(3)
+    expect(w.findAll('li')[1].text()).toContain('deny')
+    expect(w.findAll('li')[1].text()).toContain('carol')
+    expect(
+      (w.find('select[aria-label="Scope of deny user carol"]').element as HTMLSelectElement).value,
+    ).toBe('public')
+  })
+
+  it('emits the base setting, a scope change and a removal', async () => {
+    const w = mount(PynOrgRepoPolicy, { props })
+    await w.find('select').setValue('both')
+    expect(w.emitted('setBase')?.[0]).toEqual(['both'])
+    await w.find('select[aria-label="Scope of deny user carol"]').setValue('both')
+    expect(w.emitted('setRule')?.[0]).toEqual([
+      { rule: { effect: 'deny', kind: 'user', subject: 'carol', scope: 'public' }, scope: 'both' },
+    ])
+    await w.find('button[aria-label="Remove deny user carol"]').trigger('click')
+    expect(w.emitted('removeRule')?.[0]).toEqual([
+      { effect: 'deny', kind: 'user', subject: 'carol', scope: 'public' },
+    ])
+  })
+
+  it('adds a rule from the form and hides owner for deny', async () => {
+    const w = mount(PynOrgRepoPolicy, { props })
+    const form = w.find('form')
+    const [effect, kind, subject, scope] = form.findAll('select')
+    await kind.setValue('user')
+    await subject.setValue('bob')
+    await scope.setValue('private')
+    await form.trigger('submit')
+    expect(w.emitted('setRule')?.[0]).toEqual([
+      { rule: { effect: 'allow', kind: 'user', subject: 'bob' }, scope: 'private' },
+    ])
+    await effect.setValue('deny')
+    await kind.setValue('role')
+    expect(subject.findAll('option').map((o) => o.text())).toEqual(['Choose a role', 'member'])
+  })
+
+  it('shows the error', () => {
+    const w = mount(PynOrgRepoPolicy, { props: { ...props, error: 'nope' } })
+    expect(w.find('[role=alert]').text()).toBe('nope')
+  })
+})
+
+describe('PynTeamList', () => {
+  it('links each team with counts and the created date', () => {
+    const w = mount(PynTeamList, { props: { org: 'studio', teams } })
+    expect(w.find('a').attributes('href')).toBe('/studio/-/teams/artists')
+    expect(w.find('[data-members]').text()).toBe('2 members')
+    expect(w.find('[data-repos]').text()).toBe('2 repositories')
+    expect(w.text()).toContain('Sep 10 2026')
+  })
+
+  it('has an empty state', () => {
+    expect(mount(PynTeamList, { props: { org: 'studio', teams: [] } }).text()).toContain('no teams')
+  })
+})
+
+describe('PynTeamForm', () => {
+  it('emits the slug, name and description when creating', async () => {
+    const w = mount(PynTeamForm, { props: { error: 'taken' } })
+    await w.find('input').setValue(' qa ')
+    await w.find('textarea').setValue('testers')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0]).toEqual([{ slug: 'qa', name: '', description: 'testers' }])
+    expect(w.find('[role=alert]').text()).toBe('taken')
+  })
+
+  it('starts from the team when editing and has no slug field', async () => {
+    const w = mount(PynTeamForm, { props: { team: teams[0] } })
+    expect(w.findAll('input')).toHaveLength(1)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0]).toEqual([
+      { name: 'Artists', description: 'Texture and model work.' },
+    ])
+  })
+})
+
+describe('PynTeamDetail', () => {
+  const props = { team: teams[0], candidates: ['alice'], owner: true }
+
+  it('shows members and granted repositories with roles', () => {
+    const w = mount(PynTeamDetail, { props })
+    expect(w.find('[data-members]').text()).toContain('bob')
+    const links = w.findAll('[data-repos] a').map((a) => a.attributes('href'))
+    expect(links).toEqual(['/studio/game', '/studio/assets'])
+    expect(w.findAll('[data-role]').map((e) => e.text())).toEqual(['writer', 'maintainer'])
+  })
+
+  it('lets an owner add from the candidates and remove', async () => {
+    const w = mount(PynTeamDetail, { props })
+    await w.find('select').setValue('alice')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('add')?.[0]).toEqual(['alice'])
+    await w.find('button[aria-label="Remove bob"]').trigger('click')
+    expect(w.emitted('remove')?.[0]).toEqual(['bob'])
+  })
+
+  it('is read only for a plain member', () => {
+    const w = mount(PynTeamDetail, { props: { ...props, owner: false } })
+    expect(w.find('form').exists()).toBe(false)
+    expect(w.findAll('button')).toHaveLength(0)
+  })
+})
+
+describe('PynTeamDelete', () => {
+  it('enables deletion only once the slug is typed', async () => {
+    const w = mount(PynTeamDelete, { props: { slug: 'qa' } })
+    const button = w.find('button')
+    expect(button.attributes('disabled')).toBeDefined()
+    await w.find('input').setValue('qa')
+    expect(button.attributes('disabled')).toBeUndefined()
+    await w.find('form').trigger('submit')
+    expect(w.emitted('remove')).toHaveLength(1)
+  })
+})
+
+describe('PynTeamGrant', () => {
+  it('emits the chosen team and role', async () => {
+    const w = mount(PynTeamGrant, {
+      props: { teams: ['qa', 'artists'], roles: ['reader', 'writer'] },
+    })
+    const [team, role] = w.findAll('select')
+    await team.setValue('artists')
+    await role.setValue('writer')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('grant')?.[0]).toEqual([{ name: 'artists', role: 'writer' }])
+  })
+
+  it('says so when every team has a role', () => {
+    const w = mount(PynTeamGrant, { props: { teams: [], roles: ['reader'] } })
+    expect(w.find('button').exists()).toBe(false)
+    expect(w.text()).toContain('already has a role')
   })
 })
