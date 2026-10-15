@@ -3,8 +3,8 @@ import { resolve } from 'node:path'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vitest/config'
 
-// Library build: one ES module with `vue` left external and every component's
-// CSS Module extracted into a single dist/style.css.
+// Library build: one ES module with `vue` and the runtime dependencies left
+// external and every component's CSS Module extracted into a single dist/style.css.
 export default defineConfig({
   plugins: [vue()],
   css: {
@@ -19,7 +19,7 @@ export default defineConfig({
     },
     cssCodeSplit: false,
     sourcemap: true,
-    rollupOptions: { external: ['vue'] },
+    rollupOptions: { external: ['vue', /^(dompurify|highlight\.js|marked)(\/|$)/] },
   },
   test: {
     environment: 'jsdom',
