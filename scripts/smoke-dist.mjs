@@ -39,6 +39,23 @@ const orgHeader = await renderToString(
 if (!orgHeader.includes('studio')) throw new Error(`PynOrgHeader did not render: ${orgHeader}`)
 if (built.repoTabs(['read'], false).length !== 3) throw new Error('repoTabs did not run from dist')
 
+const tree = await renderToString(
+  createSSRApp({
+    render: () =>
+      h(built.PynTree, {
+        owner: 'a',
+        name: 'b',
+        entries: [{ kind: 'file', name: 'x.ts', path: 'src/x.ts', mode: 'shared' }],
+      }),
+  }),
+)
+if (!tree.includes('/a/b/blob/src/x.ts')) throw new Error(`PynTree did not render: ${tree}`)
+// renderMarkdown needs a DOM (DOMPurify), so node only checks the code highlighter.
+if (!built.highlight('const a = 1', 'javascript').includes('hljs-keyword')) throw new Error('highlight did not run from dist')
+if (built.parseLineHash('#L3-L1').start !== 1) throw new Error('parseLineHash did not run from dist')
+const code = await renderToString(createSSRApp({ render: () => h(built.PynCodeView, { text: 'a\nb', language: null }) }))
+if (!code.includes('id="L2"')) throw new Error(`PynCodeView did not render: ${code}`)
+
 const targets = Object.values(pkg.exports).flatMap((v) => (typeof v === 'string' ? [v] : Object.values(v)))
 const absent = targets.filter((t) => !existsSync(t))
 if (absent.length > 0) throw new Error(`package.json exports point at missing files: ${absent.join(', ')}`)

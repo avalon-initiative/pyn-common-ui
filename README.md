@@ -69,7 +69,7 @@ Conventions:
 - `src/components/` holds only `.vue` files; `src/styles/` holds only
   `.module.scss` (CSS Modules, one per component, bound with `:class`), the
   plain `tokens.css` and `global.css`, and `_mixins.scss` (library-internal,
-  pulled in with `@use 'mixins' as m;` and never shipped on its own); `src/stories/` holds `.stories.ts`;
+  pulled in with `@use 'mixins' as m;` and never shipped on its own); `src/stories/` holds `.stories.ts` and the shared `*-data.ts` fixtures they use;
   `src/types/` holds `*.types.ts`; `src/state/` holds extracted script logic
   that is not markup; `src/utils/` holds pure helpers.
 - Components are named `Pyn<Name>`.
@@ -135,7 +135,7 @@ Published versions are immutable; ship a fix as a new version.
 
 ## Components
 
-`PynButton` is the seed component; the rest arrive from the pyn web UI. Received so far: the primitives (`PynIcon`, `PynLockIcon`, `PynModeChip`, `PynLockBadge`, `PynMenu`, `PynSearch`, `PynBreadcrumb`, `PynPageNotFound`, `PynRepoNotFound`, `PynAccountNotice`, `PynResendForm`).
+`PynButton` is the seed component; the rest arrive from the pyn web UI. Received so far: the primitives (`PynIcon`, `PynLockIcon`, `PynModeChip`, `PynLockBadge`, `PynMenu`, `PynSearch`, `PynBreadcrumb`, `PynPageNotFound`, `PynRepoNotFound`, `PynAccountNotice`, `PynResendForm`), the shell and headers, and the files and content views (`PynTree`, `PynFileList`, `PynFileBar`, `PynFileView`, `PynCodeView`, `PynMarkdown`, `PynReadme`, `PynHistory`, `PynActivity`, `PynLockedFiles`, `PynRepoLanding`, `PynRepoDetails`, `PynCheckoutCard`) with the markdown, code and line-range helpers. Markdown and code rendering use `marked`, `dompurify` and `highlight.js`, installed with the package.
 
 ## License
 
