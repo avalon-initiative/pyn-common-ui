@@ -55,6 +55,9 @@ export { default as PynVerifyEmail } from './components/PynVerifyEmail.vue'
 export { default as PynAccountSettings } from './components/PynAccountSettings.vue'
 export { default as PynKeys } from './components/PynKeys.vue'
 export { default as PynAccounts } from './components/PynAccounts.vue'
+export { default as PynIdentities } from './components/PynIdentities.vue'
+export { default as PynTokens } from './components/PynTokens.vue'
+export { default as PynSetup } from './components/PynSetup.vue'
 export { default as PynViewAction } from './components/PynViewAction.vue'
 export { default as PynViewError } from './components/PynViewError.vue'
 export { default as PynViewGroup } from './components/PynViewGroup.vue'
@@ -74,13 +77,20 @@ export type { MenuItem } from './types/shell.types'
 export type {
   AccountStatus,
   BlockedStatus,
+  ExternalIdentity,
   ExternalProvider,
   RegisterForm,
   RegistrationMode,
+  SetupForm,
+  SetupStatus,
   SignInForm,
   SshKey,
   VerifyOutcome,
 } from './types/auth.types'
+export type { CreatedToken, TokenForm, TokenInfo } from './types/token.types'
+export { TOKEN_PERMISSIONS, expiryFromDate, parseRepos } from './state/token.state'
+export { REGISTRATION_LABELS, SETUP_STEPS, stepComplete } from './state/setup.state'
+export type { SetupStep } from './state/setup.state'
 export type { AccountInfo, AdminAccountStatus, DisableRequest } from './types/admin.types'
 export {
   STATUS_FILTERS,
