@@ -30,6 +30,16 @@ export { default as PynLockedFiles } from './components/PynLockedFiles.vue'
 export { default as PynRepoLanding } from './components/PynRepoLanding.vue'
 export { default as PynRepoDetails } from './components/PynRepoDetails.vue'
 export { default as PynCheckoutCard } from './components/PynCheckoutCard.vue'
+export { default as PynRepoForm } from './components/PynRepoForm.vue'
+export { default as PynRepoList } from './components/PynRepoList.vue'
+export { default as PynRepoDelete } from './components/PynRepoDelete.vue'
+export { default as PynMembers } from './components/PynMembers.vue'
+export { default as PynAddPerson } from './components/PynAddPerson.vue'
+export { default as PynRoles } from './components/PynRoles.vue'
+export { default as PynInvites } from './components/PynInvites.vue'
+export { default as PynAudit } from './components/PynAudit.vue'
+export { default as PynLocks } from './components/PynLocks.vue'
+export { default as PynMyLocks } from './components/PynMyLocks.vue'
 export type { PynButtonProps, PynButtonVariant } from './types/PynButton.types'
 export { applyTheme, loadTheme, saveTheme, themeChoices } from './state/theme.state'
 export type { ThemeChoice } from './state/theme.state'
@@ -45,7 +55,16 @@ export type { OrgRef, OrgRole } from './types/org.types'
 export type { RepoRef, Visibility } from './types/repo.types'
 export { mainNav, matchRepos, navItems } from './state/shell.state'
 export type { NavItem } from './state/shell.state'
-export { repoPath, repoSlug, repoTabs } from './state/repo.state'
+export {
+  AUDIT_ACTIONS,
+  MAX_LOCKS_MAX,
+  MAX_LOCKS_MIN,
+  PERMISSIONS,
+  parseLockLimit,
+  repoPath,
+  repoSlug,
+  repoTabs,
+} from './state/repo.state'
 export type { RepoTab } from './state/repo.state'
 export { orgPath, orgTabs } from './state/org.state'
 export type { OrgTab } from './state/org.state'
@@ -86,5 +105,28 @@ export type {
   TreeEntryKind,
   TreeListing,
 } from './types/tree.types'
-export type { FileRow, Mode } from './types/lock.types'
-export type { RepoInfo, Revision } from './types/repo.types'
+export {
+  isEditable,
+  personGrantees,
+  sourceNote,
+  splitRepo,
+  teamCandidates,
+  teamGrantees,
+  teamPath,
+  ungrantedTeams,
+} from './state/team.state'
+export { myLockKey } from './state/my-locks.state'
+export type { FileRow, Mode, MyLock, ReleaseFailure } from './types/lock.types'
+export type { Grantee, MemberSource, RepoTeam } from './types/team.types'
+export type {
+  AuditEntry,
+  AuditFilter,
+  InviteInfo,
+  Member,
+  NewUser,
+  RepoFormValue,
+  RepoInfo,
+  RepoSettings,
+  Revision,
+  RoleGrant,
+} from './types/repo.types'

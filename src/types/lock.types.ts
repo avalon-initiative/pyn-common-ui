@@ -18,3 +18,18 @@ export interface FileRow {
   revision?: number | null
   lock?: LockInfo | null
 }
+
+/** A lock the signed-in user holds; `owner` and `name` identify the repository. */
+export interface MyLock {
+  owner: string
+  name: string
+  path: string
+  acquired_at: string
+  expires_at: string
+}
+
+/** A lock that could not be released, with the reason shown beside it. */
+export interface ReleaseFailure {
+  lock: MyLock
+  message: string
+}

@@ -56,6 +56,21 @@ if (built.parseLineHash('#L3-L1').start !== 1) throw new Error('parseLineHash di
 const code = await renderToString(createSSRApp({ render: () => h(built.PynCodeView, { text: 'a\nb', language: null }) }))
 if (!code.includes('id="L2"')) throw new Error(`PynCodeView did not render: ${code}`)
 
+const members = await renderToString(
+  createSSRApp({
+    render: () =>
+      h(built.PynMembers, {
+        grantees: built.teamGrantees('studio', [{ slug: 'artists', name: 'Artists', description: '', role: 'writer' }]),
+        roles: ['reader'],
+        kind: 'team',
+      }),
+  }),
+)
+if (!members.includes('/studio/-/teams/artists')) throw new Error(`PynMembers did not render: ${members}`)
+const locks = await renderToString(createSSRApp({ render: () => h(built.PynMyLocks, { locks: [] }) }))
+if (!locks.includes('You hold no locks')) throw new Error(`PynMyLocks did not render: ${locks}`)
+if (built.parseLockLimit('7') !== 7) throw new Error('parseLockLimit did not run from dist')
+
 const targets = Object.values(pkg.exports).flatMap((v) => (typeof v === 'string' ? [v] : Object.values(v)))
 const absent = targets.filter((t) => !existsSync(t))
 if (absent.length > 0) throw new Error(`package.json exports point at missing files: ${absent.join(', ')}`)
