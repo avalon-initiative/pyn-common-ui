@@ -50,6 +50,11 @@ export { default as PynTeamForm } from './components/PynTeamForm.vue'
 export { default as PynTeamDetail } from './components/PynTeamDetail.vue'
 export { default as PynTeamDelete } from './components/PynTeamDelete.vue'
 export { default as PynTeamGrant } from './components/PynTeamGrant.vue'
+export { default as PynSignIn } from './components/PynSignIn.vue'
+export { default as PynVerifyEmail } from './components/PynVerifyEmail.vue'
+export { default as PynAccountSettings } from './components/PynAccountSettings.vue'
+export { default as PynKeys } from './components/PynKeys.vue'
+export { default as PynAccounts } from './components/PynAccounts.vue'
 export { default as PynViewAction } from './components/PynViewAction.vue'
 export { default as PynViewError } from './components/PynViewError.vue'
 export { default as PynViewGroup } from './components/PynViewGroup.vue'
@@ -66,7 +71,25 @@ export { EXPIRING_SOON_MS, formatLease, lockState } from './utils/lease'
 export type { LockInfo, LockState } from './types/lock.types'
 export type { Crumb, TreeMode } from './types/tree.types'
 export type { MenuItem } from './types/shell.types'
-export type { BlockedStatus } from './types/auth.types'
+export type {
+  AccountStatus,
+  BlockedStatus,
+  ExternalProvider,
+  RegisterForm,
+  RegistrationMode,
+  SignInForm,
+  SshKey,
+  VerifyOutcome,
+} from './types/auth.types'
+export type { AccountInfo, AdminAccountStatus, DisableRequest } from './types/admin.types'
+export {
+  STATUS_FILTERS,
+  accountActions,
+  applyUpdate,
+  disabledNote,
+  statusLabel,
+} from './state/admin.state'
+export type { AccountAction } from './state/admin.state'
 export type {
   CreationRule,
   MemberCreation,
@@ -82,7 +105,7 @@ export type {
   RuleScope,
 } from './types/org.types'
 export type { RepoRef, Visibility } from './types/repo.types'
-export { mainNav, matchRepos, navItems } from './state/shell.state'
+export { accountNav, accountNavItems, mainNav, matchRepos, navItems } from './state/shell.state'
 export type { NavItem } from './state/shell.state'
 export {
   AUDIT_ACTIONS,
@@ -112,7 +135,12 @@ export {
   sortOrgs,
 } from './state/org.state'
 export type { OrgTab } from './state/org.state'
-export { NOTICE_TEXT, NOTICE_TITLES } from './state/account.state'
+export {
+  NOTICE_TEXT,
+  NOTICE_TITLES,
+  externalSignInUrl,
+  signInErrorMessage,
+} from './state/account.state'
 export { splitPath, groupByTopLevel } from './state/files.state'
 export { activityVerb, breadcrumbs, encodeSegments, folderParam, treePath } from './state/tree.state'
 export {

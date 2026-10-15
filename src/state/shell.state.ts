@@ -21,6 +21,21 @@ const adminNav: NavItem = {
 /** The sidebar items; server administration shows only for administrators. */
 export const navItems = (admin: boolean): NavItem[] => (admin ? [...mainNav, adminNav] : mainNav)
 
+export const accountNav = [
+  { id: 'keys', label: 'SSH keys', href: '/_/settings/keys' },
+  { id: 'tokens', label: 'Access tokens', href: '/_/settings/tokens' },
+]
+
+const identitiesNav = {
+  id: 'identities',
+  label: 'Linked sign-in',
+  href: '/_/settings/identities',
+}
+
+/** The settings pages; linked sign-in shows only when the server offers a provider. */
+export const accountNavItems = (hasProvider: boolean) =>
+  hasProvider ? [...accountNav, identitiesNav] : accountNav
+
 /** Which repositories match what the user typed, by owner/name substring. */
 export function matchRepos(slugs: string[], query: string): string[] {
   const q = query.trim().toLowerCase()

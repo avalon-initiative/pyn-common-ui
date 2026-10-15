@@ -90,6 +90,13 @@ if (!teamList.includes('/studio/-/teams/qa')) throw new Error(`PynTeamList did n
 const orgList = await renderToString(createSSRApp({ render: () => h(built.PynOrgList, { orgs: [] }) }))
 if (!orgList.includes('not in any organization')) throw new Error(`PynOrgList did not render: ${orgList}`)
 if (built.ruleSubjects('role', 'deny', [], []).join() !== 'member') throw new Error('ruleSubjects did not run from dist')
+const signIn = await renderToString(createSSRApp({ render: () => h(built.PynSignIn, { registration: 'closed' }) }))
+if (!signIn.includes('Sign in')) throw new Error(`PynSignIn did not render: ${signIn}`)
+const keys = await renderToString(createSSRApp({ render: () => h(built.PynKeys, { keys: [] }) }))
+if (!keys.includes('No keys yet')) throw new Error(`PynKeys did not render: ${keys}`)
+const accounts = await renderToString(createSSRApp({ render: () => h(built.PynAccounts, { accounts: [], status: '', self: 'root' }) }))
+if (!accounts.includes('No accounts match')) throw new Error(`PynAccounts did not render: ${accounts}`)
+if (built.accountActions({ user: 'a', status: 'disabled' }, 'b').join() !== 'enable') throw new Error('accountActions did not run from dist')
 
 const targets = Object.values(pkg.exports).flatMap((v) => (typeof v === 'string' ? [v] : Object.values(v)))
 const absent = targets.filter((t) => !existsSync(t))

@@ -3,6 +3,8 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import {
   PynAccountNotice,
+  PynAccountSettings,
+  PynAccounts,
   PynActivity,
   PynAddPerson,
   PynAudit,
@@ -17,6 +19,7 @@ import {
   PynHistory,
   PynIcon,
   PynInvites,
+  PynKeys,
   PynLockBadge,
   PynLockIcon,
   PynLockedFiles,
@@ -46,6 +49,7 @@ import {
   PynRoles,
   PynSearch,
   PynShell,
+  PynSignIn,
   PynSideNav,
   PynTeamDelete,
   PynTeamDetail,
@@ -54,6 +58,11 @@ import {
   PynTeamList,
   PynTopBar,
   PynTree,
+  PynVerifyEmail,
+  accountActions,
+  accountNav,
+  accountNavItems,
+  applyUpdate,
   PynViewAction,
   PynViewError,
   PynViewGroup,
@@ -66,6 +75,7 @@ import {
   clickLine,
   contentUrl,
   entryAt,
+  externalSignInUrl,
   fileBody,
   fileCrumbs,
   fileKind,
@@ -92,6 +102,7 @@ import {
   repoTabs,
   resolveRelative,
   ruleSubjects,
+  signInErrorMessage,
   sortOrgs,
   sourceNote,
   splitPath,
@@ -102,6 +113,7 @@ import {
   treePath,
   ungrantedTeams,
 } from '../src'
+import { accounts } from '../src/stories/admin-data'
 import { codeText, fileEntry, imageSrc, lockedEntry, readmeText } from '../src/stories/file-data'
 import { orgMembers, orgs, repoPolicy, repoTeams, teams } from '../src/stories/org-data'
 import { folderListing, repo, rootEntries, rootListing, summary } from '../src/stories/landing-data'
@@ -1623,6 +1635,293 @@ describe('PynTeamGrant', () => {
     const w = mount(PynTeamGrant, { props: { teams: [], roles: ['reader'] } })
     expect(w.find('button').exists()).toBe(false)
     expect(w.text()).toContain('already has a role')
+  })
+})
+
+describe('PynSignIn', () => {
+  const fill = async (w: ReturnType<typeof mount>, values: string[]) => {
+    const inputs = w.findAll('input')
+    for (const [i, v] of values.entries()) await inputs[i].setValue(v)
+  }
+  const click = (w: ReturnType<typeof mount>, text: string) =>
+    w
+      .findAll('button')
+      .find((b) => b.text() === text)!
+      .trigger('click')
+
+  it('emits the user name and password when signing in', async () => {
+    const w = mount(PynSignIn, { props: { registration: 'invite' } })
+    await fill(w, ['alice', 'a long password'])
+    await w.find('form').trigger('submit')
+    expect(w.emitted('signIn')?.[0]).toEqual([{ username: 'alice', password: 'a long password' }])
+  })
+
+  it('offers an invitation field on invite-only servers and not on open ones', async () => {
+    const invite = mount(PynSignIn, { props: { registration: 'invite' } })
+    await click(invite, 'I have an invitation')
+    expect(invite.findAll('input')).toHaveLength(3)
+    await fill(invite, ['wendy', 'a long password', 'pyni_x'])
+    await invite.find('form').trigger('submit')
+    expect(invite.emitted('register')?.[0]).toEqual([
+      { username: 'wendy', password: 'a long password', invite: 'pyni_x' },
+    ])
+
+    const open = mount(PynSignIn, { props: { registration: 'open' } })
+    await click(open, 'Create an account')
+    expect(open.findAll('input')).toHaveLength(2)
+  })
+
+  it('hides registration on closed servers and offers no token entry', () => {
+    const w = mount(PynSignIn, { props: { registration: 'closed' } })
+    const labels = w.findAll('button').map((b) => b.text())
+    expect(labels).not.toContain('Create an account')
+    expect(labels).not.toContain('I have an invitation')
+    expect(labels.join(' ')).not.toMatch(/token/i)
+  })
+
+  it('shows an error', () => {
+    const w = mount(PynSignIn, {
+      props: { registration: null, error: 'wrong user name or password' },
+    })
+    expect(w.find('[role=alert]').text()).toContain('wrong user name')
+  })
+
+  it('asks for an email on open servers that verify addresses', async () => {
+    const w = mount(PynSignIn, {
+      props: { registration: 'open', emailVerification: true },
+    })
+    await click(w, 'Create an account')
+    expect(w.findAll('input')).toHaveLength(3)
+    await fill(w, ['wendy', 'a long password', 'w@example.com'])
+    await w.find('form').trigger('submit')
+    expect(w.emitted('register')?.[0]).toEqual([
+      {
+        username: 'wendy',
+        password: 'a long password',
+        email: 'w@example.com',
+        invite: undefined,
+      },
+    ])
+  })
+
+  it.each([
+    ['pending_verification', 'Check your email'],
+    ['pending_approval', 'Waiting for approval'],
+    ['account_disabled', 'Account disabled'],
+  ] as const)('shows the %s state instead of the form', async (status, title) => {
+    const w = mount(PynSignIn, {
+      props: { registration: 'open', notice: { status, user: 'wendy' } },
+    })
+    expect(w.find('form input[autocomplete=username]').exists()).toBe(false)
+    expect(w.text()).toContain(title)
+    expect(w.text()).toContain('wendy')
+    expect(w.findAll('input[type=email]')).toHaveLength(status === 'pending_verification' ? 1 : 0)
+    await click(w, 'Back to sign in')
+    expect(w.emitted('dismiss')).toHaveLength(1)
+  })
+
+  const provider = { name: 'Acme SSO', sign_in_url: '/v1/oidc/authorize' }
+
+  it('builds the provider start url with the page to return to', () => {
+    expect(externalSignInUrl('/v1/oidc/authorize', '/acme/game?x=1')).toBe(
+      '/v1/oidc/authorize?return_to=%2Facme%2Fgame%3Fx%3D1',
+    )
+    expect(externalSignInUrl('/v1/oidc/authorize?a=b')).toBe('/v1/oidc/authorize?a=b&return_to=%2F')
+  })
+
+  it('explains a provider error and falls back for unknown codes', () => {
+    expect(signInErrorMessage('external_account_not_linked')).toContain('No account is linked')
+    expect(signInErrorMessage('???')).toBe('Sign-in with the provider failed.')
+  })
+
+  it('offers the provider next to the password form', () => {
+    const w = mount(PynSignIn, {
+      props: { registration: 'closed', external: provider },
+    })
+    expect(w.find('a').text()).toBe('Sign in with Acme SSO')
+    expect(w.find('a').attributes('href')).toBe('/v1/oidc/authorize?return_to=%2F')
+    expect(w.find('input').exists()).toBe(true)
+  })
+
+  it('hides the password form until an administrator asks for it', async () => {
+    const w = mount(PynSignIn, {
+      props: {
+        registration: 'closed',
+        external: provider,
+        passwordSignIn: false,
+      },
+    })
+    expect(w.find('input').exists()).toBe(false)
+    await w.find('button[type=button]').trigger('click')
+    expect(w.find('input').exists()).toBe(true)
+  })
+
+  it('shows the error the server sent back', () => {
+    const w = mount(PynSignIn, {
+      props: {
+        registration: 'closed',
+        callbackError: 'external_sign_in_failed',
+      },
+    })
+    expect(w.find('[role=alert]').text()).toContain('did not complete')
+  })
+})
+
+describe('PynVerifyEmail', () => {
+  const outcome = (props: object) => mount(PynVerifyEmail, { props: props as never })
+
+  it('shows the verification outcomes', () => {
+    expect(outcome({ outcome: 'verifying' }).text()).toContain('Verifying')
+    const ok = outcome({
+      outcome: 'verified',
+      status: 'active',
+      user: 'wendy',
+    })
+    expect(ok.text()).toContain('You can sign in now')
+    expect(ok.find('a').attributes('href')).toBe('/')
+    const wait = outcome({ outcome: 'verified', status: 'pending_approval' })
+    expect(wait.text()).toContain('must approve')
+    const bad = outcome({
+      outcome: 'invalid',
+      resendError: 'Too many attempts. Try again in 5 minutes.',
+    })
+    expect(bad.text()).toContain('Link not valid')
+    expect(bad.find('input[type=email]').exists()).toBe(true)
+    expect(bad.text()).toContain('5 minutes')
+  })
+
+  it('emits the address to resend to', async () => {
+    const w = outcome({ outcome: 'invalid' })
+    await w.find('input').setValue('w@example.com')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('resend')?.[0]).toEqual(['w@example.com'])
+  })
+})
+
+describe('PynAccountSettings', () => {
+  it('lists the settings pages, marks the current one and renders the page', () => {
+    const w = mount(PynAccountSettings, {
+      props: { items: accountNav, current: 'keys' },
+      slots: { default: '<p>content</p>' },
+    })
+    const link = w.find('a[aria-current="page"]')
+    expect(link.text()).toBe('SSH keys')
+    expect(link.attributes('href')).toBe('/_/settings/keys')
+    expect(w.text()).toContain('content')
+  })
+
+  it('adds linked sign-in only when a provider exists', () => {
+    expect(accountNavItems(false)).toEqual(accountNav)
+    expect(accountNavItems(true).map((i) => i.id)).toEqual(['keys', 'tokens', 'identities'])
+  })
+})
+
+describe('PynKeys', () => {
+  const keys = [
+    {
+      id: 'aaaaaaaaaaaa',
+      user: 'alice',
+      title: 'work laptop',
+      algorithm: 'ssh-ed25519',
+      fingerprint: 'SHA256:abc',
+      created_at: '2026-10-08T09:00:00Z',
+      last_used_at: null,
+    },
+  ]
+
+  it('lists keys with their fingerprint and whether they were used', () => {
+    const w = mount(PynKeys, { props: { keys } })
+    expect(w.text()).toContain('work laptop')
+    expect(w.text()).toContain('SHA256:abc')
+    expect(w.text()).toContain('Added Oct 08 2026')
+    expect(w.text()).toContain('never used')
+  })
+
+  it('says so when there are no keys', () => {
+    expect(mount(PynKeys, { props: { keys: [] } }).text()).toContain('No keys yet')
+  })
+
+  it('emits the pasted key and title, then clears the form', async () => {
+    const w = mount(PynKeys, { props: { keys: [] } })
+    await w.find('input').setValue('laptop')
+    await w.find('textarea').setValue('  ssh-ed25519 AAAA  ')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('add')?.[0]).toEqual([{ key: 'ssh-ed25519 AAAA', title: 'laptop' }])
+    expect((w.find('textarea').element as HTMLTextAreaElement).value).toBe('')
+  })
+
+  it('emits the id to remove and shows an error', async () => {
+    const w = mount(PynKeys, {
+      props: { keys, error: 'that key is already linked to an account' },
+    })
+    expect(w.find('[role=alert]').text()).toContain('already linked')
+    await w.find('button[type=button]').trigger('click')
+    expect(w.emitted('remove')?.[0]).toEqual(['aaaaaaaaaaaa'])
+  })
+})
+
+describe('PynAccounts', () => {
+  const [root, bob, carol, dave] = accounts
+  const props = { accounts, status: '' as const, self: 'root' }
+  const buttons = (w: ReturnType<typeof mount>, text: string) =>
+    w.findAll('button').filter((b) => b.text().startsWith(text))
+
+  it('picks the actions the server accepts', () => {
+    expect(accountActions(root, 'root')).toEqual([])
+    expect(accountActions(root, 'other')).toEqual(['disable'])
+    expect(accountActions(bob, 'root')).toEqual(['approve', 'disable'])
+    expect(accountActions(carol, 'root')).toEqual(['disable'])
+    expect(accountActions(dave, 'root')).toEqual(['enable'])
+  })
+
+  it('swaps an updated account in and drops it when the filter no longer matches', () => {
+    const active = { ...bob, status: 'active' as const }
+    expect(applyUpdate(accounts, active, '')[1]).toEqual(active)
+    expect(applyUpdate(accounts.slice(1, 2), active, 'pending_approval')).toEqual([])
+  })
+
+  it('lists status, email and the disable reason with shared date format', () => {
+    const w = mount(PynAccounts, { props })
+    expect(w.text()).toContain('Needs approval')
+    expect(w.text()).toContain('bob@example.com')
+    expect(w.text()).toContain('Disabled Oct 05 2026 14:00: Left the studio')
+    expect(w.text()).toContain('(unverified)')
+  })
+
+  it('has no disable button for the signed-in administrator', () => {
+    const w = mount(PynAccounts, { props: { ...props, accounts: [root] } })
+    expect(w.findAll('li button')).toHaveLength(0)
+  })
+
+  it('emits the status filter, approve and enable', async () => {
+    const w = mount(PynAccounts, { props })
+    await w.find('select').setValue('disabled')
+    expect(w.emitted('status')?.[0]).toEqual(['disabled'])
+    await buttons(w, 'Approve')[0].trigger('click')
+    expect(w.emitted('approve')?.[0]).toEqual(['bob'])
+    await buttons(w, 'Enable')[0].trigger('click')
+    expect(w.emitted('enable')?.[0]).toEqual(['dave'])
+  })
+
+  it('confirms with an optional reason before disabling, and can cancel', async () => {
+    const w = mount(PynAccounts, { props })
+    await buttons(w, 'Disable')[0].trigger('click')
+    expect(w.emitted('disable')).toBeUndefined()
+    await buttons(w, 'Cancel')[0].trigger('click')
+    expect(w.find('input').exists()).toBe(false)
+    await buttons(w, 'Disable')[0].trigger('click')
+    await w.find('input').setValue('spam')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('disable')?.[0]).toEqual([{ user: 'bob', reason: 'spam' }])
+    expect(w.find('input').exists()).toBe(false)
+  })
+
+  it('says when nothing matches and shows errors', () => {
+    const w = mount(PynAccounts, {
+      props: { ...props, accounts: [], error: 'boom' },
+    })
+    expect(w.text()).toContain('No accounts match.')
+    expect(w.find('[role=alert]').text()).toBe('boom')
   })
 })
 
