@@ -1922,6 +1922,9 @@ describe('PynAccounts', () => {
     })
     expect(w.text()).toContain('No accounts match.')
     expect(w.find('[role=alert]').text()).toBe('boom')
+  })
+})
+
 describe('view layout components', () => {
   it('header renders the title and wraps actions only when given', () => {
     expect(mount(PynViewHeader, { props: { title: 'Orgs' } }).find('span').exists()).toBe(false)
