@@ -50,7 +50,7 @@ hardcode a color.
 Theme handling is exported for the app to wire to its own control:
 `themeChoices`, `loadTheme()`, `saveTheme(choice)` and `applyTheme(choice)`
 (`system` removes the `data-theme` pin so the OS preference decides). Pure
-helpers are exported too: `formatDate`, `formatDateTime`, `formatWait`,
+helpers are exported too: `formatDate`, `formatDateTime`, `formatAgo`, `formatWait`,
 `formatLease`, `lockState` and `EXPIRING_SOON_MS`.
 
 ## Develop
@@ -135,7 +135,7 @@ Published versions are immutable; ship a fix as a new version.
 
 ## Components
 
-`PynButton` is the seed component; the rest arrive from the pyn web UI. Received so far: the primitives (`PynIcon`, `PynLockIcon`, `PynModeChip`, `PynLockBadge`, `PynMenu`, `PynSearch`, `PynBreadcrumb`, `PynPageNotFound`, `PynRepoNotFound`, `PynAccountNotice`, `PynResendForm`), the shell and headers, and the files and content views (`PynTree`, `PynFileList`, `PynFileBar`, `PynFileView`, `PynCodeView`, `PynMarkdown`, `PynReadme`, `PynHistory`, `PynActivity`, `PynLockedFiles`, `PynRepoLanding`, `PynRepoDetails`, `PynCheckoutCard`) with the markdown, code and line-range helpers, and the repository management views (`PynRepoForm`, `PynRepoList`, `PynRepoDelete`, `PynMembers`, `PynAddPerson`, `PynRoles`, `PynInvites`, `PynAudit`, `PynLocks`, `PynMyLocks`), and the organization and team views (`PynOrgForm`, `PynOrgList`, `PynOrgMembers`, `PynOrgDelete`, `PynOrgRepoPolicy`, `PynTeamList`, `PynTeamForm`, `PynTeamDetail`, `PynTeamDelete`, `PynTeamGrant`), and the view layout pieces (`PynViewHeader`, `PynViewAction`, `PynViewSummary`, `PynViewError`, `PynViewStack`, `PynViewGroup`), and the account views (`PynSignIn`, `PynVerifyEmail`, `PynAccountSettings`, `PynKeys`, `PynAccounts`). Markdown and code rendering use `marked`, `dompurify` and `highlight.js`, installed with the package.
+The library holds the whole presentation layer of the pyn web UI: `PynButton`, the primitives (`PynIcon`, `PynLockIcon`, `PynModeChip`, `PynLockBadge`, `PynMenu`, `PynSearch`, `PynBreadcrumb`, `PynPageNotFound`, `PynRepoNotFound`, `PynAccountNotice`, `PynResendForm`), the shell and headers (`PynShell`, `PynTopBar`, `PynSideNav`, `PynRepoHeader`, `PynRepoNav`, `PynOrgHeader`, `PynBranchBar`), and the files and content views (`PynTree`, `PynFileList`, `PynFileBar`, `PynFileView`, `PynCodeView`, `PynMarkdown`, `PynReadme`, `PynHistory`, `PynActivity`, `PynLockedFiles`, `PynRepoLanding`, `PynRepoDetails`, `PynCheckoutCard`) with the markdown, code and line-range helpers, and the repository management views (`PynRepoForm`, `PynRepoList`, `PynRepoDelete`, `PynMembers`, `PynAddPerson`, `PynRoles`, `PynInvites`, `PynAudit`, `PynLocks`, `PynMyLocks`), and the organization and team views (`PynOrgForm`, `PynOrgList`, `PynOrgMembers`, `PynOrgDelete`, `PynOrgRepoPolicy`, `PynTeamList`, `PynTeamForm`, `PynTeamDetail`, `PynTeamDelete`, `PynTeamGrant`), and the view layout pieces (`PynViewHeader`, `PynViewAction`, `PynViewSummary`, `PynViewError`, `PynViewStack`, `PynViewGroup`), and the account views (`PynSignIn`, `PynSetup`, `PynVerifyEmail`, `PynAccountSettings`, `PynKeys`, `PynTokens`, `PynIdentities`, `PynAccounts`). Markdown and code rendering use `marked`, `dompurify` and `highlight.js`, installed with the package.
 
 ## License
 
