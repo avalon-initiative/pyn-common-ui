@@ -2338,6 +2338,39 @@ describe('PynPolicyPreview', () => {
     expect(w.find('[data-section="stranded"]').exists()).toBe(false)
   })
 
+  it('uses a visually hidden caption and shows lock expiry', () => {
+    const w = mount(PynPolicyPreview, { props: { preview } })
+    expect(w.find('table').attributes('aria-label')).toBeUndefined()
+    expect(w.find('table caption').text()).toBe('Paths that change mode')
+    expect(w.find('[data-section="locks"]').text()).toMatch(/expires Oct 2\d 2026/)
+  })
+
+  it('filters a large preview by direction and folder', async () => {
+    const mk = (d: string, n: number) => Array.from({ length: n }, (_, i) => `${d}/f${i}`)
+    const big = {
+      to_exclusive: [...mk('art', 7), ...mk('lvl', 3), 'top.psd'],
+      to_shared: mk('docs', 2),
+      released_locks: [],
+    }
+    expect(mount(PynPolicyPreview, { props: { preview } }).find('select').exists()).toBe(false)
+    const w = mount(PynPolicyPreview, { props: { preview: big } })
+    expect(w.findAll('tbody tr')).toHaveLength(13)
+    const [dir, folder] = w.findAll('select')
+    expect(folder.findAll('option').map((o) => o.text())).toEqual([
+      'All',
+      '(root)',
+      'art',
+      'docs',
+      'lvl',
+    ])
+    await dir.setValue('shared')
+    expect(w.findAll('tbody tr')).toHaveLength(2)
+    expect(w.find('[role="status"]').text()).toBe('Showing 2 of 13')
+    await dir.setValue('all')
+    await folder.setValue('art')
+    expect(w.findAll('tbody tr')).toHaveLength(7)
+  })
+
   it('shows the empty, loading and error states', async () => {
     const empty = mount(PynPolicyPreview, {
       props: { preview: { to_exclusive: [], to_shared: [], released_locks: [] } },

@@ -70,6 +70,29 @@
   }
 }
 
+.caption {
+  @include m.visually-hidden;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-3);
+  font-size: 0.875rem;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: var(--pyn-space-2);
+  }
+
+  select {
+    @include m.input;
+    padding: var(--pyn-space-1) var(--pyn-space-2);
+  }
+}
+
 .group {
   display: flex;
   flex-direction: column;
