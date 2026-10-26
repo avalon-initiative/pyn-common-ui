@@ -1,0 +1,122 @@
+@use 'mixins' as m;
+
+.preview {
+  @include m.card;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-4);
+}
+
+.title,
+.subtitle {
+  margin: 0;
+}
+
+.title {
+  font-size: 1rem;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.muted {
+  @include m.muted;
+}
+
+.text {
+  margin: 0;
+}
+
+.error {
+  @include m.error;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-3);
+}
+
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-4);
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th,
+  td {
+    padding: var(--pyn-space-2) var(--pyn-space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--pyn-border);
+  }
+
+  th {
+    color: var(--pyn-text-muted);
+    font-weight: 600;
+  }
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  font-size: 0.875rem;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pyn-space-3);
+  }
+}
+
+.path {
+  padding: 0;
+  color: var(--pyn-accent);
+  background: none;
+  border: 0;
+  font-family: var(--pyn-font-mono);
+  font-size: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  @include m.focus-ring;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+}
+
+.button {
+  @include m.button;
+}
+
+.primary {
+  @include m.button(var(--pyn-on-accent));
+  background: var(--pyn-accent);
+  border-color: var(--pyn-accent);
+}

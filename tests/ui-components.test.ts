@@ -30,6 +30,7 @@ import {
   PynMenu,
   PynPolicyConflictNotice,
   PynPolicyEditor,
+  PynPolicyPreview,
   PynModeChip,
   PynMyLocks,
   PynOrgDelete,
@@ -2300,5 +2301,72 @@ describe('PynPolicyConflictNotice', () => {
   it('disables the actions that change state while busy', () => {
     const w = mount(PynPolicyConflictNotice, { props: { kind: 'lock_required', busy: true } })
     expect(w.findAll('button').every((b) => b.attributes('disabled') !== undefined)).toBe(true)
+  })
+})
+
+describe('PynPolicyPreview', () => {
+  const preview = {
+    to_exclusive: ['art/a.psd', 'art/b.psd'],
+    to_shared: ['docs/x.md'],
+    released_locks: [
+      {
+        path: 'docs/x.md',
+        owner: 'wendy',
+        acquired_at: '2026-10-26T09:00:00Z',
+        expires_at: '2026-10-26T17:00:00Z',
+      },
+    ],
+    stranded: [],
+  }
+
+  it('lists changed paths with from and to modes and counts per direction', () => {
+    const w = mount(PynPolicyPreview, { props: { preview } })
+    const rows = w.findAll('tbody tr')
+    expect(rows).toHaveLength(3)
+    expect(rows[0].findAll('[data-mode]').map((c) => c.attributes('data-mode'))).toEqual([
+      'shared',
+      'exclusive',
+    ])
+    expect(rows[2].findAll('[data-mode]').map((c) => c.attributes('data-mode'))).toEqual([
+      'exclusive',
+      'shared',
+    ])
+    expect(w.text()).toContain('2 paths become exclusive')
+    expect(w.text()).toContain('1 path become shared')
+    expect(w.text()).toContain('1 lock would be released')
+    expect(w.text()).toContain('held by wendy')
+    expect(w.find('[data-section="stranded"]').exists()).toBe(false)
+  })
+
+  it('shows the empty, loading and error states', async () => {
+    const empty = mount(PynPolicyPreview, {
+      props: { preview: { to_exclusive: [], to_shared: [], released_locks: [] } },
+    })
+    expect(empty.text()).toContain('No paths change mode')
+    expect(empty.find('table').exists()).toBe(false)
+
+    const loading = mount(PynPolicyPreview, { props: { loading: true } })
+    expect(loading.find('[role="status"]').exists()).toBe(true)
+    expect(loading.find('[aria-live="polite"]').exists()).toBe(true)
+
+    const failed = mount(PynPolicyPreview, { props: { error: 'boom' } })
+    expect(failed.find('[role="alert"]').text()).toContain('boom')
+    await failed.find('[role="alert"] button').trigger('click')
+    expect(failed.emitted('retry')).toHaveLength(1)
+  })
+
+  it('emits selectPath, confirm and back, and gates confirm', async () => {
+    const w = mount(PynPolicyPreview, { props: { preview } })
+    await w.find('tbody button').trigger('click')
+    expect(w.emitted('selectPath')![0]).toEqual(['art/a.psd'])
+    const [save, back] = w.findAll('button').slice(-2)
+    await save.trigger('click')
+    await back.trigger('click')
+    expect(w.emitted('confirm')).toHaveLength(1)
+    expect(w.emitted('back')).toHaveLength(1)
+    for (const props of [{ loading: true }, { error: 'x' }, { busy: true }, { preview: null }]) {
+      const g = mount(PynPolicyPreview, { props: { preview, ...props } })
+      expect(g.findAll('button').at(-2)!.attributes('disabled')).toBeDefined()
+    }
   })
 })
