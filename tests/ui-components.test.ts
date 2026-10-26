@@ -1442,6 +1442,20 @@ describe('PynOrgForm', () => {
     expect(w.emitted('submit')?.[0]).toEqual(['studio'])
     expect(w.find('[role=alert]').text()).toBe('taken')
   })
+
+  it('describes the name field with the hint and the validation message', async () => {
+    const w = mount(PynOrgForm)
+    const input = w.find('input')
+    expect(input.attributes('aria-invalid')).toBeUndefined()
+    expect(input.attributes('aria-describedby')).not.toContain(' ')
+    await input.setValue(' Bad ')
+    expect(w.emitted('nameInput')?.[0]).toEqual(['Bad'])
+    await w.setProps({ nameMessage: 'lowercase only' })
+    expect(input.attributes('aria-invalid')).toBe('true')
+    const ids = input.attributes('aria-describedby')!.split(' ')
+    expect(ids).toHaveLength(2)
+    expect(w.find(`[id="${ids[1]}"]`).text()).toBe('lowercase only')
+  })
 })
 
 describe('PynOrgList', () => {
@@ -1656,6 +1670,18 @@ describe('PynTeamGrant', () => {
 })
 
 describe('PynSignIn', () => {
+  it('emits the typed name and shows its validation message', async () => {
+    const w = mount(PynSignIn, { props: { registration: 'open' } })
+    const input = w.find('input')
+    await input.setValue('al ice')
+    expect(w.emitted('nameInput')?.[0]).toEqual(['al ice'])
+    expect(input.attributes('aria-invalid')).toBeUndefined()
+    await w.setProps({ nameMessage: 'no spaces' })
+    expect(input.attributes('aria-invalid')).toBe('true')
+    const id = input.attributes('aria-describedby')!
+    expect(w.find(`[id="${id}"]`).text()).toBe('no spaces')
+  })
+
   const fill = async (w: ReturnType<typeof mount>, values: string[]) => {
     const inputs = w.findAll('input')
     for (const [i, v] of values.entries()) await inputs[i].setValue(v)
@@ -2125,6 +2151,20 @@ describe('setup state', () => {
 
 describe('PynSetup', () => {
   const next = (w: ReturnType<typeof mount>) => w.find('form').trigger('submit')
+
+  it('emits the typed administrator name and shows its validation message', async () => {
+    const w = mount(PynSetup, { props: { registration: 'closed' } })
+    await next(w)
+    await w.find('input').setValue('tok')
+    await next(w)
+    const input = w.find('input')
+    await input.setValue('ro ot')
+    expect(w.emitted('nameInput')?.[0]).toEqual(['ro ot'])
+    expect(input.attributes('aria-invalid')).toBeUndefined()
+    await w.setProps({ nameMessage: 'no spaces' })
+    expect(input.attributes('aria-invalid')).toBe('true')
+    expect(w.find(`[id="${input.attributes('aria-describedby')}"]`).text()).toBe('no spaces')
+  })
 
   it('walks every step and emits the form on finish', async () => {
     const w = mount(PynSetup, { props: { registration: 'closed', publicUrl: 'http://x' } })

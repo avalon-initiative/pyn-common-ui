@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, useId } from 'vue'
 import styles from '../styles/PynSetup.module.scss'
 import { REGISTRATION_LABELS, SETUP_STEPS, stepComplete } from '../state/setup.state'
 import type { RegistrationMode, SetupForm } from '../types/auth.types'
@@ -11,12 +11,16 @@ const props = defineProps<{
   done?: boolean
   busy?: boolean
   error?: string
+  nameMessage?: string
 }>()
 
 const emit = defineEmits<{
   finish: [SetupForm]
   signIn: []
+  nameInput: [name: string]
 }>()
+
+const nameMessageId = useId()
 
 const index = ref(0)
 const form = reactive<SetupForm>({
@@ -88,7 +92,13 @@ function next() {
           :class="styles.input"
           autocomplete="username"
           required
+          :aria-describedby="nameMessage ? nameMessageId : undefined"
+          :aria-invalid="nameMessage ? 'true' : undefined"
+          @input="emit('nameInput', form.username)"
         />
+        <span v-if="nameMessage" :id="nameMessageId" :class="styles.message">{{
+          nameMessage
+        }}</span>
       </label>
       <label :class="styles.field"
         >Password

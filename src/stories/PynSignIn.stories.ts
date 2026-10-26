@@ -57,3 +57,6 @@ export const ProviderRefusedAccount: Story = {
     callbackError: 'external_account_not_linked',
   },
 }
+export const InvalidUserName: Story = {
+  args: { registration: 'open', nameMessage: 'That user name is not allowed.' },
+}

@@ -110,6 +110,17 @@
   font-size: 0.875rem;
 }
 
+@mixin field-message {
+  color: var(--pyn-danger);
+  font-size: 0.8125rem;
+}
+
+@mixin invalid {
+  &[aria-invalid='true'] {
+    border-color: var(--pyn-danger);
+  }
+}
+
 @mixin pill {
   padding: 0 var(--pyn-space-2);
   color: var(--pyn-text-muted);
