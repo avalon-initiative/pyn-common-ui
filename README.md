@@ -117,16 +117,28 @@ Restore the app's dependency to the published version before merging.
 
 ## Release
 
-Versions are semver. From an up-to-date `main`:
+Versions are semver. `main` is protected, so a release is a pull request
+followed by a tag on the merged commit. From an up-to-date `main`:
 
 ```bash
-make release VER=0.1.0 TITLE="Optional title"
-git push origin main --tags
+make release VER=0.1.5 TITLE="Optional title"   # checks, release-v0.1.5 branch, version bump, pull request
+# review and squash-merge the pull request, then:
+git switch main && git pull
+make release-publish                            # tags the merged commit and pushes only the tag
 ```
 
-`make release` runs the pre-release checks first and changes nothing if they
-fail, then bumps `package.json` and the lockfile, commits, and creates the
-annotated tag `v<VER>` (or `v<VER>-<title-slug>`). Pushing the tag starts the
+`make release` runs the pre-release checks first (`make release-skip-tests`
+skips them) and changes nothing if they fail or if `main` is dirty or behind
+`origin/main`. It prompts for a missing `VER` or `TITLE`, bumps `package.json`
+and the lockfile on a `release-v<VER>` branch, commits
+`[noissue] - Release v<VER>[-title-slug]`, and, after a confirmation, pushes the
+branch and opens the pull request. `make release-publish` requires `main` to sit
+on that squash-merged commit, then creates the annotated tag
+`v<VER>[-title-slug]` on it and pushes the tag (`YES=1` skips the questions).
+The title slug is only part of the tag name: the published npm version is always
+the `X.Y.Z` in `package.json`, published to the `latest` dist-tag.
+
+Pushing the tag starts the
 release workflow: it verifies the tag matches `package.json`, requires the
 tagged commit to be on `main`, reruns the checks, publishes the package, and
 creates a GitHub Release with the packed tarball. The registry and scope are

@@ -8,6 +8,8 @@ set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
+echo "release-checks: release script tests"
+bash scripts/test-release.sh >/dev/null
 echo "release-checks: lint"
 npm run lint
 echo "release-checks: format"
