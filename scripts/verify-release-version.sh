@@ -6,7 +6,8 @@ set -euo pipefail
 tag="${1:?usage: verify-release-version.sh <tag>}"
 cd "$(git rev-parse --show-toplevel)"
 
-if [[ ! "${tag#v}" =~ ^([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+# The optional -title suffix is ignored: the published version is always package.json's X.Y.Z.
+if [[ ! "${tag#v}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)(-[A-Za-z0-9._-]+)?$ ]]; then
   echo "verify-release-version: cannot derive X.Y.Z from tag '${tag}'"
   exit 1
 fi

@@ -1,6 +1,6 @@
 name: Release
 
-# Pushing a v<X.Y.Z>[-title] tag (created by `make release`) publishes that
+# Pushing a v<X.Y.Z>[-title] tag (created by `make release-publish`) publishes that
 # exact version of @avalon-initiative/pyn-common-ui to the registry set in env below.
 on:
   push:
@@ -57,7 +57,7 @@ jobs:
         run: npm pack
 
       - name: Publish package
-        run: npm publish
+        run: npm publish --tag latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
