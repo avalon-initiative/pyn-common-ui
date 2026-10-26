@@ -10,3 +10,6 @@ export const NameTaken: Story = {
   args: { error: 'That name is already taken by a user or an organization.' },
 }
 export const Restricted: Story = { args: { error: 'Only a server administrator can do that.' } }
+export const InvalidName: Story = {
+  args: { nameMessage: 'Use lowercase letters, digits, "-" or "_".' },
+}

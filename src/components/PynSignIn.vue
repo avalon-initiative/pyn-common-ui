@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import styles from '../styles/PynSignIn.module.scss'
 import PynAccountNotice from './PynAccountNotice.vue'
 import { externalSignInUrl, signInErrorMessage } from '../state/account.state'
@@ -23,6 +23,7 @@ const props = withDefaults(
     resent?: boolean
     busy?: boolean
     error?: string
+    nameMessage?: string
   }>(),
   { passwordSignIn: true },
 )
@@ -32,7 +33,10 @@ const emit = defineEmits<{
   register: [RegisterForm]
   resend: [string]
   dismiss: []
+  nameInput: [name: string]
 }>()
+
+const nameMessageId = useId()
 
 type View = 'sign-in' | 'register'
 const view = ref<View>('sign-in')
@@ -82,7 +86,18 @@ function submit() {
     <template v-if="showForm">
       <label :class="styles.field"
         >User name
-        <input v-model.trim="username" :class="styles.input" autocomplete="username" required />
+        <input
+          v-model.trim="username"
+          :class="styles.input"
+          autocomplete="username"
+          required
+          :aria-describedby="nameMessage ? nameMessageId : undefined"
+          :aria-invalid="nameMessage ? 'true' : undefined"
+          @input="emit('nameInput', username)"
+        />
+        <span v-if="nameMessage" :id="nameMessageId" :class="styles.message">{{
+          nameMessage
+        }}</span>
       </label>
       <label :class="styles.field"
         >Password

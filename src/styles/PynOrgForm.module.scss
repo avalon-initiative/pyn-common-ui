@@ -10,6 +10,7 @@
 
 .input {
   @include m.input;
+  @include m.invalid;
 }
 
 .hint {
@@ -18,6 +19,10 @@
 
 .primary {
   @include m.button-primary;
+}
+
+.message {
+  @include m.field-message;
 }
 
 .error {

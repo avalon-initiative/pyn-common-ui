@@ -33,6 +33,7 @@
   border-radius: var(--pyn-radius);
 
   @include m.focus-ring;
+  @include m.invalid;
 }
 
 .primary {
@@ -68,6 +69,10 @@
   cursor: pointer;
 
   @include m.focus-ring;
+}
+
+.message {
+  @include m.field-message;
 }
 
 .error {
