@@ -28,6 +28,8 @@ import {
   PynMarkdown,
   PynMembers,
   PynMenu,
+  PynPolicyConflictNotice,
+  PynPolicyEditor,
   PynModeChip,
   PynMyLocks,
   PynOrgDelete,
@@ -2174,5 +2176,76 @@ describe('PynSetup', () => {
     const w = mount(PynSetup, { props: { registration: 'closed', done: true } })
     await w.find('button').trigger('click')
     expect(w.emitted('signIn')).toHaveLength(1)
+  })
+})
+
+describe('PynPolicyEditor', () => {
+  it('labels the textarea, shows the head revision and updates the model', async () => {
+    const w = mount(PynPolicyEditor, { props: { text: 'a', headRevision: 7 } })
+    const ta = w.find('textarea')
+    expect(w.find(`label[for="${ta.attributes('id')}"]`).exists()).toBe(true)
+    expect(w.text()).toContain('Head revision 7')
+    await ta.setValue('b')
+    expect(w.emitted('update:text')?.[0]).toEqual(['b'])
+  })
+
+  it('enables save and revert only when dirty and emits events', async () => {
+    const w = mount(PynPolicyEditor, { props: { text: 'a' } })
+    expect(w.findAll('button').every((b) => b.attributes('disabled') !== undefined)).toBe(true)
+    await w.setProps({ dirty: true })
+    const [save, revert] = w.findAll('button')
+    await save.trigger('click')
+    await revert.trigger('click')
+    expect(w.emitted('save')).toHaveLength(1)
+    expect(w.emitted('revert')).toHaveLength(1)
+    expect(w.text()).toContain('Unsaved changes')
+  })
+
+  it.each([['saving'], ['readonly'], ['disabled']] as const)('blocks saving when %s', (flag) => {
+    const w = mount(PynPolicyEditor, { props: { text: 'a', dirty: true, [flag]: true } })
+    expect(w.findAll('button').every((b) => b.attributes('disabled') !== undefined)).toBe(true)
+  })
+
+  it('makes the textarea read-only or disabled and renders the notice slot', () => {
+    const ro = mount(PynPolicyEditor, { props: { text: 'a', readonly: true }, slots: { notice: '<p id="n">x</p>' } })
+    expect(ro.find('textarea').attributes('readonly')).toBeDefined()
+    expect(ro.find('#n').exists()).toBe(true)
+    const dis = mount(PynPolicyEditor, { props: { text: 'a', disabled: true } })
+    expect(dis.find('textarea').attributes('disabled')).toBeDefined()
+  })
+})
+
+describe('PynPolicyConflictNotice', () => {
+  it.each([
+    ['lock_required', 'Take lock', 'takeLock'],
+    ['lock_required', 'Discard changes', 'discard'],
+    ['lock_held', 'Reload latest', 'reload'],
+    ['lock_held', 'Discard changes', 'discard'],
+    ['stale_base', 'Reload latest', 'reload'],
+    ['stale_base', 'Keep editing', 'dismiss'],
+    ['invalid_rules', 'Keep editing', 'dismiss'],
+    ['error', 'Try again', 'retry'],
+    ['error', 'Keep editing', 'dismiss'],
+  ] as const)('%s: "%s" emits %s', async (kind, label, event) => {
+    const w = mount(PynPolicyConflictNotice, { props: { kind } })
+    expect(w.attributes('role')).toBe('alert')
+    await w.findAll('button').find((b) => b.text() === label)!.trigger('click')
+    expect(w.emitted(event)).toHaveLength(1)
+  })
+
+  it('shows the holder, the problems and the error message', () => {
+    expect(mount(PynPolicyConflictNotice, { props: { kind: 'lock_held', holder: 'wendy' } }).text()).toContain('wendy')
+    const bad = mount(PynPolicyConflictNotice, {
+      props: { kind: 'invalid_rules', problems: [{ line: 4, message: 'bad mode' }, { message: 'no default' }] },
+    })
+    expect(bad.findAll('li')).toHaveLength(2)
+    expect(bad.text()).toContain('Line 4')
+    expect(bad.text()).toContain('bad mode')
+    expect(mount(PynPolicyConflictNotice, { props: { kind: 'error', message: 'boom' } }).text()).toContain('boom')
+  })
+
+  it('disables the actions that change state while busy', () => {
+    const w = mount(PynPolicyConflictNotice, { props: { kind: 'lock_required', busy: true } })
+    expect(w.findAll('button').every((b) => b.attributes('disabled') !== undefined)).toBe(true)
   })
 })

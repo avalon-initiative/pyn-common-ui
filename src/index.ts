@@ -45,6 +45,8 @@ export { default as PynOrgList } from './components/PynOrgList.vue'
 export { default as PynOrgMembers } from './components/PynOrgMembers.vue'
 export { default as PynOrgDelete } from './components/PynOrgDelete.vue'
 export { default as PynOrgRepoPolicy } from './components/PynOrgRepoPolicy.vue'
+export { default as PynPolicyConflictNotice } from './components/PynPolicyConflictNotice.vue'
+export { default as PynPolicyEditor } from './components/PynPolicyEditor.vue'
 export { default as PynTeamList } from './components/PynTeamList.vue'
 export { default as PynTeamForm } from './components/PynTeamForm.vue'
 export { default as PynTeamDetail } from './components/PynTeamDetail.vue'
@@ -219,3 +221,4 @@ export type {
   Revision,
   RoleGrant,
 } from './types/repo.types'
+export type { PolicyNoticeKind, PolicyProblem } from './types/policy.types'
