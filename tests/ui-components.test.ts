@@ -2247,6 +2247,53 @@ describe('PynPolicyEditor', () => {
     expect(w.findAll('button').every((b) => b.attributes('disabled') !== undefined)).toBe(true)
   })
 
+  it('saves on Ctrl/Cmd+S only when dirty and always blocks the browser dialog', async () => {
+    const w = mount(PynPolicyEditor, { props: { text: 'a' } })
+    const ta = w.find('textarea')
+    const press = async (init: KeyboardEventInit) => {
+      const e = new KeyboardEvent('keydown', { cancelable: true, bubbles: true, ...init })
+      ta.element.dispatchEvent(e)
+      await w.vm.$nextTick()
+      return e.defaultPrevented
+    }
+    expect(await press({ key: 's', ctrlKey: true })).toBe(true)
+    expect(w.emitted('save')).toBeUndefined()
+    await w.setProps({ dirty: true })
+    expect(await press({ key: 's', ctrlKey: true })).toBe(true)
+    expect(await press({ key: 'S', metaKey: true })).toBe(true)
+    expect(await press({ key: 's' })).toBe(false)
+    expect(w.emitted('save')).toHaveLength(2)
+    await w.setProps({ readonly: true })
+    await press({ key: 's', ctrlKey: true })
+    expect(w.emitted('save')).toHaveLength(2)
+  })
+
+  it('highlights TOML tokens and numbers the lines', () => {
+    const w = mount(PynPolicyEditor, {
+      props: { text: '# c\n[[rule]]\npath = "a#b"\nn = 3\nok = true' },
+    })
+    expect(w.findAll('[aria-hidden="true"] > div > div').length).toBeGreaterThan(0)
+    const kinds = (n: number) =>
+      w
+        .findAll('[data-token]')
+        .filter(
+          (t) => t.element.closest('div')!.parentElement!.children[n] === t.element.closest('div'),
+        )
+        .map((t) => `${t.attributes('data-token')}:${t.text()}`)
+    expect(kinds(0)).toEqual(['comment:# c'])
+    expect(kinds(1)).toEqual(['table:[[rule]]'])
+    expect(kinds(2)).toContain('string:"a#b"')
+    expect(kinds(3)).toContain('number:3')
+    expect(kinds(4)).toContain('boolean:true')
+    expect(w.text()).toContain('5')
+  })
+
+  it('marks the lines named in problemLines', () => {
+    const w = mount(PynPolicyEditor, { props: { text: 'a\nb\nc', problemLines: [2] } })
+    expect(w.findAll('[data-invalid]')).toHaveLength(2)
+    expect(w.findAll('[data-invalid]').map((e) => e.text())).toEqual(['2', 'b'])
+  })
+
   it('makes the textarea read-only or disabled and renders the notice slot', () => {
     const ro = mount(PynPolicyEditor, {
       props: { text: 'a', readonly: true },

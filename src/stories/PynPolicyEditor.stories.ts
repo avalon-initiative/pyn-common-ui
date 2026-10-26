@@ -30,6 +30,7 @@ export const Dirty: Story = { args: { dirty: true } }
 export const Saving: Story = { args: { dirty: true, saving: true } }
 export const ReadOnly: Story = { args: { readonly: true } }
 export const Disabled: Story = { args: { disabled: true } }
+export const InvalidLines: Story = { args: { dirty: true, problemLines: [6] } }
 export const WithNotice: Story = {
   args: { dirty: true },
   render: (args) => ({
