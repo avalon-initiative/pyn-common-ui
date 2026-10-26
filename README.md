@@ -59,7 +59,7 @@ helpers are exported too: `formatDate`, `formatDateTime`, `formatAgo`, `formatWa
 make install         # npm ci
 make storybook       # Storybook on http://localhost:6006
 make watch           # rebuild dist/ on change, for a linked app
-make check           # lint, type-check, component tests, build, smoke test
+make check           # lint, format check, type-check, component tests, build, smoke test
 make build-storybook # static Storybook build
 make help            # everything else
 ```
