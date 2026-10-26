@@ -10,5 +10,7 @@ withDefaults(defineProps<PynButtonProps>(), {
 </script>
 
 <template>
-  <button type="button" :class="[styles.pynButton, styles[variant]]" :disabled="disabled">{{ label }}</button>
+  <button type="button" :class="[styles.pynButton, styles[variant]]" :disabled="disabled">
+    {{ label }}
+  </button>
 </template>

@@ -36,9 +36,9 @@ install step.
 Import the stylesheets once at your app's entry point, then import components:
 
 ```ts
-import '@avalon-initiative/pyn-common-ui/tokens.css'   // design tokens (CSS custom properties)
-import '@avalon-initiative/pyn-common-ui/global.css'   // base page styles
-import '@avalon-initiative/pyn-common-ui/style.css'    // component styles
+import '@avalon-initiative/pyn-common-ui/tokens.css' // design tokens (CSS custom properties)
+import '@avalon-initiative/pyn-common-ui/global.css' // base page styles
+import '@avalon-initiative/pyn-common-ui/style.css' // component styles
 
 import { PynButton } from '@avalon-initiative/pyn-common-ui'
 ```
