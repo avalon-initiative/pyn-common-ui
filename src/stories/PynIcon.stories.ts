@@ -2,8 +2,19 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import PynIcon from '../components/PynIcon.vue'
 
 const names = [
-  'home', 'repo', 'settings', 'search', 'plus', 'chevron', 'menu', 'key', 'folder', 'file',
-  'branch', 'lock', 'user',
+  'home',
+  'repo',
+  'settings',
+  'search',
+  'plus',
+  'chevron',
+  'menu',
+  'key',
+  'folder',
+  'file',
+  'branch',
+  'lock',
+  'user',
 ]
 
 const meta: Meta<typeof PynIcon> = {

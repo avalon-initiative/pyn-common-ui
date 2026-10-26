@@ -2,9 +2,29 @@ import { h } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 
 const colors = [
-  'bg', 'surface', 'surface-raised', 'border', 'hover', 'selected', 'text', 'text-muted', 'accent', 'on-accent',
-  'available', 'available-bg', 'locked', 'locked-bg', 'mine', 'mine-bg', 'danger', 'danger-bg',
-  'syntax-keyword', 'syntax-string', 'syntax-comment', 'syntax-number', 'syntax-name',
+  'bg',
+  'surface',
+  'surface-raised',
+  'border',
+  'hover',
+  'selected',
+  'text',
+  'text-muted',
+  'accent',
+  'on-accent',
+  'available',
+  'available-bg',
+  'locked',
+  'locked-bg',
+  'mine',
+  'mine-bg',
+  'danger',
+  'danger-bg',
+  'syntax-keyword',
+  'syntax-string',
+  'syntax-comment',
+  'syntax-number',
+  'syntax-name',
 ]
 const spaces = [1, 2, 3, 4, 6, 8]
 const sizes = ['xs', 'sm', 'base', 'md', 'lg', 'xl']
@@ -14,7 +34,8 @@ export default meta
 
 type Story = StoryObj
 
-const row = 'display:flex;align-items:center;gap:var(--pyn-space-3);margin-bottom:var(--pyn-space-2)'
+const row =
+  'display:flex;align-items:center;gap:var(--pyn-space-3);margin-bottom:var(--pyn-space-2)'
 
 export const Colors: Story = {
   render: () =>
@@ -37,7 +58,9 @@ export const Spacing: Story = {
       'div',
       spaces.map((n) =>
         h('div', { style: row }, [
-          h('span', { style: `height:0.75rem;background:var(--pyn-accent);width:var(--pyn-space-${n})` }),
+          h('span', {
+            style: `height:0.75rem;background:var(--pyn-accent);width:var(--pyn-space-${n})`,
+          }),
           h('code', `--pyn-space-${n}`),
         ]),
       ),
@@ -48,6 +71,12 @@ export const Typography: Story = {
   render: () =>
     h(
       'div',
-      sizes.map((s) => h('p', { style: `margin:0 0 var(--pyn-space-2);font-size:var(--pyn-text-${s})` }, `--pyn-text-${s}: Merge what can be merged, lock what shouldn't be.`)),
+      sizes.map((s) =>
+        h(
+          'p',
+          { style: `margin:0 0 var(--pyn-space-2);font-size:var(--pyn-text-${s})` },
+          `--pyn-text-${s}: Merge what can be merged, lock what shouldn't be.`,
+        ),
+      ),
     ),
 }

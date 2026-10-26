@@ -2207,7 +2207,10 @@ describe('PynPolicyEditor', () => {
   })
 
   it('makes the textarea read-only or disabled and renders the notice slot', () => {
-    const ro = mount(PynPolicyEditor, { props: { text: 'a', readonly: true }, slots: { notice: '<p id="n">x</p>' } })
+    const ro = mount(PynPolicyEditor, {
+      props: { text: 'a', readonly: true },
+      slots: { notice: '<p id="n">x</p>' },
+    })
     expect(ro.find('textarea').attributes('readonly')).toBeDefined()
     expect(ro.find('#n').exists()).toBe(true)
     const dis = mount(PynPolicyEditor, { props: { text: 'a', disabled: true } })
@@ -2229,19 +2232,29 @@ describe('PynPolicyConflictNotice', () => {
   ] as const)('%s: "%s" emits %s', async (kind, label, event) => {
     const w = mount(PynPolicyConflictNotice, { props: { kind } })
     expect(w.attributes('role')).toBe('alert')
-    await w.findAll('button').find((b) => b.text() === label)!.trigger('click')
+    await w
+      .findAll('button')
+      .find((b) => b.text() === label)!
+      .trigger('click')
     expect(w.emitted(event)).toHaveLength(1)
   })
 
   it('shows the holder, the problems and the error message', () => {
-    expect(mount(PynPolicyConflictNotice, { props: { kind: 'lock_held', holder: 'wendy' } }).text()).toContain('wendy')
+    expect(
+      mount(PynPolicyConflictNotice, { props: { kind: 'lock_held', holder: 'wendy' } }).text(),
+    ).toContain('wendy')
     const bad = mount(PynPolicyConflictNotice, {
-      props: { kind: 'invalid_rules', problems: [{ line: 4, message: 'bad mode' }, { message: 'no default' }] },
+      props: {
+        kind: 'invalid_rules',
+        problems: [{ line: 4, message: 'bad mode' }, { message: 'no default' }],
+      },
     })
     expect(bad.findAll('li')).toHaveLength(2)
     expect(bad.text()).toContain('Line 4')
     expect(bad.text()).toContain('bad mode')
-    expect(mount(PynPolicyConflictNotice, { props: { kind: 'error', message: 'boom' } }).text()).toContain('boom')
+    expect(
+      mount(PynPolicyConflictNotice, { props: { kind: 'error', message: 'boom' } }).text(),
+    ).toContain('boom')
   })
 
   it('disables the actions that change state while busy', () => {

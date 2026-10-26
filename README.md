@@ -36,9 +36,9 @@ install step.
 Import the stylesheets once at your app's entry point, then import components:
 
 ```ts
-import '@avalon-initiative/pyn-common-ui/tokens.css'   // design tokens (CSS custom properties)
-import '@avalon-initiative/pyn-common-ui/global.css'   // base page styles
-import '@avalon-initiative/pyn-common-ui/style.css'    // component styles
+import '@avalon-initiative/pyn-common-ui/tokens.css' // design tokens (CSS custom properties)
+import '@avalon-initiative/pyn-common-ui/global.css' // base page styles
+import '@avalon-initiative/pyn-common-ui/style.css' // component styles
 
 import { PynButton } from '@avalon-initiative/pyn-common-ui'
 ```
@@ -59,7 +59,7 @@ helpers are exported too: `formatDate`, `formatDateTime`, `formatAgo`, `formatWa
 make install         # npm ci
 make storybook       # Storybook on http://localhost:6006
 make watch           # rebuild dist/ on change, for a linked app
-make check           # lint, type-check, component tests, build, smoke test
+make check           # lint, format check, type-check, component tests, build, smoke test
 make build-storybook # static Storybook build
 make help            # everything else
 ```

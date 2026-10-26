@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pre-release validation gate: lint, type-check, component tests, library
+# Pre-release validation gate: lint, format check, type-check, component tests, library
 # build, built-package smoke test, and Storybook build.
 #
 # `make release` runs this before it changes anything, so a broken build fails
@@ -10,6 +10,8 @@ cd "$(git rev-parse --show-toplevel)"
 
 echo "release-checks: lint"
 npm run lint
+echo "release-checks: format"
+npm run format:check
 echo "release-checks: type-check"
 npm run typecheck
 echo "release-checks: component tests"

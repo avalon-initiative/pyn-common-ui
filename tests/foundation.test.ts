@@ -25,8 +25,12 @@ function names(block: string): string[] {
 describe('tokens.css', () => {
   it('defines the same colors in the OS-light, light and dark blocks', () => {
     const dark = names(tokens.split(":root[data-theme='dark']")[1])
-    const light = names(tokens.split(":root[data-theme='light']")[1].split(":root[data-theme='dark']")[0])
-    const osLight = names(tokens.split('@media (prefers-color-scheme: light)')[1].split(":root[data-theme='light']")[0])
+    const light = names(
+      tokens.split(":root[data-theme='light']")[1].split(":root[data-theme='dark']")[0],
+    )
+    const osLight = names(
+      tokens.split('@media (prefers-color-scheme: light)')[1].split(":root[data-theme='light']")[0],
+    )
     expect(light).toEqual(dark)
     expect(osLight).toEqual(dark)
   })

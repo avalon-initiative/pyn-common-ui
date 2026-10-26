@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install build typecheck lint test smoke storybook build-storybook check pack watch clean \
+.PHONY: help install build typecheck lint format format-check test smoke storybook build-storybook check pack watch clean \
 	release-checks release release-skip-tests
 
 help: ## List available targets
@@ -13,6 +13,12 @@ install: ## Install dependencies
 
 build: ## Build the library (dist/: ES bundle, types, style.css, tokens.css, global.css)
 	npm run build
+
+format: ## Format with Prettier
+	npm run format
+
+format-check: ## Check formatting with Prettier
+	npm run format:check
 
 typecheck: ## Type-check sources, tests and config
 	npm run typecheck
@@ -32,7 +38,7 @@ storybook: ## Storybook dev server on :6006
 build-storybook: ## Static Storybook build
 	npm run build-storybook
 
-check: lint typecheck test smoke ## Everything a pull request must pass except the Storybook build
+check: lint format-check typecheck test smoke ## Everything a pull request must pass except the Storybook build
 
 pack: build ## Produce the publishable tarball without publishing
 	npm pack
@@ -43,7 +49,7 @@ watch: build ## Rebuild dist/ on change, for an app linked to this checkout
 clean: ## Remove build output
 	rm -rf dist storybook-static *.tgz
 
-release-checks: ## Run the pre-release gate (lint, type-check, tests, build, smoke, Storybook)
+release-checks: ## Run the pre-release gate (lint, format check, type-check, tests, build, smoke, Storybook)
 	bash scripts/release-checks.sh
 
 .PHONY: release

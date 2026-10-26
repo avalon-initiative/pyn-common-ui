@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Same gate `make release` runs locally: lint, type-check, component
+      # Same gate `make release` runs locally: lint, format check, type-check, component
       # tests, library build, built-package smoke test, Storybook build.
       - name: Checks
         run: bash scripts/release-checks.sh

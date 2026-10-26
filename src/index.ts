@@ -154,7 +154,13 @@ export {
   signInErrorMessage,
 } from './state/account.state'
 export { splitPath, groupByTopLevel } from './state/files.state'
-export { activityVerb, breadcrumbs, encodeSegments, folderParam, treePath } from './state/tree.state'
+export {
+  activityVerb,
+  breadcrumbs,
+  encodeSegments,
+  folderParam,
+  treePath,
+} from './state/tree.state'
 export {
   VIEW_LIMIT,
   baseName,
