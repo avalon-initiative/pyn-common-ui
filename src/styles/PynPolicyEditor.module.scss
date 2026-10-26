@@ -23,20 +23,117 @@
   font-family: var(--pyn-font-mono);
 }
 
-.area {
+.frame {
   @include m.input;
+  display: flex;
   min-height: 20rem;
+  padding: 0;
+  overflow: hidden;
   resize: vertical;
   font-family: var(--pyn-font-mono);
   font-size: var(--pyn-text-sm);
   line-height: 1.5;
-  tab-size: 2;
-  white-space: pre;
-  overflow: auto;
 
-  &:disabled {
+  &:has(:disabled) {
     opacity: 0.6;
   }
+
+  &:focus-within {
+    outline: 2px solid var(--pyn-accent);
+    outline-offset: 2px;
+  }
+}
+
+.gutter {
+  flex: none;
+  min-width: 3ch;
+  padding: var(--pyn-space-2) var(--pyn-space-2) 0;
+  overflow: hidden;
+  color: var(--pyn-text-muted);
+  background: var(--pyn-surface);
+  border-right: 1px solid var(--pyn-border);
+  text-align: right;
+  user-select: none;
+}
+
+.number,
+.line {
+  height: 1.5em;
+  white-space: pre;
+}
+
+.number[data-invalid] {
+  color: var(--pyn-danger);
+  font-weight: 600;
+}
+
+.line[data-invalid] {
+  background: var(--pyn-danger-bg);
+  box-shadow: inset 2px 0 var(--pyn-danger);
+}
+
+.code {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.mirror,
+.area {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: var(--pyn-space-2) var(--pyn-space-3);
+  font: inherit;
+  tab-size: 2;
+}
+
+.mirror {
+  right: auto;
+  bottom: auto;
+  min-width: 100%;
+  padding: var(--pyn-space-2) 0;
+  pointer-events: none;
+
+  .line {
+    padding: 0 var(--pyn-space-3);
+  }
+
+  [data-token='table'] {
+    color: var(--pyn-syntax-name);
+    font-weight: 600;
+  }
+
+  [data-token='key'] {
+    color: var(--pyn-syntax-keyword);
+  }
+
+  [data-token='string'] {
+    color: var(--pyn-syntax-string);
+  }
+
+  [data-token='number'],
+  [data-token='boolean'] {
+    color: var(--pyn-syntax-number);
+  }
+
+  [data-token='comment'] {
+    color: var(--pyn-syntax-comment);
+    font-style: italic;
+  }
+}
+
+.area {
+  width: 100%;
+  height: 100%;
+  color: transparent;
+  caret-color: var(--pyn-text);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  resize: none;
+  white-space: pre;
+  overflow: auto;
 }
 
 .hint,
