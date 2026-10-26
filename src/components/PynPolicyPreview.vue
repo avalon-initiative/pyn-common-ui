@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, useId } from 'vue'
 import styles from '../styles/PynPolicyPreview.module.scss'
 import PynModeChip from './PynModeChip.vue'
+import { formatDateTime } from '../utils/datetime'
 import type { Mode } from '../types/lock.types'
 import type { PolicyPreview } from '../types/policy.types'
 
@@ -26,6 +27,23 @@ const rows = computed<{ path: string; from: Mode; to: Mode }[]>(() => [
     to: 'shared' as const,
   })),
 ])
+
+/** Filter controls appear once the list is longer than this. */
+const FILTER_FROM = 10
+const ROOT = '(root)'
+const folderOf = (path: string) => (path.includes('/') ? path.split('/')[0] : ROOT)
+const direction = ref<'all' | Mode>('all')
+const folder = ref('all')
+const idPrefix = useId()
+const folders = computed(() => [...new Set(rows.value.map((r) => folderOf(r.path)))].sort())
+const filtering = computed(() => rows.value.length > FILTER_FROM)
+const shown = computed(() =>
+  rows.value.filter(
+    (r) =>
+      (direction.value === 'all' || r.to === direction.value) &&
+      (folder.value === 'all' || folderOf(r.path) === folder.value),
+  ),
+)
 const locks = computed(() => props.preview?.released_locks ?? [])
 const stranded = computed(() => props.preview?.stranded ?? [])
 const empty = computed(() => !rows.value.length)
@@ -52,7 +70,30 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
               >{{ plural(preview.to_shared.length, 'path') }} become shared</span
             >
           </p>
-          <table :class="styles.table" aria-label="Paths that change mode">
+          <div v-if="filtering" :class="styles.filters" data-section="filters">
+            <label :for="`${idPrefix}-dir`"
+              >Direction
+              <select :id="`${idPrefix}-dir`" v-model="direction">
+                <option value="all">All</option>
+                <option value="exclusive">To exclusive</option>
+                <option value="shared">To shared</option>
+              </select>
+            </label>
+            <label :for="`${idPrefix}-folder`"
+              >Folder
+              <select :id="`${idPrefix}-folder`" v-model="folder">
+                <option value="all">All</option>
+                <option v-for="f in folders" :key="f" :value="f">{{ f }}</option>
+              </select>
+            </label>
+            <span :class="styles.muted" role="status"
+              >Showing {{ shown.length }} of {{ rows.length }}</span
+            >
+          </div>
+          <table :class="styles.table">
+            <caption :class="styles.caption">
+              Paths that change mode
+            </caption>
             <thead>
               <tr>
                 <th scope="col">From</th>
@@ -61,7 +102,7 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
               </tr>
             </thead>
             <tbody>
-              <tr v-for="r in rows" :key="r.path">
+              <tr v-for="r in shown" :key="r.path">
                 <td><PynModeChip :mode="r.from" /></td>
                 <td><PynModeChip :mode="r.to" /></td>
                 <td>
@@ -82,6 +123,7 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
                 {{ l.path }}
               </button>
               <span :class="styles.muted">held by {{ l.owner }}</span>
+              <span :class="styles.muted">expires {{ formatDateTime(l.expires_at) }}</span>
             </li>
           </ul>
         </div>

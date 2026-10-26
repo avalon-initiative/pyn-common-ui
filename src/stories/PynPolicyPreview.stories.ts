@@ -46,3 +46,14 @@ export const Failed: Story = {
   args: { preview: null, error: 'The server is unreachable.' },
 }
 export const Saving: Story = { args: { busy: true } }
+
+const many = (dir: string, n: number) => Array.from({ length: n }, (_, i) => `${dir}/file-${i}.bin`)
+export const LargeFilterable: Story = {
+  args: {
+    preview: {
+      to_exclusive: [...many('art', 8), ...many('levels', 6), 'root.psd'],
+      to_shared: many('docs', 4),
+      released_locks: [],
+    },
+  },
+}
