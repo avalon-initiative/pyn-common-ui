@@ -64,7 +64,9 @@ import {
   PynTeamList,
   PynTokens,
   PynWebhookDeliveries,
+  PynSecretReveal,
   PynWebhookDetail,
+  PynWebhookForm,
   PynWebhooks,
   PynTopBar,
   PynTree,
@@ -89,6 +91,8 @@ import {
   expiryFromDate,
   isRotating,
   parseEventTypes,
+  webhookNameProblem,
+  webhookUrlProblem,
   externalSignInUrl,
   fileBody,
   fileCrumbs,
@@ -2942,5 +2946,72 @@ describe('PynWebhookDetail', () => {
     await w.find('select').setValue('failed')
     expect(w.emitted('filter')![0]).toEqual(['failed'])
     w.unmount()
+  })
+})
+
+describe('PynWebhookForm', () => {
+  const fill = async (w: ReturnType<typeof mount>, name: string, url: string) => {
+    const inputs = w.findAll('input')
+    await inputs[0].setValue(name)
+    await inputs[1].setValue(url)
+  }
+
+  it('emits the trimmed fields with parsed event types and enabled', async () => {
+    const w = mount(PynWebhookForm)
+    await fill(w, ' CI ', ' https://hooks.example.com/ci ')
+    await w.find('textarea').setValue('a, b\na')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')![0]).toEqual([
+      { name: 'CI', url: 'https://hooks.example.com/ci', event_types: ['a', 'b'], enabled: true },
+    ])
+  })
+
+  it('sends enabled false when the toggle is cleared', async () => {
+    const w = mount(PynWebhookForm)
+    await fill(w, 'CI', 'https://hooks.example.com/ci')
+    await w.find('input[type="checkbox"]').setValue(false)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')![0][0]).toMatchObject({ enabled: false, event_types: [] })
+  })
+
+  it('hints and does not submit an invalid name or URL', async () => {
+    const w = mount(PynWebhookForm)
+    await fill(w, '', 'ftp://hooks.example.com')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')).toBeUndefined()
+    expect(w.text()).toContain('Enter a name.')
+    expect(w.text()).toContain('Use an https URL.')
+    expect(w.find('input[aria-invalid="true"]').exists()).toBe(true)
+  })
+
+  it('validates the documented limits', () => {
+    expect(webhookNameProblem('x'.repeat(256))).toBeNull()
+    expect(webhookNameProblem('é'.repeat(129))).toContain('256 bytes')
+    expect(webhookNameProblem('a\nb')).toContain('control')
+    expect(webhookUrlProblem('https://u:p@example.com')).toContain('user name')
+    expect(webhookUrlProblem('https://example.com/#x')).toContain('fragment')
+    expect(webhookUrlProblem(`https://example.com/${'a'.repeat(2048)}`)).toContain('2048')
+    expect(webhookUrlProblem('https://example.com/hook')).toBeNull()
+    expect(webhookUrlProblem('http://example.com/hook')).toBeNull()
+  })
+
+  it('shows the error, busy state and emits cancel', async () => {
+    const w = mount(PynWebhookForm, { props: { error: 'taken', busy: true } })
+    expect(w.find('[role="alert"]').text()).toBe('taken')
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeDefined()
+    await w.findAll('button')[1].trigger('click')
+    expect(w.emitted('cancel')).toHaveLength(1)
+  })
+
+  it('switches to the one-time secret reveal and emits dismiss', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.assign(navigator, { clipboard: { writeText } })
+    const w = mount(PynWebhookForm, { props: { secret: 'whsec_new' } })
+    expect(w.find('form').exists()).toBe(false)
+    expect(w.findComponent(PynSecretReveal).props('secret')).toBe('whsec_new')
+    await w.findAll('button')[0].trigger('click')
+    expect(writeText).toHaveBeenCalledWith('whsec_new')
+    await w.findAll('button')[1].trigger('click')
+    expect(w.emitted('dismiss')).toHaveLength(1)
   })
 })
