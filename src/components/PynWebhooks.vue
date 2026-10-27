@@ -6,11 +6,11 @@ import type { WebhookSubscription } from '../types/webhook.types'
 
 defineProps<{
   webhooks: WebhookSubscription[]
-  selectedId?: string
+  selectedId?: number
   loading?: boolean
   error?: string
 }>()
-const emit = defineEmits<{ select: [string]; create: [] }>()
+const emit = defineEmits<{ select: [number]; create: [] }>()
 </script>
 
 <template>

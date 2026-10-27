@@ -2,25 +2,25 @@ import type { WebhookDelivery, WebhookSubscription } from '../types/webhook.type
 
 export const webhooks: WebhookSubscription[] = [
   {
-    id: 'w1',
+    id: 1,
     name: 'CI notifier',
     url: 'https://hooks.example.com/ci',
     enabled: true,
     event_types: ['lock.acquired', 'checkin.created'],
-    secrets: [{ id: 'sec_1a2b3c', created_at: '2026-10-01T09:00:00Z', encrypted: true }],
+    secrets: [{ id: 101, created_at: '2026-10-01T09:00:00Z', encrypted: true }],
     created_by: 'alice',
     created_at: '2026-10-01T09:00:00Z',
     updated_at: '2026-10-05T09:00:00Z',
   },
   {
-    id: 'w2',
+    id: 2,
     name: 'Audit sink',
     url: 'https://audit.example.com/in',
     enabled: false,
     event_types: [],
     secrets: [
-      { id: 'sec_4d5e6f', created_at: '2026-09-01T09:00:00Z', encrypted: true },
-      { id: 'sec_7a8b9c', created_at: '2026-10-02T09:00:00Z', encrypted: true },
+      { id: 102, created_at: '2026-09-01T09:00:00Z', encrypted: true },
+      { id: 103, created_at: '2026-10-02T09:00:00Z', encrypted: true },
     ],
     created_by: 'bob',
     created_at: '2026-09-01T09:00:00Z',

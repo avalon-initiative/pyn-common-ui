@@ -32,9 +32,9 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   update: [WebhookUpdate]
-  delete: [string]
-  'rotate-secret': [string]
-  'retire-secret': [string]
+  delete: [number]
+  'rotate-secret': [number]
+  'retire-secret': [number]
   dismiss: []
   filter: [string]
   'load-more': []

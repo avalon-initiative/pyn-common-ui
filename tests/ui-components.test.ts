@@ -2771,25 +2771,25 @@ describe('PynDrawer', () => {
 
 const subscriptions = [
   {
-    id: 'w1',
+    id: 1,
     name: 'CI notifier',
     url: 'https://hooks.example.com/ci',
     enabled: true,
     event_types: ['lock.acquired', 'checkin.created'],
-    secrets: [{ id: 's1', created_at: '2026-10-01T09:00:00Z', encrypted: true }],
+    secrets: [{ id: 101, created_at: '2026-10-01T09:00:00Z', encrypted: true }],
     created_by: 'alice',
     created_at: '2026-10-01T09:00:00Z',
     updated_at: '2026-10-05T09:00:00Z',
   },
   {
-    id: 'w2',
+    id: 2,
     name: 'Audit sink',
     url: 'https://audit.example.com/in',
     enabled: false,
     event_types: [],
     secrets: [
-      { id: 's2', created_at: '2026-09-01T09:00:00Z', encrypted: true },
-      { id: 's3', created_at: '2026-10-02T09:00:00Z', encrypted: false },
+      { id: 102, created_at: '2026-09-01T09:00:00Z', encrypted: true },
+      { id: 103, created_at: '2026-10-02T09:00:00Z', encrypted: false },
     ],
     created_by: 'bob',
     created_at: '2026-09-01T09:00:00Z',
@@ -2813,7 +2813,7 @@ describe('webhook state helpers', () => {
 
 describe('PynWebhooks', () => {
   it('renders a captioned table and marks the selected row', () => {
-    const w = mount(PynWebhooks, { props: { webhooks: subscriptions, selectedId: 'w2' } })
+    const w = mount(PynWebhooks, { props: { webhooks: subscriptions, selectedId: 2 } })
     expect(w.find('caption').text()).toBe('Webhook subscriptions')
     const rows = w.findAll('tbody tr')
     expect(rows).toHaveLength(2)
@@ -2830,7 +2830,7 @@ describe('PynWebhooks', () => {
     const w = mount(PynWebhooks, { props: { webhooks: subscriptions } })
     await w.findAll('tbody tr')[0].trigger('click')
     await w.findAll('tbody tr')[1].find('button').trigger('click')
-    expect(w.emitted('select')).toEqual([['w1'], ['w2']])
+    expect(w.emitted('select')).toEqual([[1], [2]])
   })
 
   it('emits create and shows empty, loading and error states', async () => {
@@ -2904,21 +2904,21 @@ describe('PynWebhookDetail', () => {
     expect(w.emitted('delete')).toBeUndefined()
     await byText(w, 'Delete').trigger('click')
     await w.findAll('[role="alertdialog"] button')[0].trigger('click')
-    expect(w.emitted('delete')).toEqual([['w1']])
+    expect(w.emitted('delete')).toEqual([[1]])
     w.unmount()
   })
 
   it('rotates, and while rotating retires a chosen secret after confirmation', async () => {
     const w = mountIt()
     await byText(w, 'Rotate secret').trigger('click')
-    expect(w.emitted('rotate-secret')).toEqual([['w1']])
+    expect(w.emitted('rotate-secret')).toEqual([[1]])
     await w.setProps({ webhook: subscriptions[1] })
     expect(byText(w, 'Rotate secret').attributes('disabled')).toBeDefined()
     const retire = w.findAll('button[aria-label^="Retire secret"]')
     expect(retire).toHaveLength(2)
     await retire[1].trigger('click')
     await w.findAll('[role="alertdialog"] button')[0].trigger('click')
-    expect(w.emitted('retire-secret')).toEqual([['s3']])
+    expect(w.emitted('retire-secret')).toEqual([[103]])
     w.unmount()
   })
 

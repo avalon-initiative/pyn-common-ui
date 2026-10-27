@@ -14,13 +14,13 @@ export interface WebhookDelivery {
 }
 
 export interface WebhookSecret {
-  id: string
+  id: number
   created_at: string
   encrypted: boolean
 }
 
 export interface WebhookSubscription {
-  id: string
+  id: number
   name: string
   url: string
   enabled: boolean
@@ -39,4 +39,4 @@ export interface WebhookUpdate {
   event_types?: string[]
 }
 
-export type WebhookConfirm = { kind: 'delete' } | { kind: 'retire'; secretId: string }
+export type WebhookConfirm = { kind: 'delete' } | { kind: 'retire'; secretId: number }
