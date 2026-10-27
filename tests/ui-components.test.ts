@@ -2976,7 +2976,7 @@ describe('PynWebhookForm', () => {
 
   it('hints and does not submit an invalid name or URL', async () => {
     const w = mount(PynWebhookForm)
-    await fill(w, '', 'http://hooks.example.com')
+    await fill(w, '', 'ftp://hooks.example.com')
     await w.find('form').trigger('submit')
     expect(w.emitted('submit')).toBeUndefined()
     expect(w.text()).toContain('Enter a name.')
@@ -2992,6 +2992,7 @@ describe('PynWebhookForm', () => {
     expect(webhookUrlProblem('https://example.com/#x')).toContain('fragment')
     expect(webhookUrlProblem(`https://example.com/${'a'.repeat(2048)}`)).toContain('2048')
     expect(webhookUrlProblem('https://example.com/hook')).toBeNull()
+    expect(webhookUrlProblem('http://example.com/hook')).toBeNull()
   })
 
   it('shows the error, busy state and emits cancel', async () => {

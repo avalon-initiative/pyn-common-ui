@@ -14,7 +14,9 @@ type Story = StoryObj<typeof PynWebhookForm>
 
 export const Default: Story = {}
 export const Busy: Story = { args: { busy: true } }
-export const Failed: Story = { args: { error: 'url must use https' } }
+export const Failed: Story = {
+  args: { error: 'url must use https (this server does not allow http)' },
+}
 export const SecretRevealed: Story = { args: { secret: 'whsec_3f9c1d7a5b2e4c80' } }
 
 export const InDrawer: Story = {

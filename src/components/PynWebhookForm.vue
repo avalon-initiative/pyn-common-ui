@@ -60,7 +60,8 @@ function submit() {
         :aria-describedby="`${id}-url`"
       />
       <span :id="`${id}-url`" :class="urlProblem ? styles.message : styles.hint">{{
-        urlProblem ?? 'https only, no user name, password or fragment, at most 2048 bytes.'
+        urlProblem ??
+        'Use https; http only if your server allows it. No user name, password or fragment, at most 2048 bytes.'
       }}</span>
     </label>
     <label :class="styles.field"

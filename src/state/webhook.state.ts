@@ -67,7 +67,7 @@ export function webhookNameProblem(name: string): string | null {
   return null
 }
 
-/** Client-side hint for the URL field: https, no credentials or fragment, at most 2048 bytes. */
+/** Client-side hint for the URL field: http(s) (the server decides if http is allowed), no credentials or fragment, at most 2048 bytes. */
 export function webhookUrlProblem(url: string): string | null {
   const text = url.trim()
   if (!text) return 'Enter a URL.'
@@ -78,7 +78,7 @@ export function webhookUrlProblem(url: string): string | null {
   } catch {
     return 'Enter a full URL such as https://hooks.example.com/pyn.'
   }
-  if (u.protocol !== 'https:') return 'Use an https URL.'
+  if (u.protocol !== 'https:' && u.protocol !== 'http:') return 'Use an https URL.'
   if (u.username || u.password) return 'Leave out the user name and password.'
   if (u.hash) return 'Leave out the fragment.'
   return null
