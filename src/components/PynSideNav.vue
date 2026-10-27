@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynSideNav.module.scss'
 import { orgPath } from '../state/org.state'
@@ -7,15 +8,17 @@ import type { NavItem } from '../state/shell.state'
 import type { OrgRef } from '../types/org.types'
 import type { RepoRef } from '../types/repo.types'
 
-defineProps<{
+const props = defineProps<{
   account: string
   items: NavItem[]
+  extraNav?: NavItem[]
   current: string
   repos: RepoRef[]
   currentRepo?: string
   orgs?: OrgRef[]
   currentOrg?: string
 }>()
+const allItems = computed(() => [...props.items, ...(props.extraNav ?? [])])
 </script>
 
 <template>
@@ -25,13 +28,13 @@ defineProps<{
       <span :class="styles.account">{{ account }}</span>
     </p>
     <ul :class="styles.list">
-      <li v-for="item in items" :key="item.id">
+      <li v-for="item in allItems" :key="item.id">
         <a
           :href="item.href"
           :class="styles.link"
           :aria-current="item.id === current ? 'page' : undefined"
         >
-          <PynIcon :name="item.icon" />{{ item.label }}
+          <PynIcon v-if="item.icon" :name="item.icon" />{{ item.label }}
         </a>
       </li>
     </ul>

@@ -326,6 +326,28 @@ describe('PynTopBar', () => {
     expect((await open()).find('[href="/_/admin/accounts"]').exists()).toBe(false)
   })
 
+  it('adds extra account entries: links stay links, buttons emit account', async () => {
+    const w = mount(PynTopBar, {
+      props: {
+        user: 'alice',
+        repos: [],
+        theme: 'system',
+        extraAccount: [
+          { id: 'billing', label: 'Billing', href: '/_/billing' },
+          { id: 'support', label: 'Support' },
+        ],
+      },
+    })
+    await w.find('[aria-label="Account menu"]').trigger('click')
+    expect(w.find('a[href="/_/billing"]').exists()).toBe(true)
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Support')!
+      .trigger('click')
+    expect(w.emitted('account')?.[0]).toEqual(['support'])
+    expect(w.emitted('signOut')).toBeUndefined()
+  })
+
   it('offers creating a repository and an organization', async () => {
     const bar = mount(PynTopBar, { props: { user: 'alice', repos: [], theme: 'system' } })
     await bar.find('[aria-label="Create"]').trigger('click')
@@ -353,6 +375,24 @@ describe('PynSideNav', () => {
     expect(w.findAll('a').map((a) => a.attributes('href'))).toContain('/alice/castle-quest')
     expect(w.text()).toContain('Home')
     expect(w.findAll('[aria-current]').map((a) => a.text())).toEqual(['Home', 'alice/core-engine'])
+  })
+
+  it('appends extra navigation entries, with or without an icon', () => {
+    const w = mount(PynSideNav, {
+      props: {
+        account: 'alice',
+        items: mainNav,
+        current: 'docs',
+        repos,
+        extraNav: [
+          { id: 'billing', label: 'Billing', href: '/_/billing', icon: 'lock' },
+          { id: 'docs', label: 'Docs', href: '/_/docs' },
+        ],
+      },
+    })
+    expect(w.find('a[href="/_/billing"] svg').exists()).toBe(true)
+    expect(w.find('a[href="/_/docs"] svg').exists()).toBe(false)
+    expect(w.find('a[href="/_/docs"]').attributes('aria-current')).toBe('page')
   })
 
   it('says when there are no repositories', () => {
