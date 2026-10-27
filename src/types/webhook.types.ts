@@ -40,3 +40,11 @@ export interface WebhookUpdate {
 }
 
 export type WebhookConfirm = { kind: 'delete' } | { kind: 'retire'; secretId: number }
+
+/** Fields collected to create a subscription. */
+export interface WebhookCreate {
+  name: string
+  url: string
+  event_types: string[]
+  enabled: boolean
+}

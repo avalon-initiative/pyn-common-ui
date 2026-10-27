@@ -1,0 +1,49 @@
+@use 'mixins' as m;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.field {
+  @include m.field;
+}
+
+.input {
+  @include m.input;
+  @include m.invalid;
+}
+
+.hint {
+  @include m.muted;
+  font-size: 0.8125rem;
+}
+
+.message {
+  @include m.field-message;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+}
+
+.button {
+  @include m.button;
+}
+
+.primary {
+  @include m.button-primary;
+}
+
+.error {
+  @include m.error;
+}

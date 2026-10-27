@@ -54,8 +54,7 @@
   }
 }
 
-.mono,
-.code {
+.mono {
   font-family: var(--pyn-font-mono);
 }
 
@@ -95,17 +94,12 @@
   @include m.button(var(--pyn-danger));
 }
 
-.secret,
 .confirm {
   @include m.card;
   display: flex;
   flex-direction: column;
   gap: var(--pyn-space-2);
   padding: var(--pyn-space-3) var(--pyn-space-4);
-}
-
-.code {
-  overflow-wrap: anywhere;
 }
 
 .list {

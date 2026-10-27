@@ -8,6 +8,7 @@ import {
   isRotating,
   parseEventTypes,
 } from '../state/webhook.state'
+import PynSecretReveal from './PynSecretReveal.vue'
 import PynWebhookDeliveries from './PynWebhookDeliveries.vue'
 import type {
   WebhookConfirm,
@@ -47,7 +48,6 @@ const name = ref('')
 const url = ref('')
 const events = ref('')
 const confirming = ref<WebhookConfirm>()
-const copied = ref(false)
 const cancelButton = ref<HTMLButtonElement>()
 const editButton = ref<HTMLButtonElement>()
 const nameInput = ref<HTMLInputElement>()
@@ -105,32 +105,13 @@ async function confirm() {
   else emit('retire-secret', c.secretId)
   confirming.value = undefined
 }
-
-async function copy() {
-  if (!props.secret) return
-  try {
-    await navigator.clipboard.writeText(props.secret)
-    copied.value = true
-  } catch {
-    copied.value = false
-  }
-}
 </script>
 
 <template>
   <div :class="styles.page">
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
 
-    <div v-if="secret" :class="styles.secret" role="status">
-      <strong>Copy this signing secret now. It is shown once.</strong>
-      <code :class="styles.code">{{ secret }}</code>
-      <div :class="styles.actions">
-        <button type="button" :class="styles.button" @click="copy">
-          {{ copied ? 'Copied' : 'Copy' }}
-        </button>
-        <button type="button" :class="styles.button" @click="emit('dismiss')">Done</button>
-      </div>
-    </div>
+    <PynSecretReveal v-if="secret" :secret="secret" @dismiss="emit('dismiss')" />
 
     <div
       v-if="confirming"
