@@ -64,6 +64,8 @@ import {
   PynTeamList,
   PynTokens,
   PynWebhookDeliveries,
+  PynWebhookDetail,
+  PynWebhooks,
   PynTopBar,
   PynTree,
   PynVerifyEmail,
@@ -83,7 +85,10 @@ import {
   clickLine,
   contentUrl,
   entryAt,
+  eventTypesLabel,
   expiryFromDate,
+  isRotating,
+  parseEventTypes,
   externalSignInUrl,
   fileBody,
   fileCrumbs,
@@ -2761,5 +2766,181 @@ describe('PynDrawer', () => {
     expect(document.body.style.overflow).toBe('hidden')
     w.unmount()
     expect(document.body.style.overflow).toBe('')
+  })
+})
+
+const subscriptions = [
+  {
+    id: 'w1',
+    name: 'CI notifier',
+    url: 'https://hooks.example.com/ci',
+    enabled: true,
+    event_types: ['lock.acquired', 'checkin.created'],
+    secrets: [{ id: 's1', created_at: '2026-10-01T09:00:00Z', encrypted: true }],
+    created_by: 'alice',
+    created_at: '2026-10-01T09:00:00Z',
+    updated_at: '2026-10-05T09:00:00Z',
+  },
+  {
+    id: 'w2',
+    name: 'Audit sink',
+    url: 'https://audit.example.com/in',
+    enabled: false,
+    event_types: [],
+    secrets: [
+      { id: 's2', created_at: '2026-09-01T09:00:00Z', encrypted: true },
+      { id: 's3', created_at: '2026-10-02T09:00:00Z', encrypted: false },
+    ],
+    created_by: 'bob',
+    created_at: '2026-09-01T09:00:00Z',
+    updated_at: '2026-10-02T09:00:00Z',
+  },
+]
+
+describe('webhook state helpers', () => {
+  it('parses, trims and dedupes event types', () => {
+    expect(parseEventTypes(' a, b\nb\n\n c ')).toEqual(['a', 'b', 'c'])
+    expect(parseEventTypes('')).toEqual([])
+  })
+
+  it('labels events and detects rotation', () => {
+    expect(eventTypesLabel([])).toBe('all events')
+    expect(eventTypesLabel(['a', 'b'])).toBe('a, b')
+    expect(isRotating(subscriptions[0])).toBe(false)
+    expect(isRotating(subscriptions[1])).toBe(true)
+  })
+})
+
+describe('PynWebhooks', () => {
+  it('renders a captioned table and marks the selected row', () => {
+    const w = mount(PynWebhooks, { props: { webhooks: subscriptions, selectedId: 'w2' } })
+    expect(w.find('caption').text()).toBe('Webhook subscriptions')
+    const rows = w.findAll('tbody tr')
+    expect(rows).toHaveLength(2)
+    expect(rows[0].text()).toContain('lock.acquired, checkin.created')
+    expect(rows[0].text()).toContain('Enabled')
+    expect(rows[1].text()).toContain('all events')
+    expect(rows[1].text()).toContain('Disabled')
+    expect(rows[1].findAll('td')[3].text()).toBe('2')
+    expect(rows[0].attributes('aria-current')).toBeUndefined()
+    expect(rows[1].attributes('aria-current')).toBe('true')
+  })
+
+  it('emits select from a row click and from the name button once', async () => {
+    const w = mount(PynWebhooks, { props: { webhooks: subscriptions } })
+    await w.findAll('tbody tr')[0].trigger('click')
+    await w.findAll('tbody tr')[1].find('button').trigger('click')
+    expect(w.emitted('select')).toEqual([['w1'], ['w2']])
+  })
+
+  it('emits create and shows empty, loading and error states', async () => {
+    const w = mount(PynWebhooks, { props: { webhooks: [] } })
+    expect(w.text()).toContain('No webhooks yet.')
+    await w.find('button').trigger('click')
+    expect(w.emitted('create')).toHaveLength(1)
+    const loading = mount(PynWebhooks, { props: { webhooks: [], loading: true } })
+    expect(loading.find('[role="status"]').text()).toContain('Loading')
+    expect(loading.attributes('aria-busy')).toBe('true')
+    const failed = mount(PynWebhooks, { props: { webhooks: [], error: 'nope' } })
+    expect(failed.find('[role="alert"]').text()).toBe('nope')
+    expect(failed.text()).not.toContain('No webhooks yet.')
+  })
+})
+
+describe('PynWebhookDetail', () => {
+  const mountIt = (props = {}) =>
+    mount(PynWebhookDetail, {
+      props: { webhook: subscriptions[0], deliveries, canRedeliver: true, ...props },
+      attachTo: document.body,
+    })
+  const byText = (w: ReturnType<typeof mountIt>, text: string) =>
+    w.findAll('button').find((b) => b.text() === text)!
+
+  it('shows the details, secrets and embedded deliveries', () => {
+    const w = mountIt()
+    expect(w.text()).toContain('https://hooks.example.com/ci')
+    expect(w.text()).toContain('alice')
+    expect(w.text()).toContain('encrypted')
+    expect(w.findComponent(PynWebhookDeliveries).exists()).toBe(true)
+    expect(w.findAll('li')).toHaveLength(1)
+    expect(byText(w, 'Rotate secret').attributes('disabled')).toBeUndefined()
+    expect(w.text()).not.toContain('Retire')
+    w.unmount()
+  })
+
+  it('emits an enabled update from the toggle', async () => {
+    const w = mountIt()
+    await w.find('input[type="checkbox"]').setValue(false)
+    expect(w.emitted('update')![0]).toEqual([{ enabled: false }])
+    w.unmount()
+  })
+
+  it('edits name, url and event types and returns focus to Edit', async () => {
+    const w = mountIt()
+    await byText(w, 'Edit').trigger('click')
+    await w.vm.$nextTick()
+    const inputs = w.findAll('form input, form textarea')
+    expect(document.activeElement).toBe(inputs[0].element)
+    await inputs[0].setValue(' Renamed ')
+    await inputs[2].setValue('a, b')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('update')![0]).toEqual([
+      { name: 'Renamed', url: 'https://hooks.example.com/ci', event_types: ['a', 'b'] },
+    ])
+    await w.vm.$nextTick()
+    expect(w.find('form').exists()).toBe(false)
+    expect(document.activeElement).toBe(byText(w, 'Edit').element)
+    w.unmount()
+  })
+
+  it('confirms delete before emitting and focuses Cancel', async () => {
+    const w = mountIt()
+    await byText(w, 'Delete').trigger('click')
+    await w.vm.$nextTick()
+    expect(w.find('[role="alertdialog"]').exists()).toBe(true)
+    expect(document.activeElement).toBe(byText(w, 'Cancel').element)
+    expect(w.emitted('delete')).toBeUndefined()
+    await byText(w, 'Cancel').trigger('click')
+    expect(w.emitted('delete')).toBeUndefined()
+    await byText(w, 'Delete').trigger('click')
+    await w.findAll('[role="alertdialog"] button')[0].trigger('click')
+    expect(w.emitted('delete')).toEqual([['w1']])
+    w.unmount()
+  })
+
+  it('rotates, and while rotating retires a chosen secret after confirmation', async () => {
+    const w = mountIt()
+    await byText(w, 'Rotate secret').trigger('click')
+    expect(w.emitted('rotate-secret')).toEqual([['w1']])
+    await w.setProps({ webhook: subscriptions[1] })
+    expect(byText(w, 'Rotate secret').attributes('disabled')).toBeDefined()
+    const retire = w.findAll('button[aria-label^="Retire secret"]')
+    expect(retire).toHaveLength(2)
+    await retire[1].trigger('click')
+    await w.findAll('[role="alertdialog"] button')[0].trigger('click')
+    expect(w.emitted('retire-secret')).toEqual([['s3']])
+    w.unmount()
+  })
+
+  it('reveals a one-time secret with copy and done', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.assign(navigator, { clipboard: { writeText } })
+    const w = mountIt({ secret: 'whsec_abc' })
+    expect(w.find('[role="status"] code').text()).toBe('whsec_abc')
+    await byText(w, 'Copy').trigger('click')
+    expect(writeText).toHaveBeenCalledWith('whsec_abc')
+    await w.vm.$nextTick()
+    expect(byText(w, 'Copied').exists()).toBe(true)
+    await byText(w, 'Done').trigger('click')
+    expect(w.emitted('dismiss')).toHaveLength(1)
+    w.unmount()
+  })
+
+  it('forwards the deliveries events and shows errors', async () => {
+    const w = mountIt({ error: 'boom' })
+    expect(w.find('[role="alert"]').text()).toBe('boom')
+    await w.find('select').setValue('failed')
+    expect(w.emitted('filter')![0]).toEqual(['failed'])
+    w.unmount()
   })
 })

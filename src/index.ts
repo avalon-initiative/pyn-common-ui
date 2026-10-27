@@ -62,6 +62,8 @@ export { default as PynAccounts } from './components/PynAccounts.vue'
 export { default as PynIdentities } from './components/PynIdentities.vue'
 export { default as PynTokens } from './components/PynTokens.vue'
 export { default as PynWebhookDeliveries } from './components/PynWebhookDeliveries.vue'
+export { default as PynWebhookDetail } from './components/PynWebhookDetail.vue'
+export { default as PynWebhooks } from './components/PynWebhooks.vue'
 export { default as PynSetup } from './components/PynSetup.vue'
 export { default as PynViewAction } from './components/PynViewAction.vue'
 export { default as PynViewError } from './components/PynViewError.vue'
@@ -94,8 +96,23 @@ export type {
 } from './types/auth.types'
 export type { CreatedToken, TokenForm, TokenInfo } from './types/token.types'
 export { TOKEN_PERMISSIONS, expiryFromDate, parseRepos } from './state/token.state'
-export type { WebhookDelivery, WebhookDeliveryStatus } from './types/webhook.types'
-export { DELIVERY_STATUSES, errorPreview, finishedAt } from './state/webhook.state'
+export type {
+  WebhookConfirm,
+  WebhookDelivery,
+  WebhookDeliveryStatus,
+  WebhookSecret,
+  WebhookSubscription,
+  WebhookUpdate,
+} from './types/webhook.types'
+export {
+  DELIVERY_STATUSES,
+  errorPreview,
+  eventTypesLabel,
+  eventTypesText,
+  finishedAt,
+  isRotating,
+  parseEventTypes,
+} from './state/webhook.state'
 export { REGISTRATION_LABELS, SETUP_STEPS, stepComplete } from './state/setup.state'
 export type { SetupStep } from './state/setup.state'
 export type { AccountInfo, AdminAccountStatus, DisableRequest } from './types/admin.types'
