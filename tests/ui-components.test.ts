@@ -62,6 +62,7 @@ import {
   PynTeamGrant,
   PynTeamList,
   PynTokens,
+  PynWebhookDeliveries,
   PynTopBar,
   PynTree,
   PynVerifyEmail,
@@ -2554,5 +2555,135 @@ describe('PynPolicyPreview', () => {
       const g = mount(PynPolicyPreview, { props: { preview, ...props } })
       expect(g.findAll('button').at(-2)!.attributes('disabled')).toBeDefined()
     }
+  })
+})
+
+const deliveries = [
+  {
+    id: 'd1',
+    status: 'pending' as const,
+    attempts: 1,
+    created_at: '2026-10-08T09:00:00Z',
+    next_attempt_at: '2026-10-08T09:05:00Z',
+    last_status_code: 503,
+    last_error: 'upstream unavailable',
+    event_id: 'e1',
+  },
+  {
+    id: 'd2',
+    status: 'failed' as const,
+    attempts: 5,
+    created_at: '2026-10-07T09:00:00Z',
+    failed_at: '2026-10-07T10:00:00Z',
+    next_attempt_at: '2026-10-07T10:00:00Z',
+    last_error: `connection refused ${'x'.repeat(80)}`,
+    event_id: 'e2',
+  },
+  {
+    id: 'd3',
+    status: 'delivered' as const,
+    attempts: 1,
+    created_at: '2026-10-06T09:00:00Z',
+    delivered_at: '2026-10-06T09:00:02Z',
+    next_attempt_at: '2026-10-06T09:00:00Z',
+    last_status_code: 200,
+    event_id: 'e3',
+  },
+]
+
+describe('PynWebhookDeliveries', () => {
+  const mountIt = (props = {}) =>
+    mount(PynWebhookDeliveries, {
+      props: { deliveries, canRedeliver: true, ...props },
+      attachTo: document.body,
+    })
+
+  it('renders a captioned table with next attempt for pending only', () => {
+    const w = mountIt()
+    expect(w.find('caption').text()).toBe('Webhook deliveries')
+    const rows = w.findAll('tbody tr')
+    expect(rows).toHaveLength(3)
+    expect(rows[0].findAll('td')[2].text()).toContain('2026')
+    expect(rows[1].findAll('td')[2].text()).toBe('')
+    expect(rows[0].findAll('td')[3].text()).toBe('503')
+    expect(rows[1].text()).toContain('Failed')
+    expect(rows[2].text()).toContain('Delivered')
+    w.unmount()
+  })
+
+  it('exposes long errors in full on expand', () => {
+    const w = mountIt()
+    expect(w.findAll('details')).toHaveLength(1)
+    expect(w.find('details pre').text()).toContain('x'.repeat(80))
+    expect(w.find('summary').text().endsWith('…')).toBe(true)
+    w.unmount()
+  })
+
+  it('has a labelled status filter that emits the value', async () => {
+    const w = mountIt({ status: 'failed' })
+    const select = w.find('select')
+    expect(w.find(`label[for="${select.attributes('id')}"]`).text()).toBe('Status')
+    expect((select.element as HTMLSelectElement).value).toBe('failed')
+    await select.setValue('')
+    expect(w.emitted('filter')?.[0]).toEqual([''])
+    w.unmount()
+  })
+
+  it('hides redeliver unless allowed', () => {
+    const w = mountIt({ canRedeliver: false })
+    expect(w.text()).not.toContain('Redeliver')
+    expect(w.findAll('th')).toHaveLength(7)
+    w.unmount()
+  })
+
+  it('emits redeliver only after confirmation, moving focus into the dialog', async () => {
+    const w = mountIt()
+    const trigger = w.findAll('tbody button')[1]
+    await trigger.trigger('click')
+    expect(w.emitted('redeliver')).toBeUndefined()
+    const dialog = w.find('[role=alertdialog]')
+    expect(dialog.attributes('aria-labelledby')).toBeTruthy()
+    expect(document.activeElement?.textContent?.trim()).toBe('Cancel')
+    await dialog.findAll('button')[0].trigger('click')
+    expect(w.emitted('redeliver')?.[0]).toEqual(['d2'])
+    expect(w.find('[role=alertdialog]').exists()).toBe(false)
+    expect(document.activeElement).toBe(trigger.element)
+    w.unmount()
+  })
+
+  it('cancels with Escape and returns focus without emitting', async () => {
+    const w = mountIt()
+    const trigger = w.findAll('tbody button')[0]
+    await trigger.trigger('click')
+    await w.find('[role=alertdialog]').trigger('keydown', { key: 'Escape' })
+    expect(w.emitted('redeliver')).toBeUndefined()
+    expect(w.find('[role=alertdialog]').exists()).toBe(false)
+    expect(document.activeElement).toBe(trigger.element)
+    w.unmount()
+  })
+
+  it('disables redelivery while one is running', () => {
+    const w = mountIt({ redeliveringId: 'd2' })
+    const buttons = w.findAll('tbody button')
+    expect(buttons.every((b) => b.attributes('disabled') !== undefined)).toBe(true)
+    expect(buttons[1].text()).toBe('Redelivering…')
+    w.unmount()
+  })
+
+  it('shows loading, empty and error states and pages', async () => {
+    let w = mountIt({ deliveries: [], loading: true })
+    expect(w.find('[role=status]').text()).toContain('Loading')
+    w.unmount()
+    w = mountIt({ deliveries: [], error: 'boom' })
+    expect(w.find('[role=alert]').text()).toBe('boom')
+    expect(w.text()).toContain('No matching deliveries')
+    w.unmount()
+    w = mountIt({ hasMore: true })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Load more')!
+      .trigger('click')
+    expect(w.emitted('load-more')).toHaveLength(1)
+    w.unmount()
   })
 })
