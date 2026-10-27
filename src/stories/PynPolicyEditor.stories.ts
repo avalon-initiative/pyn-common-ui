@@ -12,6 +12,12 @@ path = "assets/**/*.psd"
 mode = "exclusive"
 `
 
+const inline = `[[rule]]
+path = "**"
+mode = "shared"
+meta = { owner = "art", tags = ["a", "b"], "quoted key" = 1 }
+`
+
 const meta: Meta<typeof PynPolicyEditor> = {
   title: 'Policy/PynPolicyEditor',
   component: PynPolicyEditor,
@@ -31,6 +37,12 @@ export const Saving: Story = { args: { dirty: true, saving: true } }
 export const ReadOnly: Story = { args: { readonly: true } }
 export const Disabled: Story = { args: { disabled: true } }
 export const InvalidLines: Story = { args: { dirty: true, problemLines: [6] } }
+export const ProblemMessages: Story = {
+  args: {
+    dirty: true,
+    problems: [{ line: 6, message: 'unknown mode "lockd"; expected "shared" or "exclusive"' }],
+  },
+}
 export const WithNotice: Story = {
   args: { dirty: true },
   render: (args) => ({
@@ -41,3 +53,4 @@ export const WithNotice: Story = {
     </PynPolicyEditor>`,
   }),
 }
+export const InlineTable: Story = { args: { text: inline } }

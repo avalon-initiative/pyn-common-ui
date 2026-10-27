@@ -27,6 +27,7 @@ function push(out: TomlToken[], kind: TomlTokenKind, text: string) {
 /** Scans a value (and anything after it) from `s`, updating the multi-line state. */
 function scanValue(s: string, out: TomlToken[], st: State) {
   let i = 0
+  let inline = 0
   while (i < s.length) {
     const rest = s.slice(i)
     const c = s[i]
@@ -45,7 +46,8 @@ function scanValue(s: string, out: TomlToken[], st: State) {
     } else if (c === '"' || c === "'") {
       let j = i + 1
       while (j < s.length && s[j] !== c) j += c === '"' && s[j] === '\\' ? 2 : 1
-      push(out, 'string', s.slice(i, j + 1))
+      const quoted = s.slice(i, j + 1)
+      push(out, inline && /^\s*=/.test(s.slice(j + 1)) ? 'key' : 'string', quoted)
       i = j + 1
     } else {
       const m = DATE.exec(rest) ?? NUMBER.exec(rest)
@@ -54,10 +56,13 @@ function scanValue(s: string, out: TomlToken[], st: State) {
         push(out, 'number', m[0])
         i += m[0].length
       } else if (w) {
-        push(out, w[0] === 'true' || w[0] === 'false' ? 'boolean' : 'plain', w[0])
+        const isKey = inline > 0 && /^(\s*\.\s*[\w-]+)*\s*=/.test(rest.slice(w[0].length))
+        push(out, isKey ? 'key' : w[0] === 'true' || w[0] === 'false' ? 'boolean' : 'plain', w[0])
         i += w[0].length
       } else {
-        if (c === '[') st.depth++
+        if (c === '{') inline++
+        else if (c === '}' && inline > 0) inline--
+        else if (c === '[') st.depth++
         else if (c === ']' && st.depth > 0) st.depth--
         push(out, 'plain', c)
         i++
@@ -66,7 +71,7 @@ function scanValue(s: string, out: TomlToken[], st: State) {
   }
 }
 
-/** Tokenizes TOML into one token list per line; a lenient highlighter, not a validator. */
+/** Tokenizes TOML into one token list per line; lenient, so malformed lines stay plain (the server reports problems). */
 export function highlightToml(text: string): TomlToken[][] {
   const st: State = { multi: null, depth: 0 }
   return text.split('\n').map((line) => {

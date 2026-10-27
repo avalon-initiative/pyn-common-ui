@@ -136,6 +136,12 @@
   overflow: auto;
 }
 
+.problem {
+  margin: 0;
+  color: var(--pyn-danger);
+  font-size: var(--pyn-text-sm);
+}
+
 .hint,
 .status {
   @include m.muted;

@@ -57,3 +57,18 @@ export const LargeFilterable: Story = {
     },
   },
 }
+
+export const NestedFolders: Story = {
+  args: {
+    preview: {
+      to_exclusive: [
+        ...many('art/characters', 5),
+        ...many('art/props', 4),
+        ...many('levels/forest', 3),
+        'root.psd',
+      ],
+      to_shared: many('docs/design', 2),
+      released_locks: [],
+    },
+  },
+}

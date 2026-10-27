@@ -2334,6 +2334,40 @@ describe('PynPolicyEditor', () => {
     expect(w.findAll('[data-invalid]').map((e) => e.text())).toEqual(['2', 'b'])
   })
 
+  it('shows a problem message on hover and on caret focus, without mixing lines', async () => {
+    const w = mount(PynPolicyEditor, {
+      props: {
+        text: 'a\nb\nc',
+        problems: [
+          { line: 2, message: 'bad mode' },
+          { line: 2, message: 'bad path' },
+          { message: 'general' },
+        ],
+      },
+    })
+    expect(w.findAll('[data-invalid]').map((e) => e.text())).toEqual(['2', 'b'])
+    expect(w.find('[data-invalid][title]').attributes('title')).toBe('bad mode; bad path')
+    expect(w.find('[role=status]').exists()).toBe(false)
+    const ta = w.find('textarea')
+    vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+      lineHeight: '20px',
+      paddingTop: '4px',
+    } as CSSStyleDeclaration)
+    await ta.trigger('mousemove', { clientY: 30 })
+    expect(ta.attributes('title')).toBe('bad mode; bad path')
+    expect(w.find('[role=status]').text()).toBe('Line 2: bad mode; bad path')
+    await ta.trigger('mousemove', { clientY: 5 })
+    expect(ta.attributes('title')).toBeUndefined()
+    expect(w.find('[role=status]').exists()).toBe(false)
+    ;(ta.element as HTMLTextAreaElement).setSelectionRange(2, 2)
+    await ta.trigger('keyup')
+    expect(w.find('[role=status]').text()).toContain('Line 2')
+    expect(ta.attributes('aria-describedby')).toBe(w.find('[role=status]').attributes('id'))
+    await ta.trigger('blur')
+    expect(w.find('[role=status]').exists()).toBe(false)
+    vi.restoreAllMocks()
+  })
+
   it('makes the textarea read-only or disabled and renders the notice slot', () => {
     const ro = mount(PynPolicyEditor, {
       props: { text: 'a', readonly: true },
@@ -2408,7 +2442,7 @@ describe('PynPolicyPreview', () => {
 
   it('lists changed paths with from and to modes and counts per direction', () => {
     const w = mount(PynPolicyPreview, { props: { preview } })
-    const rows = w.findAll('tbody tr')
+    const rows = w.findAll('tbody tr:not([data-group])')
     expect(rows).toHaveLength(3)
     expect(rows[0].findAll('[data-mode]').map((c) => c.attributes('data-mode'))).toEqual([
       'shared',
@@ -2441,7 +2475,7 @@ describe('PynPolicyPreview', () => {
     }
     expect(mount(PynPolicyPreview, { props: { preview } }).find('select').exists()).toBe(false)
     const w = mount(PynPolicyPreview, { props: { preview: big } })
-    expect(w.findAll('tbody tr')).toHaveLength(13)
+    expect(w.findAll('tbody tr:not([data-group])')).toHaveLength(13)
     const [dir, folder] = w.findAll('select')
     expect(folder.findAll('option').map((o) => o.text())).toEqual([
       'All',
@@ -2451,11 +2485,43 @@ describe('PynPolicyPreview', () => {
       'lvl',
     ])
     await dir.setValue('shared')
-    expect(w.findAll('tbody tr')).toHaveLength(2)
+    expect(w.findAll('tbody tr:not([data-group])')).toHaveLength(2)
     expect(w.find('[role="status"]').text()).toBe('Showing 2 of 13')
     await dir.setValue('all')
     await folder.setValue('art')
-    expect(w.findAll('tbody tr')).toHaveLength(7)
+    expect(w.findAll('tbody tr:not([data-group])')).toHaveLength(7)
+  })
+
+  it('groups rows by folder and filters at any depth', async () => {
+    const mk = (d: string, n: number) => Array.from({ length: n }, (_, i) => `${d}/f${i}`)
+    const deep = {
+      to_exclusive: [...mk('art/chars', 6), ...mk('art/props', 3), 'top.psd'],
+      to_shared: mk('docs/design', 2),
+      released_locks: [],
+    }
+    const w = mount(PynPolicyPreview, { props: { preview: deep } })
+    expect(w.findAll('[data-group]').map((g) => g.find('th').text())).toEqual([
+      '(root) 1 path',
+      'art/chars 6 paths',
+      'art/props 3 paths',
+      'docs/design 2 paths',
+    ])
+    const folder = w.findAll('select')[1]
+    expect(folder.findAll('option').map((o) => o.text())).toEqual([
+      'All',
+      '(root)',
+      'art',
+      'art/chars',
+      'art/props',
+      'docs',
+      'docs/design',
+    ])
+    await folder.setValue('art')
+    expect(w.findAll('tbody tr:not([data-group])')).toHaveLength(9)
+    await folder.setValue('art/props')
+    expect(w.findAll('tbody tr:not([data-group])')).toHaveLength(3)
+    await folder.setValue('(root)')
+    expect(w.findAll('tbody tr:not([data-group])')).toHaveLength(1)
   })
 
   it('shows the empty, loading and error states', async () => {
