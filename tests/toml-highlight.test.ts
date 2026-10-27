@@ -28,6 +28,37 @@ describe('highlightToml', () => {
     expect(lines[7]).toEqual(['table:[t]'])
   })
 
+  it('colours keys inside inline tables and keeps them off values', () => {
+    expect(flat('m = { a = 1, "q k" = "x", b.c = true, d = [1, 2] }')[0]).toEqual([
+      'key:m',
+      'plain: = { ',
+      'key:a',
+      'plain: = ',
+      'number:1',
+      'plain:, ',
+      'key:"q k"',
+      'plain: = ',
+      'string:"x"',
+      'plain:, ',
+      'key:b',
+      'plain:.',
+      'key:c',
+      'plain: = ',
+      'boolean:true',
+      'plain:, ',
+      'key:d',
+      'plain: = [',
+      'number:1',
+      'plain:, ',
+      'number:2',
+      'plain:] }',
+    ])
+  })
+
+  it('leaves malformed lines plain', () => {
+    expect(flat('not toml at all')).toEqual([['plain:not toml at all']])
+  })
+
   it('keeps the original text intact', () => {
     const src = 'x = "a" # c\n\n[a.b]\nk = [1, 2]\n'
     expect(

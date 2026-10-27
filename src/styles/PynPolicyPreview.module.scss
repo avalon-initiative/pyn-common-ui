@@ -70,6 +70,12 @@
   }
 }
 
+.folder th {
+  font-family: var(--pyn-font-mono);
+  background: var(--pyn-surface);
+  color: var(--pyn-text);
+}
+
 .caption {
   @include m.visually-hidden;
 }

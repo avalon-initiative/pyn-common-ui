@@ -2,6 +2,7 @@
 import { computed, ref, useId } from 'vue'
 import styles from '../styles/PynPolicyPreview.module.scss'
 import PynModeChip from './PynModeChip.vue'
+import { dirOf, folderOptions, inFolder } from '../state/policy.state'
 import { formatDateTime } from '../utils/datetime'
 import type { Mode } from '../types/lock.types'
 import type { PolicyPreview } from '../types/policy.types'
@@ -30,20 +31,23 @@ const rows = computed<{ path: string; from: Mode; to: Mode }[]>(() => [
 
 /** Filter controls appear once the list is longer than this. */
 const FILTER_FROM = 10
-const ROOT = '(root)'
-const folderOf = (path: string) => (path.includes('/') ? path.split('/')[0] : ROOT)
 const direction = ref<'all' | Mode>('all')
 const folder = ref('all')
 const idPrefix = useId()
-const folders = computed(() => [...new Set(rows.value.map((r) => folderOf(r.path)))].sort())
+const folders = computed(() => folderOptions(rows.value.map((r) => r.path)))
 const filtering = computed(() => rows.value.length > FILTER_FROM)
 const shown = computed(() =>
   rows.value.filter(
     (r) =>
       (direction.value === 'all' || r.to === direction.value) &&
-      (folder.value === 'all' || folderOf(r.path) === folder.value),
+      (folder.value === 'all' || inFolder(r.path, folder.value)),
   ),
 )
+const groups = computed(() => {
+  const by = new Map<string, typeof rows.value>()
+  for (const r of shown.value) by.set(dirOf(r.path), [...(by.get(dirOf(r.path)) ?? []), r])
+  return [...by].sort(([a], [b]) => a.localeCompare(b))
+})
 const locks = computed(() => props.preview?.released_locks ?? [])
 const stranded = computed(() => props.preview?.stranded ?? [])
 const empty = computed(() => !rows.value.length)
@@ -101,8 +105,13 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
                 <th scope="col">Path</th>
               </tr>
             </thead>
-            <tbody>
-              <tr v-for="r in shown" :key="r.path">
+            <tbody v-for="[dir, group] in groups" :key="dir">
+              <tr :class="styles.folder" data-group>
+                <th scope="rowgroup" colspan="3">
+                  {{ dir }} <span :class="styles.muted">{{ plural(group.length, 'path') }}</span>
+                </th>
+              </tr>
+              <tr v-for="r in group" :key="r.path">
                 <td><PynModeChip :mode="r.from" /></td>
                 <td><PynModeChip :mode="r.to" /></td>
                 <td>
