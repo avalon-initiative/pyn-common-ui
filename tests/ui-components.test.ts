@@ -13,6 +13,7 @@ import {
   PynButton,
   PynCheckoutCard,
   PynCodeView,
+  PynDrawer,
   PynFileBar,
   PynFileList,
   PynFileView,
@@ -2685,5 +2686,80 @@ describe('PynWebhookDeliveries', () => {
       .trigger('click')
     expect(w.emitted('load-more')).toHaveLength(1)
     w.unmount()
+  })
+})
+
+describe('PynDrawer', () => {
+  const mountIt = (props = {}) =>
+    mount(PynDrawer, {
+      props: { open: true, title: 'Details', ...props },
+      slots: { default: '<button>One</button><button>Two</button>', footer: '<span>foot</span>' },
+      attachTo: document.body,
+    })
+
+  it('renders a labelled modal dialog with a footer slot', () => {
+    const w = mountIt({ width: '20rem' })
+    const d = w.find('[role="dialog"]')
+    expect(d.attributes('aria-modal')).toBe('true')
+    expect(w.find(`#${d.attributes('aria-labelledby')}`).text()).toBe('Details')
+    expect(w.text()).toContain('foot')
+    expect(d.attributes('style')).toContain('20rem')
+    w.unmount()
+  })
+
+  it('renders nothing when closed and omits an empty footer', () => {
+    const closed = mountIt({ open: false })
+    expect(closed.find('[role="dialog"]').exists()).toBe(false)
+    closed.unmount()
+    const w = mount(PynDrawer, { props: { open: true, title: 'x' }, attachTo: document.body })
+    expect(w.find('footer').exists()).toBe(false)
+    w.unmount()
+  })
+
+  it('emits close from Escape, the close button and the backdrop', async () => {
+    const w = mountIt()
+    await w.find('[role="dialog"]').trigger('keydown', { key: 'Escape' })
+    await w.find('button[aria-label="Close"]').trigger('click')
+    await w.find('[data-test="backdrop"]').trigger('click')
+    expect(w.emitted('close')).toHaveLength(3)
+    w.unmount()
+  })
+
+  it('moves focus in on open and back to the opener on close, locking page scroll', async () => {
+    const opener = document.createElement('button')
+    document.body.append(opener)
+    opener.focus()
+    const w = mountIt({ open: false })
+    await w.setProps({ open: true })
+    await w.vm.$nextTick()
+    expect(document.activeElement).toBe(w.find('[role="dialog"]').element)
+    expect(document.body.style.overflow).toBe('hidden')
+    await w.setProps({ open: false })
+    await w.vm.$nextTick()
+    expect(document.activeElement).toBe(opener)
+    expect(document.body.style.overflow).toBe('')
+    w.unmount()
+    opener.remove()
+  })
+
+  it('wraps Tab and Shift+Tab inside the panel', async () => {
+    const w = mountIt()
+    await w.vm.$nextTick()
+    const buttons = w.findAll('button')
+    const last = buttons[buttons.length - 1].element as HTMLElement
+    const close = w.find('button[aria-label="Close"]').element as HTMLElement
+    last.focus()
+    await w.find('[role="dialog"]').trigger('keydown', { key: 'Tab' })
+    expect(document.activeElement).toBe(close)
+    await w.find('[role="dialog"]').trigger('keydown', { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(last)
+    w.unmount()
+  })
+
+  it('restores page scroll if unmounted while open', () => {
+    const w = mountIt()
+    expect(document.body.style.overflow).toBe('hidden')
+    w.unmount()
+    expect(document.body.style.overflow).toBe('')
   })
 })

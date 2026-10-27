@@ -19,6 +19,7 @@ export { default as PynBranchBar } from './components/PynBranchBar.vue'
 export { default as PynOrgHeader } from './components/PynOrgHeader.vue'
 export { default as PynTree } from './components/PynTree.vue'
 export { default as PynFileList } from './components/PynFileList.vue'
+export { default as PynDrawer } from './components/PynDrawer.vue'
 export { default as PynFileBar } from './components/PynFileBar.vue'
 export { default as PynFileView } from './components/PynFileView.vue'
 export { default as PynCodeView } from './components/PynCodeView.vue'
@@ -237,3 +238,4 @@ export type {
   PolicyProblem,
   StrandedVersion,
 } from './types/policy.types'
+export { focusableIn, trapTarget } from './state/drawer.state'
