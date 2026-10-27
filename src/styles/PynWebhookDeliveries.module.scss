@@ -1,0 +1,105 @@
+@use 'mixins' as m;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.label,
+.meta,
+.empty {
+  @include m.muted;
+}
+
+.input {
+  @include m.input;
+}
+
+.button {
+  @include m.button;
+  align-self: flex-start;
+}
+
+.primary {
+  @include m.button-primary;
+}
+
+.actions {
+  display: flex;
+  gap: var(--pyn-space-2);
+}
+
+.confirm {
+  @include m.card;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+}
+
+.scroll {
+  @include m.card;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th,
+  td {
+    padding: var(--pyn-space-2) var(--pyn-space-3);
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--pyn-border);
+  }
+
+  th {
+    color: var(--pyn-text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+}
+
+.caption {
+  @include m.visually-hidden;
+}
+
+.status {
+  font-weight: 600;
+
+  &[data-status='failed'] {
+    color: var(--pyn-danger);
+  }
+
+  &[data-status='pending'] {
+    color: var(--pyn-text-muted);
+  }
+}
+
+.errorCell {
+  max-width: 24rem;
+  overflow-wrap: anywhere;
+
+  summary {
+    cursor: pointer;
+  }
+}
+
+.full {
+  margin: var(--pyn-space-1) 0 0;
+  font-family: var(--pyn-font-mono);
+  white-space: pre-wrap;
+}
+
+.error {
+  @include m.error;
+}
