@@ -9,3 +9,11 @@ const meta: Meta<typeof PynTopBar> = {
 export default meta
 export const Default: StoryObj<typeof PynTopBar> = {}
 export const Administrator: StoryObj<typeof PynTopBar> = { args: { admin: true } }
+export const ExtraAccountEntries: StoryObj<typeof PynTopBar> = {
+  args: {
+    extraAccount: [
+      { id: 'billing', label: 'Billing', href: '/_/billing' },
+      { id: 'support', label: 'Contact support' },
+    ],
+  },
+}

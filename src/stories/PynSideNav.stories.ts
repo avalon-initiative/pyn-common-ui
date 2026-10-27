@@ -26,3 +26,11 @@ export const WithOrganizations: Story = {
 }
 export const NoRepositories: Story = { args: { repos: [] } }
 export const Administrator: Story = { args: { items: navItems(true), current: 'accounts' } }
+export const ExtraNavigation: Story = {
+  args: {
+    extraNav: [
+      { id: 'billing', label: 'Billing', href: '/_/billing', icon: 'lock' },
+      { id: 'docs', label: 'Documentation', href: '/_/docs' },
+    ],
+  },
+}
