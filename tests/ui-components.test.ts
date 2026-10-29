@@ -38,6 +38,7 @@ import {
   PynOrgDelete,
   PynOrgForm,
   PynOrgHeader,
+  PynUserHeader,
   PynOrgList,
   PynOrgMembers,
   PynOrgRepoPolicy,
@@ -113,6 +114,7 @@ import {
   myLockKey,
   parseLineHash,
   orgTabs,
+  userTabs,
   ownerChoices,
   parseLockLimit,
   parseRepos,
@@ -478,6 +480,29 @@ describe('repository and organization headers', () => {
       '/studio/-/members',
       '/studio/-/teams',
     ])
+  })
+})
+
+describe('PynUserHeader', () => {
+  it('links Usage only on the signed-in user own profile', () => {
+    const own = mount(PynUserHeader, { props: { name: 'alice', self: true, current: 'usage' } })
+    expect(own.findAll('nav a').map((a) => a.attributes('href'))).toEqual([
+      '/alice',
+      '/alice/-/usage',
+    ])
+    expect(own.find('[aria-current=page]').text()).toBe('Usage')
+    const other = mount(PynUserHeader, { props: { name: 'alice' } })
+    expect(other.findAll('nav a').map((a) => a.attributes('href'))).toEqual(['/alice'])
+  })
+
+  it('lists Usage for organization owners only', () => {
+    const props = { name: 'studio', createdAt: '2026-09-02T08:00:00Z' }
+    const owner = mount(PynOrgHeader, { props: { ...props, role: 'owner' } })
+    expect(owner.findAll('nav a').map((a) => a.attributes('href'))).toContain('/studio/-/usage')
+    const member = mount(PynOrgHeader, { props: { ...props, role: 'member' } })
+    expect(member.findAll('nav a').map((a) => a.attributes('href'))).not.toContain(
+      '/studio/-/usage',
+    )
   })
 })
 
@@ -1474,6 +1499,18 @@ describe('organization helpers', () => {
     expect(isOrgOwner(orgs[0])).toBe(true)
     expect(isOrgOwner(orgs[1])).toBe(false)
     expect(orgTabs('member').map((t) => t.section)).toEqual(['', 'members', 'teams'])
+    expect(orgTabs(null).map((t) => t.section)).toEqual([''])
+    expect(orgTabs('owner').map((t) => t.section)).toEqual([
+      '',
+      'members',
+      'teams',
+      'usage',
+      'audit',
+      'settings',
+    ])
+    expect(orgTabs('owner').find((t) => t.section === 'usage')?.label).toBe('Usage')
+    expect(userTabs(true).map((t) => t.section)).toEqual(['', 'usage'])
+    expect(userTabs(false).map((t) => t.section)).toEqual([''])
     expect(canRemove(orgMembers[1], 'bob', false)).toBe(true)
     expect(canRemove(orgMembers[1], 'carol', false)).toBe(false)
   })
