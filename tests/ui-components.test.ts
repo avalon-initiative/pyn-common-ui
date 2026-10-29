@@ -29,6 +29,7 @@ import {
   PynMarkdown,
   PynMembers,
   PynMenu,
+  PynOwnerFrozenNotice,
   PynPolicyConflictNotice,
   PynPolicyEditor,
   PynPolicyPreview,
@@ -3015,5 +3016,39 @@ describe('PynWebhookForm', () => {
     expect(writeText).toHaveBeenCalledWith('whsec_new')
     await w.findAll('button')[1].trigger('click')
     expect(w.emitted('dismiss')).toHaveLength(1)
+  })
+})
+
+describe('PynOwnerFrozenNotice', () => {
+  const freeze = {
+    owner: 'acme',
+    owner_id: 'id-1',
+    kind: 'organization' as const,
+    frozen: true,
+    frozen_at: '2026-06-09T14:05:00Z',
+    reason: 'Billing review.',
+  }
+
+  it('shows the owner, kind, reason and time when frozen', () => {
+    const w = mount(PynOwnerFrozenNotice, { props: { freeze } })
+    expect(w.text()).toContain('Organization')
+    expect(w.text()).toContain('acme')
+    expect(w.text()).toContain('Billing review.')
+    expect(w.find('time').attributes('datetime')).toBe(freeze.frozen_at)
+  })
+
+  it('omits the reason when there is none', () => {
+    const w = mount(PynOwnerFrozenNotice, {
+      props: { freeze: { ...freeze, kind: 'user', reason: null } },
+    })
+    expect(w.text()).toContain('User')
+    expect(w.text()).not.toContain('Billing')
+  })
+
+  it('renders nothing when not frozen', () => {
+    const w = mount(PynOwnerFrozenNotice, {
+      props: { freeze: { ...freeze, frozen: false, frozen_at: null, reason: null } },
+    })
+    expect(w.find('section').exists()).toBe(false)
   })
 })
