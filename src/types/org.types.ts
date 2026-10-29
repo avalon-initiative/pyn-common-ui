@@ -44,3 +44,16 @@ export interface RepoPolicy {
 
 /** Identifies one rule: a subject holds at most one per effect. */
 export type RuleRef = Pick<CreationRule, 'effect' | 'kind' | 'subject'>
+
+export type OwnerKind = 'user' | 'organization'
+
+/** Whether an owner is frozen; writes under it are refused while reads continue. */
+export interface OwnerFreeze {
+  owner: string
+  owner_id: string
+  kind: OwnerKind
+  frozen: boolean
+  /** ISO 8601 timestamp; null while not frozen. */
+  frozen_at: string | null
+  reason: string | null
+}

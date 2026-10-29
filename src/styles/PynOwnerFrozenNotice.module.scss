@@ -1,0 +1,29 @@
+.notice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-4);
+  background: var(--pyn-surface);
+  border: 1px solid var(--pyn-danger);
+  border-radius: var(--pyn-radius);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.text,
+.reason,
+.meta {
+  margin: 0;
+}
+
+.text,
+.meta {
+  color: var(--pyn-text-muted);
+}
+
+.meta {
+  font-size: 0.875rem;
+}

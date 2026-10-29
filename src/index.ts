@@ -9,6 +9,7 @@ export { default as PynBreadcrumb } from './components/PynBreadcrumb.vue'
 export { default as PynPageNotFound } from './components/PynPageNotFound.vue'
 export { default as PynRepoNotFound } from './components/PynRepoNotFound.vue'
 export { default as PynAccountNotice } from './components/PynAccountNotice.vue'
+export { default as PynOwnerFrozenNotice } from './components/PynOwnerFrozenNotice.vue'
 export { default as PynResendForm } from './components/PynResendForm.vue'
 export { default as PynShell } from './components/PynShell.vue'
 export { default as PynTopBar } from './components/PynTopBar.vue'
@@ -137,6 +138,8 @@ export type {
   OrgMember,
   OrgRef,
   OrgRole,
+  OwnerFreeze,
+  OwnerKind,
   RepoPolicy,
   RuleEffect,
   RuleKind,
