@@ -2,7 +2,14 @@
 import { reactive, watch } from 'vue'
 import styles from '../styles/PynTeamGrant.module.scss'
 
-const props = defineProps<{ teams: string[]; roles: string[]; busy?: boolean; error?: string }>()
+const props = defineProps<{
+  teams: string[]
+  roles: string[]
+  busy?: boolean
+  /** Disables every control that writes. */
+  readonly?: boolean
+  error?: string
+}>()
 const emit = defineEmits<{ grant: [{ name: string; role: string }] }>()
 
 const form = reactive({ team: props.teams[0] ?? '', role: props.roles[0] ?? 'reader' })
@@ -13,7 +20,7 @@ watch(
   },
 )
 
-const grant = () => emit('grant', { name: form.team, role: form.role })
+const grant = () => !props.readonly && emit('grant', { name: form.team, role: form.role })
 </script>
 
 <template>
@@ -23,19 +30,24 @@ const grant = () => emit('grant', { name: form.team, role: form.role })
     <template v-else>
       <label :class="styles.field"
         >Team
-        <select v-model="form.team" :class="styles.input">
+        <select v-model="form.team" :class="styles.input" :disabled="readonly">
           <option v-for="t in teams" :key="t" :value="t">{{ t }}</option>
         </select>
       </label>
       <label :class="styles.field"
         >Role
-        <select v-model="form.role" :class="styles.input" aria-label="Role for the team">
+        <select
+          v-model="form.role"
+          :class="styles.input"
+          aria-label="Role for the team"
+          :disabled="readonly"
+        >
           <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
         </select>
       </label>
     </template>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-    <button v-if="teams.length" type="submit" :class="styles.primary" :disabled="busy">
+    <button v-if="teams.length" type="submit" :class="styles.primary" :disabled="busy || readonly">
       Grant
     </button>
   </form>

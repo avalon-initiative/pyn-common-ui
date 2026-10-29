@@ -9,7 +9,7 @@ defineProps<{ freeze: OwnerFreeze }>()
 <template>
   <section v-if="freeze.frozen" :class="styles.notice" role="status">
     <h2 :class="styles.title">
-      {{ freeze.kind === 'organization' ? 'Organization' : 'User' }}
+      {{ freeze.kind === 'org' ? 'Organization' : 'User' }}
       <strong>{{ freeze.owner }}</strong> is frozen
     </h2>
     <p :class="styles.text">Writes are refused while the freeze lasts. Reading continues.</p>

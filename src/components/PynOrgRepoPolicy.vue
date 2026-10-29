@@ -17,6 +17,8 @@ const props = defineProps<{
   teams: string[]
   members: string[]
   busy?: boolean
+  /** Disables every control that writes; the rules stay visible. */
+  readonly?: boolean
   error?: string
 }>()
 const emit = defineEmits<{
@@ -35,6 +37,7 @@ const subjects = computed(() => ruleSubjects(form.kind, form.effect, props.teams
 watch([() => form.kind, () => form.effect], () => (form.subject = ''))
 
 function add() {
+  if (props.readonly) return
   const { scope, ...rule } = form
   emit('setRule', { rule, scope })
   form.subject = ''
@@ -56,7 +59,7 @@ const rescope = (rule: RuleRef, e: Event) =>
       <select
         :class="styles.input"
         :value="policy.member_creation"
-        :disabled="busy"
+        :disabled="busy || readonly"
         @change="emit('setBase', ($event.target as HTMLSelectElement).value as MemberCreation)"
       >
         <option v-for="o in MEMBER_CREATION" :key="o.value" :value="o.value">{{ o.label }}</option>
@@ -75,12 +78,13 @@ const rescope = (rule: RuleRef, e: Event) =>
             :class="styles.input"
             :value="r.scope"
             :aria-label="`Scope of ${r.effect} ${r.kind} ${r.subject}`"
-            :disabled="busy"
+            :disabled="busy || readonly"
             @change="rescope(r, $event)"
           >
             <option v-for="s in RULE_SCOPES" :key="s" :value="s">{{ s }}</option>
           </select>
           <button
+            v-if="!readonly"
             type="button"
             :class="styles.danger"
             :disabled="busy"
@@ -94,7 +98,7 @@ const rescope = (rule: RuleRef, e: Event) =>
     </ul>
     <p v-else :class="styles.note">No rules.</p>
 
-    <form :class="styles.form" @submit.prevent="add">
+    <form v-if="!readonly" :class="styles.form" @submit.prevent="add">
       <h4 :class="styles.subheading">Add a rule</h4>
       <div :class="styles.row">
         <label :class="styles.field"

@@ -10,6 +10,8 @@ const props = defineProps<{
   /** The code of the invitation just created; the server shows it only once. */
   code?: string
   busy?: boolean
+  /** Disables every control that writes; reading stays visible. */
+  readonly?: boolean
   error?: string
 }>()
 const emit = defineEmits<{
@@ -19,6 +21,10 @@ const emit = defineEmits<{
 
 const role = ref(props.roles[0] ?? 'reader')
 const hours = ref(72)
+
+function create() {
+  if (!props.readonly) emit('create', { role: role.value, hours: Number(hours.value) })
+}
 
 function state(i: InviteInfo): string {
   if (i.revoked_at) return 'revoked'
@@ -39,7 +45,7 @@ function state(i: InviteInfo): string {
           <div :class="styles.meta">by {{ i.created_by }} · {{ state(i) }}</div>
         </div>
         <button
-          v-if="!i.revoked_at && !i.used_by"
+          v-if="!readonly && !i.revoked_at && !i.used_by"
           type="button"
           :class="styles.danger"
           :disabled="busy"
@@ -51,20 +57,29 @@ function state(i: InviteInfo): string {
     </ul>
     <p v-else :class="styles.empty">No invitations.</p>
 
-    <form :class="styles.form" @submit.prevent="emit('create', { role, hours: Number(hours) })">
+    <form :class="styles.form" @submit.prevent="create">
       <h3 :class="styles.subheading">New invitation</h3>
       <label :class="styles.field"
         >Role
-        <select v-model="role" :class="styles.input">
+        <select v-model="role" :class="styles.input" :disabled="readonly">
           <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
         </select>
       </label>
       <label :class="styles.field"
         >Valid for (hours)
-        <input v-model="hours" :class="styles.input" type="number" min="1" required />
+        <input
+          v-model="hours"
+          :class="styles.input"
+          type="number"
+          min="1"
+          required
+          :disabled="readonly"
+        />
       </label>
       <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-      <button type="submit" :class="styles.primary" :disabled="busy">Create invitation</button>
+      <button type="submit" :class="styles.primary" :disabled="busy || readonly">
+        Create invitation
+      </button>
     </form>
   </section>
 </template>

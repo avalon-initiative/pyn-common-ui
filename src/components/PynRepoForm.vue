@@ -13,6 +13,8 @@ const props = defineProps<{
   /** Effective lock limit, shown while the policy file sets it or the setting is empty. */
   effectiveMaxLocks?: number
   busy?: boolean
+  /** Disables every control that writes; the current values stay shown. */
+  readonly?: boolean
   error?: string
 }>()
 
@@ -32,6 +34,7 @@ const maxLocks = ref<string | number>(
 
 // Empty clears the setting when editing and takes the server default when creating.
 const submit = () => {
+  if (props.readonly) return
   const settings: RepoSettings = {
     name: name.value.trim(),
     visibility: visibility.value,
@@ -50,6 +53,7 @@ const submit = () => {
       <select
         :class="styles.input"
         :value="owner"
+        :disabled="readonly"
         @change="emit('update:owner', ($event.target as HTMLSelectElement).value)"
       >
         <option v-for="o in owners" :key="o" :value="o">{{ o }}</option>
@@ -65,20 +69,29 @@ const submit = () => {
           placeholder="game"
           required
           maxlength="100"
+          :disabled="readonly"
           autocapitalize="none"
         />
       </span>
     </label>
     <label :class="styles.field"
       >Visibility
-      <select v-model="visibility" :class="styles.input">
+      <select v-model="visibility" :class="styles.input" :disabled="readonly">
         <option value="private">private</option>
         <option value="public">public</option>
       </select>
     </label>
     <label :class="styles.field"
       >Lease length (hours)
-      <input v-model="leaseHours" :class="styles.input" type="number" min="1" max="720" required />
+      <input
+        v-model="leaseHours"
+        :class="styles.input"
+        type="number"
+        min="1"
+        max="720"
+        required
+        :disabled="readonly"
+      />
     </label>
     <label :class="styles.field"
       >Lock limit per user
@@ -90,6 +103,7 @@ const submit = () => {
         :max="MAX_LOCKS_MAX"
         step="1"
         :readonly="byPolicy"
+        :disabled="readonly"
         :placeholder="
           effectiveMaxLocks ? `Server default (${effectiveMaxLocks})` : 'Server default'
         "
@@ -105,7 +119,7 @@ const submit = () => {
       </span>
     </label>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-    <button type="submit" :class="styles.primary" :disabled="busy">
+    <button type="submit" :class="styles.primary" :disabled="busy || readonly">
       {{ repo ? 'Save changes' : 'Create repository' }}
     </button>
   </form>
