@@ -2,8 +2,13 @@ import type { OrgInfo, OrgMember, RepoPolicy } from '../types/org.types'
 import type { RepoTeam, TeamInfo } from '../types/team.types'
 
 export const orgs: OrgInfo[] = [
-  { name: 'studio', created_at: '2026-09-02T08:00:00Z', role: 'owner' },
-  { name: 'modding-club', created_at: '2026-09-20T12:30:00Z', role: 'member' },
+  { id: 'org-studio', name: 'studio', created_at: '2026-09-02T08:00:00Z', role: 'owner' },
+  {
+    id: 'org-modding-club',
+    name: 'modding-club',
+    created_at: '2026-09-20T12:30:00Z',
+    role: 'member',
+  },
 ]
 
 export const orgMembers: OrgMember[] = [

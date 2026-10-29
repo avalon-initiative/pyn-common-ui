@@ -11,6 +11,7 @@ export interface OrgMember {
 }
 
 export interface OrgInfo {
+  id: string
   /** ISO 8601 timestamp. */
   created_at: string
   name: string

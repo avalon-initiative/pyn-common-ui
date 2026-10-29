@@ -1075,6 +1075,8 @@ describe('PynFileList', () => {
 
 describe('PynRepoList', () => {
   const listed = (owner: string, name: string, role?: string) => ({
+    id: `repo-${owner}-${name}`,
+    owner_id: `owner-${owner}`,
     owner,
     name,
     visibility: 'private' as const,
