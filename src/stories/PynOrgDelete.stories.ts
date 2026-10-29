@@ -13,3 +13,4 @@ export const Default: Story = {}
 export const NotEmpty: Story = {
   args: { error: 'Delete the repositories the organization owns first.' },
 }
+export const ReadOnly: Story = { args: { readonly: true } }

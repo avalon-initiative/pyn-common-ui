@@ -13,6 +13,8 @@ withDefaults(
     revocable?: boolean
     title?: string
     busy?: boolean
+    /** Disables every control that writes; reading stays visible. */
+    readonly?: boolean
     error?: string
   }>(),
   { kind: 'person' },
@@ -44,14 +46,14 @@ const change = (name: string, e: Event) =>
             :class="styles.input"
             :value="g.role"
             :aria-label="`Role of ${g.name}`"
-            :disabled="busy"
+            :disabled="busy || readonly"
             @change="change(g.name, $event)"
           >
             <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
           </select>
           <span v-else :class="styles.pill" data-role>{{ g.role }}</span>
           <button
-            v-if="revocable && isEditable(g)"
+            v-if="revocable && !readonly && isEditable(g)"
             type="button"
             :class="styles.danger"
             :disabled="busy"

@@ -31,3 +31,6 @@ export const Teams: Story = {
 export const NotAllowed: Story = {
   args: { grantees, roles, error: 'You lack a permission that role grants.' },
 }
+export const ReadOnly: Story = {
+  args: { grantees, roles, kind: 'team', revocable: true, readonly: true },
+}

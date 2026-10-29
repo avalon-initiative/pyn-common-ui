@@ -17,3 +17,4 @@ type Story = StoryObj<typeof PynOrgRepoPolicy>
 export const Default: Story = {}
 export const OwnersOnly: Story = { args: { policy: { member_creation: 'none', rules: [] } } }
 export const NotATeam: Story = { args: { error: 'That team does not exist.' } }
+export const ReadOnly: Story = { args: { readonly: true } }

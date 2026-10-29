@@ -68,3 +68,10 @@ export const CreationForbidden: Story = {
     error: 'Members may not create public repositories in modding-club.',
   },
 }
+export const ReadOnly: Story = {
+  args: {
+    owner: 'alice',
+    repo: { name: 'game', visibility: 'public', lease_hours: 24 },
+    readonly: true,
+  },
+}

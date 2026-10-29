@@ -41,3 +41,4 @@ export const JustCreated: Story = {
   args: { invites, roles, code: 'pyni_8d2f0c91' },
 }
 export const None: Story = { args: { invites: [], roles } }
+export const ReadOnly: Story = { args: { invites, roles, readonly: true } }

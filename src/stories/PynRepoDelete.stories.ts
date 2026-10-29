@@ -15,3 +15,4 @@ export const Refused: Story = {
     error: 'Only the repository owner, as an admin, can do that.',
   },
 }
+export const ReadOnly: Story = { args: { slug: 'alice/game', readonly: true } }
