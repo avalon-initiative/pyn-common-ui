@@ -3023,7 +3023,7 @@ describe('PynOwnerFrozenNotice', () => {
   const freeze = {
     owner: 'acme',
     owner_id: 'id-1',
-    kind: 'organization' as const,
+    kind: 'org' as const,
     frozen: true,
     frozen_at: '2026-06-09T14:05:00Z',
     reason: 'Billing review.',
