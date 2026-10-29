@@ -10,5 +10,6 @@ export default meta
 type Story = StoryObj<typeof PynOrgHeader>
 
 export const Owner: Story = { args: { role: 'owner', current: '' } }
+export const OwnerUsage: Story = { args: { role: 'owner', current: 'usage' } }
 export const Member: Story = { args: { role: 'member', current: 'members' } }
 export const Visitor: Story = {}

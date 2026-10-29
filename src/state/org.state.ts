@@ -34,7 +34,18 @@ export function orgTabs(role: OrgRole | null | undefined): OrgTab[] {
   if (role)
     tabs.push({ section: 'members', label: 'Members' }, { section: 'teams', label: 'Teams' })
   if (role === 'owner')
-    tabs.push({ section: 'audit', label: 'Audit' }, { section: 'settings', label: 'Settings' })
+    tabs.push(
+      { section: 'usage', label: 'Usage' },
+      { section: 'audit', label: 'Audit' },
+      { section: 'settings', label: 'Settings' },
+    )
+  return tabs
+}
+
+/** Profile tabs; Usage is for the signed-in user on their own profile. */
+export function userTabs(self: boolean): OrgTab[] {
+  const tabs: OrgTab[] = [{ section: '', label: 'Repositories' }]
+  if (self) tabs.push({ section: 'usage', label: 'Usage' })
   return tabs
 }
 

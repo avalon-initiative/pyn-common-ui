@@ -18,6 +18,7 @@ export { default as PynRepoNav } from './components/PynRepoNav.vue'
 export { default as PynRepoHeader } from './components/PynRepoHeader.vue'
 export { default as PynBranchBar } from './components/PynBranchBar.vue'
 export { default as PynOrgHeader } from './components/PynOrgHeader.vue'
+export { default as PynUserHeader } from './components/PynUserHeader.vue'
 export { default as PynTree } from './components/PynTree.vue'
 export { default as PynFileList } from './components/PynFileList.vue'
 export { default as PynDrawer } from './components/PynDrawer.vue'
@@ -193,6 +194,7 @@ export {
   ruleKey,
   ruleSubjects,
   sortOrgs,
+  userTabs,
 } from './state/org.state'
 export type { OrgTab } from './state/org.state'
 export {
