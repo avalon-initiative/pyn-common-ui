@@ -3,6 +3,7 @@ import type { AccountStatus } from './auth.types'
 export type AdminAccountStatus = AccountStatus
 
 export interface AccountInfo {
+  id: string
   user: string
   email?: string | null
   email_verified: boolean

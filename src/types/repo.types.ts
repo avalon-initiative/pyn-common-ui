@@ -10,6 +10,8 @@ export interface RepoRef {
 
 /** The repository fields the pages show; the rest are filled by the server's repository listing. */
 export interface RepoInfo extends RepoRef {
+  id: string
+  owner_id: string
   visibility: Visibility
   lease_hours: number
   created_at: string

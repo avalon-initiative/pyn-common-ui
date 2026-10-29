@@ -9,6 +9,8 @@ export default meta
 type Story = StoryObj<typeof PynRepoList>
 
 const repo = (owner: string, name: string, role: string, visibility = 'private') => ({
+  id: `repo-${owner}-${name}`,
+  owner_id: `owner-${owner}`,
   owner,
   name,
   visibility: visibility as 'private' | 'public',

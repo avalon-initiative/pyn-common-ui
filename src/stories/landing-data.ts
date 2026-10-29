@@ -5,6 +5,8 @@ import type { RepoSummary, TreeEntry, TreeListing } from '../types/tree.types'
 export const now = new Date('2026-10-08T12:00:00Z')
 
 export const repo: RepoInfo = {
+  id: 'repo-acme-castle-quest',
+  owner_id: 'owner-acme',
   owner: 'acme',
   name: 'castle-quest',
   visibility: 'private',
