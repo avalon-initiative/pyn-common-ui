@@ -1,0 +1,49 @@
+.meter {
+  --meter-color: var(--pyn-available);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  min-width: 10rem;
+}
+
+.warning {
+  --meter-color: var(--pyn-locked);
+}
+
+.danger {
+  --meter-color: var(--pyn-danger);
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+  font-size: var(--pyn-text-sm);
+}
+
+.label {
+  color: var(--pyn-text-muted);
+}
+
+.value {
+  color: var(--pyn-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.danger .value {
+  color: var(--pyn-danger);
+}
+
+.track {
+  height: 0.5rem;
+  overflow: hidden;
+  background: var(--pyn-surface-raised);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius-pill);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: var(--meter-color);
+}
