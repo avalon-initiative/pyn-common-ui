@@ -67,6 +67,10 @@ export { default as PynWebhookDeliveries } from './components/PynWebhookDeliveri
 export { default as PynWebhookDetail } from './components/PynWebhookDetail.vue'
 export { default as PynWebhookForm } from './components/PynWebhookForm.vue'
 export { default as PynWebhooks } from './components/PynWebhooks.vue'
+export { default as PynUsageMeter } from './components/PynUsageMeter.vue'
+export { default as PynOwnerUsage } from './components/PynOwnerUsage.vue'
+export { default as PynUsageBreakdown } from './components/PynUsageBreakdown.vue'
+export { default as PynStorageCapForm } from './components/PynStorageCapForm.vue'
 export { default as PynSetup } from './components/PynSetup.vue'
 export { default as PynViewAction } from './components/PynViewAction.vue'
 export { default as PynViewError } from './components/PynViewError.vue'
@@ -78,6 +82,20 @@ export type { PynButtonProps, PynButtonVariant } from './types/PynButton.types'
 export { applyTheme, loadTheme, saveTheme, themeChoices } from './state/theme.state'
 export type { ThemeChoice } from './state/theme.state'
 export { formatDate, formatDateTime } from './utils/datetime'
+export { formatBytes } from './utils/bytes'
+export { CAP_UNITS, capToBytes, splitCap, usageLevel, usagePercent } from './state/usage.state'
+export type {
+  FolderUsage,
+  Limits,
+  OwnerLimits,
+  OwnerUsage,
+  PathUsage,
+  RepoUsage,
+  RepoUsageBreakdown,
+  SetRepoStorageCapRequest,
+  Usage,
+  UsageLevel,
+} from './types/usage.types'
 export { formatAgo } from './utils/ago'
 export { formatWait } from './utils/wait'
 export { EXPIRING_SOON_MS, formatLease, lockState } from './utils/lease'

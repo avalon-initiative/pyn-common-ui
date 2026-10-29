@@ -1,0 +1,81 @@
+@use 'mixins' as m;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.title,
+.subtitle {
+  margin: 0;
+}
+
+.title {
+  font-size: var(--pyn-text-md);
+}
+
+.subtitle {
+  font-size: var(--pyn-text-base);
+}
+
+.meters {
+  @include m.card;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--pyn-space-4);
+  padding: var(--pyn-space-4);
+}
+
+.list {
+  @include m.list;
+}
+
+.item {
+  @include m.item;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  min-width: 0;
+}
+
+.name {
+  padding: 0;
+  color: var(--pyn-text);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-family: var(--pyn-font-mono);
+  font-weight: 600;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include m.focus-ring;
+}
+
+.owner {
+  color: var(--pyn-text-muted);
+  font-weight: 400;
+}
+
+.meta,
+.empty {
+  @include m.muted;
+  font-size: var(--pyn-text-sm);
+}
+
+.repoMeter {
+  flex: 0 0 16rem;
+
+  @include m.narrow {
+    flex-basis: 100%;
+  }
+}

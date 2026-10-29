@@ -1,0 +1,58 @@
+@use 'mixins' as m;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.title,
+.subtitle {
+  margin: 0;
+}
+
+.title {
+  font-size: var(--pyn-text-md);
+}
+
+.subtitle {
+  font-size: var(--pyn-text-base);
+}
+
+.note,
+.empty {
+  @include m.muted;
+}
+
+.table {
+  @include m.card;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th,
+  td {
+    padding: var(--pyn-space-2) var(--pyn-space-4);
+    text-align: left;
+  }
+
+  th {
+    color: var(--pyn-text-muted);
+    font-weight: 500;
+  }
+
+  tbody tr {
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.path {
+  font-family: var(--pyn-font-mono);
+  overflow-wrap: anywhere;
+}
