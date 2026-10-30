@@ -8,6 +8,7 @@ export interface TeamRepo {
 }
 
 export interface TeamInfo {
+  id: string
   /** ISO 8601 timestamp. */
   created_at: string
   description: string
@@ -26,6 +27,7 @@ export interface TeamFormValue {
 
 /** A team's role in a repository. */
 export interface RepoTeam {
+  team_id: string
   slug: string
   name: string
   description: string

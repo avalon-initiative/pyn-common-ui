@@ -19,6 +19,7 @@ export const orgMembers: OrgMember[] = [
 
 export const teams: TeamInfo[] = [
   {
+    id: 'team-artists',
     slug: 'artists',
     name: 'Artists',
     description: 'Texture and model work.',
@@ -30,6 +31,7 @@ export const teams: TeamInfo[] = [
     ],
   },
   {
+    id: 'team-qa',
     slug: 'qa',
     name: 'qa',
     description: '',
@@ -41,6 +43,7 @@ export const teams: TeamInfo[] = [
 
 export const repoTeams: RepoTeam[] = [
   {
+    team_id: 'team-artists',
     slug: 'artists',
     name: 'Artists',
     description: 'Texture and model work.',
