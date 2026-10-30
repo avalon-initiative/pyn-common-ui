@@ -3,7 +3,7 @@ import styles from '../styles/PynOrgPendingInvitations.module.scss'
 import { formatDate } from '../utils/datetime'
 import type { OrgInvitation } from '../types/org.types'
 
-defineProps<{ invitations: OrgInvitation[]; busy?: boolean; error?: string }>()
+defineProps<{ invitations: OrgInvitation[]; busy?: boolean; error?: string; readonly?: boolean }>()
 const emit = defineEmits<{ cancel: [user: string] }>()
 </script>
 
@@ -17,7 +17,7 @@ const emit = defineEmits<{ cancel: [user: string] }>()
           <th scope="col">Role</th>
           <th scope="col">Invited by</th>
           <th scope="col">Expires</th>
-          <th scope="col"><span :class="styles.hidden">Actions</span></th>
+          <th v-if="!readonly" scope="col"><span :class="styles.hidden">Actions</span></th>
         </tr>
       </thead>
       <tbody>
@@ -32,7 +32,7 @@ const emit = defineEmits<{ cancel: [user: string] }>()
           <td>
             <time :datetime="i.expires_at">{{ formatDate(i.expires_at) }}</time>
           </td>
-          <td :class="styles.actions">
+          <td v-if="!readonly" :class="styles.actions">
             <button
               type="button"
               :class="styles.danger"

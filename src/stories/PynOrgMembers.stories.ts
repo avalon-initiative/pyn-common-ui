@@ -18,3 +18,4 @@ export const LastOwner: Story = {
   },
 }
 export const NotAUser: Story = { args: { error: 'That account does not exist.' } }
+export const WithNotice: Story = { args: { notice: 'Invitation sent to dave.' } }

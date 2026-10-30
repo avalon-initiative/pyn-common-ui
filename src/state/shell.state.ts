@@ -3,6 +3,8 @@ export interface NavItem {
   label: string
   href: string
   icon?: string
+  /** A count shown beside the label; hidden when 0 or empty. */
+  badge?: number | string
 }
 
 export const mainNav: NavItem[] = [

@@ -19,6 +19,9 @@ const props = defineProps<{
   currentOrg?: string
 }>()
 const allItems = computed(() => [...props.items, ...(props.extraNav ?? [])])
+
+const hasBadge = (item: NavItem) =>
+  item.badge !== undefined && item.badge !== '' && item.badge !== 0
 </script>
 
 <template>
@@ -35,6 +38,10 @@ const allItems = computed(() => [...props.items, ...(props.extraNav ?? [])])
           :aria-current="item.id === current ? 'page' : undefined"
         >
           <PynIcon v-if="item.icon" :name="item.icon" />{{ item.label }}
+          <template v-if="hasBadge(item)">
+            <span :class="styles.badge" aria-hidden="true">{{ item.badge }}</span>
+            <span :class="styles.hidden">{{ item.badge }} pending</span>
+          </template>
         </a>
       </li>
     </ul>

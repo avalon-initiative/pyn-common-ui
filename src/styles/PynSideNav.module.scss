@@ -83,3 +83,12 @@
   @include m.muted;
   padding: 0 var(--pyn-space-3);
 }
+
+.badge {
+  @include m.pill;
+  margin-left: auto;
+}
+
+.hidden {
+  @include m.visually-hidden;
+}
