@@ -2,6 +2,7 @@
 import { onBeforeUnmount, ref, watch } from 'vue'
 import styles from '../styles/PynHistory.module.scss'
 import { formatDateTime } from '../utils/datetime'
+import { commitBody, commitSubject } from '../utils/commit-message'
 import { FILTER_DEBOUNCE_MS } from '../state/history.state'
 import type { Revision } from '../types/repo.types'
 
@@ -62,7 +63,11 @@ onBeforeUnmount(() => clearTimeout(timer))
               >restored from r{{ rev.restored_from }}</span
             >
           </div>
-          <div :class="styles.message">{{ rev.message }}</div>
+          <div :class="styles.message">{{ commitSubject(rev.message) }}</div>
+          <details v-if="commitBody(rev.message)" :class="styles.body">
+            <summary :class="styles.bodyToggle">Description</summary>
+            <pre :class="styles.bodyText">{{ commitBody(rev.message) }}</pre>
+          </details>
         </div>
         <div :class="styles.meta">{{ rev.author }} · {{ formatDateTime(rev.created_at) }}</div>
       </li>

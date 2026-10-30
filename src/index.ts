@@ -284,3 +284,4 @@ export type {
   StrandedVersion,
 } from './types/policy.types'
 export { focusableIn, trapTarget } from './state/drawer.state'
+export { commitSubject, commitBody } from './utils/commit-message'

@@ -2,6 +2,7 @@
 import { reactive } from 'vue'
 import styles from '../styles/PynAudit.module.scss'
 import { formatDateTime } from '../utils/datetime'
+import { commitSubject } from '../utils/commit-message'
 import { AUDIT_ACTIONS } from '../state/repo.state'
 import type { AuditEntry, AuditFilter } from '../types/repo.types'
 
@@ -41,7 +42,7 @@ const form = reactive<AuditFilter>({
         <div>
           <span :class="styles.action">{{ e.action }}</span>
           <span v-if="e.path" :class="styles.path"> {{ e.path }}</span>
-          <div :class="styles.meta">{{ e.detail }}</div>
+          <div :class="styles.meta">{{ commitSubject(e.detail) }}</div>
         </div>
         <div :class="styles.meta">{{ e.actor }} · {{ formatDateTime(e.at) }}</div>
       </li>

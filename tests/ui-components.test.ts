@@ -989,6 +989,17 @@ describe('PynHistory', () => {
     restored_from,
   })
 
+  it('shows the subject as the title and the body in a collapsed disclosure', () => {
+    const r = { ...rev(2), message: 'Fix seam\nin wall\n\n\nTiling was off.\nMips regenerated.\n' }
+    const w = mount(PynHistory, { props: { revisions: [r, rev(1)] } })
+    expect(w.text()).toContain('Fix seam in wall')
+    const d = w.findAll('details')
+    expect(d).toHaveLength(1)
+    expect(d[0].attributes('open')).toBeUndefined()
+    expect(d[0].find('summary').exists()).toBe(true)
+    expect(d[0].find('pre').text()).toBe('Tiling was off.\nMips regenerated.')
+  })
+
   it('shows revision, path, author and message', () => {
     const w = mount(PynHistory, { props: { revisions: [rev(3, 'x/y.ts', 1)] } })
     expect(w.text()).toContain('r3')
@@ -1296,6 +1307,13 @@ describe('PynAudit', () => {
       .find((b) => b.text().startsWith('Load older'))!
       .trigger('click')
     expect(w.emitted('more')).toHaveLength(1)
+  })
+
+  it('shows only the subject of a multi-paragraph detail', () => {
+    const e = { ...entries[0], detail: 'Add lighting\n\nLong explanation here.' }
+    const w = mount(PynAudit, { props: { entries: [e], plain: true } })
+    expect(w.text()).toContain('Add lighting')
+    expect(w.text()).not.toContain('Long explanation')
   })
 
   it('hides the filter form when plain', () => {
