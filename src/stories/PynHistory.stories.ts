@@ -44,6 +44,19 @@ const revisions = [
   },
 ]
 
+export const WithBody: Story = {
+  args: {
+    revisions: [
+      {
+        ...revisions[1],
+        message:
+          'Retouch the wall texture\n\nThe old tiling showed a seam at the corner.\nRegenerated mips as well.\n',
+      },
+      revisions[2],
+    ],
+  },
+}
+
 export const Repository: Story = { args: { revisions, hasMore: true } }
 export const Filtered: Story = {
   args: { revisions: revisions.filter((r) => r.path.endsWith('.uasset')), filter: '*.uasset' },

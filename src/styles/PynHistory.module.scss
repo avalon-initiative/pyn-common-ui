@@ -60,6 +60,22 @@
   color: var(--pyn-text-muted);
 }
 
+.body {
+  margin-top: var(--pyn-space-1);
+}
+
+.bodyToggle {
+  @include m.muted;
+  cursor: pointer;
+}
+
+.bodyText {
+  margin: var(--pyn-space-1) 0 0;
+  font-family: inherit;
+  white-space: pre-wrap;
+  color: var(--pyn-text-muted);
+}
+
 .list {
   @include m.list;
 }
