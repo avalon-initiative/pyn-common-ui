@@ -27,6 +27,16 @@
   @include m.muted;
 }
 
+.notice {
+  margin: 0;
+  padding: var(--pyn-space-2) var(--pyn-space-3);
+  color: var(--pyn-text);
+  background: var(--pyn-surface);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  font-size: 0.875rem;
+}
+
 .form {
   @include m.form;
 }

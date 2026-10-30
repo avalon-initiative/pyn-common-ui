@@ -420,6 +420,24 @@ describe('PynSideNav', () => {
     expect(w.find('a[href="/_/docs"]').attributes('aria-current')).toBe('page')
   })
 
+  it('shows a badge with an accessible label, hidden when 0 or empty', () => {
+    const nav = (badge?: number | string) =>
+      mount(PynSideNav, {
+        props: {
+          account: 'alice',
+          items: [{ id: 'inv', label: 'Invitations', href: '/_/inv', badge }],
+          current: '',
+          repos,
+        },
+      })
+    const w = nav(3)
+    expect(w.find('a[href="/_/inv"] [aria-hidden="true"]').text()).toBe('3')
+    expect(w.find('a[href="/_/inv"]').text()).toContain('3 pending')
+    for (const none of [0, '', undefined]) {
+      expect(nav(none).find('a[href="/_/inv"]').text()).toBe('Invitations')
+    }
+  })
+
   it('says when there are no repositories', () => {
     const w = mount(PynSideNav, {
       props: { account: 'alice', items: mainNav, current: '', repos: [] },
@@ -1601,6 +1619,17 @@ describe('PynOrgMembers', () => {
   const buttons = (w: ReturnType<typeof mount>, text: string) =>
     w.findAll('button').filter((b) => b.text().startsWith(text))
 
+  it('renders the notice as a polite status message, and nothing when empty', () => {
+    const w = mount(PynOrgMembers, { props: { ...props, notice: 'Invitation sent.' } })
+    expect(w.find('[role=status]').text()).toBe('Invitation sent.')
+    expect(mount(PynOrgMembers, { props }).find('[role=status]').exists()).toBe(false)
+    expect(
+      mount(PynOrgMembers, { props: { ...props, notice: '' } })
+        .find('[role=status]')
+        .exists(),
+    ).toBe(false)
+  })
+
   it('lets an owner add a member with a role', async () => {
     const w = mount(PynOrgMembers, { props })
     const form = w.findAll('form').at(-1)!
@@ -1704,6 +1733,16 @@ describe('PynOrgPendingInvitations', () => {
     const w = mount(PynOrgPendingInvitations, { props: { invitations: orgInvitations } })
     await w.find('button[aria-label="Cancel invitation for dave"]').trigger('click')
     expect(w.emitted('cancel')?.[0]).toEqual(['dave'])
+  })
+
+  it('keeps the table but drops the cancel buttons and Actions column when readonly', () => {
+    const w = mount(PynOrgPendingInvitations, {
+      props: { invitations: orgInvitations, readonly: true },
+    })
+    expect(w.findAll('th').map((h) => h.text())).toEqual(['User', 'Role', 'Invited by', 'Expires'])
+    expect(w.findAll('tbody tr')).toHaveLength(2)
+    expect(w.findAll('tbody tr')[0].findAll('td')).toHaveLength(4)
+    expect(w.find('button').exists()).toBe(false)
   })
 
   it('disables cancel while busy and shows the empty state', () => {

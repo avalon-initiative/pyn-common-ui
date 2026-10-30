@@ -26,6 +26,11 @@ export const WithOrganizations: Story = {
 }
 export const NoRepositories: Story = { args: { repos: [] } }
 export const Administrator: Story = { args: { items: navItems(true), current: 'accounts' } }
+export const WithBadge: Story = {
+  args: {
+    extraNav: [{ id: 'invitations', label: 'Invitations', href: '/_/invitations', badge: 3 }],
+  },
+}
 export const ExtraNavigation: Story = {
   args: {
     extraNav: [

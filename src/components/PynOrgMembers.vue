@@ -11,6 +11,8 @@ defineProps<{
   owner: boolean
   busy?: boolean
   error?: string
+  /** A polite status message, such as a confirmation after an invitation is sent. */
+  notice?: string
 }>()
 const emit = defineEmits<{
   setRole: [{ user: string; role: OrgRole }]
@@ -75,6 +77,7 @@ const change = (user: string, e: Event) =>
       </li>
     </ul>
     <p v-else :class="styles.empty">No members.</p>
+    <p v-if="notice" :class="styles.notice" role="status">{{ notice }}</p>
     <p v-if="error && !owner" :class="styles.error" role="alert">{{ error }}</p>
 
     <form v-if="owner" :class="styles.form" @submit.prevent="add">
