@@ -1,0 +1,19 @@
+@use 'mixins' as m;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.list {
+  @include m.list;
+}
+
+.empty {
+  @include m.muted;
+}
+
+.error {
+  @include m.error;
+}

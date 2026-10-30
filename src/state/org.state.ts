@@ -86,3 +86,16 @@ export function ruleSubjects(
 /** Whether the rule already exists, so adding it would replace its scope. */
 export const hasRule = (rules: CreationRule[], r: RuleRef) =>
   rules.some((x) => ruleKey(x) === ruleKey(r))
+
+/** Organization log actions; `org_member_added` is a direct add, an invitation is `org_member_invited`. */
+export const ORG_INVITATION_AUDIT_LABELS: Record<string, string> = {
+  org_member_added: 'Member added directly',
+  org_member_invited: 'Member invited',
+  org_invitation_accepted: 'Invitation accepted',
+  org_invitation_declined: 'Invitation declined',
+  org_invitation_cancelled: 'Invitation cancelled',
+  org_invitation_expired: 'Invitation expired',
+}
+
+export const orgAuditLabel = (action: string): string =>
+  ORG_INVITATION_AUDIT_LABELS[action] ?? action
