@@ -1,4 +1,4 @@
-import type { OrgInfo, OrgMember, RepoPolicy } from '../types/org.types'
+import type { OrgInfo, OrgInvitation, OrgMember, RepoPolicy } from '../types/org.types'
 import type { RepoTeam, TeamInfo } from '../types/team.types'
 
 export const orgs: OrgInfo[] = [
@@ -59,3 +59,22 @@ export const repoPolicy: RepoPolicy = {
     { effect: 'allow', kind: 'role', subject: 'member', scope: 'private' },
   ],
 }
+
+export const orgInvitations: OrgInvitation[] = [
+  {
+    org: 'studio',
+    user: 'dave',
+    role: 'member',
+    invited_by: 'alice',
+    created_at: '2026-10-20T09:00:00Z',
+    expires_at: '2026-11-19T09:00:00Z',
+  },
+  {
+    org: 'modding-club',
+    user: 'dave',
+    role: 'owner',
+    invited_by: 'erin',
+    created_at: '2026-10-25T16:30:00Z',
+    expires_at: '2026-11-24T16:30:00Z',
+  },
+]

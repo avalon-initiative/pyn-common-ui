@@ -1,0 +1,34 @@
+@use 'mixins' as m;
+
+.card {
+  @include m.item;
+}
+
+.who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+}
+
+.meta {
+  @include m.muted;
+}
+
+.pill {
+  @include m.pill;
+}
+
+.primary {
+  @include m.button-primary;
+}
+
+.quiet {
+  @include m.button;
+}

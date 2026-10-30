@@ -40,7 +40,10 @@ import {
   PynOrgHeader,
   PynUserHeader,
   PynOrgList,
+  PynOrgInvitation,
+  PynOrgInvitations,
   PynOrgMembers,
+  PynOrgPendingInvitations,
   PynOrgRepoPolicy,
   PynPageNotFound,
   PynReadme,
@@ -107,6 +110,7 @@ import {
   historyLink,
   isEditable,
   isOrgOwner,
+  orgAuditLabel,
   languageFor,
   lineHash,
   mainNav,
@@ -139,7 +143,14 @@ import {
 import type { SetupForm } from '../src'
 import { accounts } from '../src/stories/admin-data'
 import { codeText, fileEntry, imageSrc, lockedEntry, readmeText } from '../src/stories/file-data'
-import { orgMembers, orgs, repoPolicy, repoTeams, teams } from '../src/stories/org-data'
+import {
+  orgInvitations,
+  orgMembers,
+  orgs,
+  repoPolicy,
+  repoTeams,
+  teams,
+} from '../src/stories/org-data'
 import { folderListing, repo, rootEntries, rootListing, summary } from '../src/stories/landing-data'
 
 const now = new Date('2026-10-08T12:00:00Z')
@@ -1623,6 +1634,101 @@ describe('PynOrgMembers', () => {
   it('shows the server error', () => {
     const w = mount(PynOrgMembers, { props: { ...props, error: 'last owner' } })
     expect(w.find('[role=alert]').text()).toBe('last owner')
+  })
+})
+
+describe('PynOrgInvitation', () => {
+  const invitation = orgInvitations[0]
+
+  it('shows the organization, role, inviter and expiry', () => {
+    const w = mount(PynOrgInvitation, { props: { invitation } })
+    expect(w.find('[data-org]').text()).toBe('studio')
+    expect(w.find('[data-role]').text()).toBe('member')
+    expect(w.find('[data-invited-by]').text()).toBe('alice')
+    expect(w.find('[data-expires]').text()).toBe('Nov 19 2026')
+  })
+
+  it('emits accept and decline with the organization', async () => {
+    const w = mount(PynOrgInvitation, { props: { invitation } })
+    await w.find('button[aria-label="Accept invitation to studio"]').trigger('click')
+    await w.find('button[aria-label="Decline invitation to studio"]').trigger('click')
+    expect(w.emitted('accept')?.[0]).toEqual(['studio'])
+    expect(w.emitted('decline')?.[0]).toEqual(['studio'])
+  })
+
+  it('disables both buttons while busy', () => {
+    const w = mount(PynOrgInvitation, { props: { invitation, busy: true } })
+    expect(w.findAll('button').every((b) => b.attributes('disabled') !== undefined)).toBe(true)
+  })
+})
+
+describe('PynOrgInvitations', () => {
+  it('lists the invitations and relays the answer', async () => {
+    const w = mount(PynOrgInvitations, { props: { invitations: orgInvitations } })
+    expect(w.findAll('article')).toHaveLength(2)
+    await w.find('button[aria-label="Decline invitation to modding-club"]').trigger('click')
+    expect(w.emitted('decline')?.[0]).toEqual(['modding-club'])
+  })
+
+  it('disables only the invitation being answered', () => {
+    const w = mount(PynOrgInvitations, {
+      props: { invitations: orgInvitations, busyOrg: 'studio' },
+    })
+    const [first, second] = w.findAll('article')
+    expect(first.find('button').attributes('disabled')).toBeDefined()
+    expect(second.find('button').attributes('disabled')).toBeUndefined()
+  })
+
+  it('shows the empty state and the error', () => {
+    const w = mount(PynOrgInvitations, { props: { invitations: [], error: 'frozen' } })
+    expect(w.text()).toContain('No pending invitations.')
+    expect(w.find('[role=alert]').text()).toBe('frozen')
+  })
+})
+
+describe('PynOrgPendingInvitations', () => {
+  it('renders a table with column headers', () => {
+    const w = mount(PynOrgPendingInvitations, { props: { invitations: orgInvitations } })
+    expect(w.findAll('th[scope=col]').map((h) => h.text())).toEqual([
+      'User',
+      'Role',
+      'Invited by',
+      'Expires',
+      'Actions',
+    ])
+    expect(w.findAll('tbody tr')).toHaveLength(2)
+    expect(w.findAll('tbody tr')[0].text()).toContain('alice')
+  })
+
+  it('emits cancel with the user', async () => {
+    const w = mount(PynOrgPendingInvitations, { props: { invitations: orgInvitations } })
+    await w.find('button[aria-label="Cancel invitation for dave"]').trigger('click')
+    expect(w.emitted('cancel')?.[0]).toEqual(['dave'])
+  })
+
+  it('disables cancel while busy and shows the empty state', () => {
+    const busy = mount(PynOrgPendingInvitations, {
+      props: { invitations: orgInvitations, busy: true },
+    })
+    expect(busy.find('button').attributes('disabled')).toBeDefined()
+    const empty = mount(PynOrgPendingInvitations, { props: { invitations: [] } })
+    expect(empty.find('table').exists()).toBe(false)
+    expect(empty.text()).toContain('No pending invitations.')
+  })
+})
+
+describe('orgAuditLabel', () => {
+  it('labels the invitation actions and a direct add', () => {
+    expect(orgAuditLabel('org_member_invited')).toBe('Member invited')
+    expect(orgAuditLabel('org_invitation_accepted')).toBe('Invitation accepted')
+    expect(orgAuditLabel('org_invitation_declined')).toBe('Invitation declined')
+    expect(orgAuditLabel('org_invitation_cancelled')).toBe('Invitation cancelled')
+    expect(orgAuditLabel('org_invitation_expired')).toBe('Invitation expired')
+    expect(orgAuditLabel('org_member_added')).toBe('Member added directly')
+  })
+
+  it('falls back to the raw action', () => {
+    expect(orgAuditLabel('org_created')).toBe('org_created')
   })
 })
 

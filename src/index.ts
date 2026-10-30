@@ -46,6 +46,9 @@ export { default as PynMyLocks } from './components/PynMyLocks.vue'
 export { default as PynOrgForm } from './components/PynOrgForm.vue'
 export { default as PynOrgList } from './components/PynOrgList.vue'
 export { default as PynOrgMembers } from './components/PynOrgMembers.vue'
+export { default as PynOrgInvitation } from './components/PynOrgInvitation.vue'
+export { default as PynOrgInvitations } from './components/PynOrgInvitations.vue'
+export { default as PynOrgPendingInvitations } from './components/PynOrgPendingInvitations.vue'
 export { default as PynOrgDelete } from './components/PynOrgDelete.vue'
 export { default as PynOrgRepoPolicy } from './components/PynOrgRepoPolicy.vue'
 export { default as PynPolicyConflictNotice } from './components/PynPolicyConflictNotice.vue'
@@ -154,6 +157,7 @@ export type {
   MemberCreation,
   NewOrgMember,
   OrgInfo,
+  OrgInvitation,
   OrgMember,
   OrgRef,
   OrgRole,
@@ -181,6 +185,7 @@ export {
 export type { RepoTab } from './state/repo.state'
 export {
   MEMBER_CREATION,
+  ORG_INVITATION_AUDIT_LABELS,
   ORG_ROLES,
   RULE_EFFECTS,
   RULE_KINDS,
@@ -188,6 +193,7 @@ export {
   canRemove,
   hasRule,
   isOrgOwner,
+  orgAuditLabel,
   orgPath,
   orgTabs,
   ownerChoices,

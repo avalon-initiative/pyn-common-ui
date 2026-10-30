@@ -19,6 +19,18 @@ export interface OrgInfo {
   role?: OrgRole | null
 }
 
+/** A pending offer of membership; the user accepts or declines it. */
+export interface OrgInvitation {
+  org: string
+  user: string
+  role: OrgRole
+  invited_by: string
+  /** ISO 8601 timestamp. */
+  created_at: string
+  /** ISO 8601 timestamp. */
+  expires_at: string
+}
+
 export interface NewOrgMember {
   user: string
   role: OrgRole
