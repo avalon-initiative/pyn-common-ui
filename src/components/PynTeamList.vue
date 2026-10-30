@@ -9,7 +9,7 @@ defineProps<{ org: string; teams: TeamInfo[] }>()
 
 <template>
   <ul v-if="teams.length" :class="styles.list">
-    <li v-for="t in teams" :key="t.slug" :class="styles.item">
+    <li v-for="t in teams" :key="t.id" :class="styles.item">
       <span :class="styles.who">
         <a :href="teamPath(org, t.slug)" :class="styles.link">{{ t.name }}</a>
         <span v-if="t.name !== t.slug" :class="styles.slug">{{ t.slug }}</span>
