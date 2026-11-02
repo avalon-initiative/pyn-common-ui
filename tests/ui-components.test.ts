@@ -438,6 +438,18 @@ describe('PynSideNav', () => {
     }
   })
 
+  it('keeps the link text exactly the label when there is no badge', () => {
+    const w = mount(PynSideNav, {
+      props: {
+        account: 'alice',
+        items: [{ id: 'rep', label: 'Reports', href: '/_/rep', icon: 'repo' }],
+        current: 'rep',
+        repos,
+      },
+    })
+    expect(w.find('a[href="/_/rep"]').element.textContent).toBe('Reports')
+  })
+
   it('says when there are no repositories', () => {
     const w = mount(PynSideNav, {
       props: { account: 'alice', items: mainNav, current: '', repos: [] },
