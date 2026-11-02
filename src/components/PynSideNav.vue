@@ -37,8 +37,8 @@ const hasBadge = (item: NavItem) =>
           :class="styles.link"
           :aria-current="item.id === current ? 'page' : undefined"
         >
-          <PynIcon v-if="item.icon" :name="item.icon" />{{ item.label }}
-          <template v-if="hasBadge(item)">
+          <PynIcon v-if="item.icon" :name="item.icon" />{{ item.label
+          }}<template v-if="hasBadge(item)">
             <span :class="styles.badge" aria-hidden="true">{{ item.badge }}</span>
             <span :class="styles.hidden">{{ item.badge }} pending</span>
           </template>
