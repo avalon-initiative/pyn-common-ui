@@ -58,15 +58,24 @@ describe('PynUsageMeter', () => {
 describe('PynOwnerUsage', () => {
   it('shows the owner meters and the repositories in the given order', () => {
     const w = mount(PynOwnerUsage, { props: { usage: ownerUsage } })
-    expect(w.text()).toContain('13 GB of 20 GB')
+    expect(w.text()).toContain('15.5 GB of 20 GB')
+    expect(w.find('[data-detail]').text()).toBe('Content 13 GB · LFS 2.5 GB')
     expect(w.text()).toContain('3 of 10')
     expect(w.text()).toContain('12 of 25')
     const names = w.findAll('li button').map((b) => b.text())
     expect(names).toEqual(['studio/game', 'studio/assets', 'studio/tools'])
     const rows = w.findAll('li')
-    expect(rows[0].text()).toContain('9 GB of 10 GB')
+    expect(rows[0].text()).toContain('9.5 GB of 10 GB')
+    expect(rows[0].find('[data-detail]').text()).toBe('Content 9 GB · LFS 512 MB')
     expect(rows[1].text()).toContain('unlimited')
     expect(rows[2].find('[data-level]').attributes('data-level')).toBe('danger')
+  })
+
+  it('counts LFS bytes toward the repository cap', () => {
+    const repo = { ...ownerUsage.repositories[0], stored_bytes: 9 * GB, lfs_bytes: GB }
+    const w = mount(PynOwnerUsage, { props: { usage: { ...ownerUsage, repositories: [repo] } } })
+    expect(w.find('li [data-level]').attributes('data-level')).toBe('danger')
+    expect(w.find('li').text()).toContain('10 GB of 10 GB')
   })
 
   it('emits open with the repository row', async () => {
@@ -87,11 +96,18 @@ describe('PynOwnerUsage', () => {
 describe('PynUsageBreakdown', () => {
   it('lists folders and largest paths with the shared-content note', () => {
     const w = mount(PynUsageBreakdown, { props: { breakdown } })
-    expect(w.find('[data-note]').text()).toContain('more than the stored total')
+    expect(w.find('[data-note]').text()).toContain('more than the stored content')
+    expect(w.find('[data-detail]').text()).toBe('Content 9 GB · LFS 512 MB')
+    expect(w.text()).toContain('9.5 GB of 10 GB')
     const rows = w.findAll('tbody tr').map((r) => r.text())
     expect(rows[0]).toContain('art')
     expect(rows.some((r) => r.includes('(repository root)'))).toBe(true)
     expect(rows.some((r) => r.includes('art/hero.psd') && r.includes('14'))).toBe(true)
+  })
+
+  it('sums LFS bytes into the cap', () => {
+    const w = mount(PynUsageBreakdown, { props: { breakdown: { ...breakdown, lfs_bytes: GB } } })
+    expect(w.find('[data-level]').attributes('data-level')).toBe('danger')
   })
 
   it('shows empty states', () => {

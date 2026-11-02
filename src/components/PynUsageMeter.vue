@@ -11,6 +11,8 @@ const props = defineProps<{
   limit: number | null
   /** How values read: bytes are formatted, counts are plain numbers. */
   unit?: 'bytes' | 'count'
+  /** A muted line under the bar, e.g. how the used amount splits. */
+  detail?: string
 }>()
 
 const fmt = (n: number) => (props.unit === 'bytes' ? formatBytes(n) : String(n))
@@ -41,5 +43,6 @@ const text = computed(() =>
     >
       <span v-if="percent !== null" :class="styles.fill" :style="{ width: `${percent}%` }" />
     </div>
+    <span v-if="detail" :class="styles.detail" data-detail>{{ detail }}</span>
   </div>
 </template>

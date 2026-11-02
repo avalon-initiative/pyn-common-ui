@@ -8,6 +8,7 @@ export const repoUsages: RepoUsage[] = [
     repository: 'studio/game',
     repo_id: 'r1',
     stored_bytes: 9 * GB,
+    lfs_bytes: 512 * MB,
     files: 1240,
     revisions: 5310,
     storage_cap: 10 * GB,
@@ -16,6 +17,7 @@ export const repoUsages: RepoUsage[] = [
     repository: 'studio/assets',
     repo_id: 'r2',
     stored_bytes: 4 * GB,
+    lfs_bytes: 2 * GB,
     files: 380,
     revisions: 902,
     storage_cap: null,
@@ -24,6 +26,7 @@ export const repoUsages: RepoUsage[] = [
     repository: 'studio/tools',
     repo_id: 'r3',
     stored_bytes: 12 * MB,
+    lfs_bytes: 0,
     files: 41,
     revisions: 120,
     storage_cap: 10 * MB,
@@ -39,7 +42,7 @@ export const ownerUsage: OwnerUsage = {
     effective: { repositories: 10, members: 25, storage_bytes: 20 * GB },
     own: { repositories: null, members: 25, storage_bytes: 20 * GB },
   },
-  usage: { repositories: 3, members: 12, stored_bytes: 13 * GB },
+  usage: { repositories: 3, members: 12, stored_bytes: 13 * GB, lfs_bytes: 2.5 * GB },
   repositories: repoUsages,
 }
 
@@ -52,12 +55,13 @@ export const unlimitedOwnerUsage: OwnerUsage = {
     effective: { repositories: null, members: null, storage_bytes: null },
     own: { repositories: null, members: null, storage_bytes: null },
   },
-  usage: { repositories: 1, members: null, stored_bytes: 300 * MB },
+  usage: { repositories: 1, members: null, stored_bytes: 300 * MB, lfs_bytes: 0 },
   repositories: [
     {
       repository: 'alice/notes',
       repo_id: 'r9',
       stored_bytes: 300 * MB,
+      lfs_bytes: 0,
       files: 12,
       revisions: 30,
       storage_cap: null,
@@ -69,6 +73,7 @@ export const breakdown: RepoUsageBreakdown = {
   repository: 'studio/game',
   repo_id: 'r1',
   stored_bytes: 9 * GB,
+  lfs_bytes: 512 * MB,
   storage_cap: 10 * GB,
   folders: [
     { folder: 'art', stored_bytes: 6 * GB, files: 700 },
@@ -84,6 +89,7 @@ export const breakdown: RepoUsageBreakdown = {
 export const emptyBreakdown: RepoUsageBreakdown = {
   ...breakdown,
   stored_bytes: 0,
+  lfs_bytes: 0,
   storage_cap: null,
   folders: [],
   largest_paths: [],

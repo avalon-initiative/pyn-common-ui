@@ -13,12 +13,13 @@ defineProps<{ breakdown: RepoUsageBreakdown }>()
     <PynUsageMeter
       label="Stored"
       unit="bytes"
-      :used="breakdown.stored_bytes"
+      :used="breakdown.stored_bytes + breakdown.lfs_bytes"
       :limit="breakdown.storage_cap"
+      :detail="`Content ${formatBytes(breakdown.stored_bytes)} · LFS ${formatBytes(breakdown.lfs_bytes)}`"
     />
     <p :class="styles.note" data-note>
-      Folders and paths can add up to more than the stored total, because content shared between
-      them counts in each.
+      Folders and paths can add up to more than the stored content, because content shared between
+      them counts in each. LFS objects are not part of them.
     </p>
     <h3 :class="styles.subtitle">Folders</h3>
     <table v-if="breakdown.folders.length" :class="styles.table">

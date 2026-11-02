@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import styles from '../styles/PynOwnerUsage.module.scss'
 import PynUsageMeter from './PynUsageMeter.vue'
+import { formatBytes } from '../utils/bytes'
 import type { OwnerUsage, RepoUsage } from '../types/usage.types'
 
 defineProps<{ usage: OwnerUsage }>()
 const emit = defineEmits<{ open: [RepoUsage] }>()
 
+const split = (stored: number, lfs: number) =>
+  `Content ${formatBytes(stored)} · LFS ${formatBytes(lfs)}`
 const repoName = (r: RepoUsage) => r.repository.split('/').slice(1).join('/') || r.repository
 const repoOwner = (r: RepoUsage) => r.repository.slice(0, r.repository.length - repoName(r).length)
 </script>
@@ -17,8 +20,9 @@ const repoOwner = (r: RepoUsage) => r.repository.slice(0, r.repository.length - 
       <PynUsageMeter
         label="Storage"
         unit="bytes"
-        :used="usage.usage.stored_bytes"
+        :used="usage.usage.stored_bytes + usage.usage.lfs_bytes"
         :limit="usage.limits.effective.storage_bytes"
+        :detail="split(usage.usage.stored_bytes, usage.usage.lfs_bytes)"
       />
       <PynUsageMeter
         label="Repositories"
@@ -48,8 +52,9 @@ const repoOwner = (r: RepoUsage) => r.repository.slice(0, r.repository.length - 
           :class="styles.repoMeter"
           label="Storage"
           unit="bytes"
-          :used="repo.stored_bytes"
+          :used="repo.stored_bytes + repo.lfs_bytes"
           :limit="repo.storage_cap"
+          :detail="split(repo.stored_bytes, repo.lfs_bytes)"
         />
       </li>
     </ul>
