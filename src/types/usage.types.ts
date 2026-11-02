@@ -2,7 +2,7 @@
 export interface Limits {
   repositories: number | null
   members: number | null
-  /** Bytes of distinct content across the owner's repositories. */
+  /** Bytes of distinct content plus LFS objects across the owner's repositories. */
   storage_bytes: number | null
 }
 
@@ -21,6 +21,8 @@ export interface Usage {
   members: number | null
   /** Bytes of distinct content, counted once per repository. */
   stored_bytes: number
+  /** Bytes of LFS objects; counts toward the storage limit with `stored_bytes`. */
+  lfs_bytes: number
 }
 
 export interface RepoUsage {
@@ -28,6 +30,8 @@ export interface RepoUsage {
   repository: string
   repo_id: string
   stored_bytes: number
+  /** Bytes of LFS objects; the storage cap applies to `stored_bytes` plus this. */
+  lfs_bytes: number
   files: number
   revisions: number
   /** The repository's own storage cap in bytes; null when it has none. */
@@ -60,6 +64,8 @@ export interface RepoUsageBreakdown {
   repository: string
   repo_id: string
   stored_bytes: number
+  /** Bytes of LFS objects, not part of the folders and paths. */
+  lfs_bytes: number
   storage_cap: number | null
   folders: FolderUsage[]
   largest_paths: PathUsage[]
