@@ -284,6 +284,8 @@ export type {
   RoleGrant,
 } from './types/repo.types'
 export type {
+  LockableDisagreement,
+  LockableDisagreementKind,
   PolicyNoticeKind,
   PolicyPreview,
   PolicyProblem,

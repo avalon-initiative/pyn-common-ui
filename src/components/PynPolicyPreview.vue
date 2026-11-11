@@ -5,7 +5,7 @@ import PynModeChip from './PynModeChip.vue'
 import { dirOf, folderOptions, inFolder } from '../state/policy.state'
 import { formatDateTime } from '../utils/datetime'
 import type { Mode } from '../types/lock.types'
-import type { PolicyPreview } from '../types/policy.types'
+import type { LockableDisagreementKind, PolicyPreview } from '../types/policy.types'
 
 const props = defineProps<{
   preview?: PolicyPreview | null
@@ -50,6 +50,25 @@ const groups = computed(() => {
 })
 const locks = computed(() => props.preview?.released_locks ?? [])
 const stranded = computed(() => props.preview?.stranded ?? [])
+const DISAGREEMENT_KINDS: { kind: LockableDisagreementKind; label: string; note: string }[] = [
+  {
+    kind: 'lockable_shared',
+    label: 'lockable, shared',
+    note: 'Marked lockable, but the policy makes these paths shared.',
+  },
+  {
+    kind: 'exclusive_not_lockable',
+    label: 'exclusive, not lockable',
+    note: 'Exclusive under the policy, but not marked lockable.',
+  },
+]
+const disagreements = computed(() => props.preview?.disagreements ?? [])
+const disagreementGroups = computed(() =>
+  DISAGREEMENT_KINDS.map((k) => ({
+    ...k,
+    paths: disagreements.value.filter((d) => d.kind === k.kind).map((d) => d.path),
+  })).filter((g) => g.paths.length),
+)
 const empty = computed(() => !rows.value.length)
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
 </script>
@@ -148,6 +167,27 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
               <span :class="styles.muted">on {{ s.branch }} by {{ s.branch_owner }}</span>
             </li>
           </ul>
+        </div>
+        <div v-if="disagreements.length" :class="styles.group" data-section="disagreements">
+          <h4 :class="styles.subtitle">
+            {{ plural(disagreements.length, 'path') }} where lockable and mode disagree
+          </h4>
+          <div
+            v-for="g in disagreementGroups"
+            :key="g.kind"
+            :class="styles.group"
+            :data-kind="g.kind"
+          >
+            <h5 :class="styles.kind">{{ g.label }}</h5>
+            <p :class="styles.muted">{{ g.note }}</p>
+            <ul :class="styles.list">
+              <li v-for="p in g.paths" :key="p">
+                <button type="button" :class="styles.path" @click="emit('selectPath', p)">
+                  {{ p }}
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       </template>
     </div>

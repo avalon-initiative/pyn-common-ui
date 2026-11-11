@@ -26,6 +26,12 @@ const preview: PolicyPreview = {
   ],
 }
 
+const disagreements: PolicyPreview['disagreements'] = [
+  { path: 'art/hero.psd', kind: 'lockable_shared' },
+  { path: 'art/logo.psd', kind: 'lockable_shared' },
+  { path: 'levels/forest.map', kind: 'exclusive_not_lockable' },
+]
+
 const meta: Meta<typeof PynPolicyPreview> = {
   title: 'Policy/PynPolicyPreview',
   component: PynPolicyPreview,
@@ -40,6 +46,17 @@ export const OneDirection: Story = {
 }
 export const NoChanges: Story = {
   args: { preview: { to_exclusive: [], to_shared: [], released_locks: [] } },
+}
+export const WithDisagreements: Story = {
+  args: { preview: { ...preview, disagreements } },
+}
+export const OneDisagreementKind: Story = {
+  args: {
+    preview: {
+      ...preview,
+      disagreements: disagreements!.filter((d) => d.kind === 'lockable_shared'),
+    },
+  },
 }
 export const Loading: Story = { args: { preview: null, loading: true } }
 export const Failed: Story = {

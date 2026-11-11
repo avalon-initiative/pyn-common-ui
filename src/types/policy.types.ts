@@ -20,10 +20,19 @@ export interface StrandedVersion {
   created_at: string
 }
 
+export type LockableDisagreementKind = 'lockable_shared' | 'exclusive_not_lockable'
+
+/** Mirrors the server's `LockableDisagreement`: a path whose lockable marking and policy mode disagree. */
+export interface LockableDisagreement {
+  path: string
+  kind: LockableDisagreementKind
+}
+
 /** Mirrors the server's `PolicyPreview`. */
 export interface PolicyPreview {
   to_shared: string[]
   to_exclusive: string[]
   released_locks: LockInfo[]
   stranded?: StrandedVersion[]
+  disagreements?: LockableDisagreement[]
 }
