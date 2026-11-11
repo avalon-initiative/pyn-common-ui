@@ -9,7 +9,8 @@
 }
 
 .title,
-.subtitle {
+.subtitle,
+.kind {
   margin: 0;
 }
 
@@ -19,6 +20,11 @@
 
 .subtitle {
   font-size: 0.875rem;
+}
+
+.kind {
+  font-family: var(--pyn-font-mono);
+  font-size: 0.8125rem;
 }
 
 .body {

@@ -2685,6 +2685,49 @@ describe('PynPolicyPreview', () => {
     expect(w.find('[data-section="stranded"]').exists()).toBe(false)
   })
 
+  it('renders disagreement groups per kind and emits selectPath', async () => {
+    const both = mount(PynPolicyPreview, {
+      props: {
+        preview: {
+          ...preview,
+          disagreements: [
+            { path: 'a.psd', kind: 'lockable_shared' as const },
+            { path: 'b.map', kind: 'exclusive_not_lockable' as const },
+          ],
+        },
+      },
+    })
+    const sec = both.find('[data-section="disagreements"]')
+    expect(sec.text()).toContain('2 paths where lockable and mode disagree')
+    expect(sec.find('[data-kind="lockable_shared"]').text()).toContain('lockable, shared')
+    expect(sec.find('[data-kind="exclusive_not_lockable"]').text()).toContain(
+      'exclusive, not lockable',
+    )
+    await sec.find('[data-kind="exclusive_not_lockable"] button').trigger('click')
+    expect(both.emitted('selectPath')![0]).toEqual(['b.map'])
+    const one = mount(PynPolicyPreview, {
+      props: {
+        preview: {
+          ...preview,
+          disagreements: [{ path: 'a.psd', kind: 'lockable_shared' as const }],
+        },
+      },
+    })
+    expect(one.findAll('[data-kind]').map((g) => g.attributes('data-kind'))).toEqual([
+      'lockable_shared',
+    ])
+  })
+
+  it('renders no disagreements section when empty or absent', () => {
+    expect(
+      mount(PynPolicyPreview, { props: { preview } })
+        .find('[data-section="disagreements"]')
+        .exists(),
+    ).toBe(false)
+    const w = mount(PynPolicyPreview, { props: { preview: { ...preview, disagreements: [] } } })
+    expect(w.find('[data-section="disagreements"]').exists()).toBe(false)
+  })
+
   it('uses a visually hidden caption and shows lock expiry', () => {
     const w = mount(PynPolicyPreview, { props: { preview } })
     expect(w.find('table').attributes('aria-label')).toBeUndefined()
