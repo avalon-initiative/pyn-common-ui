@@ -14,9 +14,9 @@ export const mainNav: NavItem[] = [
 ]
 
 const adminNav: NavItem = {
-  id: 'accounts',
-  label: 'Accounts',
-  href: '/_/admin/accounts',
+  id: 'admin',
+  label: 'Server administration',
+  href: '/_/admin',
   icon: 'user',
 }
 
@@ -24,8 +24,16 @@ const adminNav: NavItem = {
 export const navItems = (admin: boolean): NavItem[] => (admin ? [...mainNav, adminNav] : mainNav)
 
 export const accountNav = [
+  { id: 'password', label: 'Password', href: '/_/settings/password' },
   { id: 'keys', label: 'SSH keys', href: '/_/settings/keys' },
   { id: 'tokens', label: 'Access tokens', href: '/_/settings/tokens' },
+]
+
+/** The administration pages; add an item only when its page exists. */
+export const adminNavItems = () => [
+  { id: 'accounts', label: 'Accounts', href: '/_/admin/accounts' },
+  { id: 'audit', label: 'Audit log', href: '/_/admin/audit' },
+  { id: 'webhooks', label: 'Webhooks', href: '/_/admin/webhooks' },
 ]
 
 const identitiesNav = {
