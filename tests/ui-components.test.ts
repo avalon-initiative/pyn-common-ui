@@ -56,6 +56,8 @@ import {
   PynRepoLanding,
   PynRepoList,
   PynRepoNav,
+  PynRepoSettings,
+  PynRepoShell,
   PynRepoNotFound,
   PynResendForm,
   PynRoles,
@@ -131,6 +133,9 @@ import {
   personGrantees,
   readmeEntry,
   renderMarkdown,
+  repoSettingsNav,
+  repoSettingsPath,
+  repoShellTabs,
   repoTabs,
   resolveRelative,
   ruleSubjects,
@@ -3455,5 +3460,98 @@ describe('PynOwnerFrozenNotice', () => {
       props: { freeze: { ...freeze, frozen: false, frozen_at: null, reason: null } },
     })
     expect(w.find('section').exists()).toBe(false)
+  })
+})
+
+describe('repository shell and settings', () => {
+  const admin = ['read', 'manage_users', 'manage_roles', 'view_audit']
+  const sections = (items: { section: string }[]) => items.map((i) => i.section)
+
+  it('builds the tab bar from what exists', () => {
+    expect(repoShellTabs(['read'], false).map((t) => t.label)).toEqual(['Code', 'Locks', 'History'])
+    expect(repoShellTabs(admin, true, { insights: true }).map((t) => t.label)).toEqual([
+      'Code',
+      'Locks',
+      'History',
+      'Insights',
+      'Settings',
+    ])
+    expect(repoShellTabs(['view_audit'], false).at(-1)?.label).toBe('Settings')
+    expect(repoShellTabs(['read', 'manage_roles'], false).at(-1)?.label).toBe('Settings')
+  })
+
+  it('gates the settings navigation by permission', () => {
+    expect(repoSettingsNav(['read'], true)).toEqual([])
+    expect(repoSettingsNav(admin, true).map((i) => i.label)).toEqual([
+      'General',
+      'Members',
+      'Roles',
+      'Invitations',
+      'Audit log',
+    ])
+    expect(sections(repoSettingsNav(admin, false))).toEqual([
+      'members',
+      'roles',
+      'invites',
+      'audit',
+    ])
+    expect(sections(repoSettingsNav(['manage_users'], false))).toEqual(['members', 'invites'])
+    expect(repoSettingsPath({ owner: 'a', name: 'b' }, 'settings')).toBe('/a/b/settings')
+    expect(repoSettingsPath({ owner: 'a', name: 'b' }, 'audit')).toBe('/a/b/settings/audit')
+  })
+
+  it('renders the header, badge, actions and an accessible tab bar', () => {
+    const w = mount(PynRepoShell, {
+      props: {
+        owner: 'alice',
+        name: 'game',
+        visibility: 'public',
+        tabs: [
+          { section: '', label: 'Code' },
+          { section: 'locks', label: 'Locks', count: 2 },
+          { section: 'settings', label: 'Settings' },
+        ],
+        current: 'settings/members',
+      },
+      slots: { actions: '<button>Clone</button>', default: '<p>body</p>' },
+    })
+    expect(w.find('[data-visibility]').text()).toBe('Public')
+    expect(w.find('a[href="/alice"]').text()).toBe('alice')
+    expect(w.find('a[href="/alice/game"]').text()).toBe('game')
+    expect(w.find('button').text()).toBe('Clone')
+    expect(w.find('nav[aria-label="Repository"]').exists()).toBe(true)
+    expect(w.find('[aria-current=page]').text()).toBe('Settings')
+    expect(w.findAll('[aria-current=page]')).toHaveLength(1)
+    expect(w.find('[data-count]').text()).toBe('2')
+    expect(w.text()).toContain('body')
+  })
+
+  it('marks Code only on the files page and omits the tab bar without tabs', () => {
+    const props = { owner: 'a', name: 'b', visibility: 'private' as const }
+    const tabs = repoShellTabs(['read'], false)
+    const code = mount(PynRepoShell, { props: { ...props, tabs, current: '' } })
+    expect(code.find('[aria-current=page]').text()).toBe('Code')
+    const locks = mount(PynRepoShell, { props: { ...props, tabs, current: 'locks' } })
+    expect(locks.find('[aria-current=page]').text()).toBe('Locks')
+    const bare = mount(PynRepoShell, { props })
+    expect(bare.find('nav[aria-label="Repository"]').exists()).toBe(false)
+    expect(bare.find('[data-visibility]').text()).toBe('Private')
+  })
+
+  it('renders the settings sub-navigation and content', () => {
+    const w = mount(PynRepoSettings, {
+      props: { owner: 'a', name: 'b', items: repoSettingsNav(admin, true), current: 'audit' },
+      slots: { default: '<p>page</p>' },
+    })
+    expect(w.find('nav').attributes('aria-label')).toBe('Repository settings')
+    expect(w.findAll('nav a').map((a) => a.attributes('href'))).toEqual([
+      '/a/b/settings',
+      '/a/b/settings/members',
+      '/a/b/settings/roles',
+      '/a/b/settings/invites',
+      '/a/b/settings/audit',
+    ])
+    expect(w.find('[aria-current=page]').text()).toBe('Audit log')
+    expect(w.text()).toContain('page')
   })
 })

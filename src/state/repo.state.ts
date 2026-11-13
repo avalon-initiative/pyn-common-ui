@@ -55,6 +55,46 @@ export function repoTabs(permissions: string[], isOwner: boolean): RepoTab[] {
   return tabs
 }
 
+export interface RepoShellTab extends RepoTab {
+  /** A count shown as a badge beside the label. */
+  count?: number
+}
+
+/** Settings sub-pages the viewer may open; `settings` is General and the rest live under it. */
+export function repoSettingsNav(permissions: string[], isOwner: boolean): RepoTab[] {
+  const has = (p: string) => permissions.includes(p)
+  const items: RepoTab[] = []
+  if (isOwner && has('manage_roles')) items.push({ section: 'settings', label: 'General' })
+  if (has('manage_users')) items.push({ section: 'members', label: 'Members' })
+  if (has('manage_roles')) items.push({ section: 'roles', label: 'Roles' })
+  if (has('manage_users')) items.push({ section: 'invites', label: 'Invitations' })
+  if (has('view_audit')) items.push({ section: 'audit', label: 'Audit log' })
+  return items
+}
+
+/** The repository tab bar; Insights only when its page exists, Settings when any settings page is visible. */
+export function repoShellTabs(
+  permissions: string[],
+  isOwner: boolean,
+  options: { insights?: boolean } = {},
+): RepoShellTab[] {
+  const tabs: RepoShellTab[] = [
+    { section: '', label: 'Code' },
+    { section: 'locks', label: 'Locks' },
+    { section: 'history', label: 'History' },
+  ]
+  if (options.insights) tabs.push({ section: 'insights', label: 'Insights' })
+  if (repoSettingsNav(permissions, isOwner).length > 0) {
+    tabs.push({ section: 'settings', label: 'Settings' })
+  }
+  return tabs
+}
+
+/** The route of a settings sub-page; General is `settings` itself. */
+export function repoSettingsPath(r: { owner: string; name: string }, section: string): string {
+  return repoPath(r, section === 'settings' ? 'settings' : `settings/${section}`)
+}
+
 export const MAX_LOCKS_MIN = 1
 export const MAX_LOCKS_MAX = 10000
 

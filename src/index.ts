@@ -18,6 +18,8 @@ export { default as PynTopBar } from './components/PynTopBar.vue'
 export { default as PynSideNav } from './components/PynSideNav.vue'
 export { default as PynRepoNav } from './components/PynRepoNav.vue'
 export { default as PynRepoHeader } from './components/PynRepoHeader.vue'
+export { default as PynRepoShell } from './components/PynRepoShell.vue'
+export { default as PynRepoSettings } from './components/PynRepoSettings.vue'
 export { default as PynBranchBar } from './components/PynBranchBar.vue'
 export { default as PynOrgHeader } from './components/PynOrgHeader.vue'
 export { default as PynUserHeader } from './components/PynUserHeader.vue'
@@ -193,9 +195,12 @@ export {
   parseLockLimit,
   repoPath,
   repoSlug,
+  repoSettingsNav,
+  repoSettingsPath,
+  repoShellTabs,
   repoTabs,
 } from './state/repo.state'
-export type { RepoTab } from './state/repo.state'
+export type { RepoShellTab, RepoTab } from './state/repo.state'
 export {
   MEMBER_CREATION,
   ORG_INVITATION_AUDIT_LABELS,
