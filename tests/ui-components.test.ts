@@ -60,6 +60,8 @@ import {
   PynSearch,
   PynSetup,
   PynShell,
+  PynVersionFooter,
+  versionMismatch,
   PynSignIn,
   PynSideNav,
   PynTeamDelete,
@@ -581,6 +583,44 @@ describe('PynShell', () => {
     expect(side.classes().length).toBe(2)
     await side.find('a').trigger('click')
     expect(side.classes().length).toBe(1)
+  })
+})
+
+describe('PynShell footer', () => {
+  it('renders the footer slot only when given', () => {
+    expect(mount(PynShell).find('footer').exists()).toBe(false)
+    const w = mount(PynShell, { slots: { footer: '<footer>f</footer>' } })
+    expect(w.find('footer').exists()).toBe(true)
+  })
+})
+
+describe('PynVersionFooter', () => {
+  it('shows both versions without a flag when they agree', () => {
+    const w = mount(PynVersionFooter, { props: { webVersion: '0.1.2', serverVersion: 'v0.1.9' } })
+    expect(w.text()).toBe('web v0.1.2·server v0.1.9')
+    expect(w.attributes('data-mismatch')).toBe('false')
+  })
+  it('flags a mismatch and lists revisions in the tooltip', () => {
+    const w = mount(PynVersionFooter, {
+      props: {
+        webVersion: '0.1.2',
+        serverVersion: '0.2.0',
+        webRevision: 'abc',
+        serverRevision: 'def',
+      },
+    })
+    expect(w.text()).toContain('version mismatch')
+    expect(w.attributes('title')).toBe('web abc · server def')
+  })
+  it('shows an unknown server without flagging it', () => {
+    const w = mount(PynVersionFooter, { props: { webVersion: '0.1.2' } })
+    expect(w.text()).toContain('server unknown')
+    expect(w.attributes('data-mismatch')).toBe('false')
+  })
+  it('compares major and minor only', () => {
+    expect(versionMismatch('0.1.2', '0.1.9')).toBe(false)
+    expect(versionMismatch('0.1.2', '1.1.2')).toBe(true)
+    expect(versionMismatch('dev', '')).toBe(false)
   })
 })
 
