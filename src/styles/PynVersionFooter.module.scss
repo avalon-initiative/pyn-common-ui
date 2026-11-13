@@ -1,0 +1,22 @@
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--pyn-space-1) var(--pyn-space-4);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+  color: var(--pyn-text-muted);
+  background: var(--pyn-surface);
+  border-top: 1px solid var(--pyn-border);
+}
+
+.mismatch {
+  color: var(--pyn-danger);
+  background: var(--pyn-danger-bg);
+}
+
+.flag {
+  font-weight: 600;
+}

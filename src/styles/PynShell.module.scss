@@ -3,12 +3,12 @@
 .shell {
   display: grid;
   grid-template:
-    'top top' var(--pyn-topbar-height) 'side main' 1fr / var(--pyn-sidebar-width)
+    'top top' var(--pyn-topbar-height) 'side main' 1fr 'foot foot' auto / var(--pyn-sidebar-width)
     minmax(0, 1fr);
   min-height: 100vh;
 
   @include m.narrow {
-    grid-template: 'top' var(--pyn-topbar-height) 'main' 1fr / minmax(0, 1fr);
+    grid-template: 'top' var(--pyn-topbar-height) 'main' 1fr 'foot' auto / minmax(0, 1fr);
   }
 }
 
@@ -70,4 +70,11 @@
 
 .content {
   min-width: 0;
+}
+
+.footer {
+  grid-area: foot;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }

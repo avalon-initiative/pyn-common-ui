@@ -29,5 +29,6 @@ const closeOnLink = (e: MouseEvent) => {
     <main :class="styles.main">
       <div :class="styles.content"><slot /></div>
     </main>
+    <div v-if="$slots.footer" :class="styles.footer"><slot name="footer" /></div>
   </div>
 </template>
