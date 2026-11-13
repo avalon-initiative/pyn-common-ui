@@ -56,6 +56,8 @@ import {
   PynRepoLanding,
   PynRepoList,
   PynRepoNav,
+  PynRepoSettings,
+  PynRepoShell,
   PynRepoNotFound,
   PynResendForm,
   PynRoles,
@@ -131,6 +133,9 @@ import {
   personGrantees,
   readmeEntry,
   renderMarkdown,
+  repoSettingsNav,
+  repoSettingsPath,
+  repoShellTabs,
   repoTabs,
   resolveRelative,
   ruleSubjects,
@@ -589,6 +594,18 @@ describe('PynShell', () => {
     expect(side.classes().length).toBe(2)
     await side.find('a').trigger('click')
     expect(side.classes().length).toBe(1)
+  })
+})
+
+describe('PynShell bare', () => {
+  it('omits the side navigation and its toggle but keeps the top bar', () => {
+    const slots = { top: '<b>top</b>', side: '<a href="#x">x</a>', default: 'body' }
+    const bare = mount(PynShell, { props: { bare: true }, slots })
+    expect(bare.find('aside').exists()).toBe(false)
+    expect(bare.find('button').exists()).toBe(false)
+    expect(bare.find('header').text()).toContain('top')
+    expect(bare.text()).toContain('body')
+    expect(mount(PynShell, { slots }).find('aside').exists()).toBe(true)
   })
 })
 
@@ -3455,5 +3472,120 @@ describe('PynOwnerFrozenNotice', () => {
       props: { freeze: { ...freeze, frozen: false, frozen_at: null, reason: null } },
     })
     expect(w.find('section').exists()).toBe(false)
+  })
+})
+
+describe('repository shell and settings', () => {
+  const admin = ['read', 'manage_users', 'manage_roles', 'view_audit']
+  const sections = (items: { section: string }[]) => items.map((i) => i.section)
+
+  it('builds the tab bar from what exists', () => {
+    expect(repoShellTabs(['read'], false).map((t) => t.label)).toEqual(['Code', 'Locks', 'History'])
+    expect(repoShellTabs(admin, true, { insights: true }).map((t) => t.label)).toEqual([
+      'Code',
+      'Locks',
+      'History',
+      'Insights',
+      'Settings',
+    ])
+    expect(repoShellTabs(['view_audit'], false).at(-1)?.label).toBe('Settings')
+  })
+
+  it('gates the settings navigation as the pages do', () => {
+    expect(repoSettingsNav(['read'], false)).toEqual([])
+    const all = [...admin, 'edit_policy']
+    expect(repoSettingsNav(all, true).map((i) => i.label)).toEqual([
+      'General',
+      'Members',
+      'Roles',
+      'Invitations',
+      'Policy',
+      'Storage',
+      'Audit log',
+    ])
+    expect(sections(repoSettingsNav(all, false))).toEqual([
+      'members',
+      'roles',
+      'invites',
+      'policy',
+      'storage',
+      'audit',
+    ])
+    expect(sections(repoSettingsNav(['read'], true))).toEqual(['settings', 'storage'])
+    expect(sections(repoSettingsNav(['read'], false, { serverAdmin: true }))).toEqual(['storage'])
+    expect(sections(repoSettingsNav(['edit_policy'], false))).toEqual(['policy'])
+    expect(sections(repoSettingsNav(['manage_roles'], false))).toEqual(['roles'])
+    expect(sections(repoSettingsNav(['manage_users'], false))).toEqual(['members', 'invites'])
+    expect(repoSettingsPath({ owner: 'a', name: 'b' }, 'settings')).toBe('/a/b/settings')
+    expect(repoSettingsPath({ owner: 'a', name: 'b' }, 'audit')).toBe('/a/b/settings/audit')
+  })
+
+  it('shows the Settings tab to everyone who can open a settings page', () => {
+    const last = (p: string[], owner: boolean, serverAdmin = false) =>
+      repoShellTabs(p, owner, { serverAdmin }).some((t) => t.label === 'Settings')
+    expect(last(['read'], true)).toBe(true)
+    expect(last(['read'], false, true)).toBe(true)
+    expect(last(['edit_policy'], false)).toBe(true)
+    expect(last(['read'], false)).toBe(false)
+  })
+
+  it('renders the header, badge, actions and an accessible tab bar', () => {
+    const w = mount(PynRepoShell, {
+      props: {
+        owner: 'alice',
+        name: 'game',
+        visibility: 'public',
+        tabs: [
+          { section: '', label: 'Code' },
+          { section: 'locks', label: 'Locks', count: 2 },
+          { section: 'settings', label: 'Settings' },
+        ],
+        current: 'settings/members',
+      },
+      slots: { actions: '<button>Clone</button>', default: '<p>body</p>' },
+    })
+    expect(w.find('[data-visibility]').text()).toBe('Public')
+    expect(w.find('a[href="/alice"]').text()).toBe('alice')
+    expect(w.find('a[href="/alice/game"]').text()).toBe('game')
+    expect(w.find('button').text()).toBe('Clone')
+    expect(w.find('nav[aria-label="Repository"]').exists()).toBe(true)
+    expect(w.find('[aria-current=page]').text()).toBe('Settings')
+    expect(w.findAll('[aria-current=page]')).toHaveLength(1)
+    expect(w.find('[data-count]').text()).toBe('2')
+    expect(w.text()).toContain('body')
+  })
+
+  it('marks Code only on the files page and omits the tab bar without tabs', () => {
+    const props = { owner: 'a', name: 'b', visibility: 'private' as const }
+    const tabs = repoShellTabs(['read'], false)
+    const code = mount(PynRepoShell, { props: { ...props, tabs, current: '' } })
+    expect(code.find('[aria-current=page]').text()).toBe('Code')
+    const locks = mount(PynRepoShell, { props: { ...props, tabs, current: 'locks' } })
+    expect(locks.find('[aria-current=page]').text()).toBe('Locks')
+    const bare = mount(PynRepoShell, { props })
+    expect(bare.find('nav[aria-label="Repository"]').exists()).toBe(false)
+    expect(bare.find('[data-visibility]').text()).toBe('Private')
+  })
+
+  it('renders the settings sub-navigation and content', () => {
+    const w = mount(PynRepoSettings, {
+      props: {
+        owner: 'a',
+        name: 'b',
+        items: repoSettingsNav(admin, true).filter((i) => i.section !== 'storage'),
+        current: 'audit',
+      },
+      slots: { default: '<p>page</p>' },
+    })
+    expect(w.find('nav').attributes('aria-label')).toBe('Repository settings')
+    expect(w.findAll('nav a').map((a) => a.attributes('href'))).toEqual([
+      '/a/b/settings',
+      '/a/b/settings/members',
+      '/a/b/settings/roles',
+      '/a/b/settings/invites',
+      '/a/b/settings/audit',
+    ])
+    expect(w.find('[aria-current=page]').text()).toBe('Audit log')
+    expect(w.text()).toContain('page')
   })
 })
