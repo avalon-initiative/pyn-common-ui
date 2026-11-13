@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   PynAccountNotice,
   PynAccountSettings,
+  PynAdminLayout,
+  PynPasswordForm,
   PynAccounts,
   PynActivity,
   PynAddPerson,
@@ -81,6 +83,8 @@ import {
   accountActions,
   accountNav,
   accountNavItems,
+  adminNavItems,
+  navItems,
   applyUpdate,
   PynViewAction,
   PynViewError,
@@ -343,14 +347,16 @@ describe('PynTopBar', () => {
     expect(w.emitted('signOut')).toHaveLength(1)
   })
 
-  it('links Accounts in the account menu for administrators only', async () => {
+  it('links Server administration in the account menu for administrators only', async () => {
     const open = async (admin?: boolean) => {
       const w = mount(PynTopBar, { props: { user: 'root', repos: [], theme: 'system', admin } })
       await w.find('[aria-label="Account menu"]').trigger('click')
       return w
     }
-    expect((await open(true)).find('[href="/_/admin/accounts"]').exists()).toBe(true)
-    expect((await open()).find('[href="/_/admin/accounts"]').exists()).toBe(false)
+    const admin = await open(true)
+    expect(admin.find('[href="/_/admin"]').text()).toBe('Server administration')
+    expect(admin.find('[href="/_/settings"]').text()).toBe('Account settings')
+    expect((await open()).find('[href="/_/admin"]').exists()).toBe(false)
   })
 
   it('adds extra account entries: links stay links, buttons emit account', async () => {
@@ -2162,7 +2168,111 @@ describe('PynAccountSettings', () => {
 
   it('adds linked sign-in only when a provider exists', () => {
     expect(accountNavItems(false)).toEqual(accountNav)
-    expect(accountNavItems(true).map((i) => i.id)).toEqual(['keys', 'tokens', 'identities'])
+    expect(accountNavItems(true).map((i) => i.id)).toEqual([
+      'password',
+      'keys',
+      'tokens',
+      'identities',
+    ])
+  })
+
+  it('lists Password first, then keys and tokens', () => {
+    expect(accountNav.map((i) => [i.id, i.label, i.href])).toEqual([
+      ['password', 'Password', '/_/settings/password'],
+      ['keys', 'SSH keys', '/_/settings/keys'],
+      ['tokens', 'Access tokens', '/_/settings/tokens'],
+    ])
+  })
+})
+
+describe('PynAdminLayout', () => {
+  it('lists the administration pages, marks the current one and renders the page', () => {
+    const w = mount(PynAdminLayout, {
+      props: { items: adminNavItems(), current: 'audit' },
+      slots: { default: '<p>content</p>' },
+    })
+    expect(w.find('nav').attributes('aria-label')).toBe('Server administration')
+    expect(w.findAll('a').map((a) => [a.text(), a.attributes('href')])).toEqual([
+      ['Accounts', '/_/admin/accounts'],
+      ['Audit log', '/_/admin/audit'],
+      ['Webhooks', '/_/admin/webhooks'],
+    ])
+    expect(w.find('a[aria-current="page"]').text()).toBe('Audit log')
+    expect(w.text()).toContain('content')
+  })
+
+  it('shows one Server administration entry in the sidebar for administrators', () => {
+    expect(navItems(false).some((i) => i.id === 'admin')).toBe(false)
+    const item = navItems(true).at(-1)
+    expect(item).toMatchObject({ id: 'admin', label: 'Server administration', href: '/_/admin' })
+    expect(navItems(true).some((i) => i.id === 'accounts')).toBe(false)
+  })
+})
+
+describe('PynPasswordForm', () => {
+  const fill = async (w: ReturnType<typeof mount>, cur: string, next: string, conf: string) => {
+    const inputs = w.findAll('input')
+    await inputs[0].setValue(cur)
+    await inputs[1].setValue(next)
+    await inputs[2].setValue(conf)
+    await w.find('form').trigger('submit')
+  }
+  const mountForm = (props = {}) =>
+    mount(PynPasswordForm, {
+      props: { minLength: 10, rules: ['At least 10 characters.'], ...props },
+    })
+
+  it('labels the fields, sets autocomplete and shows the rules', () => {
+    const w = mountForm()
+    expect(w.findAll('input').map((i) => i.attributes('autocomplete'))).toEqual([
+      'current-password',
+      'new-password',
+      'new-password',
+    ])
+    expect(w.findAll('input').every((i) => i.attributes('type') === 'password')).toBe(true)
+    expect(w.text()).toContain('Current password')
+    expect(w.text()).toContain('Confirm new password')
+    expect(w.find('ul').text()).toContain('At least 10 characters.')
+  })
+
+  it('emits current and next when valid', async () => {
+    const w = mountForm()
+    await fill(w, 'old-password', 'brand-new-pass', 'brand-new-pass')
+    expect(w.emitted('submit')?.[0]).toEqual([{ current: 'old-password', next: 'brand-new-pass' }])
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+  })
+
+  it.each([
+    ['', 'brand-new-pass', 'brand-new-pass', 'current password'],
+    ['old-password', 'short', 'short', 'at least 10'],
+    ['old-password', 'old-password', 'old-password', 'differ'],
+    ['old-password', 'brand-new-pass', 'brand-new-pasS', 'do not match'],
+  ])('blocks submit: %s / %s / %s', async (cur, next, conf, text) => {
+    const w = mountForm()
+    await fill(w, cur, next, conf)
+    expect(w.emitted('submit')).toBeUndefined()
+    expect(w.find('[role="alert"]').text()).toContain(text)
+  })
+
+  it('disables while busy and does not submit', async () => {
+    const w = mountForm({ busy: true })
+    expect(w.find('button').attributes('disabled')).toBeDefined()
+    expect(w.findAll('input').every((i) => i.attributes('disabled') !== undefined)).toBe(true)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')).toBeUndefined()
+  })
+
+  it('shows the server error and success, and clears the fields on success', async () => {
+    const w = mountForm({ error: 'The current password is wrong.' })
+    expect(w.find('[role="alert"]').text()).toBe('The current password is wrong.')
+    await fill(w, 'old-password', 'brand-new-pass', 'brand-new-pass')
+    await w.setProps({ success: 'Password changed.' })
+    expect(w.find('[role="status"]').text()).toBe('Password changed.')
+    expect(w.findAll('input').map((i) => (i.element as HTMLInputElement).value)).toEqual([
+      '',
+      '',
+      '',
+    ])
   })
 })
 

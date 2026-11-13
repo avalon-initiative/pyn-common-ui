@@ -27,8 +27,8 @@ const create: MenuItem[] = [
   { id: 'new-org', label: 'New organization', href: '/_/new-org' },
 ]
 const account = computed<MenuItem[]>(() => [
-  { id: 'settings', label: 'Settings', href: '/_/settings' },
-  ...(props.admin ? [{ id: 'accounts', label: 'Accounts', href: '/_/admin/accounts' }] : []),
+  { id: 'settings', label: 'Account settings', href: '/_/settings' },
+  ...(props.admin ? [{ id: 'admin', label: 'Server administration', href: '/_/admin' }] : []),
   ...(props.extraAccount ?? []),
   { id: 'sep-theme', label: '', separator: true },
   ...themeChoices.map((t) => ({

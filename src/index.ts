@@ -64,6 +64,10 @@ export { default as PynTeamGrant } from './components/PynTeamGrant.vue'
 export { default as PynSignIn } from './components/PynSignIn.vue'
 export { default as PynVerifyEmail } from './components/PynVerifyEmail.vue'
 export { default as PynAccountSettings } from './components/PynAccountSettings.vue'
+export { default as PynAdminLayout } from './components/PynAdminLayout.vue'
+export { default as PynPasswordForm } from './components/PynPasswordForm.vue'
+export { passwordProblem } from './state/password.state'
+export type { PasswordFields } from './state/password.state'
 export { default as PynKeys } from './components/PynKeys.vue'
 export { default as PynAccounts } from './components/PynAccounts.vue'
 export { default as PynIdentities } from './components/PynIdentities.vue'
@@ -172,7 +176,14 @@ export type {
   RuleScope,
 } from './types/org.types'
 export type { RepoRef, Visibility } from './types/repo.types'
-export { accountNav, accountNavItems, mainNav, matchRepos, navItems } from './state/shell.state'
+export {
+  accountNav,
+  accountNavItems,
+  adminNavItems,
+  mainNav,
+  matchRepos,
+  navItems,
+} from './state/shell.state'
 export type { NavItem } from './state/shell.state'
 export {
   AUDIT_ACTIONS,
