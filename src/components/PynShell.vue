@@ -3,6 +3,10 @@ import { ref } from 'vue'
 import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynShell.module.scss'
 
+defineProps<{
+  /** Renders without the side navigation, keeping the top bar. */
+  bare?: boolean
+}>()
 const open = ref(false)
 const closeOnLink = (e: MouseEvent) => {
   if ((e.target as HTMLElement).closest('a')) open.value = false
@@ -10,9 +14,10 @@ const closeOnLink = (e: MouseEvent) => {
 </script>
 
 <template>
-  <div :class="styles.shell">
+  <div :class="[styles.shell, bare && styles.bare]">
     <header :class="styles.top">
       <button
+        v-if="!bare"
         type="button"
         :class="styles.toggle"
         aria-label="Toggle navigation"
@@ -23,7 +28,7 @@ const closeOnLink = (e: MouseEvent) => {
       </button>
       <slot name="top" />
     </header>
-    <aside :class="[styles.side, open && styles.open]" @click="closeOnLink">
+    <aside v-if="!bare" :class="[styles.side, open && styles.open]" @click="closeOnLink">
       <slot name="side" />
     </aside>
     <main :class="styles.main">

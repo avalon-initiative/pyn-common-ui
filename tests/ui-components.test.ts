@@ -597,6 +597,18 @@ describe('PynShell', () => {
   })
 })
 
+describe('PynShell bare', () => {
+  it('omits the side navigation and its toggle but keeps the top bar', () => {
+    const slots = { top: '<b>top</b>', side: '<a href="#x">x</a>', default: 'body' }
+    const bare = mount(PynShell, { props: { bare: true }, slots })
+    expect(bare.find('aside').exists()).toBe(false)
+    expect(bare.find('button').exists()).toBe(false)
+    expect(bare.find('header').text()).toContain('top')
+    expect(bare.text()).toContain('body')
+    expect(mount(PynShell, { slots }).find('aside').exists()).toBe(true)
+  })
+})
+
 describe('PynShell footer', () => {
   it('renders the footer slot only when given', () => {
     expect(mount(PynShell).find('footer').exists()).toBe(false)
@@ -3477,27 +3489,44 @@ describe('repository shell and settings', () => {
       'Settings',
     ])
     expect(repoShellTabs(['view_audit'], false).at(-1)?.label).toBe('Settings')
-    expect(repoShellTabs(['read', 'manage_roles'], false).at(-1)?.label).toBe('Settings')
   })
 
-  it('gates the settings navigation by permission', () => {
-    expect(repoSettingsNav(['read'], true)).toEqual([])
-    expect(repoSettingsNav(admin, true).map((i) => i.label)).toEqual([
+  it('gates the settings navigation as the pages do', () => {
+    expect(repoSettingsNav(['read'], false)).toEqual([])
+    const all = [...admin, 'edit_policy']
+    expect(repoSettingsNav(all, true).map((i) => i.label)).toEqual([
       'General',
       'Members',
       'Roles',
       'Invitations',
+      'Policy',
+      'Storage',
       'Audit log',
     ])
-    expect(sections(repoSettingsNav(admin, false))).toEqual([
+    expect(sections(repoSettingsNav(all, false))).toEqual([
       'members',
       'roles',
       'invites',
+      'policy',
+      'storage',
       'audit',
     ])
+    expect(sections(repoSettingsNav(['read'], true))).toEqual(['settings', 'storage'])
+    expect(sections(repoSettingsNav(['read'], false, { serverAdmin: true }))).toEqual(['storage'])
+    expect(sections(repoSettingsNav(['edit_policy'], false))).toEqual(['policy'])
+    expect(sections(repoSettingsNav(['manage_roles'], false))).toEqual(['roles'])
     expect(sections(repoSettingsNav(['manage_users'], false))).toEqual(['members', 'invites'])
     expect(repoSettingsPath({ owner: 'a', name: 'b' }, 'settings')).toBe('/a/b/settings')
     expect(repoSettingsPath({ owner: 'a', name: 'b' }, 'audit')).toBe('/a/b/settings/audit')
+  })
+
+  it('shows the Settings tab to everyone who can open a settings page', () => {
+    const last = (p: string[], owner: boolean, serverAdmin = false) =>
+      repoShellTabs(p, owner, { serverAdmin }).some((t) => t.label === 'Settings')
+    expect(last(['read'], true)).toBe(true)
+    expect(last(['read'], false, true)).toBe(true)
+    expect(last(['edit_policy'], false)).toBe(true)
+    expect(last(['read'], false)).toBe(false)
   })
 
   it('renders the header, badge, actions and an accessible tab bar', () => {
@@ -3540,7 +3569,12 @@ describe('repository shell and settings', () => {
 
   it('renders the settings sub-navigation and content', () => {
     const w = mount(PynRepoSettings, {
-      props: { owner: 'a', name: 'b', items: repoSettingsNav(admin, true), current: 'audit' },
+      props: {
+        owner: 'a',
+        name: 'b',
+        items: repoSettingsNav(admin, true).filter((i) => i.section !== 'storage'),
+        current: 'audit',
+      },
       slots: { default: '<p>page</p>' },
     })
     expect(w.find('nav').attributes('aria-label')).toBe('Repository settings')

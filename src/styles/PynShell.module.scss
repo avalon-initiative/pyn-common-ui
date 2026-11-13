@@ -12,6 +12,10 @@
   }
 }
 
+.bare {
+  grid-template: 'top' var(--pyn-topbar-height) 'main' 1fr 'foot' auto / minmax(0, 1fr);
+}
+
 .top {
   grid-area: top;
   display: flex;
