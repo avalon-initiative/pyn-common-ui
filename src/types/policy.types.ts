@@ -1,4 +1,5 @@
 import type { LockInfo } from './lock.types'
+import type { PublicIdentity } from './profile.types'
 
 export type PolicyNoticeKind =
   'lock_required' | 'lock_held' | 'stale_base' | 'invalid_rules' | 'error'
@@ -17,6 +18,8 @@ export interface StrandedVersion {
   revision: number
   commit: string
   author: string
+  author_current?: string | null
+  author_public?: PublicIdentity | null
   created_at: string
 }
 

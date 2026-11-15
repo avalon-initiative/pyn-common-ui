@@ -9,3 +9,10 @@ export interface ProfileInfo {
   links?: string[]
   location?: string | null
 }
+
+/** Mirrors the server's `PublicIdentity`: the public part of an account shown in lists. */
+export interface PublicIdentity {
+  user: string
+  display_name?: string | null
+  avatar_url?: string | null
+}

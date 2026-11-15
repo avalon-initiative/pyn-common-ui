@@ -1,3 +1,5 @@
+import type { PublicIdentity } from './profile.types'
+
 export type OrgRole = 'member' | 'owner'
 
 /** The identity of an organization, as far as navigation needs it. */
@@ -8,6 +10,7 @@ export interface OrgRef {
 export interface OrgMember {
   user: string
   role: OrgRole
+  identity?: PublicIdentity | null
 }
 
 export interface OrgInfo {

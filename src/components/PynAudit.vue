@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
+import PynPerson from './PynPerson.vue'
 import styles from '../styles/PynAudit.module.scss'
 import { formatDateTime } from '../utils/datetime'
 import { commitSubject } from '../utils/commit-message'
@@ -44,7 +45,10 @@ const form = reactive<AuditFilter>({
           <span v-if="e.path" :class="styles.path"> {{ e.path }}</span>
           <div :class="styles.meta">{{ commitSubject(e.detail) }}</div>
         </div>
-        <div :class="styles.meta">{{ e.actor }} · {{ formatDateTime(e.at) }}</div>
+        <div :class="styles.meta">
+          <PynPerson :name="e.actor" :current="e.actor_current" :identity="e.actor_public" /> ·
+          {{ formatDateTime(e.at) }}
+        </div>
       </li>
     </ul>
     <p v-else :class="styles.empty">No matching events.</p>

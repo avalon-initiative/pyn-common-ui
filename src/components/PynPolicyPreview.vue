@@ -2,6 +2,7 @@
 import { computed, ref, useId } from 'vue'
 import styles from '../styles/PynPolicyPreview.module.scss'
 import PynModeChip from './PynModeChip.vue'
+import PynPerson from './PynPerson.vue'
 import { dirOf, folderOptions, inFolder } from '../state/policy.state'
 import { formatDateTime } from '../utils/datetime'
 import type { Mode } from '../types/lock.types'
@@ -150,7 +151,9 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
               <button type="button" :class="styles.path" @click="emit('selectPath', l.path)">
                 {{ l.path }}
               </button>
-              <span :class="styles.muted">held by {{ l.owner }}</span>
+              <span :class="styles.muted"
+                >held by <PynPerson :name="l.owner" :identity="l.identity"
+              /></span>
               <span :class="styles.muted">expires {{ formatDateTime(l.expires_at) }}</span>
             </li>
           </ul>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import PynLockBadge from './PynLockBadge.vue'
+import PynPerson from './PynPerson.vue'
 import PynModeChip from './PynModeChip.vue'
 import styles from '../styles/PynFileBar.module.scss'
 import { baseName, contentUrl, historyLink } from '../state/blob.state'
@@ -39,7 +40,12 @@ defineProps<{
       >
       <span :class="styles.message">{{ entry.last_change.message || '(no message)' }}</span>
       <span :class="styles.meta">
-        {{ entry.last_change.author }} ·
+        <PynPerson
+          :name="entry.last_change.author"
+          :current="entry.last_change.author_current"
+          :identity="entry.last_change.author_public"
+        />
+        ·
         <span :title="formatDateTime(entry.last_change.created_at)">{{
           formatAgo(entry.last_change.created_at, now ?? new Date())
         }}</span>

@@ -1,3 +1,5 @@
+import type { PublicIdentity } from './profile.types'
+
 export type MemberSource = 'direct' | 'team' | 'org_owner'
 
 /** A repository where a team holds a role. */
@@ -41,4 +43,5 @@ export interface Grantee {
   /** Absent for a team; otherwise where the role comes from. */
   source?: MemberSource
   href?: string
+  identity?: PublicIdentity | null
 }

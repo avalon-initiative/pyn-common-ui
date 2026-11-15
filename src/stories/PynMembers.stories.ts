@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import PynMembers from '../components/PynMembers.vue'
 import { teamGrantees } from '../state/team.state'
 import { repoTeams } from './org-data'
+import { aliceIdentity, bobIdentity } from './person-data'
 
 const meta: Meta<typeof PynMembers> = {
   title: 'Repository/PynMembers',
@@ -33,4 +34,12 @@ export const NotAllowed: Story = {
 }
 export const ReadOnly: Story = {
   args: { grantees, roles, kind: 'team', revocable: true, readonly: true },
+}
+export const WithIdentities: Story = {
+  args: {
+    grantees: grantees.map((g, i) =>
+      i === 0 ? { ...g, identity: aliceIdentity } : i === 1 ? { ...g, identity: bobIdentity } : g,
+    ),
+    roles,
+  },
 }

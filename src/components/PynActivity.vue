@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import PynAvatar from './PynAvatar.vue'
+import PynPerson from './PynPerson.vue'
 import styles from '../styles/PynActivity.module.scss'
 import { formatDateTime } from '../utils/datetime'
 import { formatAgo } from '../utils/ago'
@@ -13,12 +15,25 @@ defineProps<{ entries: ActivityEntry[]; now?: Date }>()
     <h2 id="activity-title" :class="styles.title">Recent activity</h2>
     <ul v-if="entries.length" :class="styles.list">
       <li v-for="e in entries" :key="e.id" :class="styles.item">
-        <span :class="styles.avatar" aria-hidden="true">{{
+        <PynAvatar
+          v-if="e.actor_public"
+          :username="e.actor_current || e.actor"
+          :name="e.actor_public.display_name"
+          :src="e.actor_public.avatar_url"
+        />
+        <span v-else :class="styles.avatar" aria-hidden="true">{{
           e.actor.slice(0, 1).toUpperCase()
         }}</span>
         <div>
           <p :class="styles.text">
-            <strong>{{ e.actor }}</strong> {{ activityVerb(e) }}
+            <strong
+              ><PynPerson
+                :name="e.actor"
+                :current="e.actor_current"
+                :identity="e.actor_public"
+                :avatar="false"
+            /></strong>
+            {{ activityVerb(e) }}
             <span v-if="e.path" :class="styles.path">{{ e.path }}</span>
           </p>
           <time :class="styles.time" :datetime="e.at" :title="formatDateTime(e.at)">{{

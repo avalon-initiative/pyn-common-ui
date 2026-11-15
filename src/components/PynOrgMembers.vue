@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import PynPerson from './PynPerson.vue'
 import styles from '../styles/PynOrgMembers.module.scss'
 import { canRemove, ORG_ROLES } from '../state/org.state'
 import type { NewOrgMember, OrgMember, OrgRole } from '../types/org.types'
@@ -41,7 +42,7 @@ const change = (user: string, e: Event) =>
   <section :class="styles.page">
     <ul v-if="members.length" :class="styles.list">
       <li v-for="m in members" :key="m.user" :class="styles.item">
-        <strong>{{ m.user }}</strong>
+        <strong><PynPerson :name="m.user" :identity="m.identity" /></strong>
         <form v-if="confirming === m.user" :class="styles.confirm" @submit.prevent="remove">
           <span :class="styles.note"
             >{{ m.user === self ? 'Leaving' : 'Removing' }} also drops direct roles on the

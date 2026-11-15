@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynLockBadge from '../components/PynLockBadge.vue'
+import { bobIdentity } from './person-data'
 
 const now = new Date('2026-10-08T12:00:00Z')
 const lock = (owner: string, minutesLeft: number) => ({
@@ -22,3 +23,6 @@ export const LockedByOther: Story = { args: { lock: lock('bob', 222) } }
 export const LockedByYou: Story = { args: { lock: lock('alice', 222) } }
 export const ExpiringSoon: Story = { args: { lock: lock('bob', 12) } }
 export const ExpiredReadsAsAvailable: Story = { args: { lock: lock('bob', -5) } }
+export const LockedWithIdentity: Story = {
+  args: { lock: { ...lock('bob', 222), identity: bobIdentity } },
+}

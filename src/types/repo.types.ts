@@ -1,4 +1,5 @@
 import type { MemberSource } from './team.types'
+import type { PublicIdentity } from './profile.types'
 
 export type Visibility = 'public' | 'private'
 
@@ -40,6 +41,7 @@ export interface Member {
   user: string
   role: string
   source: MemberSource
+  identity?: PublicIdentity | null
 }
 
 export interface RoleGrant {
@@ -62,6 +64,9 @@ export interface AuditEntry {
   id: number
   at: string
   actor: string
+  /** The account's current name when it was renamed. */
+  actor_current?: string | null
+  actor_public?: PublicIdentity | null
   action: string
   detail: string
   hash?: string
@@ -86,6 +91,9 @@ export interface Revision {
   id: number
   path: string
   author: string
+  /** The account's current name when it was renamed. */
+  author_current?: string | null
+  author_public?: PublicIdentity | null
   message: string
   created_at: string
   /** Set when this revision restored the content of an earlier one. */

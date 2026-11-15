@@ -7,7 +7,7 @@ export const teamPath = (org: string, team = ''): string =>
   orgPath(org, team ? `teams/${encodeURIComponent(team)}` : 'teams')
 
 export const personGrantees = (members: Member[]): Grantee[] =>
-  members.map((m) => ({ name: m.user, role: m.role, source: m.source }))
+  members.map((m) => ({ name: m.user, role: m.role, source: m.source, identity: m.identity }))
 
 export const teamGrantees = (org: string, teams: RepoTeam[]): Grantee[] =>
   teams.map((t) => ({
