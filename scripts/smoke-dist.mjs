@@ -152,7 +152,7 @@ const accounts = await renderToString(
 )
 if (!accounts.includes('No accounts match'))
   throw new Error(`PynAccounts did not render: ${accounts}`)
-if (built.accountActions({ user: 'a', status: 'disabled' }, 'b').join() !== 'enable')
+if (built.accountActions({ user: 'a', status: 'disabled' }, 'b').join() !== 'enable,delete')
   throw new Error('accountActions did not run from dist')
 
 const targets = Object.values(pkg.exports).flatMap((v) =>
