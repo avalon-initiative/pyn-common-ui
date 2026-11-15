@@ -2293,6 +2293,28 @@ describe('PynPasswordForm', () => {
       '',
     ])
   })
+
+  it('hides the current password and emits only next when the account has none', async () => {
+    const w = mountForm({ hasPassword: false })
+    expect(w.findAll('input')).toHaveLength(2)
+    expect(w.text()).not.toContain('Current password')
+    expect(w.find('button').text()).toBe('Set a password')
+    const inputs = w.findAll('input')
+    await inputs[0].setValue('brand-new-pass')
+    await inputs[1].setValue('brand-new-pass')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0]).toEqual([{ next: 'brand-new-pass' }])
+  })
+
+  it('validates a first password without a current one', async () => {
+    const w = mountForm({ hasPassword: false })
+    const inputs = w.findAll('input')
+    await inputs[0].setValue('brand-new-pass')
+    await inputs[1].setValue('other-new-pass')
+    await w.find('form').trigger('submit')
+    expect(w.find('[role="alert"]').text()).toContain('do not match')
+    expect(w.emitted('submit')).toBeUndefined()
+  })
 })
 
 describe('PynKeys', () => {

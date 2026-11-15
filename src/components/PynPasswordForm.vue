@@ -3,14 +3,18 @@ import { computed, ref, watch } from 'vue'
 import styles from '../styles/PynPasswordForm.module.scss'
 import { passwordProblem } from '../state/password.state'
 
-const props = defineProps<{
-  rules?: string[]
-  minLength?: number
-  busy?: boolean
-  error?: string
-  success?: string
-}>()
-const emit = defineEmits<{ submit: [value: { current: string; next: string }] }>()
+const props = withDefaults(
+  defineProps<{
+    rules?: string[]
+    minLength?: number
+    hasPassword?: boolean
+    busy?: boolean
+    error?: string
+    success?: string
+  }>(),
+  { hasPassword: true },
+)
+const emit = defineEmits<{ submit: [value: { current?: string; next: string }] }>()
 
 const current = ref('')
 const next = ref('')
@@ -21,6 +25,7 @@ const problem = computed(() =>
   passwordProblem(
     { current: current.value, next: next.value, confirm: confirm.value },
     props.minLength,
+    props.hasPassword,
   ),
 )
 
@@ -36,7 +41,10 @@ watch(
 function send() {
   tried.value = true
   if (problem.value || props.busy) return
-  emit('submit', { current: current.value, next: next.value })
+  emit(
+    'submit',
+    props.hasPassword ? { current: current.value, next: next.value } : { next: next.value },
+  )
 }
 </script>
 
@@ -45,7 +53,7 @@ function send() {
     <ul v-if="rules?.length" :class="styles.rules" aria-label="Password rules">
       <li v-for="rule in rules" :key="rule">{{ rule }}</li>
     </ul>
-    <label :class="styles.field"
+    <label v-if="hasPassword" :class="styles.field"
       >Current password
       <input
         v-model="current"
@@ -83,7 +91,15 @@ function send() {
     <p v-else-if="error" :class="styles.error" role="alert">{{ error }}</p>
     <p v-if="success" :class="styles.success" role="status">{{ success }}</p>
     <button type="submit" :class="styles.button" :disabled="busy">
-      {{ busy ? 'Changing password…' : 'Change password' }}
+      {{
+        busy
+          ? hasPassword
+            ? 'Changing password…'
+            : 'Setting password…'
+          : hasPassword
+            ? 'Change password'
+            : 'Set a password'
+      }}
     </button>
   </form>
 </template>

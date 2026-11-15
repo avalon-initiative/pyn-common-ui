@@ -24,3 +24,9 @@ export const RateLimited: Story = {
 export const Changed: Story = {
   args: { success: 'Password changed. Your other sessions were signed out.' },
 }
+export const FirstPassword: Story = {
+  args: { hasPassword: false, rules: ['At least 10 characters, at most 256.'] },
+}
+export const FirstPasswordSet: Story = {
+  args: { hasPassword: false, success: 'Password set. You can now sign in with it.' },
+}
