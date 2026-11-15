@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import PynAvatar from './PynAvatar.vue'
 import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynSideNav.module.scss'
 import { orgPath } from '../state/org.state'
@@ -10,6 +11,9 @@ import type { RepoRef } from '../types/repo.types'
 
 const props = defineProps<{
   account: string
+  /** Shown beside the account name and used for the avatar initials. */
+  displayName?: string | null
+  avatarUrl?: string | null
   items: NavItem[]
   extraNav?: NavItem[]
   current: string
@@ -27,8 +31,15 @@ const hasBadge = (item: NavItem) =>
 <template>
   <nav :class="styles.side" aria-label="Main">
     <p :class="styles.switcher">
-      <span :class="styles.avatar">{{ account.slice(0, 1).toUpperCase() }}</span>
-      <span :class="styles.account">{{ account }}</span>
+      <PynAvatar
+        v-if="displayName || avatarUrl"
+        :username="account"
+        :name="displayName"
+        :src="avatarUrl"
+        size="sm"
+      />
+      <span v-else :class="styles.avatar">{{ account.slice(0, 1).toUpperCase() }}</span>
+      <span :class="styles.account">{{ displayName || account }}</span>
     </p>
     <ul :class="styles.list">
       <li v-for="item in allItems" :key="item.id">

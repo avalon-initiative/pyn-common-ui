@@ -39,3 +39,4 @@ export const ExtraNavigation: Story = {
     ],
   },
 }
+export const WithProfile: Story = { args: { displayName: 'Alice Anders' } }

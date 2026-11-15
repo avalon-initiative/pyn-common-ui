@@ -1,0 +1,23 @@
+.person {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  min-width: 0;
+}
+
+.text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.display {
+  font-weight: 600;
+}
+
+.display + .account {
+  color: var(--pyn-text-muted);
+}
+
+.written {
+  color: var(--pyn-text-muted);
+}

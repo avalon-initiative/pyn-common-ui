@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PynIcon from './PynIcon.vue'
 import PynLockBadge from './PynLockBadge.vue'
+import PynPerson from './PynPerson.vue'
 import PynModeChip from './PynModeChip.vue'
 import styles from '../styles/PynTree.module.scss'
 import { formatDateTime } from '../utils/datetime'
@@ -45,7 +46,12 @@ defineProps<{
                 :title="`Revision ${e.last_change.id} of ${e.last_change.path}`"
                 >r{{ e.last_change.id }}</span
               >
-              {{ e.last_change.author }} ·
+              <PynPerson
+                :name="e.last_change.author"
+                :current="e.last_change.author_current"
+                :identity="e.last_change.author_public"
+              />
+              ·
               <span :title="formatDateTime(e.last_change.created_at)">{{
                 formatAgo(e.last_change.created_at, now ?? new Date())
               }}</span

@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import PynIcon from './PynIcon.vue'
 import PynMenu from './PynMenu.vue'
+import PynAvatar from './PynAvatar.vue'
 import PynSearch from './PynSearch.vue'
 import styles from '../styles/PynTopBar.module.scss'
 import { themeChoices } from '../state/theme.state'
@@ -10,6 +11,9 @@ import type { MenuItem } from '../types/shell.types'
 
 const props = defineProps<{
   user: string
+  /** Shown beside the account name and used for the avatar initials. */
+  displayName?: string | null
+  avatarUrl?: string | null
   repos: string[]
   theme: ThemeChoice
   admin?: boolean
@@ -56,9 +60,18 @@ function pick(id: string) {
     </PynMenu>
     <PynMenu label="Account menu" :items="account" @select="pick">
       <template #header>
-        <p :class="styles.who">Signed in as {{ user }}</p>
+        <p :class="styles.who">
+          Signed in as <template v-if="displayName">{{ displayName }} ({{ user }})</template
+          ><template v-else>{{ user }}</template>
+        </p>
       </template>
-      <span :class="styles.avatar">{{ user.slice(0, 1).toUpperCase() }}</span>
+      <PynAvatar
+        v-if="displayName || avatarUrl"
+        :username="user"
+        :name="displayName"
+        :src="avatarUrl"
+      />
+      <span v-else :class="styles.avatar">{{ user.slice(0, 1).toUpperCase() }}</span>
     </PynMenu>
   </div>
 </template>

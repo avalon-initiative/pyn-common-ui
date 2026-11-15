@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynOrgMembers from '../components/PynOrgMembers.vue'
 import { orgMembers } from './org-data'
+import { aliceIdentity } from './person-data'
 
 const meta: Meta<typeof PynOrgMembers> = {
   title: 'Organizations/PynOrgMembers',
@@ -19,3 +20,8 @@ export const LastOwner: Story = {
 }
 export const NotAUser: Story = { args: { error: 'That account does not exist.' } }
 export const WithNotice: Story = { args: { notice: 'Invitation sent to dave.' } }
+export const WithIdentities: Story = {
+  args: {
+    members: orgMembers.map((m, i) => (i === 0 ? { ...m, identity: aliceIdentity } : m)),
+  },
+}

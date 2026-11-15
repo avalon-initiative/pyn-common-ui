@@ -1,4 +1,5 @@
 import type { LockInfo } from './lock.types'
+import type { PublicIdentity } from './profile.types'
 import type { Revision } from './repo.types'
 
 export type TreeMode = 'shared' | 'exclusive' | 'mixed'
@@ -33,6 +34,9 @@ export interface ActivityEntry {
   id: number
   at: string
   actor: string
+  /** The account's current name when it was renamed. */
+  actor_current?: string | null
+  actor_public?: PublicIdentity | null
   /** checkout, release, checkin, restore or force_unlock. */
   action: string
   path?: string | null

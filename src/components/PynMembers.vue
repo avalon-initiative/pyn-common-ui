@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PynPerson from './PynPerson.vue'
 import styles from '../styles/PynMembers.module.scss'
 import { isEditable, sourceNote } from '../state/team.state'
 import type { Grantee } from '../types/team.types'
@@ -34,8 +35,10 @@ const change = (name: string, e: Event) =>
     <ul v-if="grantees.length" :class="styles.list">
       <li v-for="g in grantees" :key="g.name" :class="styles.item">
         <span :class="styles.who">
-          <a v-if="g.href" :href="g.href" :class="styles.link">{{ g.name }}</a>
-          <strong v-else>{{ g.name }}</strong>
+          <a v-if="g.href" :href="g.href" :class="styles.link"
+            ><PynPerson :name="g.name" :identity="g.identity"
+          /></a>
+          <strong v-else><PynPerson :name="g.name" :identity="g.identity" /></strong>
           <span v-if="sourceNote(g.source)" :class="styles.note" data-source>{{
             sourceNote(g.source)
           }}</span>

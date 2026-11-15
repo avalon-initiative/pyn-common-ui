@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynAudit from '../components/PynAudit.vue'
+import { aliciaIdentity } from './person-data'
 
 const meta: Meta<typeof PynAudit> = {
   title: 'Repository/PynAudit',
@@ -78,4 +79,13 @@ const serverEntries = [
 ]
 export const ServerLog: Story = {
   args: { entries: serverEntries, plain: true, hasMore: true },
+}
+
+export const WithIdentities: Story = {
+  args: {
+    entries: entries.map((e, i) =>
+      i === 0 ? { ...e, actor_public: aliciaIdentity, actor_current: 'alicia' } : e,
+    ),
+    filter,
+  },
 }

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynLocks from '../components/PynLocks.vue'
+import { bobIdentity } from './person-data'
 
 const meta: Meta<typeof PynLocks> = {
   title: 'Repository/PynLocks',
@@ -27,3 +28,7 @@ const locks = [
 export const Locked: Story = { args: { locks, now } }
 export const WithForceUnlock: Story = { args: { locks, now, canForce: true } }
 export const None: Story = { args: { locks: [], now } }
+
+export const WithIdentities: Story = {
+  args: { locks: locks.map((l, i) => (i === 0 ? { ...l, identity: bobIdentity } : l)), now },
+}

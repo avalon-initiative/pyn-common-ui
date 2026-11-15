@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref, watch } from 'vue'
+import PynPerson from './PynPerson.vue'
 import styles from '../styles/PynHistory.module.scss'
 import { formatDateTime } from '../utils/datetime'
 import { commitBody, commitSubject } from '../utils/commit-message'
@@ -69,7 +70,14 @@ onBeforeUnmount(() => clearTimeout(timer))
             <pre :class="styles.bodyText">{{ commitBody(rev.message) }}</pre>
           </details>
         </div>
-        <div :class="styles.meta">{{ rev.author }} · {{ formatDateTime(rev.created_at) }}</div>
+        <div :class="styles.meta">
+          <PynPerson
+            :name="rev.author"
+            :current="rev.author_current"
+            :identity="rev.author_public"
+          />
+          · {{ formatDateTime(rev.created_at) }}
+        </div>
       </li>
     </ul>
     <p v-else-if="!error" :class="styles.empty">

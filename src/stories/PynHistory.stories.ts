@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynHistory from '../components/PynHistory.vue'
+import { aliciaIdentity } from './person-data'
 
 const meta: Meta<typeof PynHistory> = { title: 'Repository/PynHistory', component: PynHistory }
 export default meta
@@ -69,4 +70,12 @@ export const Empty: Story = { args: { revisions: [] } }
 export const NoMatch: Story = { args: { revisions: [], filter: '*.xyz' } }
 export const BadPattern: Story = {
   args: { revisions, filter: '[', error: 'invalid pattern: unclosed character class' },
+}
+
+export const WithIdentities: Story = {
+  args: {
+    revisions: revisions.map((r, i) =>
+      i === 0 ? { ...r, author_public: aliciaIdentity, author_current: 'alicia' } : r,
+    ),
+  },
 }

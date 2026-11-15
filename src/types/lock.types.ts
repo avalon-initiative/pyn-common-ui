@@ -1,7 +1,10 @@
+import type { PublicIdentity } from './profile.types'
+
 /** Mirrors the server's `Lock`. */
 export interface LockInfo {
   path: string
   owner: string
+  identity?: PublicIdentity | null
   acquired_at: string
   expires_at: string
 }
