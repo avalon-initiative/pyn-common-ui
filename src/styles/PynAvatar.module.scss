@@ -1,0 +1,43 @@
+.avatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  overflow: hidden;
+  color: var(--pyn-mine);
+  background: var(--pyn-mine-bg);
+  border-radius: 50%;
+  font-size: var(--pyn-text-sm);
+  font-weight: 600;
+  line-height: 1;
+  user-select: none;
+
+  &[data-size='sm'] {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: var(--pyn-text-xs);
+  }
+
+  &[data-size='lg'] {
+    width: 4rem;
+    height: 4rem;
+    font-size: var(--pyn-text-lg);
+  }
+
+  &[data-size='xl'] {
+    width: 7rem;
+    height: 7rem;
+    font-size: var(--pyn-text-xl);
+  }
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.initials {
+  display: block;
+}

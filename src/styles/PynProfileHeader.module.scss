@@ -1,0 +1,71 @@
+@use 'mixins' as m;
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pyn-space-6);
+
+  @include m.narrow {
+    flex-direction: column;
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  min-width: 0;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.display {
+  font-size: var(--pyn-text-xl);
+}
+
+.username {
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-md);
+  font-weight: 400;
+
+  &[data-only] {
+    color: var(--pyn-text);
+    font-size: var(--pyn-text-xl);
+    font-weight: 600;
+  }
+}
+
+.bio {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-1) var(--pyn-space-4);
+  margin: 0;
+  padding: 0;
+  color: var(--pyn-text-muted);
+  font-size: 0.875rem;
+  list-style: none;
+}
+
+.link {
+  color: var(--pyn-accent);
+  overflow-wrap: anywhere;
+
+  @include m.focus-ring;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+}
