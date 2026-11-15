@@ -6,6 +6,9 @@ import {
   PynAccountNotice,
   PynAccountPendingDeletion,
   PynAccountSettings,
+  PynEmailAddresses,
+  PynProfileForm,
+  PynUsernameChange,
   PynAdminLayout,
   PynPasswordForm,
   PynAccounts,
@@ -3682,5 +3685,184 @@ describe('PynAccountPendingDeletion', () => {
     })
     expect(w.find('button').attributes('disabled')).toBeDefined()
     expect(w.text()).toContain('Try again.')
+  })
+})
+
+describe('PynProfileForm', () => {
+  const profile = { display_name: 'Alice', bio: 'Hi', links: ['https://example.com'] }
+
+  it('fills the fields and emits the cleaned profile', async () => {
+    const w = mount(PynProfileForm, { props: { profile } })
+    const inputs = w.findAll('input[type="text"], input:not([type])')
+    await inputs[0].setValue('  Alicia  ')
+    await w.find('textarea[placeholder]').setValue('https://a.example\n\n https://b.example ')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('save')?.[0]).toEqual([
+      {
+        display_name: 'Alicia',
+        bio: 'Hi',
+        location: '',
+        company: '',
+        links: ['https://a.example', 'https://b.example'],
+      },
+    ])
+  })
+
+  it('refuses a link that is not http or https', async () => {
+    const w = mount(PynProfileForm, { props: { profile } })
+    await w.find('textarea[placeholder]').setValue('ftp://x.example')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('save')).toBeUndefined()
+    expect(w.find('[role="alert"]').text()).toContain('ftp://x.example')
+  })
+
+  it('shows an avatar with a remove button, or an initial', () => {
+    const none = mount(PynProfileForm, { props: { profile, user: 'alice' } })
+    expect(none.find('img').exists()).toBe(false)
+    expect(none.text()).toContain('A')
+    expect(none.text()).not.toContain('Remove avatar')
+    const some = mount(PynProfileForm, {
+      props: { profile, avatarUrl: '/v1/users/alice/avatar?v=1' },
+    })
+    expect(some.find('img').attributes('src')).toBe('/v1/users/alice/avatar?v=1')
+  })
+
+  it('emits a valid image and rejects a wrong type or size', async () => {
+    const w = mount(PynProfileForm, { props: { profile } })
+    const input = w.find('input[type="file"]')
+    const set = async (file: File) => {
+      Object.defineProperty(input.element, 'files', { value: [file], configurable: true })
+      await input.trigger('change')
+    }
+    const png = new File(['x'], 'a.png', { type: 'image/png' })
+    await set(png)
+    expect(w.emitted('avatar')?.[0]).toEqual([png])
+    await set(new File(['x'], 'a.gif', { type: 'image/gif' }))
+    expect(w.emitted('avatar')).toHaveLength(1)
+    expect(w.find('[role="alert"]').text()).toContain('PNG, JPEG or WebP')
+    await set(new File([new Uint8Array(1024 * 1024 + 1)], 'b.png', { type: 'image/png' }))
+    expect(w.emitted('avatar')).toHaveLength(1)
+    expect(w.find('[role="alert"]').text()).toContain('1 MiB')
+  })
+
+  it('emits removeAvatar and shows messages', async () => {
+    const w = mount(PynProfileForm, {
+      props: { profile, avatarUrl: '/a', success: 'Saved.', error: 'Nope.' },
+    })
+    await w.find('button[type="button"]').trigger('click')
+    expect(w.emitted('removeAvatar')).toHaveLength(1)
+    expect(w.find('[role="status"]').text()).toBe('Saved.')
+    expect(w.find('form [role="alert"]').text()).toBe('Nope.')
+  })
+
+  it('reloads the fields when the profile changes', async () => {
+    const w = mount(PynProfileForm, { props: { profile } })
+    await w.setProps({ profile: { display_name: 'Bob' } })
+    expect((w.find('input:not([type])').element as HTMLInputElement).value).toBe('Bob')
+  })
+})
+
+describe('PynEmailAddresses', () => {
+  const emails = [
+    { address: 'a@x.example', verified: true, primary: true, added_at: '2026-01-04T10:00:00Z' },
+    { address: 'b@x.example', verified: true, primary: false, added_at: '2026-02-04T10:00:00Z' },
+    { address: 'c@x.example', verified: false, primary: false, added_at: '2026-03-04T10:00:00Z' },
+  ]
+  const button = (w: ReturnType<typeof mount>, row: number, label: string) => {
+    const li = w.findAll('li')[row]
+    return li.findAll('button').find((b) => b.text() === label)
+  }
+
+  it('shows primary, verified and pending states', () => {
+    const w = mount(PynEmailAddresses, { props: { emails } })
+    const rows = w.findAll('li')
+    expect(rows[0].text()).toContain('Primary')
+    expect(rows[1].text()).toContain('Verified')
+    expect(rows[2].text()).toContain('Pending')
+  })
+
+  it('offers the right actions per state and emits the address', async () => {
+    const w = mount(PynEmailAddresses, { props: { emails } })
+    expect(button(w, 0, 'Make primary')).toBeUndefined()
+    await button(w, 1, 'Make primary')!.trigger('click')
+    expect(button(w, 1, 'Resend link')).toBeUndefined()
+    await button(w, 2, 'Resend link')!.trigger('click')
+    await button(w, 2, 'Remove')!.trigger('click')
+    expect(w.emitted('primary')?.[0]).toEqual(['b@x.example'])
+    expect(w.emitted('resend')?.[0]).toEqual(['c@x.example'])
+    expect(w.emitted('remove')?.[0]).toEqual(['c@x.example'])
+  })
+
+  it('adds a trimmed address and clears the field', async () => {
+    const w = mount(PynEmailAddresses, { props: { emails } })
+    const input = w.find('input[type="email"]')
+    await input.setValue('  new@x.example ')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('add')?.[0]).toEqual(['new@x.example'])
+    expect((input.element as HTMLInputElement).value).toBe('')
+  })
+
+  it('stops adding at the limit and shows the error and the sent note', () => {
+    const w = mount(PynEmailAddresses, {
+      props: { emails, max: 3, error: 'Not available.', sent: 'c@x.example' },
+    })
+    expect(w.find('input[type="email"]').attributes('disabled')).toBeDefined()
+    expect(w.text()).toContain('at most 3')
+    expect(w.text()).toContain('link sent')
+    expect(w.find('[role="alert"]').text()).toBe('Not available.')
+  })
+
+  it('says when there are none', () => {
+    expect(mount(PynEmailAddresses, { props: { emails: [] } }).text()).toContain('No addresses')
+  })
+})
+
+describe('PynUsernameChange', () => {
+  async function fill(w: ReturnType<typeof mount>, name: string, password?: string) {
+    await w.find('input[autocapitalize]').setValue(name)
+    if (password !== undefined) await w.find('input[type="password"]').setValue(password)
+    await w.find('input[type="checkbox"]').setValue(true)
+  }
+
+  it('states the consequences and lists the repositories', () => {
+    const w = mount(PynUsernameChange, {
+      props: { current: 'alice', repositories: ['alice/game'] },
+    })
+    expect(w.text()).toContain('alice')
+    expect(w.text()).toContain('not reserved')
+    expect(w.text()).toContain('alice/game')
+  })
+
+  it('needs the acknowledgement and the password', async () => {
+    const w = mount(PynUsernameChange, { props: { current: 'alice' } })
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeDefined()
+    await fill(w, 'alicia', 'pw')
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeUndefined()
+    await w.find('form').trigger('submit')
+    expect(w.emitted('rename')?.[0]).toEqual([{ username: 'alicia', password: 'pw' }])
+  })
+
+  it('omits the password for an account without one', async () => {
+    const w = mount(PynUsernameChange, { props: { current: 'alice', hasPassword: false } })
+    expect(w.find('input[type="password"]').exists()).toBe(false)
+    await fill(w, 'alicia')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('rename')?.[0]).toEqual([{ username: 'alicia' }])
+  })
+
+  it('rejects an invalid or unchanged name', async () => {
+    const w = mount(PynUsernameChange, { props: { current: 'alice', hasPassword: false } })
+    await fill(w, 'Bad Name')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('rename')).toBeUndefined()
+    expect(w.find('[role="alert"]').text()).toContain('lowercase')
+    await w.find('input[autocapitalize]').setValue('alice')
+    await w.find('form').trigger('submit')
+    expect(w.find('[role="alert"]').text()).toContain('already')
+  })
+
+  it('shows the server error', () => {
+    const w = mount(PynUsernameChange, { props: { current: 'alice', error: 'Taken.' } })
+    expect(w.find('[role="alert"]').text()).toBe('Taken.')
   })
 })
