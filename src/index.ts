@@ -324,3 +324,16 @@ export type {
 } from './types/policy.types'
 export { focusableIn, trapTarget } from './state/drawer.state'
 export { commitSubject, commitBody } from './utils/commit-message'
+export { default as PynProfileForm } from './components/PynProfileForm.vue'
+export { default as PynEmailAddresses } from './components/PynEmailAddresses.vue'
+export { default as PynUsernameChange } from './components/PynUsernameChange.vue'
+export type { AccountEmail, ProfileValues, RenameForm } from './types/account.types'
+export {
+  AVATAR_MAX_BYTES,
+  AVATAR_TYPES,
+  PROFILE_LIMITS,
+  avatarProblem,
+  cleanProfile,
+  profileProblem,
+  usernameProblem,
+} from './state/account-settings.state'

@@ -1,0 +1,64 @@
+@use 'mixins' as m;
+
+.form {
+  @include m.form;
+}
+
+.heading {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.note {
+  @include m.muted;
+}
+
+.name {
+  color: var(--pyn-text);
+}
+
+.warning {
+  padding: var(--pyn-space-3);
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  font-size: 0.875rem;
+
+  p {
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+.consequences,
+.repos {
+  margin: var(--pyn-space-1) 0 0;
+  padding-left: var(--pyn-space-4);
+}
+
+.repos {
+  font-family: var(--pyn-font-mono);
+}
+
+.field {
+  @include m.field;
+}
+
+.input {
+  @include m.input;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  font-size: 0.875rem;
+}
+
+.error {
+  @include m.error;
+}
+
+.button {
+  @include m.button-primary;
+}
