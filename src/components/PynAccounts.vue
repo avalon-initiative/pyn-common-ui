@@ -3,7 +3,12 @@ import { ref } from 'vue'
 import styles from '../styles/PynAccounts.module.scss'
 import { formatDateTime } from '../utils/datetime'
 import { accountActions, disabledNote, STATUS_FILTERS, statusLabel } from '../state/admin.state'
-import type { AccountInfo, AdminAccountStatus, DisableRequest } from '../types/admin.types'
+import type {
+  AccountInfo,
+  AdminAccountStatus,
+  DeleteAccountRequest,
+  DisableRequest,
+} from '../types/admin.types'
 
 defineProps<{
   accounts: AccountInfo[]
@@ -17,14 +22,35 @@ const emit = defineEmits<{
   approve: [user: string]
   enable: [user: string]
   disable: [DisableRequest]
+  delete: [DeleteAccountRequest]
 }>()
 
 const confirming = ref('')
+const deleting = ref('')
 const reason = ref('')
+const immediately = ref(false)
 
 function ask(user: string) {
   confirming.value = user
+  deleting.value = ''
   reason.value = ''
+}
+
+function askDelete(user: string) {
+  deleting.value = user
+  confirming.value = ''
+  reason.value = ''
+  immediately.value = false
+}
+
+function remove() {
+  if (!reason.value.trim()) return
+  emit('delete', {
+    user: deleting.value,
+    reason: reason.value.trim(),
+    immediately: immediately.value,
+  })
+  deleting.value = ''
 }
 
 function disable() {
@@ -74,6 +100,21 @@ const pick = (e: Event) =>
           </button>
           <button type="button" :class="styles.quiet" @click="confirming = ''">Cancel</button>
         </form>
+        <form v-else-if="deleting === a.user" :class="styles.confirm" @submit.prevent="remove">
+          <input
+            v-model="reason"
+            :class="styles.input"
+            placeholder="Reason (required)"
+            :aria-label="`Reason for deleting ${a.user}`"
+          />
+          <label :class="styles.check"
+            ><input v-model="immediately" type="checkbox" /> Delete immediately</label
+          >
+          <button type="submit" :class="styles.danger" :disabled="busy || !reason.trim()">
+            Delete {{ a.user }}
+          </button>
+          <button type="button" :class="styles.quiet" @click="deleting = ''">Cancel</button>
+        </form>
         <div v-else :class="styles.actions">
           <template v-for="action in accountActions(a, self)" :key="action">
             <button
@@ -93,6 +134,15 @@ const pick = (e: Event) =>
               @click="emit('enable', a.user)"
             >
               Enable
+            </button>
+            <button
+              v-else-if="action === 'delete'"
+              type="button"
+              :class="styles.danger"
+              :disabled="busy"
+              @click="askDelete(a.user)"
+            >
+              Delete
             </button>
             <button
               v-else

@@ -1,0 +1,44 @@
+@use 'mixins' as m;
+
+.form {
+  @include m.form;
+  border-color: var(--pyn-danger);
+}
+
+.heading {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.note {
+  @include m.muted;
+}
+
+.field {
+  @include m.field;
+}
+
+.input {
+  @include m.input;
+}
+
+.blockers {
+  p {
+    margin: 0;
+  }
+}
+
+.blockerList {
+  margin: var(--pyn-space-1) 0 0;
+  padding-left: var(--pyn-space-4);
+  font-family: var(--pyn-font-mono);
+}
+
+.danger {
+  @include m.button(var(--pyn-danger));
+  align-self: flex-start;
+}
+
+.error {
+  @include m.error;
+}

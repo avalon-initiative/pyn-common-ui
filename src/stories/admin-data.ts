@@ -39,4 +39,16 @@ export const accounts: AccountInfo[] = [
     admin: false,
     created_at: '2026-09-20T12:00:00Z',
   },
+  {
+    id: 'user-erin',
+    user: 'erin',
+    email: 'erin@example.com',
+    email_verified: true,
+    status: 'disabled',
+    disabled_at: '2026-11-01T10:00:00Z',
+    disabled_reason: 'Deleted by request',
+    purge_at: '2026-12-01T10:00:00Z',
+    admin: false,
+    created_at: '2026-09-22T12:00:00Z',
+  },
 ]

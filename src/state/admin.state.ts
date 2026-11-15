@@ -18,11 +18,12 @@ const LABELS: Record<AdminAccountStatus, string> = {
 
 export const statusLabel = (status: AdminAccountStatus) => LABELS[status] ?? status
 
-export type AccountAction = 'approve' | 'disable' | 'enable'
+export type AccountAction = 'approve' | 'disable' | 'enable' | 'delete'
 
 /** The actions the server accepts for this account; an admin cannot disable themselves. */
 export function accountActions(account: AccountInfo, self: string): AccountAction[] {
-  if (account.status === 'disabled') return ['enable']
+  if (account.status === 'disabled')
+    return account.user === self ? ['enable'] : ['enable', 'delete']
   const actions: AccountAction[] = account.status === 'pending_approval' ? ['approve'] : []
   if (account.user !== self) actions.push('disable')
   return actions
@@ -42,5 +43,6 @@ export function applyUpdate(
 export function disabledNote(account: AccountInfo): string {
   const when = account.disabled_at ? ` ${formatDateTime(account.disabled_at)}` : ''
   const why = account.disabled_reason ? `: ${account.disabled_reason}` : ''
-  return `Disabled${when}${why}`
+  const purge = account.purge_at ? `. Deleted ${formatDateTime(account.purge_at)}` : ''
+  return `Disabled${when}${why}${purge}`
 }

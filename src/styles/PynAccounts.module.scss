@@ -64,3 +64,9 @@
 .quiet {
   @include m.button;
 }
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-1);
+}

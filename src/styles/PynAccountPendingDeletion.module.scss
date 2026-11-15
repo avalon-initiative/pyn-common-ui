@@ -1,0 +1,28 @@
+@use 'mixins' as m;
+
+.card {
+  @include m.card;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-4);
+  border-color: var(--pyn-danger);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.text {
+  @include m.muted;
+}
+
+.restore {
+  @include m.button-primary;
+  align-self: flex-start;
+}
+
+.error {
+  @include m.error;
+}
