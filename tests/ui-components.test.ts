@@ -2,7 +2,9 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import {
+  PynAccountDelete,
   PynAccountNotice,
+  PynAccountPendingDeletion,
   PynAccountSettings,
   PynAdminLayout,
   PynPasswordForm,
@@ -2338,7 +2340,7 @@ describe('PynKeys', () => {
 })
 
 describe('PynAccounts', () => {
-  const [root, bob, carol, dave] = accounts
+  const [root, bob, carol, dave, erin] = accounts
   const props = { accounts, status: '' as const, self: 'root' }
   const buttons = (w: ReturnType<typeof mount>, text: string) =>
     w.findAll('button').filter((b) => b.text().startsWith(text))
@@ -2348,7 +2350,8 @@ describe('PynAccounts', () => {
     expect(accountActions(root, 'other')).toEqual(['disable'])
     expect(accountActions(bob, 'root')).toEqual(['approve', 'disable'])
     expect(accountActions(carol, 'root')).toEqual(['disable'])
-    expect(accountActions(dave, 'root')).toEqual(['enable'])
+    expect(accountActions(dave, 'root')).toEqual(['enable', 'delete'])
+    expect(accountActions(dave, 'dave')).toEqual(['enable'])
   })
 
   it('swaps an updated account in and drops it when the filter no longer matches', () => {
@@ -2368,6 +2371,22 @@ describe('PynAccounts', () => {
   it('has no disable button for the signed-in administrator', () => {
     const w = mount(PynAccounts, { props: { ...props, accounts: [root] } })
     expect(w.findAll('li button')).toHaveLength(0)
+  })
+
+  it('shows the deletion deadline of a scheduled account', () => {
+    const w = mount(PynAccounts, { props: { ...props, accounts: [erin] } })
+    expect(w.text()).toContain('Deleted Dec 01 2026')
+  })
+
+  it('needs a reason to delete and emits it with the immediately choice', async () => {
+    const w = mount(PynAccounts, { props: { ...props, accounts: [dave] } })
+    await buttons(w, 'Delete')[0].trigger('click')
+    const submit = buttons(w, 'Delete dave')[0]
+    expect(submit.attributes('disabled')).toBeDefined()
+    await w.find('input[placeholder="Reason (required)"]').setValue(' Gone ')
+    await w.find('input[type="checkbox"]').setValue(true)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('delete')?.[0]).toEqual([{ user: 'dave', reason: 'Gone', immediately: true }])
   })
 
   it('emits the status filter, approve and enable', async () => {
@@ -3587,5 +3606,59 @@ describe('repository shell and settings', () => {
     ])
     expect(w.find('[aria-current=page]').text()).toBe('Audit log')
     expect(w.text()).toContain('page')
+  })
+})
+
+describe('PynAccountDelete', () => {
+  const blockers = { repos: ['alice/game'], orgs: ['studio'] }
+
+  it('asks for the password and emits it', async () => {
+    const w = mount(PynAccountDelete, { props: {} })
+    expect(w.find('button').attributes('disabled')).toBeDefined()
+    await w.find('input[type="password"]').setValue('hunter2')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('remove')?.[0]).toEqual(['hunter2'])
+  })
+
+  it('needs no password for an external sign-in', async () => {
+    const w = mount(PynAccountDelete, { props: { external: true } })
+    expect(w.find('input').exists()).toBe(false)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('remove')?.[0]).toEqual([undefined])
+  })
+
+  it('lists blockers and refuses to delete', async () => {
+    const w = mount(PynAccountDelete, { props: { external: true, blockers } })
+    expect(w.text()).toContain('alice/game')
+    expect(w.text()).toContain('studio')
+    expect(w.find('button').attributes('disabled')).toBeDefined()
+    await w.find('form').trigger('submit')
+    expect(w.emitted('remove')).toBeUndefined()
+  })
+
+  it('states the recovery window and shows the error', () => {
+    const w = mount(PynAccountDelete, { props: { recoveryDays: 30, error: 'Wrong password.' } })
+    expect(w.text()).toContain('30 days')
+    expect(w.find('[role="alert"]').text()).toBe('Wrong password.')
+  })
+})
+
+describe('PynAccountPendingDeletion', () => {
+  it('shows the deadline and emits restore', async () => {
+    const w = mount(PynAccountPendingDeletion, {
+      props: { deadline: '2026-12-01T10:00:00Z', user: 'alice' },
+    })
+    expect(w.text()).toContain('alice')
+    expect(w.text()).toContain('Dec 01 2026')
+    await w.find('button').trigger('click')
+    expect(w.emitted('restore')).toHaveLength(1)
+  })
+
+  it('disables restore while busy', () => {
+    const w = mount(PynAccountPendingDeletion, {
+      props: { deadline: '2026-12-01T10:00:00Z', busy: true, error: 'Try again.' },
+    })
+    expect(w.find('button').attributes('disabled')).toBeDefined()
+    expect(w.text()).toContain('Try again.')
   })
 })

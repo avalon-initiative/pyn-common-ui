@@ -12,9 +12,17 @@ export interface AccountInfo {
   created_at: string
   disabled_at?: string | null
   disabled_reason?: string | null
+  /** When a scheduled deletion takes effect; null or absent when none is scheduled. */
+  purge_at?: string | null
 }
 
 export interface DisableRequest {
   user: string
   reason: string
+}
+
+export interface DeleteAccountRequest {
+  user: string
+  reason: string
+  immediately: boolean
 }

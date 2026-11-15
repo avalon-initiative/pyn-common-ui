@@ -55,3 +55,9 @@ export interface SetupStatus {
   registration: RegistrationMode
   server_name?: string | null
 }
+
+/** What an account still owns, which must be moved or deleted before it can be deleted. */
+export interface AccountDeleteBlockers {
+  repos: string[]
+  orgs: string[]
+}

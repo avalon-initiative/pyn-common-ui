@@ -18,3 +18,6 @@ export const Failed: Story = {
   args: { error: 'That account does not exist.' },
 }
 export const None: Story = { args: { accounts: [], status: 'active' } }
+export const ScheduledDeletion: Story = {
+  args: { accounts: accounts.slice(3), status: 'disabled' },
+}

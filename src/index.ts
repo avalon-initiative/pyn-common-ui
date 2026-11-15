@@ -8,7 +8,9 @@ export { default as PynSearch } from './components/PynSearch.vue'
 export { default as PynBreadcrumb } from './components/PynBreadcrumb.vue'
 export { default as PynPageNotFound } from './components/PynPageNotFound.vue'
 export { default as PynRepoNotFound } from './components/PynRepoNotFound.vue'
+export { default as PynAccountDelete } from './components/PynAccountDelete.vue'
 export { default as PynAccountNotice } from './components/PynAccountNotice.vue'
+export { default as PynAccountPendingDeletion } from './components/PynAccountPendingDeletion.vue'
 export { default as PynOwnerFrozenNotice } from './components/PynOwnerFrozenNotice.vue'
 export { default as PynResendForm } from './components/PynResendForm.vue'
 export { default as PynShell } from './components/PynShell.vue'
@@ -115,6 +117,7 @@ export type { LockInfo, LockState } from './types/lock.types'
 export type { Crumb, TreeMode } from './types/tree.types'
 export type { MenuItem } from './types/shell.types'
 export type {
+  AccountDeleteBlockers,
   AccountStatus,
   BlockedStatus,
   ExternalIdentity,
@@ -151,7 +154,12 @@ export {
 } from './state/webhook.state'
 export { REGISTRATION_LABELS, SETUP_STEPS, stepComplete } from './state/setup.state'
 export type { SetupStep } from './state/setup.state'
-export type { AccountInfo, AdminAccountStatus, DisableRequest } from './types/admin.types'
+export type {
+  AccountInfo,
+  AdminAccountStatus,
+  DeleteAccountRequest,
+  DisableRequest,
+} from './types/admin.types'
 export {
   STATUS_FILTERS,
   accountActions,
