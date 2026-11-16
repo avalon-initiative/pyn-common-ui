@@ -29,6 +29,19 @@ export function accountActions(account: AccountInfo, self: string): AccountActio
   return actions
 }
 
+export type AdminAction = 'grant' | 'revoke'
+
+/** Grant on an active non-administrator, revoke on another active administrator. */
+export function adminAction(
+  account: AccountInfo,
+  self: string,
+  canRevoke = true,
+): AdminAction | null {
+  if (account.status !== 'active') return null
+  if (!account.admin) return 'grant'
+  return canRevoke && account.user !== self ? 'revoke' : null
+}
+
 /** Replaces an account in the list after an action, or drops it when the filter no longer matches. */
 export function applyUpdate(
   accounts: AccountInfo[],

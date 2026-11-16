@@ -12,11 +12,13 @@ const props = defineProps<{
   busy?: boolean
   error?: string
   nameMessage?: string
+  suggestSecondAdmin?: boolean
 }>()
 
 const emit = defineEmits<{
   finish: [SetupForm]
   signIn: []
+  manageAdmins: []
   nameInput: [name: string]
 }>()
 
@@ -56,6 +58,13 @@ function next() {
     <h2 :class="styles.title">Your server is ready</h2>
     <p :class="styles.note">
       {{ form.username }} is the administrator. Sign in to start creating repositories.
+    </p>
+    <p v-if="suggestSecondAdmin" :class="styles.note">
+      With one administrator, losing this account locks you out of managing the server. After
+      signing in, make a second administrator on the
+      <button type="button" :class="styles.link" @click="emit('manageAdmins')">
+        accounts administration page</button
+      >.
     </p>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
     <button type="button" :class="styles.primary" :disabled="busy" @click="emit('signIn')">

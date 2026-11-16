@@ -52,3 +52,26 @@ export const accounts: AccountInfo[] = [
     created_at: '2026-09-22T12:00:00Z',
   },
 ]
+
+export const adminAccounts: AccountInfo[] = [
+  accounts[0],
+  {
+    id: 'user-frank',
+    user: 'frank',
+    email: 'frank@example.com',
+    email_verified: true,
+    status: 'active',
+    admin: false,
+    created_at: '2026-10-10T09:00:00Z',
+  },
+  {
+    id: 'user-gina',
+    user: 'gina',
+    email: 'gina@example.com',
+    email_verified: true,
+    status: 'active',
+    admin: true,
+    created_at: '2026-10-12T09:00:00Z',
+  },
+  accounts[3],
+]

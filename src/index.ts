@@ -93,6 +93,7 @@ export { default as PynSetup } from './components/PynSetup.vue'
 export { default as PynViewAction } from './components/PynViewAction.vue'
 export { default as PynViewError } from './components/PynViewError.vue'
 export { default as PynViewGroup } from './components/PynViewGroup.vue'
+export { default as PynViewNotice } from './components/PynViewNotice.vue'
 export { default as PynViewHeader } from './components/PynViewHeader.vue'
 export { default as PynViewStack } from './components/PynViewStack.vue'
 export { default as PynViewSummary } from './components/PynViewSummary.vue'
@@ -171,11 +172,12 @@ export type {
 export {
   STATUS_FILTERS,
   accountActions,
+  adminAction,
   applyUpdate,
   disabledNote,
   statusLabel,
 } from './state/admin.state'
-export type { AccountAction } from './state/admin.state'
+export type { AccountAction, AdminAction } from './state/admin.state'
 export type {
   CreationRule,
   MemberCreation,

@@ -2,7 +2,13 @@
 import { ref } from 'vue'
 import styles from '../styles/PynAccounts.module.scss'
 import { formatDateTime } from '../utils/datetime'
-import { accountActions, disabledNote, STATUS_FILTERS, statusLabel } from '../state/admin.state'
+import {
+  accountActions,
+  adminAction,
+  disabledNote,
+  STATUS_FILTERS,
+  statusLabel,
+} from '../state/admin.state'
 import type {
   AccountInfo,
   AdminAccountStatus,
@@ -10,19 +16,25 @@ import type {
   DisableRequest,
 } from '../types/admin.types'
 
-defineProps<{
-  accounts: AccountInfo[]
-  status: AdminAccountStatus | ''
-  self: string
-  busy?: boolean
-  error?: string
-}>()
+withDefaults(
+  defineProps<{
+    accounts: AccountInfo[]
+    status: AdminAccountStatus | ''
+    self: string
+    busy?: boolean
+    error?: string
+    canRevokeAdmin?: boolean
+  }>(),
+  { canRevokeAdmin: true },
+)
 const emit = defineEmits<{
   status: [AdminAccountStatus | '']
   approve: [user: string]
   enable: [user: string]
   disable: [DisableRequest]
   delete: [DeleteAccountRequest]
+  grantAdmin: [user: string]
+  revokeAdmin: [user: string]
 }>()
 
 const confirming = ref('')
@@ -154,6 +166,24 @@ const pick = (e: Event) =>
               Disable
             </button>
           </template>
+          <button
+            v-if="adminAction(a, self, canRevokeAdmin) === 'grant'"
+            type="button"
+            :class="styles.quiet"
+            :disabled="busy"
+            @click="emit('grantAdmin', a.user)"
+          >
+            Make administrator
+          </button>
+          <button
+            v-else-if="adminAction(a, self, canRevokeAdmin) === 'revoke'"
+            type="button"
+            :class="styles.quiet"
+            :disabled="busy"
+            @click="emit('revokeAdmin', a.user)"
+          >
+            Remove administrator
+          </button>
         </div>
       </li>
     </ul>
