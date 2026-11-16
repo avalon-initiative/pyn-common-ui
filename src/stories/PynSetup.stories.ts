@@ -13,6 +13,9 @@ export const Welcome: Story = {}
 export const WrongToken: Story = { args: { error: 'the setup token is not valid' } }
 export const RateLimited: Story = { args: { error: 'too many attempts; try again in 15 minutes' } }
 export const Finished: Story = { args: { done: true } }
+export const FinishedSuggestSecondAdmin: Story = {
+  args: { done: true, suggestSecondAdmin: true },
+}
 
 const tick = () => new Promise((resolve) => setTimeout(resolve))
 

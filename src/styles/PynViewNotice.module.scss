@@ -1,0 +1,33 @@
+.notice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  color: var(--pyn-text);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.warning {
+  background: var(--pyn-locked-bg);
+  border-color: var(--pyn-locked);
+}
+
+.info {
+  background: var(--pyn-mine-bg);
+  border-color: var(--pyn-mine);
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.text {
+  font-size: 0.875rem;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+}

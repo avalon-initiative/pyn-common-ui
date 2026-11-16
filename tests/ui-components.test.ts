@@ -88,6 +88,7 @@ import {
   PynTree,
   PynVerifyEmail,
   accountActions,
+  adminAction,
   accountNav,
   accountNavItems,
   adminNavItems,
@@ -95,6 +96,7 @@ import {
   applyUpdate,
   PynViewAction,
   PynViewError,
+  PynViewNotice,
   PynViewGroup,
   PynViewHeader,
   PynViewStack,
@@ -157,7 +159,7 @@ import {
   ungrantedTeams,
 } from '../src'
 import type { SetupForm } from '../src'
-import { accounts } from '../src/stories/admin-data'
+import { accounts, adminAccounts } from '../src/stories/admin-data'
 import { codeText, fileEntry, imageSrc, lockedEntry, readmeText } from '../src/stories/file-data'
 import {
   orgInvitations,
@@ -2437,6 +2439,45 @@ describe('PynAccounts', () => {
     expect(w.find('input').exists()).toBe(false)
   })
 
+  it('picks the administrator action', () => {
+    const [, frank, gina] = adminAccounts
+    expect(adminAction(frank, 'root')).toBe('grant')
+    expect(adminAction(gina, 'root')).toBe('revoke')
+    expect(adminAction(gina, 'root', false)).toBeNull()
+    expect(adminAction(root, 'root')).toBeNull()
+    expect(adminAction(bob, 'root')).toBeNull()
+    expect(adminAction(carol, 'root')).toBeNull()
+    expect(adminAction(dave, 'root')).toBeNull()
+  })
+
+  it('emits grantAdmin and revokeAdmin with the user', async () => {
+    const w = mount(PynAccounts, { props: { ...props, accounts: adminAccounts } })
+    expect(w.findAll('.pill, span').some((s) => s.text() === 'admin')).toBe(true)
+    await buttons(w, 'Make administrator')[0].trigger('click')
+    await buttons(w, 'Remove administrator')[0].trigger('click')
+    expect(w.emitted('grantAdmin')).toEqual([['frank']])
+    expect(w.emitted('revokeAdmin')).toEqual([['gina']])
+    expect(buttons(w, 'Make administrator')).toHaveLength(1)
+    expect(buttons(w, 'Remove administrator')).toHaveLength(1)
+  })
+
+  it('hides revoke with canRevokeAdmin false and disables both while busy', async () => {
+    const w = mount(PynAccounts, {
+      props: { ...props, accounts: adminAccounts, canRevokeAdmin: false },
+    })
+    expect(buttons(w, 'Remove administrator')).toHaveLength(0)
+    expect(buttons(w, 'Make administrator')).toHaveLength(1)
+    await w.setProps({ canRevokeAdmin: true, busy: true })
+    for (const b of [...buttons(w, 'Make administrator'), ...buttons(w, 'Remove administrator')])
+      expect(b.attributes('disabled')).toBeDefined()
+  })
+
+  it('offers no grant on pending or disabled accounts', () => {
+    const w = mount(PynAccounts, { props })
+    expect(buttons(w, 'Make administrator')).toHaveLength(0)
+    expect(buttons(w, 'Remove administrator')).toHaveLength(0)
+  })
+
   it('says when nothing matches and shows errors', () => {
     const w = mount(PynAccounts, {
       props: { ...props, accounts: [], error: 'boom' },
@@ -2478,6 +2519,16 @@ describe('view layout components', () => {
   it('error is an alert and summary is plain text', () => {
     expect(mount(PynViewError, { slots: { default: 'Boom' } }).attributes('role')).toBe('alert')
     expect(mount(PynViewSummary, { slots: { default: 'Hello' } }).text()).toBe('Hello')
+  })
+
+  it('notice is a status, warning by default, with an optional title', () => {
+    const w = mount(PynViewNotice, { slots: { default: 'Heads up <a href="/x">link</a>' } })
+    expect(w.attributes('role')).toBe('status')
+    expect(w.find('h3').exists()).toBe(false)
+    expect(w.find('a').text()).toBe('link')
+    const info = mount(PynViewNotice, { props: { tone: 'info', title: 'FYI' } })
+    expect(info.find('h3').text()).toBe('FYI')
+    expect(info.classes()).not.toEqual(w.classes())
   })
 
   it('group titles its content and stack holds its children', () => {
@@ -2693,6 +2744,26 @@ describe('PynSetup', () => {
   it('offers sign-in once finished', async () => {
     const w = mount(PynSetup, { props: { registration: 'closed', done: true } })
     await w.find('button').trigger('click')
+    expect(w.emitted('signIn')).toHaveLength(1)
+  })
+})
+
+describe('PynSetup second administrator', () => {
+  it('shows no suggestion by default', () => {
+    const w = mount(PynSetup, { props: { registration: 'closed', done: true } })
+    expect(w.text()).not.toContain('accounts administration page')
+    expect(w.findAll('button')).toHaveLength(1)
+  })
+
+  it('suggests it when asked and emits manageAdmins without signing in', async () => {
+    const w = mount(PynSetup, {
+      props: { registration: 'closed', done: true, suggestSecondAdmin: true },
+    })
+    expect(w.text()).toContain('second administrator')
+    await w.findAll('button')[0].trigger('click')
+    expect(w.emitted('manageAdmins')).toHaveLength(1)
+    expect(w.emitted('signIn')).toBeUndefined()
+    await w.findAll('button')[1].trigger('click')
     expect(w.emitted('signIn')).toHaveLength(1)
   })
 })
