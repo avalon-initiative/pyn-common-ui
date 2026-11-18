@@ -72,6 +72,7 @@ export { default as PynTeamGrant } from './components/PynTeamGrant.vue'
 export { default as PynSignIn } from './components/PynSignIn.vue'
 export { default as PynVerifyEmail } from './components/PynVerifyEmail.vue'
 export { default as PynAccountSettings } from './components/PynAccountSettings.vue'
+export { default as PynAccessMode } from './components/PynAccessMode.vue'
 export { default as PynAdminLayout } from './components/PynAdminLayout.vue'
 export { default as PynPasswordForm } from './components/PynPasswordForm.vue'
 export { passwordProblem } from './state/password.state'
@@ -190,6 +191,8 @@ export {
   webhookNameProblem,
   webhookUrlProblem,
 } from './state/webhook.state'
+export { ACCESS_EFFECTS, ACCESS_LABELS, otherMode } from './state/access.state'
+export type { AccessCheckItem, AccessCheckStatus, AccessMode } from './types/access.types'
 export { REGISTRATION_LABELS, SETUP_STEPS, stepComplete } from './state/setup.state'
 export type { SetupStep } from './state/setup.state'
 export type {

@@ -32,6 +32,7 @@ export const accountNav = [
 /** The administration pages; add an item only when its page exists. */
 export const adminNavItems = () => [
   { id: 'accounts', label: 'Accounts', href: '/_/admin/accounts' },
+  { id: 'access', label: 'Server access', href: '/_/admin/access' },
   { id: 'audit', label: 'Audit log', href: '/_/admin/audit' },
   { id: 'webhooks', label: 'Webhooks', href: '/_/admin/webhooks' },
 ]

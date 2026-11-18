@@ -2224,6 +2224,7 @@ describe('PynAdminLayout', () => {
     expect(w.find('nav').attributes('aria-label')).toBe('Server administration')
     expect(w.findAll('a').map((a) => [a.text(), a.attributes('href')])).toEqual([
       ['Accounts', '/_/admin/accounts'],
+      ['Server access', '/_/admin/access'],
       ['Audit log', '/_/admin/audit'],
       ['Webhooks', '/_/admin/webhooks'],
     ])
