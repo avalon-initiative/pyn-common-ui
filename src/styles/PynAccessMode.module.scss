@@ -1,0 +1,102 @@
+@use 'mixins' as m;
+
+.panel {
+  @include m.card;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.mode {
+  font-family: var(--pyn-font-mono);
+}
+
+.warning {
+  padding: var(--pyn-space-3);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.lead {
+  margin: 0 0 var(--pyn-space-2);
+  font-weight: 600;
+}
+
+.effects {
+  margin: 0;
+  padding-left: var(--pyn-space-6);
+}
+
+.heading {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.checklist {
+  @include m.list;
+}
+
+.item {
+  @include m.item;
+  display: flex;
+  gap: var(--pyn-space-3);
+  align-items: baseline;
+}
+
+.status {
+  @include m.pill;
+}
+
+.ok {
+  color: var(--pyn-available);
+}
+
+.todo {
+  color: var(--pyn-danger);
+}
+
+.unknown {
+  color: var(--pyn-text-muted);
+}
+
+.detail {
+  @include m.muted;
+  display: block;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.label {
+  font-size: 0.875rem;
+}
+
+.input {
+  @include m.input;
+  font-family: var(--pyn-font-mono);
+}
+
+.actions {
+  display: flex;
+  gap: var(--pyn-space-3);
+}
+
+.primary {
+  @include m.button-primary;
+}
+
+.cancel {
+  @include m.button;
+}
+
+.error {
+  @include m.error;
+}
