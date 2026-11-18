@@ -79,6 +79,7 @@ import {
   PynTeamGrant,
   PynTeamList,
   PynTokens,
+  PynTokenForm,
   PynWebhookDeliveries,
   PynSecretReveal,
   PynWebhookDetail,
@@ -109,6 +110,12 @@ import {
   entryAt,
   eventTypesLabel,
   expiryFromDate,
+  expiryAfter,
+  expiryPreview,
+  filterRepos,
+  availableResources,
+  buildPermissions,
+  TOKEN_EXPIRY_CHOICES,
   isRotating,
   parseEventTypes,
   webhookNameProblem,
@@ -136,7 +143,6 @@ import {
   userTabs,
   ownerChoices,
   parseLockLimit,
-  parseRepos,
   personGrantees,
   readmeEntry,
   renderMarkdown,
@@ -2580,8 +2586,13 @@ const tokenList = [
     id: 'aaaaaaaaaaaa',
     user: 'alice',
     name: 'ci',
-    repos: ['acme/game'],
-    permissions: ['read', 'lock'],
+    owner: 'acme',
+    repository_access: { mode: 'selected' as const, repos: ['acme/game'] },
+    permissions: [
+      { resource: 'metadata', level: 'read' as const },
+      { resource: 'locks', level: 'write' as const },
+    ],
+    sign_in: false,
     created_at: '2026-10-08T09:00:00Z',
     expires_at: null,
     last_used_at: null,
@@ -2590,66 +2601,110 @@ const tokenList = [
     id: 'bbbbbbbbbbbb',
     user: 'alice',
     name: 'old',
-    repos: [],
-    permissions: ['read'],
+    owner: 'alice',
+    repository_access: { mode: 'all' as const },
+    permissions: [],
+    sign_in: false,
     created_at: '2026-10-01T09:00:00Z',
     revoked_at: '2026-10-02T09:00:00Z',
   },
 ]
+const tokenOwners = [
+  { name: 'alice', kind: 'account' as const },
+  { name: 'acme', kind: 'org' as const },
+]
+const tokenProps = {
+  owners: tokenOwners,
+  repos: ['acme/game', 'acme/tools'],
+  now: '2026-11-18T12:00:00Z',
+}
 
 describe('token state', () => {
-  it('splits and de-duplicates repositories', () => {
-    expect(parseRepos('a/b, c/d\na/b  e/f')).toEqual(['a/b', 'c/d', 'e/f'])
-    expect(parseRepos('')).toEqual([])
-  })
-
   it('turns a date into an end-of-day expiry', () => {
     expect(expiryFromDate('2027-01-01')).toBe('2027-01-01T23:59:59Z')
     expect(expiryFromDate('')).toBeNull()
   })
+
+  it('computes expiry dates from the choice', () => {
+    const now = new Date('2026-11-18T12:00:00Z')
+    expect(expiryAfter(now, 30)).toBe('2026-12-18T12:00:00.000Z')
+    expect(expiryPreview(TOKEN_EXPIRY_CHOICES[1], now)).toBe('Dec 18 2026')
+    expect(expiryPreview(TOKEN_EXPIRY_CHOICES[5], now)).toBeNull()
+  })
+
+  it('offers resources by owner kind and repository access', () => {
+    const names = (k: 'account' | 'org', m: 'public' | 'all') =>
+      availableResources(k, m).map((r) => r.resource)
+    expect(names('account', 'public')).toEqual([
+      'account_profile',
+      'account_ssh_keys',
+      'account_locks',
+    ])
+    expect(names('org', 'public')).toEqual([
+      'org_members',
+      'org_teams',
+      'org_administration',
+      'org_audit',
+    ])
+    expect(names('org', 'all')).toContain('metadata')
+    expect(names('org', 'all')).not.toContain('account_locks')
+  })
+
+  it('adds metadata read only with a repository permission', () => {
+    expect(buildPermissions({ contents: 'write' }, 'account', 'all')).toEqual([
+      { resource: 'metadata', level: 'read' },
+      { resource: 'contents', level: 'write' },
+    ])
+    expect(buildPermissions({ account_locks: 'read' }, 'account', 'all')).toEqual([
+      { resource: 'account_locks', level: 'read' },
+    ])
+    expect(buildPermissions({ contents: 'read' }, 'account', 'public')).toEqual([])
+  })
+
+  it('filters repositories', () => {
+    expect(filterRepos(['a/Game', 'a/tools'], ' game ')).toEqual(['a/Game'])
+    expect(filterRepos(['a/b'], '')).toEqual(['a/b'])
+  })
 })
 
 describe('PynTokens', () => {
-  it('lists tokens and only offers revoke for live ones', () => {
-    const w = mount(PynTokens, { props: { tokens: tokenList } })
+  it('lists owner, access, grants and expiry and only offers revoke for live ones', () => {
+    const w = mount(PynTokens, { props: { tokens: tokenList, ...tokenProps } })
+    expect(w.text()).toContain('Owner acme')
+    expect(w.text()).toContain('1 selected repository')
     expect(w.text()).toContain('acme/game')
-    expect(w.text()).toContain('no expiry')
+    expect(w.text()).toContain('locks: write')
+    expect(w.text()).toContain('never expires')
     expect(w.text()).toContain('revoked')
     expect(w.findAll('button').filter((b) => b.text() === 'Revoke')).toHaveLength(1)
   })
 
   it('says so when there are no tokens', () => {
-    expect(mount(PynTokens, { props: { tokens: [] } }).text()).toContain('No tokens yet')
+    const w = mount(PynTokens, { props: { tokens: [], ...tokenProps } })
+    expect(w.text()).toContain('No tokens yet')
   })
 
-  it('emits the form and resets it', async () => {
-    const w = mount(PynTokens, { props: { tokens: [] } })
-    await w.find('input').setValue(' ci ')
-    await w.find('textarea').setValue('acme/game acme/tools')
-    await w.find('input[type=date]').setValue('2027-01-01')
-    await w.find('input[value=lock]').setValue(true)
-    await w.find('form').trigger('submit')
-    expect(w.emitted('create')?.[0]).toEqual([
-      {
-        name: 'ci',
-        repos: ['acme/game', 'acme/tools'],
-        permissions: ['read', 'lock'],
-        expires_at: '2027-01-01T23:59:59Z',
-      },
-    ])
-    expect((w.find('textarea').element as HTMLTextAreaElement).value).toBe('')
+  it('opens the form and relays its events', async () => {
+    const w = mount(PynTokens, { props: { tokens: [], ...tokenProps } })
+    expect(w.find('form').exists()).toBe(false)
+    await w.find('button').trigger('click')
+    expect(w.find('form').exists()).toBe(true)
+    await w.find('select').setValue('acme')
+    expect(w.emitted('owner-change')?.[0]).toEqual(['acme'])
   })
 
-  it('shows the secret once and the error', async () => {
-    const w = mount(PynTokens, { props: { tokens: [], secret: 'pyn_abc', error: 'nope' } })
+  it('shows the secret once and closes the form', async () => {
+    const w = mount(PynTokens, { props: { tokens: [], ...tokenProps } })
+    await w.find('button').trigger('click')
+    await w.setProps({ secret: 'pyn_abc' })
     expect(w.text()).toContain('pyn_abc')
-    expect(w.find('[role=alert]').text()).toBe('nope')
+    expect(w.find('form').exists()).toBe(false)
     await w.find('[role=status] button').trigger('click')
     expect(w.emitted('dismiss')).toHaveLength(1)
   })
 
   it('emits the id to revoke', async () => {
-    const w = mount(PynTokens, { props: { tokens: tokenList } })
+    const w = mount(PynTokens, { props: { tokens: tokenList, ...tokenProps } })
     await w
       .findAll('button')
       .find((b) => b.text() === 'Revoke')!
@@ -2658,6 +2713,113 @@ describe('PynTokens', () => {
   })
 })
 
+describe('PynTokenForm', () => {
+  const radio = (w: ReturnType<typeof mount>, v: string) => w.find(`input[type=radio][value=${v}]`)
+
+  it('shows computed dates and the default expiry', () => {
+    const w = mount(PynTokenForm, { props: tokenProps })
+    expect(w.text()).toContain('30 days (Dec 18 2026) (default)')
+    expect(w.text()).toContain('Expires Dec 18 2026.')
+  })
+
+  it('warns on a token that never expires', async () => {
+    const w = mount(PynTokenForm, { props: tokenProps })
+    await w.findAll('select')[1].setValue('never')
+    expect(w.find('[role=note]').text()).toContain('never expires')
+  })
+
+  it('refuses an incomplete form with a reason', async () => {
+    const w = mount(PynTokenForm, { props: tokenProps })
+    await w.find('form').trigger('submit')
+    expect(w.find('[role=alert]').text()).toContain('name')
+    await w.find('input').setValue('ci')
+    await radio(w, 'selected').setValue(true)
+    await w.find('form').trigger('submit')
+    expect(w.find('[role=alert]').text()).toContain('repository')
+    expect(w.emitted('submit')).toBeUndefined()
+  })
+
+  it('offers no repository permissions for public access', async () => {
+    const w = mount(PynTokenForm, { props: tokenProps })
+    expect(w.text()).toContain('Public access takes no repository permissions')
+    expect(w.text()).not.toContain('Contents')
+    await radio(w, 'all').setValue(true)
+    expect(w.text()).toContain('Contents')
+    expect(w.text()).not.toContain('Organization members')
+  })
+
+  it('swaps permissions with the owner and clears the selection', async () => {
+    const w = mount(PynTokenForm, { props: tokenProps })
+    await w.findAll('select')[0].setValue('acme')
+    expect(w.text()).toContain('Organization members')
+    expect(w.text()).not.toContain('Your locks')
+  })
+
+  it('searches, selects and removes repositories', async () => {
+    const w = mount(PynTokenForm, { props: tokenProps })
+    await radio(w, 'selected').setValue(true)
+    await w.find('input[type=search]').setValue('tools')
+    const match = w.findAll('button').filter((b) => b.text() === 'acme/tools')
+    expect(match).toHaveLength(1)
+    await match[0].trigger('click')
+    expect(w.find('[aria-label="Selected repositories"]').text()).toContain('acme/tools')
+    await w.find('[aria-label="Remove acme/tools"]').trigger('click')
+    expect(w.find('[aria-label="Selected repositories"]').exists()).toBe(false)
+  })
+
+  it('emits the request with metadata added and the default expiry omitted', async () => {
+    const w = mount(PynTokenForm, { props: tokenProps })
+    await w.find('input').setValue(' ci ')
+    await radio(w, 'selected').setValue(true)
+    await w.find('input[type=search]').setValue('game')
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'acme/game')!
+      .trigger('click')
+    await w.find('select[id$=contents]').setValue('write')
+    await w.find('select[id$=locks]').setValue('admin')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0]).toEqual([
+      {
+        name: 'ci',
+        owner: 'alice',
+        repository_access: { mode: 'selected', repos: ['acme/game'] },
+        permissions: [
+          { resource: 'metadata', level: 'read' },
+          { resource: 'contents', level: 'write' },
+          { resource: 'locks', level: 'admin' },
+        ],
+      },
+    ])
+  })
+
+  it('emits a custom date or never', async () => {
+    const w = mount(PynTokenForm, { props: tokenProps })
+    await w.find('input').setValue('ci')
+    await w.find('select[id$=account_ssh_keys]').setValue('read')
+    await w.findAll('select')[1].setValue('custom')
+    await w.find('input[type=date]').setValue('2027-01-01')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0][0]).toMatchObject({ expires_at: '2027-01-01T23:59:59Z' })
+    await w.findAll('select')[1].setValue('never')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[1][0]).toMatchObject({ never: true })
+    expect(w.emitted('submit')?.[1][0]).not.toHaveProperty('expires_at')
+  })
+
+  it('rejects a past custom date and shows the server error', async () => {
+    const w = mount(PynTokenForm, { props: { ...tokenProps, error: 'nope' } })
+    await w.find('input').setValue('ci')
+    await w.find('select[id$=account_ssh_keys]').setValue('read')
+    await w.findAll('select')[1].setValue('custom')
+    await w.find('input[type=date]').setValue('2020-01-01')
+    await w.find('form').trigger('submit')
+    expect(w.find('[role=alert]').text()).toContain('future')
+    expect(w.emitted('submit')).toBeUndefined()
+    await w.find('input[type=date]').setValue('2027-01-01')
+    expect(w.find('[role=alert]').text()).toBe('nope')
+  })
+})
 const blank: SetupForm = {
   token: '',
   username: '',
