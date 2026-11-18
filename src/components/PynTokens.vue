@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import styles from '../styles/PynTokens.module.scss'
 import { formatDate } from '../utils/datetime'
-import { expiryFromDate, parseRepos, TOKEN_PERMISSIONS } from '../state/token.state'
-import type { TokenForm, TokenInfo } from '../types/token.types'
+import { describeAccess, describeExpiry, describeGrant } from '../state/token.state'
+import PynTokenForm from './PynTokenForm.vue'
+import type { TokenForm, TokenInfo, TokenOwnerOption } from '../types/token.types'
 
-defineProps<{
+const props = defineProps<{
   tokens: TokenInfo[]
+  owners: TokenOwnerOption[]
+  repos: string[]
   secret?: string
   busy?: boolean
   error?: string
@@ -16,33 +19,25 @@ const emit = defineEmits<{
   create: [TokenForm]
   revoke: [string]
   dismiss: []
+  'owner-change': [string]
 }>()
 
-const name = ref('')
-const repos = ref('')
-const permissions = ref<string[]>(['read'])
-const expires = ref('')
+const creating = ref(false)
 
-function submit() {
-  emit('create', {
-    name: name.value.trim(),
-    repos: parseRepos(repos.value),
-    permissions: permissions.value,
-    expires_at: expiryFromDate(expires.value),
-  })
-  name.value = ''
-  repos.value = ''
-  permissions.value = ['read']
-  expires.value = ''
-}
+watch(
+  () => props.secret,
+  (secret) => {
+    if (secret) creating.value = false
+  },
+)
 </script>
 
 <template>
   <section :class="styles.page">
     <h2 :class="styles.heading">Personal access tokens</h2>
     <p :class="styles.note">
-      Tokens let scripts and automation act as you on the repositories you pick. A token never
-      grants more than your role allows.
+      Tokens let scripts and automation act as you, for one owner, with only the permissions you
+      choose. A token never grants more than your role allows and cannot be edited once created.
     </p>
 
     <div v-if="secret" :class="styles.secret" role="status">
@@ -56,13 +51,19 @@ function submit() {
         <div>
           <strong>{{ t.name }}</strong>
           <span v-if="t.revoked_at" :class="styles.meta"> · revoked</span>
+          <span v-if="t.sign_in" :class="styles.meta"> · sign-in</span>
+          <div v-if="t.description" :class="styles.meta">{{ t.description }}</div>
           <div :class="styles.meta">
-            {{ t.repos.length ? t.repos.join(', ') : 'every repository' }} ·
-            {{ t.permissions.join(', ') }}
+            Owner {{ t.owner }} · {{ describeAccess(t.repository_access) }}
+            <template v-if="t.repository_access.repos?.length">
+              ({{ t.repository_access.repos.join(', ') }})
+            </template>
+          </div>
+          <div v-if="t.permissions.length" :class="styles.meta">
+            {{ t.permissions.map(describeGrant).join(', ') }}
           </div>
           <div :class="styles.meta">
-            Created {{ formatDate(t.created_at) }} ·
-            {{ t.expires_at ? `expires ${formatDate(t.expires_at)}` : 'no expiry' }} ·
+            Created {{ formatDate(t.created_at) }} · {{ describeExpiry(t) }} ·
             {{ t.last_used_at ? `last used ${formatDate(t.last_used_at)}` : 'never used' }}
           </div>
         </div>
@@ -79,28 +80,18 @@ function submit() {
     </ul>
     <p v-else :class="styles.empty">No tokens yet.</p>
 
-    <form :class="styles.form" @submit.prevent="submit">
-      <h3 :class="styles.subheading">Create a token</h3>
-      <label :class="styles.field"
-        >Name
-        <input v-model="name" :class="styles.input" placeholder="ci" required />
-      </label>
-      <label :class="styles.field"
-        >Repositories (owner/name, one per line)
-        <textarea v-model="repos" :class="styles.input" rows="3" placeholder="acme/game" required />
-      </label>
-      <fieldset :class="styles.field">
-        <legend>Permissions</legend>
-        <label v-for="p in TOKEN_PERMISSIONS" :key="p" :class="styles.check"
-          ><input v-model="permissions" type="checkbox" :value="p" /> {{ p }}</label
-        >
-      </fieldset>
-      <label :class="styles.field"
-        >Expires (optional)
-        <input v-model="expires" type="date" :class="styles.input" />
-      </label>
-      <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-      <button type="submit" :class="styles.primary" :disabled="busy">Create token</button>
-    </form>
+    <PynTokenForm
+      v-if="creating"
+      :owners="owners"
+      :repos="repos"
+      :busy="busy"
+      :error="error"
+      @submit="emit('create', $event)"
+      @cancel="creating = false"
+      @owner-change="emit('owner-change', $event)"
+    />
+    <button v-else type="button" :class="styles.primary" @click="creating = true">
+      Generate new token
+    </button>
   </section>
 </template>

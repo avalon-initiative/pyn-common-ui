@@ -1,0 +1,113 @@
+@use 'mixins' as m;
+
+.form {
+  @include m.form;
+}
+
+.field {
+  @include m.field;
+}
+
+.input {
+  @include m.input;
+}
+
+.hint {
+  @include m.muted;
+  font-size: 0.8125rem;
+}
+
+.message {
+  @include m.field-message;
+}
+
+.warning {
+  padding: var(--pyn-space-2) var(--pyn-space-3);
+  color: var(--pyn-danger);
+  background: var(--pyn-danger-bg);
+  border-radius: var(--pyn-radius);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  margin: 0;
+  padding: var(--pyn-space-3);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pyn-space-2);
+
+  small {
+    display: block;
+    color: var(--pyn-text-muted);
+  }
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
+.matches,
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.matches {
+  max-height: 10rem;
+  overflow-y: auto;
+}
+
+.match {
+  @include m.button;
+}
+
+.chip {
+  @include m.pill;
+}
+
+.permission {
+  display: grid;
+  grid-template-columns: 1fr minmax(10rem, auto);
+  gap: var(--pyn-space-3);
+  align-items: center;
+
+  small {
+    display: block;
+    color: var(--pyn-text-muted);
+  }
+
+  @include m.narrow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+}
+
+.button {
+  @include m.button;
+}
+
+.primary {
+  @include m.button-primary;
+}
+
+.error {
+  @include m.error;
+}
