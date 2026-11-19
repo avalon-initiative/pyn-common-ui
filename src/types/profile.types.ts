@@ -16,3 +16,12 @@ export interface PublicIdentity {
   display_name?: string | null
   avatar_url?: string | null
 }
+
+/** Mirrors the server's `PersonEntry`: a people-directory row. */
+export interface PersonEntry {
+  identity: PublicIdentity
+  bio?: string | null
+  company?: string | null
+  location?: string | null
+  links?: string[]
+}

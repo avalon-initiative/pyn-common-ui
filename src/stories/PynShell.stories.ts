@@ -47,3 +47,15 @@ export const BareRepositoryPage: StoryObj<typeof PynShell> = {
       </PynShell>`,
   }),
 }
+
+/** Public page: signed-out top bar, no sidebar. */
+export const SignedOutPage: StoryObj<typeof PynShell> = {
+  render: () => ({
+    components: { PynShell, PynTopBar },
+    template: `
+      <PynShell bare>
+        <template #top><PynTopBar signed-out theme="system" /></template>
+        <p>Public page content</p>
+      </PynShell>`,
+  }),
+}

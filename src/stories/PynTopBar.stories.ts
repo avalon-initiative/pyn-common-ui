@@ -20,3 +20,4 @@ export const ExtraAccountEntries: StoryObj<typeof PynTopBar> = {
 export const WithProfile: StoryObj<typeof PynTopBar> = {
   args: { displayName: 'Alice Anders' },
 }
+export const SignedOut: StoryObj<typeof PynTopBar> = { args: { signedOut: true, user: undefined } }
