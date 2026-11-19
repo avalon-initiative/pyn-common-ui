@@ -1,0 +1,26 @@
+@use 'mixins' as m;
+
+.list {
+  @include m.list;
+  border-color: var(--pyn-locked);
+  background: var(--pyn-locked-bg);
+}
+
+.item {
+  @include m.item;
+}
+
+.what {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  font-size: 0.875rem;
+}
+
+.meta {
+  @include m.muted;
+}
+
+.button {
+  @include m.button;
+}

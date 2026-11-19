@@ -4,6 +4,7 @@ import type {
   OrgInfo,
   OrgMember,
   OrgRole,
+  ReadOnlyChoice,
   RuleEffect,
   RuleKind,
   RuleRef,
@@ -99,3 +100,15 @@ export const ORG_INVITATION_AUDIT_LABELS: Record<string, string> = {
 
 export const orgAuditLabel = (action: string): string =>
   ORG_INVITATION_AUDIT_LABELS[action] ?? action
+
+export const READ_ONLY_CHOICES: { value: ReadOnlyChoice; label: string }[] = [
+  { value: 'default', label: 'Not set (on)' },
+  { value: 'on', label: 'On' },
+  { value: 'off', label: 'Off' },
+]
+
+export const readOnlyChoice = (v?: boolean | null): ReadOnlyChoice =>
+  v == null ? 'default' : v ? 'on' : 'off'
+
+export const readOnlyValue = (c: ReadOnlyChoice): boolean | null =>
+  c === 'default' ? null : c === 'on'

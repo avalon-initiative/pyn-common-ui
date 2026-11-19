@@ -1,0 +1,38 @@
+@use 'mixins' as m;
+
+.form {
+  @include m.form;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.field {
+  @include m.field;
+  max-width: 12rem;
+}
+
+.input {
+  @include m.input;
+  @include m.invalid;
+}
+
+.hint {
+  @include m.muted;
+}
+
+.fieldError {
+  @include m.field-message;
+  margin: 0;
+}
+
+.error {
+  @include m.error;
+}
+
+.primary {
+  @include m.button-primary;
+}
