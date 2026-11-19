@@ -78,6 +78,11 @@ export { default as PynPasswordForm } from './components/PynPasswordForm.vue'
 export { passwordProblem } from './state/password.state'
 export type { PasswordFields } from './state/password.state'
 export { default as PynKeys } from './components/PynKeys.vue'
+export { default as PynQrCode } from './components/PynQrCode.vue'
+export { default as PynTotpEnrolment } from './components/PynTotpEnrolment.vue'
+export { default as PynRecoveryCodes } from './components/PynRecoveryCodes.vue'
+export { default as PynSecondFactor } from './components/PynSecondFactor.vue'
+export { default as PynPasskeys } from './components/PynPasskeys.vue'
 export { default as PynAccounts } from './components/PynAccounts.vue'
 export { default as PynIdentities } from './components/PynIdentities.vue'
 export { default as PynTokenForm } from './components/PynTokenForm.vue'
@@ -141,6 +146,12 @@ export type {
   SshKey,
   VerifyOutcome,
 } from './types/auth.types'
+export type {
+  Passkey,
+  SecondFactorForm,
+  SecondFactorKind,
+  TotpEnrolment,
+} from './types/two-factor.types'
 export type {
   CreatedToken,
   RepositoryAccess,

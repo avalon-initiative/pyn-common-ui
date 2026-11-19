@@ -16,6 +16,7 @@ const props = withDefaults(
     registration: RegistrationMode | null
     external?: ExternalProvider | null
     passwordSignIn?: boolean
+    passkeys?: boolean
     returnTo?: string
     callbackError?: string
     emailVerification?: boolean
@@ -34,6 +35,7 @@ const emit = defineEmits<{
   resend: [string]
   dismiss: []
   nameInput: [name: string]
+  passkey: []
 }>()
 
 const nameMessageId = useId()
@@ -131,6 +133,15 @@ function submit() {
       {{ title }}
     </button>
 
+    <button
+      v-if="passkeys && view === 'sign-in'"
+      type="button"
+      :class="styles.provider"
+      :disabled="busy"
+      @click="emit('passkey')"
+    >
+      Sign in with a passkey
+    </button>
     <a
       v-if="external"
       :class="styles.provider"

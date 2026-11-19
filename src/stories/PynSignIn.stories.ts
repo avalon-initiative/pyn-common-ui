@@ -60,3 +60,5 @@ export const ProviderRefusedAccount: Story = {
 export const InvalidUserName: Story = {
   args: { registration: 'open', nameMessage: 'That user name is not allowed.' },
 }
+
+export const WithPasskeys: Story = { args: { registration: 'open', passkeys: true } }
