@@ -1,0 +1,44 @@
+@use 'mixins' as m;
+
+.card {
+  @include m.form;
+}
+
+.heading {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.note {
+  @include m.muted;
+}
+
+.codes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--pyn-space-2);
+  margin: 0;
+  padding: var(--pyn-space-3);
+  list-style: none;
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.code {
+  font-family: var(--pyn-font-mono);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-3);
+}
+
+.button {
+  @include m.button;
+}
+
+.primary {
+  @include m.button-primary;
+}

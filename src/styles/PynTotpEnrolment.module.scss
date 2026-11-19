@@ -1,0 +1,52 @@
+@use 'mixins' as m;
+
+.form {
+  @include m.form;
+}
+
+.heading {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.note {
+  @include m.muted;
+}
+
+.manual {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-3);
+}
+
+.secret {
+  font-family: var(--pyn-font-mono);
+  overflow-wrap: anywhere;
+}
+
+.field {
+  @include m.field;
+}
+
+.input {
+  @include m.input;
+  font-family: var(--pyn-font-mono);
+}
+
+.actions {
+  display: flex;
+  gap: var(--pyn-space-3);
+}
+
+.primary {
+  @include m.button-primary;
+}
+
+.button {
+  @include m.button;
+}
+
+.error {
+  @include m.error;
+}

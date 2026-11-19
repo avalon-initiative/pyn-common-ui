@@ -92,6 +92,9 @@
   font-weight: 600;
   text-align: center;
   text-decoration: none;
+  background: none;
+  font-size: inherit;
+  cursor: pointer;
 
   @include m.focus-ring;
 }

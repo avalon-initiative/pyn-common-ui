@@ -29,6 +29,11 @@ import {
   PynIdentities,
   PynInvites,
   PynKeys,
+  PynPasskeys,
+  PynQrCode,
+  PynRecoveryCodes,
+  PynSecondFactor,
+  PynTotpEnrolment,
   PynLockBadge,
   PynLockIcon,
   PynLockedFiles,
@@ -4098,5 +4103,200 @@ describe('PynUsernameChange', () => {
   it('shows the server error', () => {
     const w = mount(PynUsernameChange, { props: { current: 'alice', error: 'Taken.' } })
     expect(w.find('[role="alert"]').text()).toBe('Taken.')
+  })
+})
+
+describe('PynQrCode', () => {
+  it('draws a square code with a finder pattern in each corner', () => {
+    const w = mount(PynQrCode, { props: { value: 'hello' } })
+    expect(w.find('svg').attributes('viewBox')).toBe('0 0 29 29')
+    expect(w.find('path').attributes('d')).toContain('M4 4h1v1h-1z')
+  })
+
+  it('draws nothing when the text is too long to encode', () => {
+    expect(
+      mount(PynQrCode, { props: { value: 'x'.repeat(400) } })
+        .find('svg')
+        .exists(),
+    ).toBe(false)
+  })
+})
+
+describe('PynTotpEnrolment', () => {
+  const enrolment = {
+    id: 'f1',
+    secret: 'JBSWY3DPEHPK3PXP',
+    uri: 'otpauth://totp/Pyn:a?secret=JBSWY3DPEHPK3PXP',
+  }
+
+  it('shows the QR code and the grouped manual key', () => {
+    const w = mount(PynTotpEnrolment, { props: { enrolment } })
+    expect(w.find('svg').exists()).toBe(true)
+    expect(w.text()).toContain('JBSW Y3DP EHPK 3PXP')
+  })
+
+  it('emits the code without spaces, and cancel', async () => {
+    const w = mount(PynTotpEnrolment, { props: { enrolment } })
+    await w.find('input').setValue('123 456')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('confirm')?.[0]).toEqual(['123456'])
+    await w.findAll('button').at(-1)!.trigger('click')
+    expect(w.emitted('cancel')).toHaveLength(1)
+  })
+
+  it('shows the error and does not submit while busy', async () => {
+    const w = mount(PynTotpEnrolment, { props: { enrolment, busy: true, error: 'Wrong code.' } })
+    expect(w.find('[role="alert"]').text()).toBe('Wrong code.')
+    await w.find('input').setValue('123456')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('confirm')).toBeUndefined()
+  })
+})
+
+describe('PynRecoveryCodes', () => {
+  const codes = ['aaaa-bbbb', 'cccc-dddd']
+
+  it('lists the codes and confirms they were saved', async () => {
+    const w = mount(PynRecoveryCodes, { props: { codes } })
+    expect(w.findAll('li').map((l) => l.text())).toEqual(codes)
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'I saved them')!
+      .trigger('click')
+    expect(w.emitted('saved')).toHaveLength(1)
+  })
+
+  it('copies the codes, one per line', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    const w = mount(PynRecoveryCodes, { props: { codes } })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Copy')!
+      .trigger('click')
+    expect(writeText).toHaveBeenCalledWith('aaaa-bbbb\ncccc-dddd')
+    vi.unstubAllGlobals()
+  })
+
+  it('downloads a text file with the chosen name', async () => {
+    const create = vi.fn().mockReturnValue('blob:x')
+    const revoke = vi.fn()
+    vi.stubGlobal('URL', { createObjectURL: create, revokeObjectURL: revoke })
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    const w = mount(PynRecoveryCodes, { props: { codes, filename: 'codes.txt' } })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Download')!
+      .trigger('click')
+    expect(create).toHaveBeenCalledTimes(1)
+    expect(click).toHaveBeenCalledTimes(1)
+    expect(revoke).toHaveBeenCalledWith('blob:x')
+    click.mockRestore()
+    vi.unstubAllGlobals()
+  })
+})
+
+describe('PynSecondFactor', () => {
+  it('emits an authenticator code, then a recovery code after switching', async () => {
+    const w = mount(PynSecondFactor)
+    await w.find('input').setValue('123456')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0]).toEqual([{ kind: 'totp', code: '123456' }])
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Use a recovery code')!
+      .trigger('click')
+    expect(w.text()).toContain('Enter one of your recovery codes')
+    await w.find('input').setValue('aaaa-bbbb')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[1]).toEqual([{ kind: 'recovery', code: 'aaaa-bbbb' }])
+  })
+
+  it('offers a passkey only when passkeys are offered', async () => {
+    expect(mount(PynSecondFactor).text()).not.toContain('Use a passkey')
+    const w = mount(PynSecondFactor, { props: { passkeys: true } })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Use a passkey')!
+      .trigger('click')
+    expect(w.emitted('passkey')).toHaveLength(1)
+  })
+
+  it('goes back to sign-in and shows the error', async () => {
+    const w = mount(PynSecondFactor, { props: { error: 'Wrong code.' } })
+    expect(w.find('[role="alert"]').text()).toBe('Wrong code.')
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Back to sign in')!
+      .trigger('click')
+    expect(w.emitted('cancel')).toHaveLength(1)
+  })
+})
+
+describe('PynPasskeys', () => {
+  const passkeys = [
+    {
+      id: 'pk1',
+      name: 'Laptop',
+      created_at: '2026-10-08T09:00:00Z',
+      last_used_at: null,
+      transports: ['usb', 'nfc'],
+      sign_count: 0,
+      backup_eligible: true,
+      backup_state: false,
+    },
+  ]
+
+  it('lists passkeys with dates, backup state and transports', () => {
+    const w = mount(PynPasskeys, { props: { passkeys, available: true } })
+    expect(w.text()).toContain('Laptop')
+    expect(w.text()).toContain('Added Oct 08 2026')
+    expect(w.text()).toContain('never used')
+    expect(w.text()).toContain('Can be synced')
+    expect(w.text()).toContain('usb, nfc')
+  })
+
+  it('emits add, rename and remove', async () => {
+    const w = mount(PynPasskeys, { props: { passkeys, available: true } })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Add a passkey')!
+      .trigger('click')
+    expect(w.emitted('add')).toHaveLength(1)
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Rename')!
+      .trigger('click')
+    await w.find('input').setValue('Work laptop')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('rename')?.[0]).toEqual([{ id: 'pk1', name: 'Work laptop' }])
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Remove')!
+      .trigger('click')
+    expect(w.emitted('remove')?.[0]).toEqual(['pk1'])
+  })
+
+  it('disables adding and explains when the server offers none', () => {
+    const w = mount(PynPasskeys, { props: { passkeys: [], available: false } })
+    expect(w.find('[role="note"]').text()).toContain("can't register passkeys")
+    expect(
+      w
+        .findAll('button')
+        .find((b) => b.text() === 'Add a passkey')!
+        .attributes('disabled'),
+    ).toBeDefined()
+  })
+})
+
+describe('PynSignIn passkey button', () => {
+  it('shows only when passkeys are offered and emits passkey', async () => {
+    expect(mount(PynSignIn, { props: { registration: 'open' } }).text()).not.toContain('passkey')
+    const w = mount(PynSignIn, { props: { registration: 'open', passkeys: true } })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Sign in with a passkey')!
+      .trigger('click')
+    expect(w.emitted('passkey')).toHaveLength(1)
   })
 })
