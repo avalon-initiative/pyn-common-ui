@@ -1,4 +1,4 @@
-import type { Passkey, TotpEnrolment } from '../types/two-factor.types'
+import type { Notice, Passkey, TotpEnrolment, TwoFactorStatus } from '../types/two-factor.types'
 
 export const enrolment: TotpEnrolment = {
   id: 'f1',
@@ -39,5 +39,38 @@ export const passkeys: Passkey[] = [
     sign_count: 0,
     backup_eligible: false,
     backup_state: false,
+  },
+]
+
+export const status: TwoFactorStatus = {
+  enabled: true,
+  factors: [{ id: 'f1', kind: 'totp', label: 'Phone', created_at: '2026-10-08T09:00:00Z' }],
+  passkeys,
+  passkeys_available: true,
+  recovery_codes_left: 8,
+  required: null,
+}
+
+export const emptyStatus: TwoFactorStatus = {
+  enabled: false,
+  factors: [],
+  passkeys: [],
+  passkeys_available: true,
+  recovery_codes_left: 0,
+  required: null,
+}
+
+export const notices: Notice[] = [
+  {
+    id: 'n1',
+    kind: 'two_factor_reset',
+    detail: 'An administrator reset your second factors.',
+    created_at: '2026-10-09T10:00:00Z',
+  },
+  {
+    id: 'n2',
+    kind: 'something_new',
+    detail: 'The studio moved to a new address.',
+    created_at: '2026-10-10T10:00:00Z',
   },
 ]

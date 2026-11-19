@@ -35,6 +35,7 @@ const emit = defineEmits<{
   delete: [DeleteAccountRequest]
   grantAdmin: [user: string]
   revokeAdmin: [user: string]
+  reset: [user: string]
 }>()
 
 const confirming = ref('')
@@ -183,6 +184,16 @@ const pick = (e: Event) =>
             @click="emit('revokeAdmin', a.user)"
           >
             Remove administrator
+          </button>
+          <button
+            v-if="a.user !== self"
+            type="button"
+            :class="styles.quiet"
+            :disabled="busy"
+            :aria-label="`Reset two-factor for ${a.user}`"
+            @click="emit('reset', a.user)"
+          >
+            Reset two-factor
           </button>
         </div>
       </li>

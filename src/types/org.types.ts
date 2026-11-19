@@ -72,3 +72,10 @@ export interface OwnerFreeze {
   frozen_at: string | null
   reason: string | null
 }
+
+/** An organization's repository defaults; null means the organization does not set it. */
+export interface OrgSettings {
+  exclusive_read_only?: boolean | null
+}
+
+export type ReadOnlyChoice = 'default' | 'on' | 'off'

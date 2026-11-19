@@ -83,6 +83,12 @@ export { default as PynTotpEnrolment } from './components/PynTotpEnrolment.vue'
 export { default as PynRecoveryCodes } from './components/PynRecoveryCodes.vue'
 export { default as PynSecondFactor } from './components/PynSecondFactor.vue'
 export { default as PynPasskeys } from './components/PynPasskeys.vue'
+export { default as PynPasswordPrompt } from './components/PynPasswordPrompt.vue'
+export { default as PynTwoFactor } from './components/PynTwoFactor.vue'
+export { default as PynNotices } from './components/PynNotices.vue'
+export { default as PynTwoFactorNag } from './components/PynTwoFactorNag.vue'
+export { default as PynTwoFactorRequirement } from './components/PynTwoFactorRequirement.vue'
+export { default as PynOrgSettings } from './components/PynOrgSettings.vue'
 export { default as PynAccounts } from './components/PynAccounts.vue'
 export { default as PynIdentities } from './components/PynIdentities.vue'
 export { default as PynTokenForm } from './components/PynTokenForm.vue'
@@ -147,10 +153,16 @@ export type {
   VerifyOutcome,
 } from './types/auth.types'
 export type {
+  Notice,
   Passkey,
   SecondFactorForm,
   SecondFactorKind,
   TotpEnrolment,
+  TwoFactorFactor,
+  TwoFactorRequired,
+  TwoFactorRequirementChange,
+  TwoFactorSetting,
+  TwoFactorStatus,
 } from './types/two-factor.types'
 export type {
   CreatedToken,
@@ -221,6 +233,12 @@ export {
   statusLabel,
 } from './state/admin.state'
 export type { AccountAction, AdminAction } from './state/admin.state'
+export {
+  GRACE_DAYS_DEFAULT,
+  GRACE_DAYS_MAX,
+  noticeTitle,
+  validGraceDays,
+} from './state/two-factor.state'
 export type {
   CreationRule,
   MemberCreation,
@@ -230,8 +248,10 @@ export type {
   OrgMember,
   OrgRef,
   OrgRole,
+  OrgSettings,
   OwnerFreeze,
   OwnerKind,
+  ReadOnlyChoice,
   RepoPolicy,
   RuleEffect,
   RuleKind,

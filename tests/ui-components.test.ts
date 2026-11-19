@@ -30,6 +30,12 @@ import {
   PynInvites,
   PynKeys,
   PynPasskeys,
+  PynPasswordPrompt,
+  PynTwoFactor,
+  PynNotices,
+  PynTwoFactorNag,
+  PynTwoFactorRequirement,
+  PynOrgSettings,
   PynQrCode,
   PynRecoveryCodes,
   PynSecondFactor,
@@ -171,6 +177,7 @@ import {
 } from '../src'
 import type { SetupForm } from '../src'
 import { accounts, adminAccounts } from '../src/stories/admin-data'
+import { emptyStatus, notices, status as twoFactorStatus } from '../src/stories/two-factor-data'
 import { codeText, fileEntry, imageSrc, lockedEntry, readmeText } from '../src/stories/file-data'
 import {
   orgInvitations,
@@ -2407,9 +2414,17 @@ describe('PynAccounts', () => {
     expect(w.text()).toContain('(unverified)')
   })
 
+  it('emits reset for another account but not for oneself', async () => {
+    const w = mount(PynAccounts, { props })
+    await buttons(w, 'Reset two-factor')[0].trigger('click')
+    expect(w.emitted('reset')?.[0]).toEqual([bob.user])
+    const own = mount(PynAccounts, { props: { ...props, accounts: [root] } })
+    expect(buttons(own, 'Reset two-factor')).toHaveLength(0)
+  })
+
   it('has no disable button for the signed-in administrator', () => {
     const w = mount(PynAccounts, { props: { ...props, accounts: [root] } })
-    expect(w.findAll('li button')).toHaveLength(0)
+    expect(buttons(w, 'Disable')).toHaveLength(0)
   })
 
   it('shows the deletion deadline of a scheduled account', () => {
@@ -4298,5 +4313,180 @@ describe('PynSignIn passkey button', () => {
       .find((b) => b.text() === 'Sign in with a passkey')!
       .trigger('click')
     expect(w.emitted('passkey')).toHaveLength(1)
+  })
+})
+
+describe('PynPasswordPrompt', () => {
+  it('emits the password and cancel, and blocks an empty password', async () => {
+    const w = mount(PynPasswordPrompt, { props: { error: 'Nope' } })
+    expect(w.text()).toContain('Confirm your password')
+    expect(w.text()).toContain('Nope')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')).toBeUndefined()
+    await w.find('input').setValue('hunter2')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')?.[0]).toEqual(['hunter2'])
+    await w.findAll('button')[1].trigger('click')
+    expect(w.emitted('cancel')).toHaveLength(1)
+  })
+
+  it('does not submit while busy', async () => {
+    const w = mount(PynPasswordPrompt, { props: { busy: true } })
+    await w.find('input').setValue('x')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')).toBeUndefined()
+  })
+})
+
+describe('PynTwoFactor', () => {
+  const button = (w: ReturnType<typeof mount>, text: string) =>
+    w.findAll('button').find((b) => b.text() === text)!
+
+  it('lists the app and the recovery codes left', () => {
+    const w = mount(PynTwoFactor, { props: { status: twoFactorStatus } })
+    expect(w.text()).toContain('Phone')
+    expect(w.text()).toContain('8 recovery codes left')
+  })
+
+  it('hides recovery codes until a factor is on', () => {
+    const w = mount(PynTwoFactor, { props: { status: emptyStatus } })
+    expect(w.text()).not.toContain('Recovery codes')
+    expect(w.text()).toContain('No authenticator app yet')
+  })
+
+  it('adds with the label at once when a factor already exists', async () => {
+    const w = mount(PynTwoFactor, { props: { status: twoFactorStatus } })
+    await w.find('input').setValue(' Tablet ')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('addTotp')?.[0]).toEqual(['Tablet'])
+  })
+
+  it('asks for the password before the first factor and sends it with the label', async () => {
+    const w = mount(PynTwoFactor, { props: { status: emptyStatus } })
+    await w.find('input').setValue('Phone')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('addTotp')).toBeUndefined()
+    await w.find('input[type="password"]').setValue('hunter2')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('addTotp')?.[0]).toEqual(['Phone', 'hunter2'])
+  })
+
+  it('skips the prompt for an account without a password', async () => {
+    const w = mount(PynTwoFactor, { props: { status: emptyStatus, hasPassword: false } })
+    await w.find('form').trigger('submit')
+    expect(w.emitted('addTotp')?.[0]).toEqual([''])
+  })
+
+  it('emits remove and regenerateCodes', async () => {
+    const w = mount(PynTwoFactor, { props: { status: twoFactorStatus } })
+    await button(w, 'Remove').trigger('click')
+    await button(w, 'Generate new codes').trigger('click')
+    expect(w.emitted('remove')?.[0]).toEqual(['f1'])
+    expect(w.emitted('regenerateCodes')).toHaveLength(1)
+  })
+
+  it('disables the buttons while busy', () => {
+    const w = mount(PynTwoFactor, { props: { status: twoFactorStatus, busy: true } })
+    expect(w.findAll('button').every((b) => b.attributes('disabled') !== undefined)).toBe(true)
+  })
+})
+
+describe('PynNotices', () => {
+  it('renders nothing without notices', () => {
+    expect(
+      mount(PynNotices, { props: { notices: [] } })
+        .find('ul')
+        .exists(),
+    ).toBe(false)
+  })
+
+  it('titles known kinds, shows the detail and emits dismiss', async () => {
+    const w = mount(PynNotices, { props: { notices } })
+    expect(w.text()).toContain('Two-factor authentication was reset')
+    expect(w.text()).toContain('The studio moved to a new address.')
+    expect(w.text()).toContain('Oct 09 2026')
+    await w.findAll('button')[1].trigger('click')
+    expect(w.emitted('dismiss')?.[0]).toEqual(['n2'])
+  })
+})
+
+describe('PynTwoFactorNag', () => {
+  const deadline = '2026-12-01T00:00:00Z'
+
+  it('names the server and the deadline before it passes', () => {
+    const w = mount(PynTwoFactorNag, {
+      props: { required: { by: 'server', deadline, enforced: false }, href: '/s' },
+    })
+    expect(w.text()).toContain('This server requires two-factor authentication from Dec 01 2026')
+    expect(w.find('a').attributes('href')).toBe('/s')
+  })
+
+  it('names the organization and says access is limited once enforced', () => {
+    const w = mount(PynTwoFactorNag, {
+      props: {
+        required: { by: 'organization', organization: 'acme', deadline, enforced: true },
+        href: '/s',
+      },
+    })
+    expect(w.text()).toContain('The organization acme requires two-factor authentication.')
+    expect(w.text()).toContain('to keep using your account')
+  })
+})
+
+describe('PynTwoFactorRequirement', () => {
+  it('emits the requirement with the grace period', async () => {
+    const w = mount(PynTwoFactorRequirement, { props: { setting: { required: false } } })
+    await w.find('input[type="checkbox"]').setValue(true)
+    await w.find('input[type="number"]').setValue(14)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('change')?.[0]).toEqual([{ required: true, grace_days: 14 }])
+  })
+
+  it('defaults the grace period to 7 days and shows since', () => {
+    const w = mount(PynTwoFactorRequirement, {
+      props: { setting: { required: true, since: '2026-11-01T00:00:00Z' } },
+    })
+    expect((w.find('input[type="number"]').element as HTMLInputElement).value).toBe('7')
+    expect(w.text()).toContain('Required since Nov 01 2026')
+  })
+
+  it('refuses a grace period outside 0 to 90', async () => {
+    const w = mount(PynTwoFactorRequirement, { props: { setting: { required: true } } })
+    await w.find('input[type="number"]').setValue(91)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('change')).toBeUndefined()
+    expect(w.text()).toContain('0 to 90')
+  })
+
+  it('writes nothing when readonly', async () => {
+    const w = mount(PynTwoFactorRequirement, {
+      props: { setting: { required: true }, readonly: true },
+    })
+    await w.find('form').trigger('submit')
+    expect(w.emitted('change')).toBeUndefined()
+    expect(w.find('button').attributes('disabled')).toBeDefined()
+  })
+})
+
+describe('PynOrgSettings', () => {
+  it('shows an unset default and saves null for it', async () => {
+    const w = mount(PynOrgSettings, { props: { settings: { exclusive_read_only: null } } })
+    expect((w.find('select').element as HTMLSelectElement).value).toBe('default')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('save')?.[0]).toEqual([{ exclusive_read_only: null }])
+  })
+
+  it('saves on and off as booleans', async () => {
+    const w = mount(PynOrgSettings, { props: { settings: { exclusive_read_only: true } } })
+    expect((w.find('select').element as HTMLSelectElement).value).toBe('on')
+    await w.find('select').setValue('off')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('save')?.[0]).toEqual([{ exclusive_read_only: false }])
+  })
+
+  it('writes nothing when readonly', async () => {
+    const w = mount(PynOrgSettings, { props: { settings: {}, readonly: true } })
+    await w.find('form').trigger('submit')
+    expect(w.emitted('save')).toBeUndefined()
   })
 })
