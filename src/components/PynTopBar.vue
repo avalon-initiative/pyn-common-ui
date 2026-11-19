@@ -10,12 +10,15 @@ import type { ThemeChoice } from '../state/theme.state'
 import type { MenuItem } from '../types/shell.types'
 
 const props = defineProps<{
-  user: string
+  user?: string
   /** Shown beside the account name and used for the avatar initials. */
   displayName?: string | null
   avatarUrl?: string | null
-  repos: string[]
+  repos?: string[]
   theme: ThemeChoice
+  /** Public variant: sign-in link and theme control, no search, create or account menus. */
+  signedOut?: boolean
+  signInHref?: string
   admin?: boolean
   extraAccount?: MenuItem[]
 }>()
@@ -30,16 +33,19 @@ const create: MenuItem[] = [
   { id: 'new-repo', label: 'New repository', href: '/_/new' },
   { id: 'new-org', label: 'New organization', href: '/_/new-org' },
 ]
+const themeItems = computed<MenuItem[]>(() =>
+  themeChoices.map((t) => ({
+    id: `theme:${t.id}`,
+    label: `${t.label} theme`,
+    checked: props.theme === t.id,
+  })),
+)
 const account = computed<MenuItem[]>(() => [
   { id: 'settings', label: 'Account settings', href: '/_/settings' },
   ...(props.admin ? [{ id: 'admin', label: 'Server administration', href: '/_/admin' }] : []),
   ...(props.extraAccount ?? []),
   { id: 'sep-theme', label: '', separator: true },
-  ...themeChoices.map((t) => ({
-    id: `theme:${t.id}`,
-    label: `${t.label} theme`,
-    checked: props.theme === t.id,
-  })),
+  ...themeItems.value,
   { id: 'sep-out', label: '', separator: true },
   { id: 'sign-out', label: 'Sign out' },
 ])
@@ -54,24 +60,33 @@ function pick(id: string) {
 <template>
   <div :class="styles.bar">
     <a href="/" :class="styles.brand">PYN</a>
-    <PynSearch :options="repos" :class="styles.search" @open="emit('open', $event)" />
-    <PynMenu label="Create" :items="create">
-      <PynIcon name="plus" /><PynIcon name="chevron" :class="styles.chevron" />
-    </PynMenu>
-    <PynMenu label="Account menu" :items="account" @select="pick">
-      <template #header>
-        <p :class="styles.who">
-          Signed in as <template v-if="displayName">{{ displayName }} ({{ user }})</template
-          ><template v-else>{{ user }}</template>
-        </p>
-      </template>
-      <PynAvatar
-        v-if="displayName || avatarUrl"
-        :username="user"
-        :name="displayName"
-        :src="avatarUrl"
-      />
-      <span v-else :class="styles.avatar">{{ user.slice(0, 1).toUpperCase() }}</span>
-    </PynMenu>
+    <template v-if="signedOut">
+      <span :class="styles.spacer" />
+      <PynMenu label="Theme" :items="themeItems" @select="pick"
+        >Theme<PynIcon name="chevron" :class="styles.chevron"
+      /></PynMenu>
+      <a :href="signInHref ?? '/_/sign-in'" :class="styles.signIn" data-sign-in>Sign in</a>
+    </template>
+    <template v-else>
+      <PynSearch :options="repos ?? []" :class="styles.search" @open="emit('open', $event)" />
+      <PynMenu label="Create" :items="create">
+        <PynIcon name="plus" /><PynIcon name="chevron" :class="styles.chevron" />
+      </PynMenu>
+      <PynMenu label="Account menu" :items="account" @select="pick">
+        <template #header>
+          <p :class="styles.who">
+            Signed in as <template v-if="displayName">{{ displayName }} ({{ user }})</template
+            ><template v-else>{{ user }}</template>
+          </p>
+        </template>
+        <PynAvatar
+          v-if="displayName || avatarUrl"
+          :username="user ?? ''"
+          :name="displayName"
+          :src="avatarUrl"
+        />
+        <span v-else :class="styles.avatar">{{ (user ?? '').slice(0, 1).toUpperCase() }}</span>
+      </PynMenu>
+    </template>
   </div>
 </template>

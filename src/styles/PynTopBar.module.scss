@@ -48,3 +48,12 @@
   font-size: var(--pyn-text-sm);
   font-weight: 700;
 }
+
+.spacer {
+  flex: 1;
+}
+
+.signIn {
+  @include m.button;
+  text-decoration: none;
+}
