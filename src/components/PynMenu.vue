@@ -64,8 +64,7 @@ function choose(id: string) {
           :aria-checked="item.checked"
           @click="choose(item.id)"
         >
-          <span :class="styles.check">{{ item.checked ? '✓' : '' }}</span
-          >{{ item.label }}
+          <span :class="styles.check">{{ item.checked ? '✓' : '' }}</span>{{ item.label }}
         </button>
       </template>
     </div>

@@ -19,8 +19,7 @@ const emit = defineEmits<{ resend: [string]; back: [] }>()
     <h2 :class="styles.title">{{ NOTICE_TITLES[status] }}</h2>
     <p :class="styles.text">
       <template v-if="user"
-        >Account <strong>{{ user }}</strong
-        >.
+        >Account <strong>{{ user }}</strong>.
       </template>
       {{ NOTICE_TEXT[status] }}
     </p>
