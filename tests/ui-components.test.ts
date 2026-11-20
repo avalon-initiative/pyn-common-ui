@@ -48,6 +48,7 @@ import {
   PynMembers,
   PynMenu,
   PynOwnerFrozenNotice,
+  PynUpdateNotice,
   PynPolicyConflictNotice,
   PynPolicyEditor,
   PynPolicyPreview,
@@ -3770,6 +3771,60 @@ describe('PynOwnerFrozenNotice', () => {
       props: { freeze: { ...freeze, frozen: false, frozen_at: null, reason: null } },
     })
     expect(w.find('section').exists()).toBe(false)
+  })
+})
+
+describe('PynUpdateNotice', () => {
+  const props = { current: '0.1.2', latest: '0.1.3', url: 'https://example.com/notes' }
+
+  it('renders nothing without a latest version', () => {
+    const w = mount(PynUpdateNotice, { props: { current: '0.1.2' } })
+    expect(w.find('section').exists()).toBe(false)
+    expect(w.html()).not.toContain('Dismiss')
+  })
+
+  it('shows the running and latest versions as a status', () => {
+    const w = mount(PynUpdateNotice, { props })
+    expect(w.find('[role="status"]').exists()).toBe(true)
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+    expect(w.text()).toContain('0.1.2 to 0.1.3')
+    expect(w.text()).not.toContain('pre-release')
+  })
+
+  it('tags a pre-release', () => {
+    const w = mount(PynUpdateNotice, { props: { ...props, prerelease: true } })
+    expect(w.text()).toContain('pre-release')
+  })
+
+  it('opens release notes in a new tab safely', () => {
+    const a = mount(PynUpdateNotice, { props }).find('a')
+    expect(a.text()).toBe('Release notes')
+    expect(a.attributes('href')).toBe('https://example.com/notes')
+    expect(a.attributes('target')).toBe('_blank')
+    expect(a.attributes('rel')).toBe('noopener noreferrer')
+  })
+
+  it('omits the link without a url or for non-http urls', () => {
+    expect(
+      mount(PynUpdateNotice, { props: { current: '1', latest: '2' } })
+        .find('a')
+        .exists(),
+    ).toBe(false)
+    for (const url of ['javascript:alert(1)', 'data:text/html,x', '/relative']) {
+      expect(
+        mount(PynUpdateNotice, { props: { current: '1', latest: '2', url } })
+          .find('a')
+          .exists(),
+      ).toBe(false)
+    }
+  })
+
+  it('emits dismiss from a labelled button', async () => {
+    const w = mount(PynUpdateNotice, { props })
+    const b = w.find('button')
+    expect(b.attributes('aria-label')).toBeTruthy()
+    await b.trigger('click')
+    expect(w.emitted('dismiss')).toHaveLength(1)
   })
 })
 
