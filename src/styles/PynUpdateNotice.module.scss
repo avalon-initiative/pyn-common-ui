@@ -1,0 +1,52 @@
+@use 'mixins' as m;
+
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  color: var(--pyn-text);
+  background: var(--pyn-mine-bg);
+  border: 1px solid var(--pyn-mine);
+  border-radius: var(--pyn-radius);
+}
+
+.body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-1) var(--pyn-space-3);
+}
+
+.text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.versions {
+  font-family: var(--pyn-font-mono);
+}
+
+.tag {
+  padding: 0 var(--pyn-space-2);
+  font-size: 0.75rem;
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.link {
+  font-size: 0.875rem;
+  color: inherit;
+  text-decoration: underline;
+
+  @include m.focus-ring;
+}
+
+.dismiss {
+  @include m.button;
+}
