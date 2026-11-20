@@ -17,8 +17,7 @@ const emit = defineEmits<{ restore: [] }>()
     <h2 :class="styles.title">This account is scheduled for deletion</h2>
     <p :class="styles.text">
       <template v-if="user"
-        >Account <strong>{{ user }}</strong
-        >.
+        >Account <strong>{{ user }}</strong>.
       </template>
       It is deleted on {{ formatDateTime(deadline) }}. Restore it before then to keep it.
     </p>

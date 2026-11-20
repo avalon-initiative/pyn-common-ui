@@ -54,8 +54,7 @@ defineProps<{
               ·
               <span :title="formatDateTime(e.last_change.created_at)">{{
                 formatAgo(e.last_change.created_at, now ?? new Date())
-              }}</span
-              ><template v-if="e.kind === 'folder'">
+              }}</span><template v-if="e.kind === 'folder'">
                 · {{ splitPath(e.last_change.path).name }}</template
               >
             </span>

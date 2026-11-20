@@ -13,8 +13,7 @@ const emit = defineEmits<{ accept: [org: string]; decline: [org: string] }>()
       <strong data-org>{{ invitation.org }}</strong>
       <span :class="styles.pill" data-role>{{ invitation.role }}</span>
       <span :class="styles.meta">
-        invited by <span data-invited-by>{{ invitation.invited_by }}</span
-        >, expires
+        invited by <span data-invited-by>{{ invitation.invited_by }}</span>, expires
         <time data-expires :datetime="invitation.expires_at">{{
           formatDate(invitation.expires_at)
         }}</time>

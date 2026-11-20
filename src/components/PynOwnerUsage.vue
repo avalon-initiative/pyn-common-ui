@@ -43,8 +43,7 @@ const repoOwner = (r: RepoUsage) => r.repository.slice(0, r.repository.length - 
       <li v-for="repo in usage.repositories" :key="repo.repo_id" :class="styles.item">
         <div :class="styles.info">
           <button type="button" :class="styles.name" @click="emit('open', repo)">
-            <span :class="styles.owner">{{ repoOwner(repo) }}</span
-            >{{ repoName(repo) }}
+            <span :class="styles.owner">{{ repoOwner(repo) }}</span>{{ repoName(repo) }}
           </button>
           <span :class="styles.meta">{{ repo.files }} files · {{ repo.revisions }} revisions</span>
         </div>
