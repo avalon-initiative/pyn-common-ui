@@ -1,0 +1,32 @@
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
+.session {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  color: var(--pyn-text);
+  background: var(--pyn-locked-bg);
+  border: 1px solid var(--pyn-locked);
+  border-radius: var(--pyn-radius);
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.text,
+.notes {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.notes {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

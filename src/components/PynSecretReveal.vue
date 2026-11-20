@@ -2,7 +2,9 @@
 import { ref } from 'vue'
 import styles from '../styles/PynSecretReveal.module.scss'
 
-const props = defineProps<{ secret: string }>()
+const props = withDefaults(defineProps<{ secret: string; message?: string }>(), {
+  message: 'Copy this signing secret now. It is shown once.',
+})
 const emit = defineEmits<{ dismiss: [] }>()
 
 const copied = ref(false)
@@ -19,7 +21,8 @@ async function copy() {
 
 <template>
   <div :class="styles.secret" role="status">
-    <strong>Copy this signing secret now. It is shown once.</strong>
+    <strong>{{ message }}</strong>
+    <p v-if="$slots.default" :class="styles.note"><slot /></p>
     <code :class="styles.code">{{ secret }}</code>
     <div :class="styles.actions">
       <button type="button" :class="styles.button" @click="copy">

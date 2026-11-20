@@ -1,0 +1,20 @@
+@use 'mixins' as m;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.heading {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.list {
+  @include m.list;
+}
+
+.empty {
+  @include m.muted;
+}
