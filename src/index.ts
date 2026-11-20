@@ -408,3 +408,21 @@ export {
   profileProblem,
   usernameProblem,
 } from './state/account-settings.state'
+export { default as PynAccessSessionBanner } from './components/PynAccessSessionBanner.vue'
+export { default as PynAccessSessionHistory } from './components/PynAccessSessionHistory.vue'
+export { default as PynAccessSessionStartForm } from './components/PynAccessSessionStartForm.vue'
+export { default as PynAccessSessionList } from './components/PynAccessSessionList.vue'
+export type {
+  AccessSessionInfo,
+  AccessSessionReach,
+  AccessSessionReason,
+  AccessSessionStart,
+  AccessSessionState,
+  StartedAccessSession,
+} from './types/access-session.types'
+export {
+  ACCESS_SESSION_NOTES_MAX,
+  ACCESS_SESSION_REASONS,
+  accessSessionProblem,
+  reasonLabel,
+} from './state/access-session.state'

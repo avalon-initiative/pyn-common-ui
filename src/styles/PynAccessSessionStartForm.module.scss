@@ -1,0 +1,37 @@
+@use 'mixins' as m;
+
+.form {
+  @include m.form;
+}
+
+.heading {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.note,
+.hint {
+  @include m.muted;
+}
+
+.field {
+  @include m.field;
+}
+
+.input {
+  @include m.input;
+  @include m.invalid;
+}
+
+.message {
+  @include m.field-message;
+  margin: 0;
+}
+
+.error {
+  @include m.error;
+}
+
+.primary {
+  @include m.button-primary;
+}

@@ -1,0 +1,39 @@
+@use 'mixins' as m;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.heading {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.list {
+  @include m.list;
+}
+
+.empty {
+  @include m.muted;
+}
+
+.error {
+  @include m.error;
+}
+
+.confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  font-size: 0.875rem;
+}
+
+.danger {
+  @include m.button(var(--pyn-danger));
+}
+
+.quiet {
+  @include m.button;
+}
