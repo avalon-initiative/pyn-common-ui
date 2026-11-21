@@ -17,6 +17,7 @@ import {
   PynAddPerson,
   PynAudit,
   PynBranchBar,
+  PynBranchCompare,
   PynBranchPicker,
   PynBreadcrumb,
   PynButton,
@@ -633,6 +634,80 @@ describe('PynBranchBar', () => {
     expect(formatAgo(at(2 * 3_600_000), now)).toBe('2 hours ago')
     expect(formatAgo(at(3 * 86_400_000), now)).toBe('3 days ago')
     expect(formatAgo(at(90 * 86_400_000), now)).toBe('Jul 10 2026')
+  })
+})
+
+describe('PynBranchCompare', () => {
+  const base = { base: 'main', head: 'feature/art', status: 'ahead' as const, ahead: 3, behind: 0 }
+  const sentence = (props: Record<string, unknown>) =>
+    mount(PynBranchCompare, { props: { ...base, ...props } })
+      .find('p')
+      .text()
+
+  it('words each status, singular and plural', () => {
+    expect(sentence({})).toBe('3 commits ahead of main')
+    expect(sentence({ ahead: 1 })).toBe('1 commit ahead of main')
+    expect(sentence({ status: 'behind', ahead: 0, behind: 1 })).toBe('1 commit behind main')
+    expect(sentence({ status: 'behind', ahead: 0, behind: 4 })).toBe('4 commits behind main')
+    expect(sentence({ status: 'diverged', behind: 2 })).toBe('3 commits ahead, 2 behind main')
+    expect(sentence({ status: 'identical', ahead: 0 })).toBe('Up to date with main')
+    expect(sentence({ status: 'diverged', ahead: 0, behind: 0 })).toBe('Up to date with main')
+  })
+
+  it('shows capped counts as max+', () => {
+    const capped = { countsCapped: true, maxCommits: 1000 }
+    expect(sentence({ ...capped, ahead: 1000 })).toBe('1000+ commits ahead of main')
+    expect(sentence({ ...capped, status: 'behind', ahead: 0, behind: 1000 })).toBe(
+      '1000+ commits behind main',
+    )
+    expect(sentence({ ...capped, status: 'diverged', ahead: 1000, behind: 2 })).toBe(
+      '1000+ commits ahead, 2 behind main',
+    )
+    expect(sentence({ countsCapped: true, ahead: 7 })).toBe('7+ commits ahead of main')
+  })
+
+  const changes = [
+    { path: 'a.txt', kind: 'added' as const },
+    { path: 'b.psd', kind: 'modified' as const },
+    { path: 'c.md', kind: 'deleted' as const },
+  ]
+
+  it('lists changes in a disclosure with text markers and emits select', async () => {
+    const w = mount(PynBranchCompare, { props: { ...base, changes } })
+    expect(w.find('details').exists()).toBe(true)
+    expect(w.find('summary').text()).toBe('3 changed paths')
+    const items = w.findAll('li')
+    expect(items.map((i) => i.find('[aria-hidden=true]').text())).toEqual(['A', 'M', 'D'])
+    expect(items.map((i) => i.text())).toEqual(['AAddeda.txt', 'MModifiedb.psd', 'DDeletedc.md'])
+    await items[1].find('button').trigger('click')
+    expect(w.emitted('select')).toEqual([['b.psd']])
+    expect(w.text()).not.toContain('Showing the first')
+  })
+
+  it('has no disclosure without changes and notes truncation', () => {
+    expect(mount(PynBranchCompare, { props: base }).find('details').exists()).toBe(false)
+    expect(
+      mount(PynBranchCompare, { props: { ...base, changes: [] } })
+        .find('details')
+        .exists(),
+    ).toBe(false)
+    const w = mount(PynBranchCompare, { props: { ...base, changes, truncated: true } })
+    expect(w.text()).toContain('Showing the first 3 changed paths')
+  })
+
+  it('shows a status while loading and hides the rest', () => {
+    const w = mount(PynBranchCompare, { props: { ...base, changes, loading: true, error: 'x' } })
+    expect(w.find('[role=status]').text()).toBe('Comparing with main…')
+    expect(w.find('[role=alert]').exists()).toBe(false)
+    expect(w.text()).not.toContain('ahead')
+    expect(w.find('details').exists()).toBe(false)
+  })
+
+  it('shows an alert on error and hides the rest', () => {
+    const w = mount(PynBranchCompare, { props: { ...base, changes, error: 'Compare failed' } })
+    expect(w.find('[role=alert]').text()).toBe('Compare failed')
+    expect(w.text()).not.toContain('ahead')
+    expect(w.find('details').exists()).toBe(false)
   })
 })
 

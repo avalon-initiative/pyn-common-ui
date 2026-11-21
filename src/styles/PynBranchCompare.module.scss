@@ -1,0 +1,95 @@
+@use 'mixins' as m;
+
+.compare {
+  @include m.card;
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+}
+
+.sentence {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.status {
+  @include m.muted;
+}
+
+.error {
+  @include m.error;
+}
+
+.changes {
+  margin-top: var(--pyn-space-2);
+}
+
+.toggle {
+  @include m.muted;
+  cursor: pointer;
+  @include m.focus-ring;
+}
+
+.list {
+  margin: var(--pyn-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-1) 0;
+}
+
+.marker {
+  flex: none;
+  width: 1.5rem;
+  text-align: center;
+  border: 1px solid currentcolor;
+  border-radius: var(--pyn-radius);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
+}
+
+.added {
+  color: var(--pyn-available);
+  background: var(--pyn-available-bg);
+}
+
+.modified {
+  color: var(--pyn-locked);
+  background: var(--pyn-locked-bg);
+}
+
+.deleted {
+  color: var(--pyn-danger);
+  background: var(--pyn-danger-bg);
+}
+
+.hidden {
+  @include m.visually-hidden;
+}
+
+.path {
+  min-width: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--pyn-accent);
+  font-family: var(--pyn-font-mono);
+  font-size: 0.875rem;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  @include m.focus-ring;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.note {
+  @include m.muted;
+  margin-top: var(--pyn-space-2);
+}
