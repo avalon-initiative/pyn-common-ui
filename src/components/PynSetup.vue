@@ -23,6 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const nameMessageId = useId()
+const confirmMessageId = useId()
 
 const index = ref(0)
 const form = reactive<SetupForm>({
@@ -35,6 +36,8 @@ const form = reactive<SetupForm>({
   registration: props.registration,
 })
 
+const confirm = ref('')
+
 const step = computed(() => SETUP_STEPS[index.value])
 const last = computed(() => index.value === SETUP_STEPS.length - 1)
 const titles: Record<(typeof SETUP_STEPS)[number], string> = {
@@ -46,8 +49,11 @@ const titles: Record<(typeof SETUP_STEPS)[number], string> = {
   review: 'Review',
 }
 
+const mismatch = computed(() => step.value === 'admin' && form.password !== confirm.value)
+const showMismatch = computed(() => mismatch.value && confirm.value !== '')
+
 function next() {
-  if (!stepComplete(step.value, form)) return
+  if (mismatch.value || !stepComplete(step.value, form)) return
   if (last.value) emit('finish', { ...form })
   else index.value += 1
 }
@@ -120,6 +126,21 @@ function next() {
         />
       </label>
       <label :class="styles.field"
+        >Confirm password
+        <input
+          v-model="confirm"
+          :class="styles.input"
+          type="password"
+          autocomplete="new-password"
+          required
+          :aria-describedby="showMismatch ? confirmMessageId : undefined"
+          :aria-invalid="showMismatch ? 'true' : undefined"
+        />
+        <span v-if="showMismatch" :id="confirmMessageId" :class="styles.message" role="alert"
+          >The passwords do not match.</span
+        >
+      </label>
+      <label :class="styles.field"
         >Email address (optional)
         <input v-model.trim="form.email" :class="styles.input" type="email" autocomplete="email" />
       </label>
@@ -169,7 +190,7 @@ function next() {
 
     <div :class="styles.actions">
       <button v-if="index > 0" type="button" :class="styles.link" @click="index -= 1">Back</button>
-      <button type="submit" :class="styles.primary" :disabled="busy">
+      <button type="submit" :class="styles.primary" :disabled="busy || mismatch">
         {{ last ? 'Finish setup' : step === 'welcome' ? 'Begin' : 'Continue' }}
       </button>
     </div>

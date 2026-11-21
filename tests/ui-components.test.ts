@@ -2888,6 +2888,7 @@ describe('PynSetup', () => {
     const [user, pass] = w.findAll('input')
     await user.setValue('root')
     await pass.setValue('pw')
+    await w.findAll('input')[2].setValue('pw')
     await next(w)
     await w.find('input').setValue('Studio')
     await next(w)
@@ -2908,6 +2909,32 @@ describe('PynSetup', () => {
         registration: 'invite',
       },
     ])
+  })
+
+  it('asks for the password twice and blocks continuing until they match', async () => {
+    const w = mount(PynSetup, { props: { registration: 'closed' } })
+    await next(w)
+    await w.find('input').setValue('tok')
+    await next(w)
+    const [user, pass, confirm] = w.findAll('input')
+    expect(pass.attributes('autocomplete')).toBe('new-password')
+    expect(confirm.attributes('autocomplete')).toBe('new-password')
+    await user.setValue('root')
+    await pass.setValue('secret')
+    expect(w.find('[role=alert]').exists()).toBe(false)
+    expect(w.find('button[type=submit]').attributes('disabled')).toBeDefined()
+    await confirm.setValue('secrex')
+    const msg = w.find('[role=alert]')
+    expect(msg.text()).toBe('The passwords do not match.')
+    expect(confirm.attributes('aria-invalid')).toBe('true')
+    expect(confirm.attributes('aria-describedby')).toBe(msg.attributes('id'))
+    await next(w)
+    expect(w.text()).toContain('Step 3 of 6')
+    await confirm.setValue('secret')
+    expect(w.find('[role=alert]').exists()).toBe(false)
+    expect(w.find('button[type=submit]').attributes('disabled')).toBeUndefined()
+    await next(w)
+    expect(w.text()).toContain('Step 4 of 6')
   })
 
   it('stays on the token step until one is entered', async () => {
