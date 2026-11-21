@@ -18,3 +18,4 @@ export const Markdown: Story = {}
 export const PlainText: Story = {
   args: { readme: { name: 'README', path: 'README', text: 'Plain text\nreadme.' } },
 }
+export const OnBranch: Story = { args: { branch: 'feature/levels' } }

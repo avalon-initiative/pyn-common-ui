@@ -6,18 +6,23 @@ type Repo = { owner: string; name: string }
 export const encodeSegments = (path: string) => path.split('/').map(encodeURIComponent).join('/')
 
 /** The app route of a folder; the root is the repository's Code tab. */
-export function treePath(r: Repo, path: string): string {
+export function treePath(r: Repo, path: string, branch?: string): string {
   const clean = path.replace(/^\/+|\/+$/g, '')
-  return clean ? repoPath(r, `tree/${encodeSegments(clean)}`) : repoPath(r)
+  return clean ? repoPath(r, `tree/${encodeSegments(clean)}`, branch) : repoPath(r, '', branch)
 }
 
 /** The repository name, then one crumb per folder; the last is the current location. */
-export function breadcrumbs(r: Repo, path: string): Crumb[] {
+export function breadcrumbs(r: Repo, path: string, branch?: string): Crumb[] {
   const parts = path.split('/').filter(Boolean)
-  const crumbs: Crumb[] = [{ label: r.name, href: parts.length ? treePath(r, '') : undefined }]
+  const crumbs: Crumb[] = [
+    { label: r.name, href: parts.length ? treePath(r, '', branch) : undefined },
+  ]
   parts.forEach((label, i) => {
     const last = i === parts.length - 1
-    crumbs.push({ label, href: last ? undefined : treePath(r, parts.slice(0, i + 1).join('/')) })
+    crumbs.push({
+      label,
+      href: last ? undefined : treePath(r, parts.slice(0, i + 1).join('/'), branch),
+    })
   })
   return crumbs
 }

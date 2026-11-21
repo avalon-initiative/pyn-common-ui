@@ -1,7 +1,7 @@
 import type { Crumb, TreeEntry } from '../types/tree.types'
 import type { FetchedContent, FileBody } from '../types/blob.types'
 import { fileExtension, languageFor } from './code.state'
-import { repoPath } from './repo.state'
+import { repoPath, withBranch } from './repo.state'
 import { encodeSegments, treePath } from './tree.state'
 
 type Repo = { owner: string; name: string }
@@ -17,32 +17,36 @@ const README = /^readme(\.(md|markdown|txt))?$/i
 const clean = (path: string) => path.replace(/^\/+|\/+$/g, '')
 
 /** The app route of a file. */
-export const blobPath = (r: Repo, path: string): string =>
-  repoPath(r, `blob/${encodeSegments(clean(path))}`)
+export const blobPath = (r: Repo, path: string, branch?: string): string =>
+  repoPath(r, `blob/${encodeSegments(clean(path))}`, branch)
 
 /** The server URL of a file's head content, or of one revision. */
-export function contentUrl(r: Repo, path: string, revision?: number): string {
+export function contentUrl(r: Repo, path: string, revision?: number, branch?: string): string {
   const q = new URLSearchParams({ path })
   if (revision !== undefined) q.set('revision', String(revision))
+  if (branch) q.set('branch', branch)
   const base = `/v1/repos/${encodeURIComponent(r.owner)}/${encodeURIComponent(r.name)}`
   return `${base}/content?${q}`
 }
 
 /** The history tab scoped to one file. */
-export const historyLink = (r: Repo, path: string): string =>
-  `${repoPath(r, 'history')}?path=${encodeURIComponent(path)}`
+export const historyLink = (r: Repo, path: string, branch?: string): string =>
+  withBranch(`${repoPath(r, 'history')}?path=${encodeURIComponent(path)}`, branch)
 
 export const parentOf = (path: string): string => path.split('/').slice(0, -1).join('/')
 
 export const baseName = (path: string): string => path.slice(path.lastIndexOf('/') + 1)
 
 /** The repository, each folder, then the file as the current location. */
-export function fileCrumbs(r: Repo, path: string): Crumb[] {
+export function fileCrumbs(r: Repo, path: string, branch?: string): Crumb[] {
   const parts = clean(path).split('/')
-  const crumbs: Crumb[] = [{ label: r.name, href: treePath(r, '') }]
+  const crumbs: Crumb[] = [{ label: r.name, href: treePath(r, '', branch) }]
   parts.forEach((label, i) => {
     const last = i === parts.length - 1
-    crumbs.push({ label, href: last ? undefined : treePath(r, parts.slice(0, i + 1).join('/')) })
+    crumbs.push({
+      label,
+      href: last ? undefined : treePath(r, parts.slice(0, i + 1).join('/'), branch),
+    })
   })
   return crumbs
 }

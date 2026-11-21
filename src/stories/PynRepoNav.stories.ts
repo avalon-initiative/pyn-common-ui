@@ -14,3 +14,12 @@ export const OwnerAdmin: Story = {
 export const Reader: Story = {
   args: { owner: 'alice', name: 'game', tabs: repoTabs(['read'], false), current: '' },
 }
+export const OnBranch: Story = {
+  args: {
+    owner: 'alice',
+    name: 'game',
+    tabs: repoTabs(admin, true),
+    current: '',
+    branch: 'feature/levels',
+  },
+}
