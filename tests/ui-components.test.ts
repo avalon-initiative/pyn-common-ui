@@ -1,5 +1,5 @@
 // Component render tests for every exported component. Run with `make test`.
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import {
   PynAccountDelete,
@@ -16,6 +16,7 @@ import {
   PynAddPerson,
   PynAudit,
   PynBranchBar,
+  PynBranchPicker,
   PynBreadcrumb,
   PynButton,
   PynCheckoutCard,
@@ -608,6 +609,130 @@ describe('PynBranchBar', () => {
     expect(formatAgo(at(2 * 3_600_000), now)).toBe('2 hours ago')
     expect(formatAgo(at(3 * 86_400_000), now)).toBe('3 days ago')
     expect(formatAgo(at(90 * 86_400_000), now)).toBe('Jul 10 2026')
+  })
+})
+
+describe('PynBranchPicker', () => {
+  const branches = [
+    { name: 'main', isDefault: true, updatedAt: '2026-10-08T10:00:00Z' },
+    { name: 'feature/art', updatedAt: null },
+    { name: 'release/1.0' },
+  ]
+  const mountPicker = (props: Record<string, unknown> = {}) =>
+    mount(PynBranchPicker, {
+      props: { branches, current: 'main', now, ...props },
+      attachTo: document.body,
+    })
+  const open = async (w: ReturnType<typeof mountPicker>) => {
+    await w.find('button').trigger('click')
+    await flushPromises()
+  }
+
+  it('shows the current branch and keeps the list closed', () => {
+    const w = mountPicker()
+    expect(w.find('button').text()).toContain('main')
+    expect(w.find('button').attributes('aria-expanded')).toBe('false')
+    expect(w.find('[role=listbox]').exists()).toBe(false)
+    w.unmount()
+  })
+
+  it('opens a listbox with combobox wiring, marks the default and the current branch', async () => {
+    const w = mountPicker()
+    await open(w)
+    const box = w.find('[role=combobox]')
+    const list = w.find('[role=listbox]')
+    expect(w.find('button').attributes('aria-expanded')).toBe('true')
+    expect(box.attributes('aria-controls')).toBe(list.attributes('id'))
+    expect(box.attributes('aria-activedescendant')).toBe(w.find('[role=option]').attributes('id'))
+    expect(document.activeElement).toBe(box.element)
+    const options = w.findAll('[role=option]')
+    expect(options).toHaveLength(3)
+    expect(options[0].text()).toContain('default')
+    expect(options[0].text()).toContain('2 hours ago')
+    expect(options[0].attributes('aria-selected')).toBe('true')
+    expect(options[1].attributes('aria-selected')).toBe('false')
+    w.unmount()
+  })
+
+  it('filters by the search text and reports no matches', async () => {
+    const w = mountPicker()
+    await open(w)
+    await w.find('[role=combobox]').setValue('REL')
+    expect(w.findAll('[role=option]').map((o) => o.text())).toEqual(['release/1.0'])
+    await w.find('[role=combobox]').setValue('zzz')
+    expect(w.findAll('[role=option]')).toHaveLength(0)
+    expect(w.find('[role=status]').text()).toBe('No matching branches')
+    w.unmount()
+  })
+
+  it('selects with arrow keys and Enter, then closes with focus on the button', async () => {
+    const w = mountPicker()
+    await open(w)
+    const box = w.find('[role=combobox]')
+    await box.trigger('keydown', { key: 'ArrowDown' })
+    await box.trigger('keydown', { key: 'ArrowDown' })
+    await box.trigger('keydown', { key: 'ArrowUp' })
+    await box.trigger('keydown', { key: 'Enter' })
+    expect(w.emitted('select')).toEqual([['feature/art']])
+    expect(w.find('[role=listbox]').exists()).toBe(false)
+    expect(document.activeElement).toBe(w.find('button').element)
+    w.unmount()
+  })
+
+  it('selects by click', async () => {
+    const w = mountPicker()
+    await open(w)
+    await w.findAll('[role=option]')[2].trigger('click')
+    expect(w.emitted('select')).toEqual([['release/1.0']])
+    w.unmount()
+  })
+
+  it('closes on Escape and returns focus to the button without selecting', async () => {
+    const w = mountPicker()
+    await open(w)
+    await w.find('[role=combobox]').trigger('keydown', { key: 'Escape' })
+    expect(w.find('[role=listbox]').exists()).toBe(false)
+    expect(document.activeElement).toBe(w.find('button').element)
+    expect(w.emitted('select')).toBeUndefined()
+    w.unmount()
+  })
+
+  it('opens from the button with the down arrow', async () => {
+    const w = mountPicker()
+    await w.find('button').trigger('keydown', { key: 'ArrowDown' })
+    await flushPromises()
+    expect(w.find('[role=listbox]').exists()).toBe(true)
+    w.unmount()
+  })
+
+  it('shows loading and error states without a list or selection', async () => {
+    const w = mountPicker({ loading: true })
+    await open(w)
+    expect(w.find('[role=status]').text()).toContain('Loading')
+    expect(w.find('[role=listbox]').exists()).toBe(false)
+    await w.find('[role=combobox]').trigger('keydown', { key: 'Enter' })
+    expect(w.emitted('select')).toBeUndefined()
+    await w.setProps({ loading: false, error: 'Could not load branches.' })
+    expect(w.find('[role=alert]').text()).toBe('Could not load branches.')
+    w.unmount()
+  })
+
+  it('says so when only the default branch exists', async () => {
+    const w = mountPicker({ branches: [{ name: 'main', isDefault: true }] })
+    await open(w)
+    expect(w.text()).toContain('Only the default branch exists')
+    w.unmount()
+  })
+
+  it('composes with the static branch bar', () => {
+    const w = mount({
+      components: { PynBranchBar, PynBranchPicker },
+      template:
+        '<div><PynBranchPicker :branches="b" current="main" /><PynBranchBar branch="main" :files="3" /></div>',
+      data: () => ({ b: branches }),
+    })
+    expect(w.text()).toContain('3 files')
+    expect(w.findComponent(PynBranchPicker).exists()).toBe(true)
   })
 })
 
