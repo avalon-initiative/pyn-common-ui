@@ -24,6 +24,7 @@ export { default as PynRepoHeader } from './components/PynRepoHeader.vue'
 export { default as PynRepoShell } from './components/PynRepoShell.vue'
 export { default as PynRepoSettings } from './components/PynRepoSettings.vue'
 export { default as PynBranchBar } from './components/PynBranchBar.vue'
+export { default as PynBranchPicker } from './components/PynBranchPicker.vue'
 export { default as PynOrgHeader } from './components/PynOrgHeader.vue'
 export { default as PynUserHeader } from './components/PynUserHeader.vue'
 export { default as PynAvatar } from './components/PynAvatar.vue'
@@ -263,6 +264,7 @@ export type {
   RuleScope,
 } from './types/org.types'
 export type { RepoRef, Visibility } from './types/repo.types'
+export type { BranchOption } from './types/branch.types'
 export {
   accountNav,
   accountNavItems,
