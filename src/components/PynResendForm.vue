@@ -2,13 +2,16 @@
 import { ref } from 'vue'
 import styles from '../styles/PynResendForm.module.scss'
 
-defineProps<{ busy?: boolean; sent?: boolean; error?: string }>()
+import { VERIFICATION_GUIDANCE } from '../state/account.state'
+
+defineProps<{ busy?: boolean; sent?: boolean; error?: string; emailVerification?: boolean }>()
 const emit = defineEmits<{ resend: [string] }>()
 const email = ref('')
 </script>
 
 <template>
   <form :class="styles.form" @submit.prevent="emit('resend', email)">
+    <p v-if="emailVerification" :class="styles.hint">{{ VERIFICATION_GUIDANCE }}</p>
     <label :class="styles.field"
       >Email address
       <input

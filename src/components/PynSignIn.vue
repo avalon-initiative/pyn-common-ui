@@ -91,6 +91,7 @@ function submit() {
     :busy="busy"
     :sent="resent"
     :error="error"
+    :email-verification="emailVerification"
     @resend="(address) => emit('resend', address)"
     @back="emit('dismiss')"
   />

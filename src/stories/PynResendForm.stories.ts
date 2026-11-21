@@ -9,5 +9,6 @@ export default meta
 type Story = StoryObj<typeof PynResendForm>
 
 export const Empty: Story = {}
+export const WithGuidance: Story = { args: { emailVerification: true } }
 export const Sent: Story = { args: { sent: true } }
 export const RateLimited: Story = { args: { error: 'Too many attempts. Try again in 38 minutes.' } }

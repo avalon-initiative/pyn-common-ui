@@ -1,17 +1,29 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import styles from '../styles/PynAccountNotice.module.scss'
-import { NOTICE_TEXT, NOTICE_TITLES } from '../state/account.state'
+import {
+  NOTICE_TEXT,
+  NOTICE_TITLES,
+  VERIFICATION_GUIDANCE,
+  VERIFICATION_NOT_REQUIRED_TEXT,
+} from '../state/account.state'
 import type { BlockedStatus } from '../types/auth.types'
 import PynResendForm from './PynResendForm.vue'
 
-defineProps<{
+const props = defineProps<{
   status: BlockedStatus
+  emailVerification?: boolean
   user?: string
   busy?: boolean
   sent?: boolean
   error?: string
 }>()
 const emit = defineEmits<{ resend: [string]; back: [] }>()
+const text = computed(() =>
+  props.status === 'pending_verification' && props.emailVerification === false
+    ? VERIFICATION_NOT_REQUIRED_TEXT
+    : NOTICE_TEXT[props.status],
+)
 </script>
 
 <template>
@@ -21,7 +33,10 @@ const emit = defineEmits<{ resend: [string]; back: [] }>()
       <template v-if="user"
         >Account <strong>{{ user }}</strong>.
       </template>
-      {{ NOTICE_TEXT[status] }}
+      {{ text }}
+    </p>
+    <p v-if="status === 'pending_verification' && emailVerification" :class="styles.text">
+      {{ VERIFICATION_GUIDANCE }}
     </p>
     <PynResendForm
       v-if="status === 'pending_verification'"
