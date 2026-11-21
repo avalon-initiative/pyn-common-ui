@@ -39,3 +39,20 @@ export const InvalidAdminName: Story = {
     await submit(canvasElement)
   },
 }
+
+export const PasswordsDiffer: Story = {
+  play: async ({ canvasElement }) => {
+    await submit(canvasElement)
+    await type(canvasElement, 'token')
+    await submit(canvasElement)
+    const [, password, confirm] = Array.from(canvasElement.querySelectorAll('input'))
+    for (const [input, value] of [
+      [password, 'correct horse'],
+      [confirm, 'correct hose'],
+    ] as const) {
+      input.value = value
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+    await tick()
+  },
+}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import styles from '../styles/PynRecoveryCodes.module.scss'
+import { copyText } from '../utils/copy'
 import { downloadText } from '../utils/download'
 
 const props = withDefaults(defineProps<{ codes: string[]; filename?: string }>(), {
@@ -9,14 +10,11 @@ const props = withDefaults(defineProps<{ codes: string[]; filename?: string }>()
 const emit = defineEmits<{ saved: [] }>()
 
 const copied = ref(false)
+const copyFailed = ref(false)
 
 async function copy() {
-  try {
-    await navigator.clipboard.writeText(props.codes.join('\n'))
-    copied.value = true
-  } catch {
-    copied.value = false
-  }
+  copied.value = await copyText(props.codes.join('\n'))
+  copyFailed.value = !copied.value
 }
 </script>
 
@@ -30,6 +28,7 @@ async function copy() {
     <ul :class="styles.codes">
       <li v-for="code in codes" :key="code" :class="styles.code">{{ code }}</li>
     </ul>
+    <p v-if="copyFailed" :class="styles.error" role="status">Could not copy</p>
     <div :class="styles.actions">
       <button type="button" :class="styles.button" @click="copy">
         {{ copied ? 'Copied' : 'Copy' }}

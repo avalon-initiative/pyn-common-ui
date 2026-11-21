@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import styles from '../styles/PynTotpEnrolment.module.scss'
 import PynQrCode from './PynQrCode.vue'
+import { copyText } from '../utils/copy'
 import type { TotpEnrolment } from '../types/two-factor.types'
 
 const props = defineProps<{
@@ -13,18 +14,15 @@ const emit = defineEmits<{ confirm: [code: string]; cancel: [] }>()
 
 const code = ref('')
 const copied = ref(false)
+const copyFailed = ref(false)
 
 function groups(secret: string): string {
   return secret.replace(/(.{4})(?=.)/g, '$1 ')
 }
 
 async function copy() {
-  try {
-    await navigator.clipboard.writeText(props.enrolment.secret)
-    copied.value = true
-  } catch {
-    copied.value = false
-  }
+  copied.value = await copyText(props.enrolment.secret)
+  copyFailed.value = !copied.value
 }
 
 function send() {
@@ -37,16 +35,19 @@ function send() {
   <form :class="styles.form" @submit.prevent="send">
     <h2 :class="styles.heading">Set up an authenticator app</h2>
     <p :class="styles.note">
-      Scan the code with an authenticator app, or type the key in by hand. Then enter the six-digit
+      Scan the code with an authenticator app, or copy the key into it. Then enter the six-digit
       code the app shows.
     </p>
     <PynQrCode :value="enrolment.uri" label="Authenticator app QR code" />
     <div :class="styles.manual">
-      <span :class="styles.note">Can't scan? Enter this key</span>
-      <code :class="styles.secret">{{ groups(enrolment.secret) }}</code>
+      <span :class="styles.note">Can't scan?</span>
       <button type="button" :class="styles.button" @click="copy">
         {{ copied ? 'Copied' : 'Copy key' }}
       </button>
+      <p v-if="copyFailed" :class="styles.error" role="status">
+        Could not copy. Type this key into the app instead:
+      </p>
+      <code v-if="copyFailed" :class="styles.secret">{{ groups(enrolment.secret) }}</code>
     </div>
     <label :class="styles.field"
       >Code from the app

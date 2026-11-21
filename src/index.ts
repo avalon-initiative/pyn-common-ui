@@ -119,6 +119,7 @@ export { applyTheme, loadTheme, saveTheme, themeChoices } from './state/theme.st
 export type { ThemeChoice } from './state/theme.state'
 export { formatDate, formatDateTime } from './utils/datetime'
 export { formatBytes } from './utils/bytes'
+export { copyText } from './utils/copy'
 export { CAP_UNITS, capToBytes, splitCap, usageLevel, usagePercent } from './state/usage.state'
 export type {
   FolderUsage,
