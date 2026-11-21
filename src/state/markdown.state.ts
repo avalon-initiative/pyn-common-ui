@@ -90,7 +90,7 @@ function externalImage(img: Element, src: string): Node {
 }
 
 /** Safe HTML for markdown; relative links open in the viewer, relative images load from the server, external ones become text. */
-export function renderMarkdown(source: string, repo: Repo, dir: string): string {
+export function renderMarkdown(source: string, repo: Repo, dir: string, branch?: string): string {
   const raw = marked.parse(source, { async: false })
   const doc = DOMPurify.sanitize(raw, { RETURN_DOM_FRAGMENT: true, FORBID_ATTR: ['style'] })
   for (const a of doc.querySelectorAll('a[href]')) {
@@ -98,7 +98,7 @@ export function renderMarkdown(source: string, repo: Repo, dir: string): string 
     const path = resolveRelative(dir, href)
     if (path !== null) {
       const folder = href.endsWith('/') || path === ''
-      a.setAttribute('href', folder ? treePath(repo, path) : blobPath(repo, path))
+      a.setAttribute('href', folder ? treePath(repo, path, branch) : blobPath(repo, path, branch))
     } else if (!href.startsWith('#')) {
       a.setAttribute('target', '_blank')
       a.setAttribute('rel', 'noopener noreferrer')
@@ -111,7 +111,7 @@ export function renderMarkdown(source: string, repo: Repo, dir: string): string 
   for (const img of doc.querySelectorAll('img')) {
     const src = (img.getAttribute('src') ?? '').trim()
     const path = resolveRelative(dir, src)
-    if (path !== null) img.setAttribute('src', contentUrl(repo, path))
+    if (path !== null) img.setAttribute('src', contentUrl(repo, path, undefined, branch))
     else img.replaceWith(externalImage(img, src))
   }
   assignHeadingIds(doc)

@@ -14,6 +14,8 @@ defineProps<{
   name: string
   me?: string
   now?: Date
+  /** Branch the History and Download links keep; omitted is the default branch. */
+  branch?: string
 }>()
 </script>
 
@@ -24,10 +26,12 @@ defineProps<{
       <PynModeChip :mode="entry.mode" />
       <PynLockBadge v-if="entry.mode === 'exclusive'" :lock="entry.lock" :me="me" :now="now" />
       <span :class="styles.actions">
-        <a :href="historyLink({ owner, name }, entry.path)" :class="styles.action">History</a>
+        <a :href="historyLink({ owner, name }, entry.path, branch)" :class="styles.action"
+          >History</a
+        >
         <a
           v-if="entry.last_change"
-          :href="contentUrl({ owner, name }, entry.path)"
+          :href="contentUrl({ owner, name }, entry.path, undefined, branch)"
           :download="baseName(entry.path)"
           :class="styles.action"
           >Download</a

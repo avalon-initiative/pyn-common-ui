@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import styles from '../styles/PynRepoShell.module.scss'
-import { repoPath } from '../state/repo.state'
+import { BRANCH_SECTIONS, repoPath } from '../state/repo.state'
 import type { RepoShellTab } from '../state/repo.state'
 import type { Visibility } from '../types/repo.types'
 
@@ -14,6 +14,8 @@ const props = defineProps<{
   current?: string
   /** Where the owner crumb links; defaults to `/<owner>`. */
   ownerHref?: string
+  /** Branch the repository link and the Code and History tabs keep; omitted is the default branch. */
+  branch?: string
 }>()
 
 function isCurrent(section: string): boolean {
@@ -32,7 +34,7 @@ function isCurrent(section: string): boolean {
               owner
             }}</a>
             <span :class="styles.sep" aria-hidden="true">/</span>
-            <a :href="repoPath({ owner, name })" :class="styles.name">{{ name }}</a>
+            <a :href="repoPath({ owner, name }, '', branch)" :class="styles.name">{{ name }}</a>
           </nav>
           <span :class="styles.badge" data-visibility>{{
             visibility === 'public' ? 'Public' : 'Private'
@@ -44,7 +46,13 @@ function isCurrent(section: string): boolean {
         <a
           v-for="tab in tabs"
           :key="tab.section"
-          :href="repoPath({ owner, name }, tab.section)"
+          :href="
+            repoPath(
+              { owner, name },
+              tab.section,
+              BRANCH_SECTIONS.has(tab.section) ? branch : undefined,
+            )
+          "
           :class="styles.tab"
           :aria-current="isCurrent(tab.section) ? 'page' : undefined"
         >

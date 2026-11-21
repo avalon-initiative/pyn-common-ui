@@ -161,6 +161,7 @@ import {
   readmeEntry,
   renderMarkdown,
   repoSettingsNav,
+  repoPath,
   repoSettingsPath,
   repoShellTabs,
   repoTabs,
@@ -2221,8 +2222,8 @@ describe('PynSignIn', () => {
   it('offers an invitation field on invite-only servers and not on open ones', async () => {
     const invite = mount(PynSignIn, { props: { registration: 'invite' } })
     await click(invite, 'I have an invitation')
-    expect(invite.findAll('input')).toHaveLength(3)
-    await fill(invite, ['wendy', 'a long password', 'pyni_x'])
+    expect(invite.findAll('input')).toHaveLength(4)
+    await fill(invite, ['wendy', 'a long password', 'a long password', 'pyni_x'])
     await invite.find('form').trigger('submit')
     expect(invite.emitted('register')?.[0]).toEqual([
       { username: 'wendy', password: 'a long password', invite: 'pyni_x' },
@@ -2230,7 +2231,39 @@ describe('PynSignIn', () => {
 
     const open = mount(PynSignIn, { props: { registration: 'open' } })
     await click(open, 'Create an account')
-    expect(open.findAll('input')).toHaveLength(2)
+    expect(open.findAll('input')).toHaveLength(3)
+  })
+
+  it('has no confirm field when signing in', () => {
+    const w = mount(PynSignIn, { props: { registration: 'open' } })
+    expect(w.text()).not.toContain('Confirm password')
+    expect(w.findAll('input[type="password"]')).toHaveLength(1)
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeUndefined()
+  })
+
+  it('blocks registering while the passwords differ and says so', async () => {
+    const w = mount(PynSignIn, { props: { registration: 'open' } })
+    await click(w, 'Create an account')
+    const [user, pw, again] = w.findAll('input')
+    expect(pw.attributes('autocomplete')).toBe('new-password')
+    expect(again.attributes('autocomplete')).toBe('new-password')
+    await user.setValue('wendy')
+    await pw.setValue('a long password')
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeDefined()
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+    await again.setValue('a long passw')
+    expect(again.attributes('aria-invalid')).toBe('true')
+    const alert = w.find('[role="alert"]')
+    expect(alert.text()).toBe('The passwords do not match.')
+    expect(again.attributes('aria-describedby')).toBe(alert.attributes('id'))
+    await w.find('form').trigger('submit')
+    expect(w.emitted('register')).toBeUndefined()
+    await again.setValue('a long password')
+    expect(again.attributes('aria-invalid')).toBeUndefined()
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeUndefined()
+    await w.find('form').trigger('submit')
+    expect(w.emitted('register')?.[0]).toEqual([{ username: 'wendy', password: 'a long password' }])
   })
 
   it('hides registration on closed servers and offers no token entry', () => {
@@ -2253,8 +2286,8 @@ describe('PynSignIn', () => {
       props: { registration: 'open', emailVerification: true },
     })
     await click(w, 'Create an account')
-    expect(w.findAll('input')).toHaveLength(3)
-    await fill(w, ['wendy', 'a long password', 'w@example.com'])
+    expect(w.findAll('input')).toHaveLength(4)
+    await fill(w, ['wendy', 'a long password', 'a long password', 'w@example.com'])
     await w.find('form').trigger('submit')
     expect(w.emitted('register')?.[0]).toEqual([
       {
@@ -4831,5 +4864,90 @@ describe('copyText', () => {
     expect(document.activeElement).toBe(button)
     button.remove()
     vi.unstubAllGlobals()
+  })
+})
+
+describe('branch-aware links', () => {
+  const b = 'feature/levels'
+  const q = '?branch=feature%2Flevels'
+
+  it('keeps the branch in the helpers and leaves them unchanged without one', () => {
+    expect(treePath(r, 'a b', b)).toBe(`/acme/castle-quest/tree/a%20b${q}`)
+    expect(treePath(r, '', b)).toBe(`/acme/castle-quest${q}`)
+    expect(blobPath(r, 'a.ts', b)).toBe(`/acme/castle-quest/blob/a.ts${q}`)
+    expect(historyLink(r, 'a.ts', b)).toBe(
+      '/acme/castle-quest/history?path=a.ts&branch=feature%2Flevels',
+    )
+    expect(contentUrl(r, 'a.ts', 3, b)).toBe(
+      '/v1/repos/acme/castle-quest/content?path=a.ts&revision=3&branch=feature%2Flevels',
+    )
+    expect(contentUrl(r, 'a.ts')).toBe('/v1/repos/acme/castle-quest/content?path=a.ts')
+    expect(fileCrumbs(r, 'a/b.ts', b)[1].href).toBe(`/acme/castle-quest/tree/a${q}`)
+    expect(breadcrumbs(r, 'a/b', b)[0].href).toBe(`/acme/castle-quest${q}`)
+    expect(repoPath(r, 'history', b)).toBe(`/acme/castle-quest/history${q}`)
+  })
+
+  it('keeps the branch on tree rows, the file bar and the README', () => {
+    const tree = mount(PynTree, { props: { entries: rootEntries, ...r, now, branch: b } })
+    for (const a of tree.findAll('a'))
+      expect(a.attributes('href')).toContain('branch=feature%2Flevels')
+    const bar = mount(PynFileBar, { props: { entry: fileEntry, ...r, now, branch: b } })
+    for (const a of bar.findAll('a'))
+      expect(a.attributes('href')).toContain('branch=feature%2Flevels')
+    const readme = mount(PynReadme, {
+      props: {
+        readme: { name: 'README.md', path: 'README.md', text: '[a](docs/a.md)' },
+        ...r,
+        branch: b,
+      },
+    })
+    expect(readme.findAll('a').map((a) => a.attributes('href'))).toEqual([
+      `/acme/castle-quest/blob/README.md${q}`,
+      `/acme/castle-quest/blob/docs/a.md${q}`,
+    ])
+  })
+
+  it('keeps the branch in markdown links and images', () => {
+    const html = renderMarkdown('[a](x.md) ![i](p.png)', r, '', b)
+    expect(html).toContain(`href="/acme/castle-quest/blob/x.md${q}"`)
+    expect(html).toContain('branch=feature%2Flevels')
+    expect(renderMarkdown('[a](x.md)', r, '')).not.toContain('branch=')
+  })
+
+  it('keeps the branch in the repository nav on Code and History only', () => {
+    const tabs = [
+      { section: '', label: 'Code' },
+      { section: 'locks', label: 'Locks' },
+      { section: 'history', label: 'History' },
+    ]
+    const hrefs = (w: ReturnType<typeof mount>) => w.findAll('a').map((a) => a.attributes('href'))
+    const nav = mount(PynRepoNav, { props: { ...r, tabs, current: '', branch: b } })
+    expect(hrefs(nav)).toEqual([
+      `/acme/castle-quest${q}`,
+      '/acme/castle-quest/locks',
+      `/acme/castle-quest/history${q}`,
+    ])
+    const shell = mount(PynRepoShell, {
+      props: { ...r, visibility: 'private', tabs, current: '', branch: b },
+    })
+    expect(hrefs(shell)).toContain('/acme/castle-quest/locks')
+    expect(hrefs(shell)).toContain(`/acme/castle-quest/history${q}`)
+    expect(hrefs(mount(PynRepoNav, { props: { ...r, tabs, current: '' } }))[0]).toBe(
+      '/acme/castle-quest',
+    )
+  })
+
+  it('keeps the branch in the file view and landing links', () => {
+    const view = mount(PynFileView, {
+      props: { ...r, path: 'a/b.ts', entry: fileEntry, body: null, now, branch: b },
+    })
+    for (const a of view.findAll('a'))
+      expect(a.attributes('href')).toContain('branch=feature%2Flevels')
+    const gone = mount(PynFileView, { props: { ...r, path: 'a/b.ts', missing: true, branch: b } })
+    expect(gone.find('[role="alert"] a').attributes('href')).toBe(`/acme/castle-quest/tree/a${q}`)
+    const landing = mount(PynRepoLanding, {
+      props: { repo, path: 'x', listing: null, missing: true, branch: b },
+    })
+    expect(landing.find('[role="alert"] a').attributes('href')).toBe(`/acme/castle-quest${q}`)
   })
 })

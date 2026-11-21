@@ -12,3 +12,4 @@ type Story = StoryObj<typeof PynTree>
 
 export const Root: Story = { args: { entries: rootEntries } }
 export const Empty: Story = { args: { entries: [] } }
+export const OnBranch: Story = { args: { entries: rootEntries, branch: 'feature/levels' } }

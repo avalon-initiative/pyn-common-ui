@@ -63,3 +63,31 @@ export const InvalidUserName: Story = {
 }
 
 export const WithPasskeys: Story = { args: { registration: 'open', passkeys: true } }
+
+const tick = () => new Promise((resolve) => setTimeout(resolve))
+
+function type(input: HTMLInputElement, value: string) {
+  input.value = value
+  input.dispatchEvent(new Event('input', { bubbles: true }))
+}
+
+async function register(root: HTMLElement, confirm: string) {
+  const create = [...root.querySelectorAll('button')].find(
+    (b) => b.textContent?.trim() === 'Create an account',
+  )
+  create!.click()
+  await tick()
+  const [, password, again] = root.querySelectorAll('input')
+  type(password, 'a long password')
+  type(again, confirm)
+  await tick()
+}
+
+export const RegisterMatching: Story = {
+  args: { registration: 'open' },
+  play: ({ canvasElement }) => register(canvasElement, 'a long password'),
+}
+export const RegisterMismatch: Story = {
+  args: { registration: 'open' },
+  play: ({ canvasElement }) => register(canvasElement, 'a long passw'),
+}

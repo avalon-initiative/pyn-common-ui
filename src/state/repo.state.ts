@@ -28,11 +28,24 @@ export const AUDIT_ACTIONS = [
 
 export const repoSlug = (r: { owner: string; name: string }) => `${r.owner}/${r.name}`
 
-/** The app route of a repository page; `section` is empty for the files page. */
-export function repoPath(r: { owner: string; name: string }, section = ''): string {
-  const base = `/${encodeURIComponent(r.owner)}/${encodeURIComponent(r.name)}`
-  return section ? `${base}/${section}` : base
+/** A URL with `branch` kept as a query parameter; none leaves it unchanged. */
+export function withBranch(url: string, branch?: string): string {
+  if (!branch) return url
+  return `${url}${url.includes('?') ? '&' : '?'}branch=${encodeURIComponent(branch)}`
 }
+
+/** The app route of a repository page; `section` is empty for the files page. */
+export function repoPath(
+  r: { owner: string; name: string },
+  section = '',
+  branch?: string,
+): string {
+  const base = `/${encodeURIComponent(r.owner)}/${encodeURIComponent(r.name)}`
+  return withBranch(section ? `${base}/${section}` : base, branch)
+}
+
+/** Tab sections whose pages show a branch. */
+export const BRANCH_SECTIONS: ReadonlySet<string> = new Set(['', 'history'])
 
 export interface RepoTab {
   section: string
