@@ -25,9 +25,11 @@ const props = defineProps<{
   readme?: ReadmeDoc | null
   me?: string
   now?: Date
+  /** Branch the links keep; omitted is the default branch. */
+  branch?: string
 }>()
 
-const crumbs = computed(() => breadcrumbs(props.repo, props.path))
+const crumbs = computed(() => breadcrumbs(props.repo, props.path, props.branch))
 </script>
 
 <template>
@@ -45,7 +47,7 @@ const crumbs = computed(() => breadcrumbs(props.repo, props.path))
         <p>
           There is no folder <code>/{{ path }}</code> in this repository.
         </p>
-        <a :href="treePath(repo, '')">Back to the top</a>
+        <a :href="treePath(repo, '', branch)">Back to the top</a>
       </div>
       <PynTree
         v-else-if="listing"
@@ -54,8 +56,15 @@ const crumbs = computed(() => breadcrumbs(props.repo, props.path))
         :name="repo.name"
         :me="me"
         :now="now"
+        :branch="branch"
       />
-      <PynReadme v-if="readme && !missing" :readme="readme" :owner="repo.owner" :name="repo.name" />
+      <PynReadme
+        v-if="readme && !missing"
+        :readme="readme"
+        :owner="repo.owner"
+        :name="repo.name"
+        :branch="branch"
+      />
       <PynCheckoutCard />
     </div>
     <aside v-if="summary" :class="styles.rail" aria-label="Repository summary">

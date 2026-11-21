@@ -34,3 +34,6 @@ export const Loading: Story = { args: { listing: null, summary: null } }
 export const WithReadme: Story = {
   args: { readme: { name: 'README.md', path: 'README.md', text: readmeText } },
 }
+export const OnBranch: Story = {
+  args: { branch: 'feature/levels', path: 'Content/Levels', listing: folderListing },
+}

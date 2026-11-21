@@ -9,10 +9,17 @@ const props = defineProps<{
   name: string
   /** Folder of the document, for resolving relative links and images. */
   dir?: string
+  /** Branch the links and images keep; omitted is the default branch. */
+  branch?: string
 }>()
 
 const html = computed(() =>
-  renderMarkdown(props.source, { owner: props.owner, name: props.name }, props.dir ?? ''),
+  renderMarkdown(
+    props.source,
+    { owner: props.owner, name: props.name },
+    props.dir ?? '',
+    props.branch,
+  ),
 )
 </script>
 

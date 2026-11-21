@@ -35,3 +35,10 @@ export const TooLarge: Story = { args: { body: { kind: 'large' } } }
 export const Empty: Story = { args: { body: { kind: 'empty' } } }
 export const Loading: Story = { args: { body: null } }
 export const Missing: Story = { args: { entry: null, missing: true, path: 'Source/gone.ts' } }
+export const OnBranch: Story = {
+  args: {
+    branch: 'feature/levels',
+    path: 'Source/Notes.md',
+    body: { kind: 'markdown', text: readmeText },
+  },
+}
