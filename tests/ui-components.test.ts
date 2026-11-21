@@ -2026,6 +2026,21 @@ describe('PynTeamGrant', () => {
 })
 
 describe('PynSignIn', () => {
+  it('starts with the initial username and never fills the password', async () => {
+    const w = mount(PynSignIn, { props: { registration: 'invite', initialUsername: 'lv' } })
+    expect((w.find('input').element as HTMLInputElement).value).toBe('lv')
+    expect((w.find('input[type="password"]').element as HTMLInputElement).value).toBe('')
+  })
+
+  it('takes a later initial username only while the field is untouched', async () => {
+    const w = mount(PynSignIn, { props: { registration: 'invite' } })
+    await w.setProps({ initialUsername: 'lv' })
+    expect((w.find('input').element as HTMLInputElement).value).toBe('lv')
+    await w.find('input').setValue('other')
+    await w.setProps({ initialUsername: 'again' })
+    expect((w.find('input').element as HTMLInputElement).value).toBe('other')
+  })
+
   it('emits the typed name and shows its validation message', async () => {
     const w = mount(PynSignIn, { props: { registration: 'open' } })
     const input = w.find('input')
