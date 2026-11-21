@@ -347,6 +347,28 @@ describe('PynAccountNotice', () => {
     expect(w.emitted('back')).toHaveLength(1)
   })
 
+  it.each([
+    [true, true, true],
+    [false, false, false],
+    [undefined, false, true],
+  ] as const)('notice emailVerification=%s', (emailVerification, guidance, link) => {
+    const w = mount(PynAccountNotice, {
+      props: { status: 'pending_verification', emailVerification },
+    })
+    expect(w.text().includes('Check your spam folder')).toBe(guidance)
+    expect(w.text().includes('Follow the link in the verification email')).toBe(link)
+    expect(w.text().includes('not active yet')).toBe(emailVerification === false)
+  })
+
+  it.each([
+    [true, true],
+    [false, false],
+    [undefined, false],
+  ] as const)('resend form emailVerification=%s', (emailVerification, guidance) => {
+    const w = mount(PynResendForm, { props: { emailVerification } })
+    expect(w.text().includes('Check your spam folder')).toBe(guidance)
+  })
+
   it('renders the resend form states', () => {
     const w = mount(PynResendForm, { props: { sent: true, error: 'Too many attempts.' } })
     expect(w.find('[role=status]').exists()).toBe(true)

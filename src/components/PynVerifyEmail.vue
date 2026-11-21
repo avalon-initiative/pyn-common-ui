@@ -11,6 +11,7 @@ defineProps<{
   resendError?: string
   busy?: boolean
   sent?: boolean
+  emailVerification?: boolean
 }>()
 const emit = defineEmits<{ resend: [string] }>()
 </script>
@@ -41,6 +42,7 @@ const emit = defineEmits<{ resend: [string] }>()
       <PynResendForm
         :busy="busy"
         :sent="sent"
+        :email-verification="emailVerification"
         :error="resendError"
         @resend="(email) => emit('resend', email)"
       />

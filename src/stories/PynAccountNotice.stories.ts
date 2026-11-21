@@ -10,6 +10,8 @@ export default meta
 type Story = StoryObj<typeof PynAccountNotice>
 
 export const PendingVerification: Story = {}
+export const PendingVerificationWithGuidance: Story = { args: { emailVerification: true } }
+export const VerificationNotRequired: Story = { args: { emailVerification: false } }
 export const Resent: Story = { args: { sent: true } }
 export const ResendRateLimited: Story = {
   args: { error: 'Too many attempts. Try again in 1 hour.' },
