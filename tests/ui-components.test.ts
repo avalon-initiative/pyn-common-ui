@@ -161,6 +161,7 @@ import {
   readmeEntry,
   renderMarkdown,
   repoSettingsNav,
+  repoPath,
   repoSettingsPath,
   repoShellTabs,
   repoTabs,
@@ -4809,5 +4810,90 @@ describe('copyText', () => {
     expect(document.activeElement).toBe(button)
     button.remove()
     vi.unstubAllGlobals()
+  })
+})
+
+describe('branch-aware links', () => {
+  const b = 'feature/levels'
+  const q = '?branch=feature%2Flevels'
+
+  it('keeps the branch in the helpers and leaves them unchanged without one', () => {
+    expect(treePath(r, 'a b', b)).toBe(`/acme/castle-quest/tree/a%20b${q}`)
+    expect(treePath(r, '', b)).toBe(`/acme/castle-quest${q}`)
+    expect(blobPath(r, 'a.ts', b)).toBe(`/acme/castle-quest/blob/a.ts${q}`)
+    expect(historyLink(r, 'a.ts', b)).toBe(
+      '/acme/castle-quest/history?path=a.ts&branch=feature%2Flevels',
+    )
+    expect(contentUrl(r, 'a.ts', 3, b)).toBe(
+      '/v1/repos/acme/castle-quest/content?path=a.ts&revision=3&branch=feature%2Flevels',
+    )
+    expect(contentUrl(r, 'a.ts')).toBe('/v1/repos/acme/castle-quest/content?path=a.ts')
+    expect(fileCrumbs(r, 'a/b.ts', b)[1].href).toBe(`/acme/castle-quest/tree/a${q}`)
+    expect(breadcrumbs(r, 'a/b', b)[0].href).toBe(`/acme/castle-quest${q}`)
+    expect(repoPath(r, 'history', b)).toBe(`/acme/castle-quest/history${q}`)
+  })
+
+  it('keeps the branch on tree rows, the file bar and the README', () => {
+    const tree = mount(PynTree, { props: { entries: rootEntries, ...r, now, branch: b } })
+    for (const a of tree.findAll('a'))
+      expect(a.attributes('href')).toContain('branch=feature%2Flevels')
+    const bar = mount(PynFileBar, { props: { entry: fileEntry, ...r, now, branch: b } })
+    for (const a of bar.findAll('a'))
+      expect(a.attributes('href')).toContain('branch=feature%2Flevels')
+    const readme = mount(PynReadme, {
+      props: {
+        readme: { name: 'README.md', path: 'README.md', text: '[a](docs/a.md)' },
+        ...r,
+        branch: b,
+      },
+    })
+    expect(readme.findAll('a').map((a) => a.attributes('href'))).toEqual([
+      `/acme/castle-quest/blob/README.md${q}`,
+      `/acme/castle-quest/blob/docs/a.md${q}`,
+    ])
+  })
+
+  it('keeps the branch in markdown links and images', () => {
+    const html = renderMarkdown('[a](x.md) ![i](p.png)', r, '', b)
+    expect(html).toContain(`href="/acme/castle-quest/blob/x.md${q}"`)
+    expect(html).toContain('branch=feature%2Flevels')
+    expect(renderMarkdown('[a](x.md)', r, '')).not.toContain('branch=')
+  })
+
+  it('keeps the branch in the repository nav on Code and History only', () => {
+    const tabs = [
+      { section: '', label: 'Code' },
+      { section: 'locks', label: 'Locks' },
+      { section: 'history', label: 'History' },
+    ]
+    const hrefs = (w: ReturnType<typeof mount>) => w.findAll('a').map((a) => a.attributes('href'))
+    const nav = mount(PynRepoNav, { props: { ...r, tabs, current: '', branch: b } })
+    expect(hrefs(nav)).toEqual([
+      `/acme/castle-quest${q}`,
+      '/acme/castle-quest/locks',
+      `/acme/castle-quest/history${q}`,
+    ])
+    const shell = mount(PynRepoShell, {
+      props: { ...r, visibility: 'private', tabs, current: '', branch: b },
+    })
+    expect(hrefs(shell)).toContain('/acme/castle-quest/locks')
+    expect(hrefs(shell)).toContain(`/acme/castle-quest/history${q}`)
+    expect(hrefs(mount(PynRepoNav, { props: { ...r, tabs, current: '' } }))[0]).toBe(
+      '/acme/castle-quest',
+    )
+  })
+
+  it('keeps the branch in the file view and landing links', () => {
+    const view = mount(PynFileView, {
+      props: { ...r, path: 'a/b.ts', entry: fileEntry, body: null, now, branch: b },
+    })
+    for (const a of view.findAll('a'))
+      expect(a.attributes('href')).toContain('branch=feature%2Flevels')
+    const gone = mount(PynFileView, { props: { ...r, path: 'a/b.ts', missing: true, branch: b } })
+    expect(gone.find('[role="alert"] a').attributes('href')).toBe(`/acme/castle-quest/tree/a${q}`)
+    const landing = mount(PynRepoLanding, {
+      props: { repo, path: 'x', listing: null, missing: true, branch: b },
+    })
+    expect(landing.find('[role="alert"] a').attributes('href')).toBe(`/acme/castle-quest${q}`)
   })
 })

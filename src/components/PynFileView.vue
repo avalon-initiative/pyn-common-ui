@@ -23,6 +23,8 @@ defineProps<{
   now?: Date
   /** Highlighted line range of a code file. */
   lines?: LineRange | null
+  /** Branch the links keep; omitted is the default branch. */
+  branch?: string
 }>()
 
 defineEmits<{ selectLines: [range: LineRange] }>()
@@ -30,18 +32,24 @@ defineEmits<{ selectLines: [range: LineRange] }>()
 
 <template>
   <div :class="styles.view">
-    <PynBreadcrumb :crumbs="fileCrumbs({ owner, name }, path)" />
+    <PynBreadcrumb :crumbs="fileCrumbs({ owner, name }, path, branch)" />
     <div v-if="missing" :class="styles.notice" role="alert">
       <p>
         There is no file <code>/{{ path }}</code> in this repository.
       </p>
-      <a :href="treePath({ owner, name }, parentOf(path))">Back to the folder</a>
+      <a :href="treePath({ owner, name }, parentOf(path), branch)">Back to the folder</a>
     </div>
     <template v-else-if="entry">
-      <PynFileBar :entry="entry" :owner="owner" :name="name" :me="me" :now="now" />
+      <PynFileBar :entry="entry" :owner="owner" :name="name" :me="me" :now="now" :branch="branch" />
       <p v-if="!body" :class="styles.notice">Loading...</p>
       <div v-else-if="body.kind === 'markdown'" :class="styles.panel">
-        <PynMarkdown :source="body.text" :owner="owner" :name="name" :dir="parentOf(path)" />
+        <PynMarkdown
+          :source="body.text"
+          :owner="owner"
+          :name="name"
+          :dir="parentOf(path)"
+          :branch="branch"
+        />
       </div>
       <PynCodeView
         v-else-if="body.kind === 'code'"

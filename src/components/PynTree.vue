@@ -17,6 +17,8 @@ defineProps<{
   name: string
   me?: string
   now?: Date
+  /** Branch the row links keep; omitted is the default branch. */
+  branch?: string
 }>()
 </script>
 
@@ -33,7 +35,7 @@ defineProps<{
       <tr v-for="e in entries" :key="e.path" :class="styles.row" :data-kind="e.kind">
         <td :class="styles.name">
           <PynIcon :name="e.kind" :class="styles.icon" />
-          <a :href="(e.kind === 'folder' ? treePath : blobPath)({ owner, name }, e.path)">{{
+          <a :href="(e.kind === 'folder' ? treePath : blobPath)({ owner, name }, e.path, branch)">{{
             e.name
           }}</a>
         </td>
