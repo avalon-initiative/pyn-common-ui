@@ -40,6 +40,7 @@ const emit = defineEmits<{
 }>()
 
 const nameMessageId = useId()
+const confirmMessageId = useId()
 
 type View = 'sign-in' | 'register'
 const view = ref<View>('sign-in')
@@ -56,15 +57,19 @@ watch(
   },
 )
 const password = ref('')
+const confirm = ref('')
 const invite = ref('')
 const email = ref('')
 
 const canRegister = computed(() => props.registration === 'open' || props.registration === 'invite')
 const needsEmail = computed(() => props.registration === 'open' && !!props.emailVerification)
 const needsInvite = computed(() => props.registration === 'invite')
+const mismatch = computed(() => view.value === 'register' && password.value !== confirm.value)
+const showMismatch = computed(() => mismatch.value && confirm.value !== '')
 const title = computed(() => ({ 'sign-in': 'Sign in', register: 'Create an account' })[view.value])
 
 function submit() {
+  if (mismatch.value) return
   if (view.value === 'sign-in')
     emit('signIn', { username: username.value, password: password.value })
   else {
@@ -118,6 +123,21 @@ function submit() {
           required
         />
       </label>
+      <label v-if="view === 'register'" :class="styles.field"
+        >Confirm password
+        <input
+          v-model="confirm"
+          :class="styles.input"
+          type="password"
+          autocomplete="new-password"
+          required
+          :aria-describedby="showMismatch ? confirmMessageId : undefined"
+          :aria-invalid="showMismatch ? 'true' : undefined"
+        />
+        <span v-if="showMismatch" :id="confirmMessageId" :class="styles.message" role="alert"
+          >The passwords do not match.</span
+        >
+      </label>
       <label v-if="view === 'register' && needsEmail" :class="styles.field"
         >Email address
         <input
@@ -136,7 +156,7 @@ function submit() {
 
     <p v-if="shownError" :class="styles.error" role="alert">{{ shownError }}</p>
 
-    <button v-if="showForm" type="submit" :class="styles.primary" :disabled="busy">
+    <button v-if="showForm" type="submit" :class="styles.primary" :disabled="busy || mismatch">
       {{ title }}
     </button>
 
