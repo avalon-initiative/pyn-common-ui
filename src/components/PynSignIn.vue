@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 import styles from '../styles/PynSignIn.module.scss'
 import PynAccountNotice from './PynAccountNotice.vue'
 import { externalSignInUrl, signInErrorMessage } from '../state/account.state'
@@ -25,6 +25,7 @@ const props = withDefaults(
     busy?: boolean
     error?: string
     nameMessage?: string
+    initialUsername?: string
   }>(),
   { passwordSignIn: true },
 )
@@ -47,7 +48,13 @@ const showForm = computed(() => props.passwordSignIn || adminForm.value)
 const shownError = computed(
   () => props.error || (props.callbackError ? signInErrorMessage(props.callbackError) : ''),
 )
-const username = ref('')
+const username = ref(props.initialUsername ?? '')
+watch(
+  () => props.initialUsername,
+  (name) => {
+    if (name && !username.value) username.value = name
+  },
+)
 const password = ref('')
 const invite = ref('')
 const email = ref('')

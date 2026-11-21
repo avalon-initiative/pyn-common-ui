@@ -12,6 +12,7 @@ type Story = StoryObj<typeof PynSignIn>
 export const InviteOnlyServer: Story = {}
 export const OpenServer: Story = { args: { registration: 'open' } }
 export const ClosedServer: Story = { args: { registration: 'closed' } }
+export const AfterSetup: Story = { args: { registration: 'invite', initialUsername: 'lv' } }
 export const WrongPassword: Story = {
   args: { error: 'authentication failed: wrong user name or password' },
 }
