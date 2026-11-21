@@ -1,6 +1,7 @@
 // Component render tests for every exported component. Run with `make test`.
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
+import { copyText } from '../src/utils/copy'
 import {
   PynAccountDelete,
   PynAccountNotice,
@@ -16,6 +17,7 @@ import {
   PynAddPerson,
   PynAudit,
   PynBranchBar,
+  PynBranchPicker,
   PynBreadcrumb,
   PynButton,
   PynCheckoutCard,
@@ -608,6 +610,130 @@ describe('PynBranchBar', () => {
     expect(formatAgo(at(2 * 3_600_000), now)).toBe('2 hours ago')
     expect(formatAgo(at(3 * 86_400_000), now)).toBe('3 days ago')
     expect(formatAgo(at(90 * 86_400_000), now)).toBe('Jul 10 2026')
+  })
+})
+
+describe('PynBranchPicker', () => {
+  const branches = [
+    { name: 'main', isDefault: true, updatedAt: '2026-10-08T10:00:00Z' },
+    { name: 'feature/art', updatedAt: null },
+    { name: 'release/1.0' },
+  ]
+  const mountPicker = (props: Record<string, unknown> = {}) =>
+    mount(PynBranchPicker, {
+      props: { branches, current: 'main', now, ...props },
+      attachTo: document.body,
+    })
+  const open = async (w: ReturnType<typeof mountPicker>) => {
+    await w.find('button').trigger('click')
+    await flushPromises()
+  }
+
+  it('shows the current branch and keeps the list closed', () => {
+    const w = mountPicker()
+    expect(w.find('button').text()).toContain('main')
+    expect(w.find('button').attributes('aria-expanded')).toBe('false')
+    expect(w.find('[role=listbox]').exists()).toBe(false)
+    w.unmount()
+  })
+
+  it('opens a listbox with combobox wiring, marks the default and the current branch', async () => {
+    const w = mountPicker()
+    await open(w)
+    const box = w.find('[role=combobox]')
+    const list = w.find('[role=listbox]')
+    expect(w.find('button').attributes('aria-expanded')).toBe('true')
+    expect(box.attributes('aria-controls')).toBe(list.attributes('id'))
+    expect(box.attributes('aria-activedescendant')).toBe(w.find('[role=option]').attributes('id'))
+    expect(document.activeElement).toBe(box.element)
+    const options = w.findAll('[role=option]')
+    expect(options).toHaveLength(3)
+    expect(options[0].text()).toContain('default')
+    expect(options[0].text()).toContain('2 hours ago')
+    expect(options[0].attributes('aria-selected')).toBe('true')
+    expect(options[1].attributes('aria-selected')).toBe('false')
+    w.unmount()
+  })
+
+  it('filters by the search text and reports no matches', async () => {
+    const w = mountPicker()
+    await open(w)
+    await w.find('[role=combobox]').setValue('REL')
+    expect(w.findAll('[role=option]').map((o) => o.text())).toEqual(['release/1.0'])
+    await w.find('[role=combobox]').setValue('zzz')
+    expect(w.findAll('[role=option]')).toHaveLength(0)
+    expect(w.find('[role=status]').text()).toBe('No matching branches')
+    w.unmount()
+  })
+
+  it('selects with arrow keys and Enter, then closes with focus on the button', async () => {
+    const w = mountPicker()
+    await open(w)
+    const box = w.find('[role=combobox]')
+    await box.trigger('keydown', { key: 'ArrowDown' })
+    await box.trigger('keydown', { key: 'ArrowDown' })
+    await box.trigger('keydown', { key: 'ArrowUp' })
+    await box.trigger('keydown', { key: 'Enter' })
+    expect(w.emitted('select')).toEqual([['feature/art']])
+    expect(w.find('[role=listbox]').exists()).toBe(false)
+    expect(document.activeElement).toBe(w.find('button').element)
+    w.unmount()
+  })
+
+  it('selects by click', async () => {
+    const w = mountPicker()
+    await open(w)
+    await w.findAll('[role=option]')[2].trigger('click')
+    expect(w.emitted('select')).toEqual([['release/1.0']])
+    w.unmount()
+  })
+
+  it('closes on Escape and returns focus to the button without selecting', async () => {
+    const w = mountPicker()
+    await open(w)
+    await w.find('[role=combobox]').trigger('keydown', { key: 'Escape' })
+    expect(w.find('[role=listbox]').exists()).toBe(false)
+    expect(document.activeElement).toBe(w.find('button').element)
+    expect(w.emitted('select')).toBeUndefined()
+    w.unmount()
+  })
+
+  it('opens from the button with the down arrow', async () => {
+    const w = mountPicker()
+    await w.find('button').trigger('keydown', { key: 'ArrowDown' })
+    await flushPromises()
+    expect(w.find('[role=listbox]').exists()).toBe(true)
+    w.unmount()
+  })
+
+  it('shows loading and error states without a list or selection', async () => {
+    const w = mountPicker({ loading: true })
+    await open(w)
+    expect(w.find('[role=status]').text()).toContain('Loading')
+    expect(w.find('[role=listbox]').exists()).toBe(false)
+    await w.find('[role=combobox]').trigger('keydown', { key: 'Enter' })
+    expect(w.emitted('select')).toBeUndefined()
+    await w.setProps({ loading: false, error: 'Could not load branches.' })
+    expect(w.find('[role=alert]').text()).toBe('Could not load branches.')
+    w.unmount()
+  })
+
+  it('says so when only the default branch exists', async () => {
+    const w = mountPicker({ branches: [{ name: 'main', isDefault: true }] })
+    await open(w)
+    expect(w.text()).toContain('Only the default branch exists')
+    w.unmount()
+  })
+
+  it('composes with the static branch bar', () => {
+    const w = mount({
+      components: { PynBranchBar, PynBranchPicker },
+      template:
+        '<div><PynBranchPicker :branches="b" current="main" /><PynBranchBar branch="main" :files="3" /></div>',
+      data: () => ({ b: branches }),
+    })
+    expect(w.text()).toContain('3 files')
+    expect(w.findComponent(PynBranchPicker).exists()).toBe(true)
   })
 })
 
@@ -2903,6 +3029,7 @@ describe('PynSetup', () => {
     const [user, pass] = w.findAll('input')
     await user.setValue('root')
     await pass.setValue('pw')
+    await w.findAll('input')[2].setValue('pw')
     await next(w)
     await w.find('input').setValue('Studio')
     await next(w)
@@ -2923,6 +3050,32 @@ describe('PynSetup', () => {
         registration: 'invite',
       },
     ])
+  })
+
+  it('asks for the password twice and blocks continuing until they match', async () => {
+    const w = mount(PynSetup, { props: { registration: 'closed' } })
+    await next(w)
+    await w.find('input').setValue('tok')
+    await next(w)
+    const [user, pass, confirm] = w.findAll('input')
+    expect(pass.attributes('autocomplete')).toBe('new-password')
+    expect(confirm.attributes('autocomplete')).toBe('new-password')
+    await user.setValue('root')
+    await pass.setValue('secret')
+    expect(w.find('[role=alert]').exists()).toBe(false)
+    expect(w.find('button[type=submit]').attributes('disabled')).toBeDefined()
+    await confirm.setValue('secrex')
+    const msg = w.find('[role=alert]')
+    expect(msg.text()).toBe('The passwords do not match.')
+    expect(confirm.attributes('aria-invalid')).toBe('true')
+    expect(confirm.attributes('aria-describedby')).toBe(msg.attributes('id'))
+    await next(w)
+    expect(w.text()).toContain('Step 3 of 6')
+    await confirm.setValue('secret')
+    expect(w.find('[role=alert]').exists()).toBe(false)
+    expect(w.find('button[type=submit]').attributes('disabled')).toBeUndefined()
+    await next(w)
+    expect(w.text()).toContain('Step 4 of 6')
   })
 
   it('stays on the token step until one is entered', async () => {
@@ -4214,10 +4367,51 @@ describe('PynTotpEnrolment', () => {
     uri: 'otpauth://totp/Pyn:a?secret=JBSWY3DPEHPK3PXP',
   }
 
-  it('shows the QR code and the grouped manual key', () => {
+  const copyButton = (w: ReturnType<typeof mount>) =>
+    w.findAll('button').find((b) => b.text() === 'Copy key')!
+
+  it('shows the QR code and hides the key text by default', () => {
     const w = mount(PynTotpEnrolment, { props: { enrolment } })
     expect(w.find('svg').exists()).toBe(true)
-    expect(w.text()).toContain('JBSW Y3DP EHPK 3PXP')
+    expect(w.text()).not.toContain('JBSW')
+    expect(w.find('code').exists()).toBe(false)
+  })
+
+  it('copies the key with the clipboard API and keeps it hidden', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    const w = mount(PynTotpEnrolment, { props: { enrolment } })
+    await copyButton(w).trigger('click')
+    await flushPromises()
+    expect(writeText).toHaveBeenCalledWith('JBSWY3DPEHPK3PXP')
+    expect(w.text()).toContain('Copied')
+    expect(w.find('code').exists()).toBe(false)
+    vi.unstubAllGlobals()
+  })
+
+  it('falls back to execCommand when the clipboard API is missing', async () => {
+    vi.stubGlobal('navigator', {})
+    const exec = vi.fn().mockReturnValue(true)
+    document.execCommand = exec
+    const w = mount(PynTotpEnrolment, { props: { enrolment } })
+    await copyButton(w).trigger('click')
+    await flushPromises()
+    expect(exec).toHaveBeenCalledWith('copy')
+    expect(w.text()).toContain('Copied')
+    expect(w.find('code').exists()).toBe(false)
+    expect(document.querySelector('textarea')).toBeNull()
+    vi.unstubAllGlobals()
+  })
+
+  it('reveals the key and says so when copying fails', async () => {
+    vi.stubGlobal('navigator', {})
+    document.execCommand = vi.fn().mockReturnValue(false)
+    const w = mount(PynTotpEnrolment, { props: { enrolment } })
+    await copyButton(w).trigger('click')
+    await flushPromises()
+    expect(w.find('[role="status"]').text()).toContain('Could not copy')
+    expect(w.find('code').text()).toBe('JBSW Y3DP EHPK 3PXP')
+    vi.unstubAllGlobals()
   })
 
   it('emits the code without spaces, and cancel', async () => {
@@ -4260,6 +4454,19 @@ describe('PynRecoveryCodes', () => {
       .find((b) => b.text() === 'Copy')!
       .trigger('click')
     expect(writeText).toHaveBeenCalledWith('aaaa-bbbb\ncccc-dddd')
+    vi.unstubAllGlobals()
+  })
+
+  it('shows Could not copy when both copy paths fail', async () => {
+    vi.stubGlobal('navigator', {})
+    document.execCommand = vi.fn().mockReturnValue(false)
+    const w = mount(PynRecoveryCodes, { props: { codes } })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Copy')!
+      .trigger('click')
+    await flushPromises()
+    expect(w.text()).toContain('Could not copy')
     vi.unstubAllGlobals()
   })
 
@@ -4558,5 +4765,49 @@ describe('PynOrgSettings', () => {
     const w = mount(PynOrgSettings, { props: { settings: {}, readonly: true } })
     await w.find('form').trigger('submit')
     expect(w.emitted('save')).toBeUndefined()
+  })
+})
+
+describe('PynSecretReveal copy', () => {
+  const copy = (w: ReturnType<typeof mount>) =>
+    w
+      .findAll('button')
+      .find((b) => b.text() === 'Copy')!
+      .trigger('click')
+
+  it('uses the execCommand fallback without the clipboard API', async () => {
+    vi.stubGlobal('navigator', {})
+    const exec = vi.fn().mockReturnValue(true)
+    document.execCommand = exec
+    const w = mount(PynSecretReveal, { props: { secret: 'whsec_x' } })
+    await copy(w)
+    await flushPromises()
+    expect(exec).toHaveBeenCalledWith('copy')
+    expect(w.text()).toContain('Copied')
+    vi.unstubAllGlobals()
+  })
+
+  it('shows Could not copy when both paths fail', async () => {
+    vi.stubGlobal('navigator', {})
+    document.execCommand = vi.fn().mockReturnValue(false)
+    const w = mount(PynSecretReveal, { props: { secret: 'whsec_x' } })
+    await copy(w)
+    await flushPromises()
+    expect(w.text()).toContain('Could not copy')
+    vi.unstubAllGlobals()
+  })
+})
+
+describe('copyText', () => {
+  it('restores focus after the fallback copy', async () => {
+    vi.stubGlobal('navigator', {})
+    document.execCommand = vi.fn().mockReturnValue(true)
+    const button = document.createElement('button')
+    document.body.appendChild(button)
+    button.focus()
+    expect(await copyText('x')).toBe(true)
+    expect(document.activeElement).toBe(button)
+    button.remove()
+    vi.unstubAllGlobals()
   })
 })

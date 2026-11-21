@@ -42,3 +42,7 @@
 .primary {
   @include m.button-primary;
 }
+
+.error {
+  @include m.error;
+}
