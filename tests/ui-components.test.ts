@@ -2199,8 +2199,8 @@ describe('PynSignIn', () => {
   it('offers an invitation field on invite-only servers and not on open ones', async () => {
     const invite = mount(PynSignIn, { props: { registration: 'invite' } })
     await click(invite, 'I have an invitation')
-    expect(invite.findAll('input')).toHaveLength(3)
-    await fill(invite, ['wendy', 'a long password', 'pyni_x'])
+    expect(invite.findAll('input')).toHaveLength(4)
+    await fill(invite, ['wendy', 'a long password', 'a long password', 'pyni_x'])
     await invite.find('form').trigger('submit')
     expect(invite.emitted('register')?.[0]).toEqual([
       { username: 'wendy', password: 'a long password', invite: 'pyni_x' },
@@ -2208,7 +2208,39 @@ describe('PynSignIn', () => {
 
     const open = mount(PynSignIn, { props: { registration: 'open' } })
     await click(open, 'Create an account')
-    expect(open.findAll('input')).toHaveLength(2)
+    expect(open.findAll('input')).toHaveLength(3)
+  })
+
+  it('has no confirm field when signing in', () => {
+    const w = mount(PynSignIn, { props: { registration: 'open' } })
+    expect(w.text()).not.toContain('Confirm password')
+    expect(w.findAll('input[type="password"]')).toHaveLength(1)
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeUndefined()
+  })
+
+  it('blocks registering while the passwords differ and says so', async () => {
+    const w = mount(PynSignIn, { props: { registration: 'open' } })
+    await click(w, 'Create an account')
+    const [user, pw, again] = w.findAll('input')
+    expect(pw.attributes('autocomplete')).toBe('new-password')
+    expect(again.attributes('autocomplete')).toBe('new-password')
+    await user.setValue('wendy')
+    await pw.setValue('a long password')
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeDefined()
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+    await again.setValue('a long passw')
+    expect(again.attributes('aria-invalid')).toBe('true')
+    const alert = w.find('[role="alert"]')
+    expect(alert.text()).toBe('The passwords do not match.')
+    expect(again.attributes('aria-describedby')).toBe(alert.attributes('id'))
+    await w.find('form').trigger('submit')
+    expect(w.emitted('register')).toBeUndefined()
+    await again.setValue('a long password')
+    expect(again.attributes('aria-invalid')).toBeUndefined()
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeUndefined()
+    await w.find('form').trigger('submit')
+    expect(w.emitted('register')?.[0]).toEqual([{ username: 'wendy', password: 'a long password' }])
   })
 
   it('hides registration on closed servers and offers no token entry', () => {
@@ -2231,8 +2263,8 @@ describe('PynSignIn', () => {
       props: { registration: 'open', emailVerification: true },
     })
     await click(w, 'Create an account')
-    expect(w.findAll('input')).toHaveLength(3)
-    await fill(w, ['wendy', 'a long password', 'w@example.com'])
+    expect(w.findAll('input')).toHaveLength(4)
+    await fill(w, ['wendy', 'a long password', 'a long password', 'w@example.com'])
     await w.find('form').trigger('submit')
     expect(w.emitted('register')?.[0]).toEqual([
       {
