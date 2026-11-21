@@ -1,6 +1,7 @@
 // Component render tests for every exported component. Run with `make test`.
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
+import { copyText } from '../src/utils/copy'
 import {
   PynAccountDelete,
   PynAccountNotice,
@@ -4199,10 +4200,51 @@ describe('PynTotpEnrolment', () => {
     uri: 'otpauth://totp/Pyn:a?secret=JBSWY3DPEHPK3PXP',
   }
 
-  it('shows the QR code and the grouped manual key', () => {
+  const copyButton = (w: ReturnType<typeof mount>) =>
+    w.findAll('button').find((b) => b.text() === 'Copy key')!
+
+  it('shows the QR code and hides the key text by default', () => {
     const w = mount(PynTotpEnrolment, { props: { enrolment } })
     expect(w.find('svg').exists()).toBe(true)
-    expect(w.text()).toContain('JBSW Y3DP EHPK 3PXP')
+    expect(w.text()).not.toContain('JBSW')
+    expect(w.find('code').exists()).toBe(false)
+  })
+
+  it('copies the key with the clipboard API and keeps it hidden', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    const w = mount(PynTotpEnrolment, { props: { enrolment } })
+    await copyButton(w).trigger('click')
+    await flushPromises()
+    expect(writeText).toHaveBeenCalledWith('JBSWY3DPEHPK3PXP')
+    expect(w.text()).toContain('Copied')
+    expect(w.find('code').exists()).toBe(false)
+    vi.unstubAllGlobals()
+  })
+
+  it('falls back to execCommand when the clipboard API is missing', async () => {
+    vi.stubGlobal('navigator', {})
+    const exec = vi.fn().mockReturnValue(true)
+    document.execCommand = exec
+    const w = mount(PynTotpEnrolment, { props: { enrolment } })
+    await copyButton(w).trigger('click')
+    await flushPromises()
+    expect(exec).toHaveBeenCalledWith('copy')
+    expect(w.text()).toContain('Copied')
+    expect(w.find('code').exists()).toBe(false)
+    expect(document.querySelector('textarea')).toBeNull()
+    vi.unstubAllGlobals()
+  })
+
+  it('reveals the key and says so when copying fails', async () => {
+    vi.stubGlobal('navigator', {})
+    document.execCommand = vi.fn().mockReturnValue(false)
+    const w = mount(PynTotpEnrolment, { props: { enrolment } })
+    await copyButton(w).trigger('click')
+    await flushPromises()
+    expect(w.find('[role="status"]').text()).toContain('Could not copy')
+    expect(w.find('code').text()).toBe('JBSW Y3DP EHPK 3PXP')
+    vi.unstubAllGlobals()
   })
 
   it('emits the code without spaces, and cancel', async () => {
@@ -4245,6 +4287,19 @@ describe('PynRecoveryCodes', () => {
       .find((b) => b.text() === 'Copy')!
       .trigger('click')
     expect(writeText).toHaveBeenCalledWith('aaaa-bbbb\ncccc-dddd')
+    vi.unstubAllGlobals()
+  })
+
+  it('shows Could not copy when both copy paths fail', async () => {
+    vi.stubGlobal('navigator', {})
+    document.execCommand = vi.fn().mockReturnValue(false)
+    const w = mount(PynRecoveryCodes, { props: { codes } })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Copy')!
+      .trigger('click')
+    await flushPromises()
+    expect(w.text()).toContain('Could not copy')
     vi.unstubAllGlobals()
   })
 
@@ -4543,5 +4598,49 @@ describe('PynOrgSettings', () => {
     const w = mount(PynOrgSettings, { props: { settings: {}, readonly: true } })
     await w.find('form').trigger('submit')
     expect(w.emitted('save')).toBeUndefined()
+  })
+})
+
+describe('PynSecretReveal copy', () => {
+  const copy = (w: ReturnType<typeof mount>) =>
+    w
+      .findAll('button')
+      .find((b) => b.text() === 'Copy')!
+      .trigger('click')
+
+  it('uses the execCommand fallback without the clipboard API', async () => {
+    vi.stubGlobal('navigator', {})
+    const exec = vi.fn().mockReturnValue(true)
+    document.execCommand = exec
+    const w = mount(PynSecretReveal, { props: { secret: 'whsec_x' } })
+    await copy(w)
+    await flushPromises()
+    expect(exec).toHaveBeenCalledWith('copy')
+    expect(w.text()).toContain('Copied')
+    vi.unstubAllGlobals()
+  })
+
+  it('shows Could not copy when both paths fail', async () => {
+    vi.stubGlobal('navigator', {})
+    document.execCommand = vi.fn().mockReturnValue(false)
+    const w = mount(PynSecretReveal, { props: { secret: 'whsec_x' } })
+    await copy(w)
+    await flushPromises()
+    expect(w.text()).toContain('Could not copy')
+    vi.unstubAllGlobals()
+  })
+})
+
+describe('copyText', () => {
+  it('restores focus after the fallback copy', async () => {
+    vi.stubGlobal('navigator', {})
+    document.execCommand = vi.fn().mockReturnValue(true)
+    const button = document.createElement('button')
+    document.body.appendChild(button)
+    button.focus()
+    expect(await copyText('x')).toBe(true)
+    expect(document.activeElement).toBe(button)
+    button.remove()
+    vi.unstubAllGlobals()
   })
 })
