@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynAccounts from '../components/PynAccounts.vue'
-import { accounts, adminAccounts } from './admin-data'
+import { accounts, adminAccounts, pendingAccounts } from './admin-data'
 
 const meta: Meta<typeof PynAccounts> = {
   title: 'Admin/PynAccounts',
@@ -26,3 +26,7 @@ export const LastAdministrator: Story = {
   args: { accounts: adminAccounts, canRevokeAdmin: false },
 }
 export const Busy: Story = { args: { accounts: adminAccounts, busy: true } }
+export const PendingConfirmation: Story = { args: { accounts: pendingAccounts } }
+export const ResendingConfirmation: Story = {
+  args: { accounts: pendingAccounts, resendingUser: 'carol' },
+}

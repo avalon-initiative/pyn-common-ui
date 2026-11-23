@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import PynDrawer from '../components/PynDrawer.vue'
 import PynWebhookForm from '../components/PynWebhookForm.vue'
 import PynWebhooks from '../components/PynWebhooks.vue'
-import { webhooks } from './webhook-data'
+import { eventTypeOptions, webhooks } from './webhook-data'
 
 const meta: Meta<typeof PynWebhookForm> = {
   title: 'Repository/PynWebhookForm',
@@ -13,6 +13,11 @@ export default meta
 type Story = StoryObj<typeof PynWebhookForm>
 
 export const Default: Story = {}
+export const WithEventTypes: Story = { args: { eventTypeOptions } }
+export const EventTypesLoading: Story = { args: { eventTypesLoading: true } }
+export const EventTypesFailed: Story = {
+  args: { eventTypeOptions, eventTypesError: 'Could not load the event types.' },
+}
 export const Busy: Story = { args: { busy: true } }
 export const Failed: Story = {
   args: { error: 'url must use https (this server does not allow http)' },

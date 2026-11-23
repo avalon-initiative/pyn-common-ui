@@ -2,14 +2,11 @@
 import { nextTick, ref, useId, watch } from 'vue'
 import styles from '../styles/PynWebhookDetail.module.scss'
 import { formatDateTime } from '../utils/datetime'
-import {
-  eventTypesLabel,
-  eventTypesText,
-  isRotating,
-  parseEventTypes,
-} from '../state/webhook.state'
+import { eventTypesLabel, isRotating } from '../state/webhook.state'
+import PynEventTypesField from './PynEventTypesField.vue'
 import PynSecretReveal from './PynSecretReveal.vue'
 import PynWebhookDeliveries from './PynWebhookDeliveries.vue'
+import type { MultiSelectOption } from '../types/multi-select.types'
 import type {
   WebhookConfirm,
   WebhookDelivery,
@@ -30,6 +27,10 @@ const props = defineProps<{
   deliveriesError?: string
   canRedeliver?: boolean
   redeliveringId?: string
+  /** The server's event types; without it the edit form takes types as text. */
+  eventTypeOptions?: MultiSelectOption[]
+  eventTypesLoading?: boolean
+  eventTypesError?: string
 }>()
 const emit = defineEmits<{
   update: [WebhookUpdate]
@@ -46,7 +47,7 @@ const idPrefix = useId()
 const editing = ref(false)
 const name = ref('')
 const url = ref('')
-const events = ref('')
+const events = ref<string[]>([])
 const confirming = ref<WebhookConfirm>()
 const cancelButton = ref<HTMLButtonElement>()
 const editButton = ref<HTMLButtonElement>()
@@ -64,7 +65,7 @@ watch(
 async function edit() {
   name.value = props.webhook.name
   url.value = props.webhook.url
-  events.value = eventTypesText(props.webhook.event_types)
+  events.value = [...props.webhook.event_types]
   editing.value = true
   await nextTick()
   nameInput.value?.focus()
@@ -80,7 +81,7 @@ async function save() {
   emit('update', {
     name: name.value.trim(),
     url: url.value.trim(),
-    event_types: parseEventTypes(events.value),
+    event_types: events.value,
   })
   await stopEditing()
 }
@@ -163,12 +164,17 @@ async function confirm() {
           >URL
           <input v-model="url" type="url" :class="styles.input" required />
         </label>
-        <label :class="styles.field"
-          >Event types (one per line, empty for all)
-          <textarea v-model="events" :class="styles.input" rows="3" />
-        </label>
+        <PynEventTypesField
+          v-model="events"
+          :options="eventTypeOptions"
+          :loading="eventTypesLoading"
+          :error="eventTypesError"
+          :stored="webhook.event_types"
+        />
         <div :class="styles.actions">
-          <button type="submit" :class="styles.primary" :disabled="busy">Save</button>
+          <button type="submit" :class="styles.primary" :disabled="busy || eventTypesLoading">
+            Save
+          </button>
           <button type="button" :class="styles.button" @click="stopEditing">Cancel</button>
         </div>
       </form>

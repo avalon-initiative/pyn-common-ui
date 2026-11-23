@@ -24,6 +24,8 @@ withDefaults(
     busy?: boolean
     error?: string
     canRevokeAdmin?: boolean
+    /** The user whose confirmation link is being resent. */
+    resendingUser?: string
   }>(),
   { canRevokeAdmin: true },
 )
@@ -36,6 +38,7 @@ const emit = defineEmits<{
   grantAdmin: [user: string]
   revokeAdmin: [user: string]
   reset: [user: string]
+  resendConfirmation: [user: string]
 }>()
 
 const confirming = ref('')
@@ -93,6 +96,11 @@ const pick = (e: Event) =>
             <strong>{{ a.user }}</strong>
             <span v-if="a.admin" :class="styles.pill">admin</span>
             <span :class="styles.pill" :data-status="a.status">{{ statusLabel(a.status) }}</span>
+            <span
+              v-if="a.pending_verification && a.status !== 'pending_verification'"
+              :class="styles.pill"
+              >Awaiting confirmation</span
+            >
           </span>
           <span :class="styles.meta"
             >{{ a.email ?? 'No email'
@@ -184,6 +192,16 @@ const pick = (e: Event) =>
             @click="emit('revokeAdmin', a.user)"
           >
             Remove administrator
+          </button>
+          <button
+            v-if="a.pending_verification"
+            type="button"
+            :class="styles.quiet"
+            :disabled="busy || !!resendingUser"
+            :aria-label="`Resend confirmation to ${a.user}`"
+            @click="emit('resendConfirmation', a.user)"
+          >
+            {{ resendingUser === a.user ? 'Sending…' : 'Resend confirmation' }}
           </button>
           <button
             v-if="a.user !== self"

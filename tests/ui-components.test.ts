@@ -13,6 +13,11 @@ import {
   PynAdminLayout,
   PynPasswordForm,
   PynAccounts,
+  PynAddAccount,
+  PynEmailStatus,
+  PynMultiSelect,
+  PynEmptyState,
+  PynServerInvitations,
   PynActivity,
   PynAddPerson,
   PynAudit,
@@ -177,9 +182,11 @@ import {
   teamPath,
   treePath,
   ungrantedTeams,
+  validExpiry,
 } from '../src'
 import type { SetupForm } from '../src'
 import { accounts, adminAccounts } from '../src/stories/admin-data'
+import { invitations, roles, targets } from '../src/stories/server-invitation-data'
 import { emptyStatus, notices, status as twoFactorStatus } from '../src/stories/two-factor-data'
 import { codeText, fileEntry, imageSrc, lockedEntry, readmeText } from '../src/stories/file-data'
 import {
@@ -5125,5 +5132,315 @@ describe('PynPageNotFound links', () => {
     })
     expect(w.findAll('a').map((a) => a.attributes('href'))).toEqual(['/', '/explore'])
     expect(w.text()).not.toContain('Orphan')
+  })
+})
+
+describe('PynWebhookForm event types', () => {
+  const options = [
+    { value: 'lock.acquired', label: 'lock.acquired', description: 'A lock was taken.' },
+    { value: 'checkin.created', label: 'checkin.created' },
+  ]
+  const fillBasics = async (w: ReturnType<typeof mount>) => {
+    await w.find('input').setValue('CI')
+    await w.find('input[type="url"]').setValue('https://hooks.example.com/ci')
+  }
+
+  it('keeps the textarea without options', () => {
+    const w = mount(PynWebhookForm)
+    expect(w.find('textarea').exists()).toBe(true)
+    expect(w.findComponent(PynMultiSelect).exists()).toBe(false)
+  })
+
+  it('picks from the options, labels the control and emits the chosen array', async () => {
+    const w = mount(PynWebhookForm, {
+      props: { eventTypeOptions: options },
+      attachTo: document.body,
+    })
+    expect(w.find('textarea').exists()).toBe(false)
+    const select = w.findComponent(PynMultiSelect)
+    const trigger = select.find('[role="combobox"]')
+    const label = select.find('label')
+    expect(label.attributes('for')).toBe(trigger.attributes('id'))
+    expect(select.text()).toContain('None chosen: all events')
+    await trigger.trigger('click')
+    await select.findAll('[role="option"]')[1].trigger('click')
+    await fillBasics(w)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')![0][0]).toMatchObject({ event_types: ['checkin.created'] })
+    w.unmount()
+  })
+
+  it('emits an empty array when nothing is chosen', async () => {
+    const w = mount(PynWebhookForm, { props: { eventTypeOptions: options } })
+    await fillBasics(w)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')![0][0]).toMatchObject({ event_types: [] })
+  })
+
+  it('shows a loading state and blocks create meanwhile', () => {
+    const w = mount(PynWebhookForm, { props: { eventTypesLoading: true } })
+    expect(w.find('[role="status"]').text()).toBe('Loading event types…')
+    expect(w.find('textarea').exists()).toBe(false)
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeDefined()
+  })
+
+  it('shows the load error and falls back to the textarea', async () => {
+    const w = mount(PynWebhookForm, {
+      props: { eventTypeOptions: options, eventTypesError: 'Could not load.' },
+    })
+    expect(w.find('[role="alert"]').text()).toBe('Could not load.')
+    await w.find('textarea').setValue('a\nb')
+    await fillBasics(w)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')![0][0]).toMatchObject({ event_types: ['a', 'b'] })
+  })
+})
+
+describe('PynWebhookDetail event types', () => {
+  const options = [
+    { value: 'lock.acquired', label: 'lock.acquired' },
+    { value: 'checkin.created', label: 'checkin.created' },
+  ]
+  const edit = async (webhook: (typeof subscriptions)[number], props = {}) => {
+    const w = mount(PynWebhookDetail, {
+      props: { webhook, deliveries, eventTypeOptions: options, ...props },
+      attachTo: document.body,
+    })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Edit')!
+      .trigger('click')
+    return w
+  }
+
+  it('marks a stored type the server no longer lists and explains it', async () => {
+    const w = await edit({ ...subscriptions[0], event_types: ['lock.acquired', 'repo.archived'] })
+    const chips = w.findAll('[data-test="chip"]').map((c) => c.text())
+    expect(chips).toEqual(expect.arrayContaining(['lock.acquired ×', 'repo.archived (unknown) ×']))
+    expect(w.text()).toContain('The server no longer lists repo.archived')
+    w.unmount()
+  })
+
+  it('shows no hint when every stored type is listed, and saves the chosen array', async () => {
+    const w = await edit({ ...subscriptions[0], event_types: ['lock.acquired'] })
+    expect(w.text()).not.toContain('no longer lists')
+    await w.find('[aria-label="Remove lock.acquired"]').trigger('click')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('update')![0][0]).toMatchObject({ event_types: [] })
+    w.unmount()
+  })
+
+  it('keeps the textarea without options', async () => {
+    const w = mount(PynWebhookDetail, {
+      props: { webhook: subscriptions[0], deliveries },
+      attachTo: document.body,
+    })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Edit')!
+      .trigger('click')
+    expect(w.find('textarea').element.value).toBe(subscriptions[0].event_types.join('\n'))
+    w.unmount()
+  })
+
+  it('shows loading and blocks save', async () => {
+    const w = await edit(subscriptions[0], { eventTypesLoading: true })
+    expect(w.text()).toContain('Loading event types…')
+    expect(
+      w
+        .findAll('button')
+        .find((b) => b.text() === 'Save')!
+        .attributes('disabled'),
+    ).toBeDefined()
+    w.unmount()
+  })
+})
+
+describe('PynServerInvitations', () => {
+  const mountIt = (props = {}) =>
+    mount(PynServerInvitations, { props: { invitations, targets, roles, ...props } })
+
+  it('labels every status with text and hides revoke for used and revoked', () => {
+    const w = mountIt()
+    const items = w.findAll('li')
+    expect(items.map((i) => i.find('[data-status]').text())).toEqual([
+      'Pending',
+      'Used',
+      'Revoked',
+      'Expired',
+    ])
+    expect(items[0].text()).toContain('writer in alice/site')
+    expect(items[1].text()).toContain('No role')
+    expect(items[1].text()).toContain('used by erin')
+    expect(items.map((i) => i.find('button').exists())).toEqual([true, false, false, true])
+  })
+
+  it('emits revoke with the id', async () => {
+    const w = mountIt()
+    await w.find('button[aria-label="Revoke invitation dana@example.com"]').trigger('click')
+    expect(w.emitted('revoke')).toEqual([['pynv_a1']])
+  })
+
+  it('uses the empty state for no invitations', () => {
+    const w = mountIt({ invitations: [] })
+    expect(w.findComponent(PynEmptyState).exists()).toBe(true)
+    expect(w.text()).toContain('No invitations')
+  })
+
+  it('creates with the defaults: 7 days, no email, no grant', async () => {
+    const w = mountIt()
+    const days = w.find('input[type="number"]')
+    expect(days.attributes('min')).toBe('1')
+    expect(days.attributes('max')).toBe('90')
+    expect((days.element as HTMLInputElement).value).toBe('7')
+    expect(w.find('select option').text()).toBe('No role')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('create')).toEqual([[{ expires_in_days: 7 }]])
+  })
+
+  it('emits email, days and a repository or organization grant', async () => {
+    const w = mountIt()
+    await w.find('input[type="email"]').setValue(' gus@example.com ')
+    await w.find('input[type="number"]').setValue(30)
+    const selects = w.findAll('select')
+    await selects[0].setValue('repository:alice/site')
+    expect(
+      w
+        .findAll('select')[1]
+        .findAll('option')
+        .map((o) => o.text()),
+    ).toEqual(['reader', 'writer', 'maintainer', 'admin'])
+    await w.findAll('select')[1].setValue('maintainer')
+    await w.find('form').trigger('submit')
+    await selects[0].setValue('organization:acme')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('create')).toEqual([
+      [
+        {
+          email: 'gus@example.com',
+          expires_in_days: 30,
+          grant: { repository: 'alice/site', role: 'maintainer' },
+        },
+      ],
+      [
+        {
+          email: 'gus@example.com',
+          expires_in_days: 30,
+          grant: { organization: 'acme', role: 'member' },
+        },
+      ],
+    ])
+  })
+
+  it('refuses an expiry outside 1 to 90', async () => {
+    const w = mountIt()
+    await w.find('input[type="number"]').setValue(91)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('create')).toBeUndefined()
+    expect(w.text()).toContain('from 1 to 90')
+    expect(w.find('input[aria-invalid="true"]').exists()).toBe(true)
+    expect(validExpiry(90)).toBe(true)
+    expect(validExpiry(0)).toBe(false)
+  })
+
+  it('shows the one-time code with the register hint and emits dismiss', async () => {
+    const w = mountIt({ created: 'pynv_abc', serverUrl: 'https://pyn.example.com', emailed: true })
+    const reveal = w.findComponent(PynSecretReveal)
+    expect(reveal.text()).toContain('pynv_abc')
+    expect(reveal.text()).toContain('pyn register <name> --invite pynv_abc')
+    expect(reveal.text()).toContain('https://pyn.example.com')
+    expect(reveal.text()).toContain('also emailed')
+    await reveal.findAll('button')[1].trigger('click')
+    expect(w.emitted('dismiss')).toHaveLength(1)
+  })
+
+  it('shows the error, busy state and hides grant controls without targets', () => {
+    const w = mountIt({ error: 'no such repository', busy: true, targets: [] })
+    expect(w.find('[role="alert"]').text()).toBe('no such repository')
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeDefined()
+    expect(w.find('select').exists()).toBe(false)
+  })
+})
+
+describe('PynAddAccount', () => {
+  it('emits the trimmed name and password, then clears the password', async () => {
+    const w = mount(PynAddAccount)
+    const [name, pass] = w.findAll('input')
+    expect(pass.attributes('type')).toBe('password')
+    expect(pass.attributes('minlength')).toBe('10')
+    expect(w.text()).toContain('must choose their own password')
+    await name.setValue(' hana ')
+    await pass.setValue('one-time-pass')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('add')).toEqual([[{ username: 'hana', password: 'one-time-pass' }]])
+    expect((pass.element as HTMLInputElement).value).toBe('')
+  })
+
+  it('shows the error and disables while busy', () => {
+    const w = mount(PynAddAccount, { props: { error: 'taken', busy: true } })
+    expect(w.find('[role="alert"]').text()).toBe('taken')
+    expect(w.find('button[type="submit"]').attributes('disabled')).toBeDefined()
+  })
+})
+
+describe('PynEmailStatus', () => {
+  it.each([
+    ['none', 'the server sends no email', 'None'],
+    ['log', 'Nothing is delivered to anyone', 'Log only'],
+    ['smtp', 'delivers email through an SMTP server', 'SMTP'],
+  ] as const)('says plainly what the %s mailer does', (mailer, sentence, label) => {
+    const w = mount(PynEmailStatus, { props: { mailer, verification: false } })
+    expect(w.text()).toContain(label)
+    expect(w.text()).toContain(sentence)
+  })
+
+  it('states address verification in words and has a labelled heading', () => {
+    const on = mount(PynEmailStatus, { props: { mailer: 'smtp', verification: true } })
+    expect(on.text()).toContain('On')
+    expect(on.text()).toContain('must confirm the email address')
+    const off = mount(PynEmailStatus, { props: { mailer: 'smtp', verification: false } })
+    expect(off.text()).toContain('Off')
+    expect(off.text()).toContain('does not confirm')
+    const section = on.find('section')
+    expect(on.find(`#${section.attributes('aria-labelledby')}`).text()).toBe('Email')
+  })
+})
+
+describe('PynAccounts resend confirmation', () => {
+  const pending = { ...accounts[2], pending_verification: true }
+  const base = { accounts: [accounts[0], pending], status: '' as const, self: 'root' }
+
+  it('offers resend only for pending accounts and emits the user name', async () => {
+    const w = mount(PynAccounts, { props: base })
+    const buttons = w.findAll('button').filter((b) => b.text() === 'Resend confirmation')
+    expect(buttons).toHaveLength(1)
+    await buttons[0].trigger('click')
+    expect(w.emitted('resendConfirmation')).toEqual([['carol']])
+  })
+
+  it('offers nothing when the marker is absent', () => {
+    const w = mount(PynAccounts, { props: { ...base, accounts } })
+    expect(w.text()).not.toContain('Resend confirmation')
+  })
+
+  it('marks the row being resent and disables the buttons', () => {
+    const w = mount(PynAccounts, { props: { ...base, resendingUser: 'carol' } })
+    const b = w.find('button[aria-label="Resend confirmation to carol"]')
+    expect(b.text()).toBe('Sending…')
+    expect(b.attributes('disabled')).toBeDefined()
+  })
+})
+
+describe('PynPasswordForm reason', () => {
+  it('shows the reason above the form as a status', () => {
+    const w = mount(PynPasswordForm, { props: { reason: 'Choose your own password.' } })
+    const note = w.find('[role="status"]')
+    expect(note.text()).toBe('Choose your own password.')
+    expect(w.find('form').element.firstElementChild).toBe(note.element)
+  })
+
+  it('leaves the output unchanged without a reason', () => {
+    const w = mount(PynPasswordForm)
+    expect(w.find('[role="status"]').exists()).toBe(false)
   })
 })
