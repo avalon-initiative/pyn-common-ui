@@ -11,11 +11,11 @@ defineProps<{ orgs: OrgInfo[]; empty?: string }>()
 <template>
   <ul v-if="orgs.length" :class="styles.list">
     <li v-for="org in orgs" :key="org.name" :class="styles.item">
-      <a :href="orgPath(org.name)" :class="styles.link">{{ org.name }}</a>
-      <span :class="styles.meta">
+      <span :class="styles.title">
+        <a :href="orgPath(org.name)" :class="styles.link">{{ org.name }}</a>
         <span v-if="org.role" :class="styles.pill" data-role>{{ org.role }}</span>
-        <span>created {{ formatDate(org.created_at) }}</span>
       </span>
+      <span :class="styles.meta">Created {{ formatDate(org.created_at) }}</span>
     </li>
   </ul>
   <slot v-else name="empty">

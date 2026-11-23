@@ -13,6 +13,8 @@ withDefaults(
     error?: string
     /** Shows a Try again button with the error. */
     retryable?: boolean
+    /** Drops the body padding so a flat list fills the card edge to edge. */
+    flush?: boolean
   }>(),
   { headingLevel: 2 },
 )
@@ -42,6 +44,6 @@ const id = useId()
         Try again
       </button>
     </div>
-    <div v-else :class="styles.body"><slot /></div>
+    <div v-else :class="styles.body" :data-flush="flush || undefined"><slot /></div>
   </section>
 </template>

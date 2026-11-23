@@ -26,6 +26,8 @@
 
 .display {
   font-size: var(--pyn-text-xl);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
 }
 
 .username {
@@ -53,15 +55,13 @@
   margin: 0;
   padding: 0;
   color: var(--pyn-text-muted);
-  font-size: 0.875rem;
+  font-size: var(--pyn-text-base);
   list-style: none;
 }
 
 .link {
-  color: var(--pyn-accent);
+  @include m.accent-link;
   overflow-wrap: anywhere;
-
-  @include m.focus-ring;
 }
 
 .actions {

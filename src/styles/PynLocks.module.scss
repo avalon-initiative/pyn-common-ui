@@ -6,18 +6,31 @@
   gap: var(--pyn-space-3);
 }
 
+.box {
+  @include m.flat-box;
+}
+
+.head {
+  @include m.list-header;
+}
+
 .list {
-  @include m.list;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .item {
-  @include m.item;
+  @include m.table-row;
+  flex-wrap: wrap;
+  @include m.row-hover;
 }
 
 .path {
   flex: 1;
+  min-width: 0;
   font-family: var(--pyn-font-mono);
-  font-size: 0.875rem;
+  font-size: var(--pyn-text-base);
   overflow-wrap: anywhere;
 }
 
@@ -30,6 +43,13 @@
 .meta,
 .empty {
   @include m.muted;
+  font-size: var(--pyn-text-sm);
+}
+
+.empty {
+  @include m.flat-box;
+  padding: var(--pyn-space-6);
+  text-align: center;
 }
 
 .reason {
