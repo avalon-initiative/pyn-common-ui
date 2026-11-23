@@ -18,22 +18,125 @@ import type { LockInfo } from '../src'
 
 const tokens = readFileSync('src/styles/tokens.css', 'utf8')
 
-function names(block: string): string[] {
-  return [...block.matchAll(/(--pyn-[\w-]+):/g)].map((m) => m[1]).sort()
+type Theme = 'light' | 'dark'
+
+/** Resolves a token to a hex color for one theme, following var() aliases. */
+function color(name: string, theme: Theme): string {
+  const m = new RegExp(`${name}:\\s*([^;]+);`).exec(tokens)
+  if (!m) throw new Error(`missing token ${name}`)
+  const value = m[1].trim()
+  const alias = /^var\((--pyn-[\w-]+)\)$/.exec(value)
+  if (alias) return color(alias[1], theme)
+  const pair = /^light-dark\(\s*(#\w+)\s*,\s*(#\w+)\s*\)$/.exec(value)
+  if (pair) return theme === 'light' ? pair[1] : pair[2]
+  return value
 }
 
+function rgba(hex: string): [number, number, number, number] {
+  let h = hex.slice(1)
+  if (h.length === 3) h = [...h].map((c) => c + c).join('')
+  const n = (i: number) => parseInt(h.slice(i, i + 2), 16)
+  return [n(0), n(2), n(4), h.length === 8 ? n(6) / 255 : 1]
+}
+
+function luminance([r, g, b]: number[]): number {
+  const lin = (v: number) => {
+    const c = v / 255
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  }
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+}
+
+/** WCAG contrast of fg on bg; translucent colors are composited over the canvas. */
+function contrast(fg: string, bg: string, theme: Theme): number {
+  const canvas = rgba(color('--pyn-bg', theme))
+  const over = (top: number[], under: number[]) => {
+    const a = top[3] ?? 1
+    return [0, 1, 2].map((i) => top[i] * a + under[i] * (1 - a))
+  }
+  const base = over(rgba(color(bg, theme)), canvas)
+  const front = over(rgba(color(fg, theme)), base)
+  const [hi, lo] = [luminance(front), luminance(base)].sort((x, y) => y - x)
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+const textPairs: [string, string][] = [
+  ['--pyn-text', '--pyn-bg'],
+  ['--pyn-text', '--pyn-bg-subtle'],
+  ['--pyn-text', '--pyn-control-bg'],
+  ['--pyn-text', '--pyn-selected'],
+  ['--pyn-text-muted', '--pyn-bg'],
+  ['--pyn-text-muted', '--pyn-bg-subtle'],
+  ['--pyn-text-muted', '--pyn-bg-inset'],
+  ['--pyn-accent', '--pyn-bg'],
+  ['--pyn-accent', '--pyn-bg-subtle'],
+  ['--pyn-accent', '--pyn-accent-bg'],
+  ['--pyn-success', '--pyn-bg'],
+  ['--pyn-success', '--pyn-success-bg'],
+  ['--pyn-attention', '--pyn-bg'],
+  ['--pyn-attention', '--pyn-attention-bg'],
+  ['--pyn-danger', '--pyn-bg'],
+  ['--pyn-danger', '--pyn-danger-bg'],
+  ['--pyn-on-accent', '--pyn-accent-fill'],
+  ['--pyn-on-accent', '--pyn-success-fill'],
+  ['--pyn-on-accent', '--pyn-danger-fill'],
+  ['--pyn-syntax-keyword', '--pyn-bg'],
+  ['--pyn-syntax-string', '--pyn-bg'],
+  ['--pyn-syntax-comment', '--pyn-bg'],
+  ['--pyn-syntax-number', '--pyn-bg'],
+  ['--pyn-syntax-name', '--pyn-bg'],
+  ['--pyn-syntax-comment', '--pyn-bg-inset'],
+]
+
+const nonTextPairs: [string, string][] = [
+  ['--pyn-focus', '--pyn-bg'],
+  ['--pyn-border-strong', '--pyn-bg'],
+]
+
 describe('tokens.css', () => {
-  it('defines the same colors in the OS-light, light and dark blocks', () => {
-    const dark = names(tokens.split(":root[data-theme='dark']")[1])
-    const light = names(
-      tokens.split(":root[data-theme='light']")[1].split(":root[data-theme='dark']")[0],
-    )
-    const osLight = names(
-      tokens.split('@media (prefers-color-scheme: light)')[1].split(":root[data-theme='light']")[0],
-    )
-    expect(light).toEqual(dark)
-    expect(osLight).toEqual(dark)
+  it('declares every color once, as a light/dark pair or an alias', () => {
+    expect(tokens).not.toContain('prefers-color-scheme')
+    const decls = [...tokens.split('@media')[0].matchAll(/^\s+(--pyn-[\w-]+):/gm)].map((m) => m[1])
+    expect(new Set(decls).size).toBe(decls.length)
   })
+
+  it('follows the OS and lets data-theme pin a scheme', () => {
+    expect(tokens).toMatch(/color-scheme: light dark;/)
+    expect(tokens).toMatch(/:root\[data-theme='light'\] \{\s*color-scheme: light;/)
+    expect(tokens).toMatch(/:root\[data-theme='dark'\] \{\s*color-scheme: dark;/)
+  })
+
+  it('keeps the older token names', () => {
+    for (const name of [
+      '--pyn-surface',
+      '--pyn-surface-raised',
+      '--pyn-available',
+      '--pyn-available-bg',
+      '--pyn-locked',
+      '--pyn-locked-bg',
+      '--pyn-mine',
+      '--pyn-mine-bg',
+    ]) {
+      expect(() => color(name, 'light')).not.toThrow()
+    }
+  })
+
+  it('sets a 14px base on the body', () => {
+    expect(color('--pyn-text-base', 'light')).toBe('0.875rem')
+    expect(readFileSync('src/styles/global.css', 'utf8')).toContain(
+      'font-size: var(--pyn-text-base)',
+    )
+  })
+
+  for (const theme of ['light', 'dark'] as const) {
+    it.each(textPairs)(`${theme}: %s on %s meets AA text contrast (4.5)`, (fg, bg) => {
+      expect(contrast(fg, bg, theme)).toBeGreaterThanOrEqual(4.5)
+    })
+
+    it.each(nonTextPairs)(`${theme}: %s on %s meets non-text contrast (3)`, (fg, bg) => {
+      expect(contrast(fg, bg, theme)).toBeGreaterThanOrEqual(3)
+    })
+  }
 })
 
 describe('theme', () => {

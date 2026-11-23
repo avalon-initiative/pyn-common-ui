@@ -34,7 +34,7 @@
 .brand {
   color: var(--pyn-text);
   font-size: var(--pyn-text-lg);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-decoration: none;
 
@@ -113,7 +113,7 @@
   min-width: 1rem;
   padding: 0 var(--pyn-space-1);
   color: var(--pyn-on-accent);
-  background: var(--pyn-accent);
+  background: var(--pyn-accent-fill);
   border-radius: var(--pyn-radius-pill);
   font-size: var(--pyn-text-xs);
   line-height: 1rem;
@@ -163,7 +163,7 @@
   width: 1.75rem;
   height: 1.75rem;
   color: var(--pyn-on-accent);
-  background: var(--pyn-accent);
+  background: var(--pyn-accent-fill);
   border-radius: var(--pyn-radius-pill);
   font-size: var(--pyn-text-sm);
   font-weight: 700;

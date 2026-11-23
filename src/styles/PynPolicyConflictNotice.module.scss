@@ -52,6 +52,6 @@
 
 .primary {
   @include m.button(var(--pyn-on-accent));
-  background: var(--pyn-accent);
+  background: var(--pyn-accent-fill);
   border-color: var(--pyn-accent);
 }
