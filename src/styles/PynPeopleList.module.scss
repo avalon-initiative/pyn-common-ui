@@ -1,7 +1,7 @@
 @use 'mixins' as m;
 
 .list {
-  @include m.list;
+  @include m.flat-list;
 }
 
 .item {
@@ -23,18 +23,11 @@
 }
 
 .link {
+  @include m.accent-link;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--pyn-space-2);
-  color: var(--pyn-text);
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-
-  @include m.focus-ring;
 }
 
 .display {
@@ -43,8 +36,7 @@
 
 .username {
   color: var(--pyn-text-muted);
-  font-family: var(--pyn-font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--pyn-text-base);
 }
 
 .bio {
@@ -59,7 +51,7 @@
   margin: 0;
   padding: 0;
   color: var(--pyn-text-muted);
-  font-size: 0.8125rem;
+  font-size: var(--pyn-text-sm);
   list-style: none;
 }
 

@@ -1557,6 +1557,25 @@ describe('PynRepoList', () => {
     expect(w.find('a').attributes('href')).toBe('/alice/game')
   })
 
+  it('shows the visibility pill and the lease and creation line', () => {
+    const w = mount(PynRepoList, { props: { repos: [listed('alice', 'game')] } })
+    expect(w.find('[data-visibility]').text()).toBe('private')
+    expect(w.text()).toContain('8h leases · Created Oct 01 2026')
+    expect(w.find('input').exists()).toBe(false)
+  })
+
+  it('filters by owner and name when filterable', async () => {
+    const repos = [listed('alice', 'game'), listed('bob', 'tools')]
+    const w = mount(PynRepoList, { props: { repos, filterable: true } })
+    expect(w.findAll('li')).toHaveLength(2)
+    await w.find('input').setValue('TOO')
+    expect(w.findAll('li')).toHaveLength(1)
+    expect(w.text()).toContain('bob/tools')
+    await w.find('input').setValue('zzz')
+    expect(w.find('[data-no-match]').text()).toBe('No repositories match.')
+    expect(w.find('input').exists()).toBe(true)
+  })
+
   it('offers to create one when empty', () => {
     expect(
       mount(PynRepoList, { props: { repos: [] } })
@@ -1679,6 +1698,10 @@ describe('PynLocks', () => {
       expires_at: '2026-10-08T15:00:00Z',
     },
   ]
+
+  it('counts the held locks in the list header', () => {
+    expect(mount(PynLocks, { props: { locks, now } }).text()).toContain('1 lock held')
+  })
 
   it('hides force unlock without the permission', () => {
     const w = mount(PynLocks, { props: { locks, now } })

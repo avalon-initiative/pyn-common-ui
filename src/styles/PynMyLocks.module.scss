@@ -6,43 +6,51 @@
   gap: var(--pyn-space-3);
 }
 
-.bar,
+.box {
+  @include m.flat-box;
+}
+
+.bar {
+  @include m.list-header;
+}
+
 .confirm {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: var(--pyn-space-3);
-}
-
-.confirm {
-  justify-content: flex-end;
+  font-weight: 400;
 }
 
 .list {
-  @include m.list;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .item {
-  @include m.item;
+  @include m.table-row;
+  flex-wrap: wrap;
+  padding-block: var(--pyn-space-2);
+  @include m.row-hover;
 }
 
 .what {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--pyn-space-1);
+  gap: var(--pyn-space-half);
   min-width: 0;
 }
 
 .repo {
-  color: var(--pyn-text-muted);
-  font-size: 0.875rem;
+  @include m.accent-link;
+  font-size: var(--pyn-text-sm);
 }
 
 .path {
   font-family: var(--pyn-font-mono);
-  font-size: 0.875rem;
+  font-size: var(--pyn-text-base);
   overflow-wrap: anywhere;
 }
 
@@ -52,10 +60,20 @@
   vertical-align: -0.125em;
 }
 
-.count,
+.count {
+  margin: 0;
+}
+
 .meta,
 .empty {
   @include m.muted;
+  font-size: var(--pyn-text-sm);
+}
+
+.empty {
+  @include m.flat-box;
+  padding: var(--pyn-space-6);
+  text-align: center;
 }
 
 .failure,

@@ -30,29 +30,34 @@ function confirm() {
 <template>
   <section :class="styles.page">
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-    <ul v-if="locks.length" :class="styles.list">
-      <li v-for="lock in locks" :key="lock.path" :class="styles.item">
-        <span :class="styles.path"><PynLockIcon :class="styles.lockIcon" />{{ lock.path }}</span>
-        <PynModeChip mode="exclusive" />
-        <span :class="styles.meta" :title="`Expires ${formatDateTime(lock.expires_at)}`">
-          <PynPerson :name="lock.owner" :identity="lock.identity" /> ·
-          {{ formatLease(lock.expires_at, now ?? new Date()) }}</span
-        >
-        <button
-          v-if="canForce && forcing !== lock.path"
-          type="button"
-          :class="styles.danger"
-          @click="forcing = lock.path"
-        >
-          Force unlock
-        </button>
-        <form v-else-if="forcing === lock.path" :class="styles.reason" @submit.prevent="confirm">
-          <input v-model="reason" :class="styles.input" placeholder="Reason" required />
-          <button type="submit" :class="styles.danger" :disabled="busy">Unlock</button>
-          <button type="button" :class="styles.quiet" @click="forcing = ''">Cancel</button>
-        </form>
-      </li>
-    </ul>
+    <div v-if="locks.length" :class="styles.box">
+      <div :class="styles.head">
+        {{ locks.length }} {{ locks.length === 1 ? 'lock' : 'locks' }} held
+      </div>
+      <ul :class="styles.list">
+        <li v-for="lock in locks" :key="lock.path" :class="styles.item">
+          <span :class="styles.path"><PynLockIcon :class="styles.lockIcon" />{{ lock.path }}</span>
+          <PynModeChip mode="exclusive" />
+          <span :class="styles.meta" :title="`Expires ${formatDateTime(lock.expires_at)}`">
+            <PynPerson :name="lock.owner" :identity="lock.identity" /> ·
+            {{ formatLease(lock.expires_at, now ?? new Date()) }}</span
+          >
+          <button
+            v-if="canForce && forcing !== lock.path"
+            type="button"
+            :class="styles.danger"
+            @click="forcing = lock.path"
+          >
+            Force unlock
+          </button>
+          <form v-else-if="forcing === lock.path" :class="styles.reason" @submit.prevent="confirm">
+            <input v-model="reason" :class="styles.input" placeholder="Reason" required />
+            <button type="submit" :class="styles.danger" :disabled="busy">Unlock</button>
+            <button type="button" :class="styles.quiet" @click="forcing = ''">Cancel</button>
+          </form>
+        </li>
+      </ul>
+    </div>
     <p v-else :class="styles.empty">No locks are held.</p>
   </section>
 </template>

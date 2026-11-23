@@ -49,6 +49,17 @@ describe('PynDashboardCard', () => {
     expect(w.text()).toContain('body')
   })
 
+  it('marks a flush body so a list can fill the card', () => {
+    const slots = { default: '<p>body</p>' }
+    const flush = mount(PynDashboardCard, { props: { heading: 'X', flush: true }, slots })
+    expect(flush.find('[data-flush]').exists()).toBe(true)
+    expect(
+      mount(PynDashboardCard, { props: { heading: 'X' }, slots })
+        .find('[data-flush]')
+        .exists(),
+    ).toBe(false)
+  })
+
   it('shows a loading status instead of the content', () => {
     const w = mount(PynDashboardCard, {
       props: { heading: 'X', loading: true },

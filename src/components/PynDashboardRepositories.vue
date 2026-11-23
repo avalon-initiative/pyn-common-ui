@@ -34,7 +34,7 @@ const shown = computed(() => props.repos.slice(0, props.max))
     <template #actions>
       <a :href="createHref" :class="styles.create" @click="emit('create', $event)">New</a>
     </template>
-    <PynRepoList :repos="shown">
+    <PynRepoList :repos="shown" filterable>
       <template #empty>
         <PynEmptyState
           compact

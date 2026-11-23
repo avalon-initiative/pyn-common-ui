@@ -8,5 +8,5 @@ defineProps<{ mode: TreeMode }>()
 </script>
 
 <template>
-  <span :class="[styles.chip, styles[mode]]" :data-mode="mode">{{ LABELS[mode] }}</span>
+  <span :class="styles[mode]" :data-mode="mode">{{ LABELS[mode] }}</span>
 </template>
