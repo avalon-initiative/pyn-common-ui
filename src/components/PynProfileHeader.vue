@@ -20,7 +20,13 @@ defineProps<{
 
 <template>
   <header :class="styles.header">
-    <PynAvatar :username="username" :name="displayName" :src="avatarUrl" size="xl" />
+    <PynAvatar
+      :class="styles.avatar"
+      :username="username"
+      :name="displayName"
+      :src="avatarUrl"
+      size="lg"
+    />
     <div :class="styles.body">
       <h1 :class="styles.title">
         <span v-if="displayName" :class="styles.display">{{ displayName }}</span>

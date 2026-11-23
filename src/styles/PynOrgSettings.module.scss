@@ -5,8 +5,8 @@
 }
 
 .heading {
-  margin: 0;
-  font-size: 1.125rem;
+  @include m.settings-title;
+  margin-bottom: 0;
 }
 
 .field {

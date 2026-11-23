@@ -6,6 +6,8 @@ import PynDashboardFirstRun from '../components/PynDashboardFirstRun.vue'
 import PynDashboardOrganizations from '../components/PynDashboardOrganizations.vue'
 import PynDashboardRepositories from '../components/PynDashboardRepositories.vue'
 import PynRecentItems from '../components/PynRecentItems.vue'
+import PynViewAction from '../components/PynViewAction.vue'
+import PynViewHeader from '../components/PynViewHeader.vue'
 import { orgInvitations, orgs } from './org-data'
 import { dashboardRepos, heldLocks, notices, now, recent } from './dashboard-data'
 
@@ -25,12 +27,19 @@ const parts = {
   PynDashboardOrganizations,
   PynDashboardRepositories,
   PynRecentItems,
+  PynViewAction,
+  PynViewHeader,
 }
 const setup = () => ({ dashboardRepos, orgs, orgInvitations, heldLocks, notices, recent, now })
 
 const full = `
   <PynDashboard>
-    <template #header><h1>Home</h1></template>
+    <template #header>
+      <PynViewHeader title="Dashboard">
+        <PynViewAction href="/_/explore">Explore</PynViewAction>
+        <PynViewAction href="/_/new" primary>New repository</PynViewAction>
+      </PynViewHeader>
+    </template>
     <template #main>
       <PynDashboardRepositories :repos="dashboardRepos" />
       <PynDashboardCard heading="Recently opened"><PynRecentItems :items="recent" clearable /></PynDashboardCard>

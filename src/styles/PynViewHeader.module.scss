@@ -1,7 +1,7 @@
 .header {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--pyn-space-3);
   margin-bottom: var(--pyn-space-4);
@@ -9,7 +9,10 @@
 
 .title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: var(--pyn-text-xl);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
+  overflow-wrap: anywhere;
 }
 
 .actions {
