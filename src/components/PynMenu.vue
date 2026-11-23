@@ -29,8 +29,18 @@ const close = (refocus: boolean) => {
 const away = (e: Event) => {
   if (root.value && !root.value.contains(e.target as Node)) open.value = false
 }
-const stop = () => document.removeEventListener('click', away)
-watch(open, (o) => (o ? document.addEventListener('click', away) : stop()))
+const escape = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && !e.defaultPrevented) close(true)
+}
+const stop = () => {
+  document.removeEventListener('click', away)
+  document.removeEventListener('keydown', escape)
+}
+watch(open, (o) => {
+  if (!o) return stop()
+  document.addEventListener('click', away)
+  document.addEventListener('keydown', escape)
+})
 onBeforeUnmount(stop)
 
 function onTriggerKey(e: KeyboardEvent) {
