@@ -4,7 +4,8 @@ import { formatDate } from '../utils/datetime'
 import { orgPath } from '../state/org.state'
 import type { OrgInfo } from '../types/org.types'
 
-defineProps<{ orgs: OrgInfo[] }>()
+/** `empty` replaces the empty message; an empty string or the `empty` slot replaces it entirely. */
+defineProps<{ orgs: OrgInfo[]; empty?: string }>()
 </script>
 
 <template>
@@ -17,7 +18,10 @@ defineProps<{ orgs: OrgInfo[] }>()
       </span>
     </li>
   </ul>
-  <p v-else :class="styles.empty">
-    You are not in any organization yet. <a href="/_/new-org">Create one</a>.
-  </p>
+  <slot v-else name="empty">
+    <p v-if="empty === undefined" :class="styles.empty">
+      You are not in any organization yet. <a href="/_/new-org">Create one</a>.
+    </p>
+    <p v-else-if="empty" :class="styles.empty">{{ empty }}</p>
+  </slot>
 </template>

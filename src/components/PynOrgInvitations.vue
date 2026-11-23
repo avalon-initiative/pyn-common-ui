@@ -8,6 +8,8 @@ defineProps<{
   /** The organization whose invitation is being answered; its buttons are disabled. */
   busyOrg?: string
   error?: string
+  /** Replaces the empty message; an empty string or the `empty` slot replaces it entirely. */
+  empty?: string
 }>()
 const emit = defineEmits<{ accept: [org: string]; decline: [org: string] }>()
 </script>
@@ -25,6 +27,8 @@ const emit = defineEmits<{ accept: [org: string]; decline: [org: string] }>()
         />
       </li>
     </ul>
-    <p v-else :class="styles.empty">No pending invitations.</p>
+    <slot v-else name="empty">
+      <p v-if="empty !== ''" :class="styles.empty">{{ empty ?? 'No pending invitations.' }}</p>
+    </slot>
   </section>
 </template>

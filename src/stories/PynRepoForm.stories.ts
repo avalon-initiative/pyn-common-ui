@@ -55,6 +55,7 @@ export const LimitSetByPolicy: Story = {
     effectiveMaxLocks: 3,
   },
 }
+export const WithCancel: Story = { args: { owner: 'alice', cancelHref: '/' } }
 export const NameTaken: Story = {
   args: {
     owner: 'alice',

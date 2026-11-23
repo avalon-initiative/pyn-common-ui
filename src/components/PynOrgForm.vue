@@ -2,8 +2,20 @@
 import { computed, ref, useId } from 'vue'
 import styles from '../styles/PynOrgForm.module.scss'
 
-const props = defineProps<{ busy?: boolean; error?: string; nameMessage?: string }>()
-const emit = defineEmits<{ submit: [name: string]; nameInput: [name: string] }>()
+const props = defineProps<{
+  busy?: boolean
+  error?: string
+  nameMessage?: string
+  /** Shows a secondary action next to the submit button: a link with `cancelHref`, else a button. */
+  cancelHref?: string
+  /** Defaults to "Cancel" when `cancelHref` is set. */
+  cancelLabel?: string
+}>()
+const emit = defineEmits<{
+  submit: [name: string]
+  nameInput: [name: string]
+  cancel: [event: MouseEvent]
+}>()
 
 const name = ref('')
 const id = useId()
@@ -37,6 +49,20 @@ const describedBy = computed(() =>
       }}</span>
     </label>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-    <button type="submit" :class="styles.primary" :disabled="busy">Create organization</button>
+    <div :class="styles.actions">
+      <button type="submit" :class="styles.primary" :disabled="busy">Create organization</button>
+      <template v-if="cancelHref || cancelLabel">
+        <a
+          v-if="cancelHref"
+          :href="cancelHref"
+          :class="styles.cancel"
+          @click="emit('cancel', $event)"
+          >{{ cancelLabel ?? 'Cancel' }}</a
+        >
+        <button v-else type="button" :class="styles.cancel" @click="emit('cancel', $event)">
+          {{ cancelLabel }}
+        </button>
+      </template>
+    </div>
   </form>
 </template>

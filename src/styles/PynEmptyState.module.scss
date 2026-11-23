@@ -55,3 +55,28 @@
   @include m.button;
   text-decoration: none;
 }
+
+.commands {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  width: 100%;
+  max-width: 32rem;
+  margin: var(--pyn-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.command {
+  display: block;
+  padding: var(--pyn-space-2) var(--pyn-space-3);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  background: var(--pyn-surface);
+  font-family: var(--pyn-font-mono);
+  font-size: 0.8125rem;
+  overflow-x: auto;
+  white-space: pre;
+  user-select: all;
+}

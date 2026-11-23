@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import PynEmptyState from '../components/PynEmptyState.vue'
 import PynRepoList from '../components/PynRepoList.vue'
 
 const meta: Meta<typeof PynRepoList> = {
@@ -31,3 +32,12 @@ export const Repositories: Story = {
   },
 }
 export const Empty: Story = { args: { repos: [] } }
+export const EmptySilenced: Story = { args: { repos: [], empty: '' } }
+export const EmptySlot: Story = {
+  args: { repos: [] },
+  render: (args) => ({
+    components: { PynRepoList, PynEmptyState },
+    setup: () => ({ args }),
+    template: `<PynRepoList v-bind="args"><template #empty><PynEmptyState title="Nothing here yet" description="Custom empty state." compact /></template></PynRepoList>`,
+  }),
+}

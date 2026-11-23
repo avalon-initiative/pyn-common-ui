@@ -16,11 +16,16 @@ const props = defineProps<{
   /** Disables every control that writes; the current values stay shown. */
   readonly?: boolean
   error?: string
+  /** Shows a secondary action next to the submit button: a link with `cancelHref`, else a button. */
+  cancelHref?: string
+  /** Defaults to "Cancel" when `cancelHref` is set. */
+  cancelLabel?: string
 }>()
 
 const emit = defineEmits<{
   submit: [RepoSettings]
   'update:owner': [string]
+  cancel: [event: MouseEvent]
 }>()
 
 const name = ref(props.repo?.name ?? '')
@@ -119,8 +124,22 @@ const submit = () => {
       </span>
     </label>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-    <button type="submit" :class="styles.primary" :disabled="busy || readonly">
-      {{ repo ? 'Save changes' : 'Create repository' }}
-    </button>
+    <div :class="styles.actions">
+      <button type="submit" :class="styles.primary" :disabled="busy || readonly">
+        {{ repo ? 'Save changes' : 'Create repository' }}
+      </button>
+      <template v-if="cancelHref || cancelLabel">
+        <a
+          v-if="cancelHref"
+          :href="cancelHref"
+          :class="styles.cancel"
+          @click="emit('cancel', $event)"
+          >{{ cancelLabel ?? 'Cancel' }}</a
+        >
+        <button v-else type="button" :class="styles.cancel" @click="emit('cancel', $event)">
+          {{ cancelLabel }}
+        </button>
+      </template>
+    </div>
   </form>
 </template>
