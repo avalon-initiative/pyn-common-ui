@@ -1,0 +1,29 @@
+@use 'mixins' as m;
+
+.nav {
+  margin-bottom: var(--pyn-space-3);
+}
+
+.more {
+  display: none;
+
+  @include m.narrow {
+    display: list-item;
+  }
+}
+
+.toggle {
+  @include m.button(var(--pyn-accent));
+  padding: 0 var(--pyn-space-2);
+  line-height: 1.4;
+}
+
+.middle {
+  @include m.narrow {
+    display: none;
+
+    &.shown {
+      display: list-item;
+    }
+  }
+}

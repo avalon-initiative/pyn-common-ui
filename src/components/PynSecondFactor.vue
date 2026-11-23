@@ -3,11 +3,20 @@ import { computed, ref } from 'vue'
 import styles from '../styles/PynSecondFactor.module.scss'
 import type { SecondFactorForm, SecondFactorKind } from '../types/two-factor.types'
 
-defineProps<{
-  passkeys?: boolean
-  busy?: boolean
-  error?: string
-}>()
+withDefaults(
+  defineProps<{
+    passkeys?: boolean
+    busy?: boolean
+    error?: string
+    /** One line shown with the recovery option. */
+    recoveryHint?: string
+    /** Optional closing line, for example who can help when no factor is available. */
+    helpHint?: string
+  }>(),
+  {
+    recoveryHint: 'Recovery codes were shown once when two-step verification was turned on.',
+  },
+)
 const emit = defineEmits<{ submit: [SecondFactorForm]; passkey: []; cancel: [] }>()
 
 const kind = ref<SecondFactorKind>('totp')
@@ -50,19 +59,29 @@ function send() {
     <button type="submit" :class="styles.primary" :disabled="busy">
       {{ busy ? 'Verifying…' : 'Verify' }}
     </button>
-    <button
-      v-if="passkeys"
-      type="button"
-      :class="styles.secondary"
-      :disabled="busy"
-      @click="emit('passkey')"
-    >
-      Use a passkey
-    </button>
+    <section :class="styles.alternatives" aria-labelledby="pyn-second-factor-other">
+      <h3 id="pyn-second-factor-other" :class="styles.heading">Other ways to verify</h3>
+      <ul :class="styles.options">
+        <li v-if="recovery" :class="styles.option">
+          <button type="button" :class="styles.choice" :disabled="busy" @click="toggle">
+            Use an authenticator code
+          </button>
+        </li>
+        <li v-if="passkeys" :class="styles.option">
+          <button type="button" :class="styles.choice" :disabled="busy" @click="emit('passkey')">
+            Use a passkey
+          </button>
+        </li>
+        <li v-if="!recovery" :class="styles.option">
+          <button type="button" :class="styles.choice" :disabled="busy" @click="toggle">
+            Use a recovery code
+          </button>
+          <p :class="styles.hint" data-recovery-hint>{{ recoveryHint }}</p>
+        </li>
+      </ul>
+    </section>
+    <p v-if="helpHint" :class="styles.hint" data-help-hint>{{ helpHint }}</p>
     <p :class="styles.links">
-      <button type="button" :class="styles.link" @click="toggle">
-        {{ recovery ? 'Use an authenticator code' : 'Use a recovery code' }}
-      </button>
       <button type="button" :class="styles.link" @click="emit('cancel')">Back to sign in</button>
     </p>
   </form>

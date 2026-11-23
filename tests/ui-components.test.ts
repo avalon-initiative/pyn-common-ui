@@ -20,6 +20,7 @@ import {
   PynBranchCompare,
   PynBranchPicker,
   PynBreadcrumb,
+  PynBreadcrumbs,
   PynButton,
   PynCheckoutCard,
   PynCodeView,
@@ -72,10 +73,8 @@ import {
   PynRepoDelete,
   PynRepoDetails,
   PynRepoForm,
-  PynRepoHeader,
   PynRepoLanding,
   PynRepoList,
-  PynRepoNav,
   PynRepoSettings,
   PynRepoShell,
   PynRepoNotFound,
@@ -165,7 +164,6 @@ import {
   repoPath,
   repoSettingsPath,
   repoShellTabs,
-  repoTabs,
   resolveRelative,
   ruleSubjects,
   signInErrorMessage,
@@ -538,44 +536,6 @@ describe('PynSideNav', () => {
 })
 
 describe('repository and organization headers', () => {
-  it('shows name, visibility and the permitted tabs', () => {
-    const w = mount(PynRepoHeader, {
-      props: {
-        owner: 'alice',
-        name: 'game',
-        visibility: 'private',
-        leaseHours: 24,
-        tabs: repoTabs(['read'], false),
-      },
-    })
-    expect(w.find('h1').text()).toContain('alice/game')
-    expect(w.find('[data-visibility]').text()).toBe('private')
-    expect(w.findAll('nav a').map((a) => a.text())).toEqual(['Code', 'Locks', 'History'])
-  })
-
-  it('omits the tab row without access', () => {
-    const w = mount(PynRepoHeader, {
-      props: { owner: 'a', name: 'b', visibility: 'public', leaseHours: 1 },
-    })
-    expect(w.find('nav').exists()).toBe(false)
-  })
-
-  it('shows the organization chip on a repository header', () => {
-    const base = { owner: 'studio', name: 'game', visibility: 'private' as const, leaseHours: 8 }
-    const org = mount(PynRepoHeader, { props: { ...base, orgOwned: true } })
-    expect(org.find('[data-org]').exists()).toBe(true)
-    expect(org.find('a[href="/studio"]').exists()).toBe(true)
-    expect(mount(PynRepoHeader, { props: base }).find('[data-org]').exists()).toBe(false)
-  })
-
-  it('marks the current repository tab', () => {
-    const w = mount(PynRepoNav, {
-      props: { owner: 'alice', name: 'game', tabs: repoTabs(['read'], false), current: 'locks' },
-    })
-    expect(w.find('[aria-current=page]').text()).toBe('Locks')
-    expect(w.findAll('a')[0].attributes('href')).toBe('/alice/game')
-  })
-
   it('marks the organization and links only the tabs the role allows', () => {
     const w = mount(PynOrgHeader, {
       props: { name: 'studio', createdAt: '2026-09-02T08:00:00Z', role: 'member' },
@@ -4996,20 +4956,14 @@ describe('branch-aware links', () => {
       { section: 'history', label: 'History' },
     ]
     const hrefs = (w: ReturnType<typeof mount>) => w.findAll('a').map((a) => a.attributes('href'))
-    const nav = mount(PynRepoNav, { props: { ...r, tabs, current: '', branch: b } })
-    expect(hrefs(nav)).toEqual([
-      `/acme/castle-quest${q}`,
-      '/acme/castle-quest/locks',
-      `/acme/castle-quest/history${q}`,
-    ])
     const shell = mount(PynRepoShell, {
       props: { ...r, visibility: 'private', tabs, current: '', branch: b },
     })
     expect(hrefs(shell)).toContain('/acme/castle-quest/locks')
     expect(hrefs(shell)).toContain(`/acme/castle-quest/history${q}`)
-    expect(hrefs(mount(PynRepoNav, { props: { ...r, tabs, current: '' } }))[0]).toBe(
-      '/acme/castle-quest',
-    )
+    expect(
+      hrefs(mount(PynRepoShell, { props: { ...r, visibility: 'private', tabs, current: '' } })),
+    ).toContain('/acme/castle-quest/locks')
   })
 
   it('keeps the branch in the file view and landing links', () => {
@@ -5024,5 +4978,152 @@ describe('branch-aware links', () => {
       props: { repo, path: 'x', listing: null, missing: true, branch: b },
     })
     expect(landing.find('[role="alert"] a').attributes('href')).toBe(`/acme/castle-quest${q}`)
+  })
+})
+
+describe('PynBreadcrumbs', () => {
+  const trail = [
+    { label: 'Home', href: '/' },
+    { label: 'acme', href: '/acme' },
+    { label: 'game', href: '/acme/game' },
+    { label: 'Code', href: '/acme/game' },
+    { label: 'Locks' },
+  ]
+
+  it('renders nothing for an empty or single-item trail', () => {
+    expect(
+      mount(PynBreadcrumbs, { props: { items: [] } })
+        .find('nav')
+        .exists(),
+    ).toBe(false)
+    expect(
+      mount(PynBreadcrumbs, { props: { items: [{ label: 'Home' }] } })
+        .find('nav')
+        .exists(),
+    ).toBe(false)
+  })
+
+  it('links every item but the last, which is the current page', () => {
+    const w = mount(PynBreadcrumbs, { props: { items: trail.slice(0, 3) } })
+    expect(w.find('nav').attributes('aria-label')).toBe('Breadcrumb')
+    expect(w.findAll('a').map((a) => a.attributes('href'))).toEqual(['/', '/acme'])
+    const current = w.find('[aria-current=page]')
+    expect(current.text()).toBe('game')
+    expect(current.element.tagName).toBe('SPAN')
+    expect(w.find('[data-more]').exists()).toBe(false)
+  })
+
+  it('never links the last item even when it has an href', () => {
+    const w = mount(PynBreadcrumbs, { props: { items: trail.slice(0, 2) } })
+    expect(w.findAll('a')).toHaveLength(1)
+    expect(w.find('[aria-current=page]').text()).toBe('acme')
+  })
+
+  it('collapses the middle items behind a button that reveals them', async () => {
+    const w = mount(PynBreadcrumbs, { props: { items: trail }, attachTo: document.body })
+    const hidden = () => w.findAll('[data-collapsible]')
+    expect(hidden().map((l) => l.text())).toEqual(['acme', 'game'])
+    expect(hidden().some((l) => l.classes().some((c) => c.includes('shown')))).toBe(false)
+    const btn = w.find('[data-more] button')
+    expect(btn.attributes('aria-expanded')).toBe('false')
+    await btn.trigger('click')
+    expect(btn.attributes('aria-expanded')).toBe('true')
+    expect(hidden().every((l) => l.classes().some((c) => c.includes('shown')))).toBe(true)
+    expect(w.find('[aria-current=page]').text()).toBe('Locks')
+    w.unmount()
+  })
+
+  it('closes on Escape, returning focus, and on an outside click', async () => {
+    const w = mount(PynBreadcrumbs, { props: { items: trail }, attachTo: document.body })
+    const btn = w.find('[data-more] button')
+    await btn.trigger('click')
+    await w.find('nav').trigger('keydown', { key: 'Escape' })
+    expect(btn.attributes('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(btn.element)
+    await btn.trigger('click')
+    document.body.click()
+    await flushPromises()
+    expect(btn.attributes('aria-expanded')).toBe('false')
+    w.unmount()
+  })
+
+  it('is a real button, reachable by keyboard', () => {
+    const w = mount(PynBreadcrumbs, { props: { items: trail } })
+    const btn = w.find('[data-more] button')
+    expect(btn.attributes('type')).toBe('button')
+    expect(btn.attributes('aria-label')).toBeTruthy()
+  })
+
+  it('shows in the shell content area only with a trail of two or more', () => {
+    const shell = (breadcrumbs?: { label: string; href?: string }[]) =>
+      mount(PynShell, { props: { bare: true, breadcrumbs }, slots: { default: '<p>body</p>' } })
+    expect(shell().find('nav').exists()).toBe(false)
+    expect(
+      shell([{ label: 'Home' }])
+        .find('nav')
+        .exists(),
+    ).toBe(false)
+    const w = shell(trail.slice(0, 3))
+    expect(w.find('main nav[aria-label=Breadcrumb]').exists()).toBe(true)
+    expect(w.find('main').text()).toContain('body')
+  })
+})
+
+describe('PynSecondFactor alternatives and hints', () => {
+  it('lists the other ways to verify with the default recovery hint', () => {
+    const w = mount(PynSecondFactor)
+    expect(w.find('h3').text()).toBe('Other ways to verify')
+    expect(w.find('[data-recovery-hint]').text()).toContain('shown once')
+    expect(w.find('[data-help-hint]').exists()).toBe(false)
+  })
+
+  it('offers authenticator code, passkey and recovery as alternatives in turn', async () => {
+    const w = mount(PynSecondFactor, { props: { passkeys: true } })
+    const labels = () => w.findAll('section button').map((b) => b.text())
+    expect(labels()).toEqual(['Use a passkey', 'Use a recovery code'])
+    await w.findAll('section button')[1].trigger('click')
+    expect(labels()).toEqual(['Use an authenticator code', 'Use a passkey'])
+    expect(w.find('[data-recovery-hint]').exists()).toBe(false)
+    await w.findAll('section button')[0].trigger('click')
+    expect(w.text()).toContain('six-digit code')
+  })
+
+  it('takes the wording from props', () => {
+    const w = mount(PynSecondFactor, {
+      props: { recoveryHint: 'Saved codes only.', helpHint: 'Ask an administrator.' },
+    })
+    expect(w.find('[data-recovery-hint]').text()).toBe('Saved codes only.')
+    expect(w.find('[data-help-hint]').text()).toBe('Ask an administrator.')
+  })
+
+  it('disables every alternative while busy', () => {
+    const w = mount(PynSecondFactor, { props: { passkeys: true, busy: true } })
+    for (const b of w.findAll('section button')) expect(b.attributes('disabled')).toBeDefined()
+  })
+})
+
+describe('PynPageNotFound links', () => {
+  it('keeps the single home link by default', () => {
+    const w = mount(PynPageNotFound)
+    expect(w.findAll('a').map((a) => a.attributes('href'))).toEqual(['/'])
+  })
+
+  it('adds a back link with a default or given label', () => {
+    const plain = mount(PynPageNotFound, { props: { backHref: '/alice' } })
+    expect(plain.findAll('a').map((a) => a.attributes('href'))).toEqual(['/', '/alice'])
+    expect(plain.find('[data-back]').text()).toBe('Go back')
+    const named = mount(PynPageNotFound, {
+      props: { backHref: '/alice', backLabel: 'Go to alice' },
+    })
+    expect(named.find('[data-back]').text()).toBe('Go to alice')
+  })
+
+  it('renders the actions slot after the home link and ignores a label without a href', () => {
+    const w = mount(PynPageNotFound, {
+      props: { backLabel: 'Orphan' },
+      slots: { actions: '<a href="/explore">Explore</a>' },
+    })
+    expect(w.findAll('a').map((a) => a.attributes('href'))).toEqual(['/', '/explore'])
+    expect(w.text()).not.toContain('Orphan')
   })
 })
