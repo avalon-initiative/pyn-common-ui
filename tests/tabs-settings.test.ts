@@ -6,6 +6,7 @@ import {
   PynAccountNotice,
   PynAccountSettings,
   PynAdminLayout,
+  PynBranchBar,
   PynOrgHeader,
   PynOrgSettingsLayout,
   PynRepoBranches,
@@ -231,6 +232,18 @@ describe('PynRepoBranches and the landing rail', () => {
     expect(w.find('aside #branches-title').exists()).toBe(true)
     const link = mount(PynRepoLanding, { props: { ...base, branchesHref: '/x' } })
     expect(link.find('aside [data-default]').text()).toBe('default')
+  })
+
+  it('feeds the rail from railBranches and the toolbar picker from branches', () => {
+    const base = { repo, path: '', listing: rootListing, summary, branchesHref: '/x' }
+    const many = Array.from({ length: 8 }, (_, i) => ({ name: `b${i}` }))
+    const same = mount(PynRepoLanding, { props: { ...base, branches: many } })
+    expect(same.findAll('aside section[aria-labelledby=branches-title] li')).toHaveLength(5)
+    const split = mount(PynRepoLanding, {
+      props: { ...base, branches: many, railBranches: [{ name: 'only', isDefault: true }] },
+    })
+    expect(split.findAll('aside section[aria-labelledby=branches-title] li')).toHaveLength(1)
+    expect(split.findAllComponents(PynBranchBar)[0].props('branches')).toHaveLength(8)
   })
 })
 

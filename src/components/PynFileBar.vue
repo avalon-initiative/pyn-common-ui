@@ -20,6 +20,8 @@ defineProps<{
   lockable?: boolean
   /** Drops the box border so a parent can frame it. */
   embedded?: boolean
+  /** Policy rule line shown beside the mode chip; the `note` slot overrides it. */
+  note?: string
 }>()
 
 defineEmits<{ lock: [] }>()
@@ -33,6 +35,9 @@ defineEmits<{ lock: [] }>()
       <span :class="styles.info">
         <PynModeChip :mode="entry.mode" />
         <PynLockBadge v-if="entry.mode === 'exclusive'" :lock="entry.lock" :me="me" :now="now" />
+        <span v-if="note || $slots.note" :class="styles.note" data-note
+          ><slot name="note">{{ note }}</slot></span
+        >
         <span v-if="stats" :class="styles.stats">{{ stats }}</span>
       </span>
       <span :class="styles.actions">

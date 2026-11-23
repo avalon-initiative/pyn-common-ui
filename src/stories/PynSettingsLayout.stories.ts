@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import PynSettingsLayout from '../components/PynSettingsLayout.vue'
 import PynButton from '../components/PynButton.vue'
 import PynOrgSettingsLayout from '../components/PynOrgSettingsLayout.vue'
+import PynRepoForm from '../components/PynRepoForm.vue'
 import { adminNavItems } from '../state/shell.state'
 
 const sections = [
@@ -30,6 +31,16 @@ export default meta
 type Story = StoryObj<typeof PynSettingsLayout>
 
 export const Default: Story = {}
+export const WithRepositoryForm: Story = {
+  args: { title: 'General' },
+  render: (args) => ({
+    components: { PynSettingsLayout, PynRepoForm },
+    setup: () => ({ args }),
+    template: `<PynSettingsLayout v-bind="args">
+      <PynRepoForm owner="studio" :repo="{ name: 'game', visibility: 'private', lease_hours: 8 }" />
+    </PynSettingsLayout>`,
+  }),
+}
 export const Untitled: Story = { args: { title: undefined } }
 export const Administration: Story = {
   args: {

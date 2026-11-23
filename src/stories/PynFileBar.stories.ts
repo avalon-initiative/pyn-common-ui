@@ -12,6 +12,9 @@ export default meta
 type Story = StoryObj<typeof PynFileBar>
 
 export const Shared: Story = {}
+export const WithNote: Story = {
+  args: { entry: lockedEntry, note: 'Exclusive: matches rule "**/*.umap"' },
+}
 export const LockedByOther: Story = { args: { entry: lockedEntry } }
 export const NoRevision: Story = {
   args: {

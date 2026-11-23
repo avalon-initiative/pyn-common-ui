@@ -7,11 +7,12 @@
   justify-content: space-between;
   gap: var(--pyn-space-3);
   margin-bottom: var(--pyn-space-6);
+  padding-bottom: var(--pyn-space-2);
+  border-bottom: 1px solid var(--pyn-border);
 }
 
 .admin .head {
   padding-bottom: var(--pyn-space-4);
-  border-bottom: 1px solid var(--pyn-border);
 }
 
 .title {

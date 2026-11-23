@@ -21,6 +21,14 @@ export default meta
 type Story = StoryObj<typeof PynFileView>
 
 export const Code: Story = {}
+export const WithPolicyNote: Story = {
+  args: {
+    path: lockedEntry.path,
+    entry: lockedEntry,
+    body: { kind: 'binary' },
+    note: 'Exclusive: matches rule "**/*.umap"',
+  },
+}
 export const LinkedLines: Story = { args: { lines: { start: 2, end: 4 } } }
 export const Markdown: Story = {
   args: { path: 'Source/Notes.md', body: { kind: 'markdown', text: readmeText } },

@@ -32,8 +32,10 @@ const props = defineProps<{
   now?: Date
   /** Branch the links keep; omitted is the default branch. */
   branch?: string
-  /** Recent branches for the rail, with ahead and behind against the default branch. */
+  /** Branches for the toolbar picker, with ahead and behind against the default branch. */
   branches?: BranchSummary[]
+  /** Branches for the side rail; defaults to `branches`, of which the rail shows the first 5. */
+  railBranches?: BranchSummary[]
   /** Where the rail's Branches panel links to; with `branches` it shows the panel. */
   branchesHref?: string
   /** Toolbar count for the Branches link; defaults to the length of `branches`. */
@@ -57,6 +59,7 @@ const toolbarBranches = computed(() =>
     ? (props.branches ?? [])
     : undefined,
 )
+const sideBranches = computed(() => props.railBranches ?? props.branches)
 const emptyRepo = computed(
   () => !props.missing && !props.path && !!props.listing && props.listing.entries.length === 0,
 )
@@ -128,8 +131,8 @@ const emptyRepo = computed(
         :now="now"
       />
       <PynRepoBranches
-        v-if="branches?.length || branchesHref"
-        :branches="branches"
+        v-if="sideBranches?.length || branchesHref"
+        :branches="sideBranches"
         :default-branch="summary.default_branch"
         :href="branchesHref"
         :now="now"
