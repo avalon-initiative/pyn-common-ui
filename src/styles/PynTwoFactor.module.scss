@@ -3,17 +3,17 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--pyn-space-3);
+  gap: var(--pyn-space-4);
 }
 
 .heading {
-  margin: 0;
-  font-size: 1.25rem;
+  @include m.settings-title;
 }
 
 .subheading {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--pyn-text-md);
+  font-weight: 600;
 }
 
 .note,
@@ -33,7 +33,7 @@
 .codes {
   display: flex;
   flex-direction: column;
-  gap: var(--pyn-space-2);
+  gap: var(--pyn-space-3);
   max-width: 40rem;
 }
 
@@ -51,7 +51,7 @@
 }
 
 .remove {
-  @include m.button(var(--pyn-danger));
+  @include m.button-danger;
 }
 
 .primary {

@@ -35,7 +35,7 @@
 }
 
 .hint {
-  font-size: 0.8125rem;
+  @include m.help;
 }
 
 .actions {

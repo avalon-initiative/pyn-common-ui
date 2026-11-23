@@ -79,5 +79,5 @@
 }
 
 .danger {
-  @include m.button(var(--pyn-danger));
+  @include m.button-danger;
 }

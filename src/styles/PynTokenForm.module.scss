@@ -13,8 +13,7 @@
 }
 
 .hint {
-  @include m.muted;
-  font-size: 0.8125rem;
+  @include m.help;
 }
 
 .message {
@@ -22,10 +21,7 @@
 }
 
 .warning {
-  padding: var(--pyn-space-2) var(--pyn-space-3);
-  color: var(--pyn-danger);
-  background: var(--pyn-danger-bg);
-  border-radius: var(--pyn-radius);
+  @include m.error;
 }
 
 .group {

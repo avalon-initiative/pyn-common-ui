@@ -23,7 +23,7 @@
 
 .primary {
   color: var(--pyn-on-accent);
-  background: var(--pyn-accent-fill);
+  background: var(--pyn-success-fill);
   border-color: transparent;
 
   &:hover:not(:disabled) {
@@ -33,19 +33,20 @@
 
 .secondary {
   color: var(--pyn-text);
-  background: var(--pyn-surface-raised);
+  background: var(--pyn-control-bg);
 
   &:hover:not(:disabled) {
-    background: var(--pyn-hover);
+    background: var(--pyn-control-bg-hover);
   }
 }
 
 .danger {
   color: var(--pyn-danger);
-  background: var(--pyn-danger-bg);
-  border-color: transparent;
+  background: var(--pyn-control-bg);
 
   &:hover:not(:disabled) {
-    border-color: var(--pyn-danger);
+    color: var(--pyn-on-accent);
+    background: var(--pyn-danger-fill);
+    border-color: transparent;
   }
 }

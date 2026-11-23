@@ -1,15 +1,11 @@
 @use 'mixins' as m;
 
 .card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pyn-space-3);
-  max-width: 24rem;
+  @include m.auth-box;
+  box-sizing: border-box;
+  width: min(calc(100% - 2rem), 21.25rem);
   margin: var(--pyn-space-8) auto;
-  padding: var(--pyn-space-6);
-  background: var(--pyn-surface);
-  border: 1px solid var(--pyn-locked);
-  border-radius: var(--pyn-radius);
+  border-color: var(--pyn-locked);
 }
 
 .disabled {
@@ -18,7 +14,8 @@
 
 .title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: var(--pyn-text-lg);
+  font-weight: 600;
 }
 
 .text {
@@ -27,13 +24,6 @@
 }
 
 .link {
+  @include m.link-button;
   align-self: flex-start;
-  padding: 0;
-  color: var(--pyn-accent);
-  background: none;
-  border: 0;
-  font-size: 0.875rem;
-  cursor: pointer;
-
-  @include m.focus-ring;
 }

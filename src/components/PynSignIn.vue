@@ -133,78 +133,9 @@ function submit() {
     @resend="(address) => emit('resend', address)"
     @back="emit('dismiss')"
   />
-  <form v-else :class="styles.card" @submit.prevent="submit">
+  <div v-else :class="styles.page">
+    <span :class="styles.mark" aria-hidden="true">PYN</span>
     <h2 :class="styles.title">{{ title }}</h2>
-
-    <template v-if="showForm">
-      <label :class="styles.field"
-        >User name
-        <input
-          v-model.trim="username"
-          :class="styles.input"
-          autocomplete="username"
-          required
-          :aria-describedby="nameDescribedBy"
-          :aria-invalid="nameMessage ? 'true' : undefined"
-          @input="emit('nameInput', username)"
-        />
-        <span v-if="showCanonical" :id="canonicalId" :class="styles.hint" data-canonical
-          >Will be created as: {{ nameCanonical }}</span
-        >
-        <span v-if="nameMessage" :id="nameMessageId" :class="styles.message">{{
-          nameMessage
-        }}</span>
-      </label>
-      <label v-if="view === 'sign-in' && rememberOption" :class="styles.check"
-        ><input v-model="remember" type="checkbox" data-remember />Remember me</label
-      >
-      <label :class="styles.field"
-        >Password
-        <input
-          v-model="password"
-          :class="styles.input"
-          type="password"
-          :autocomplete="view === 'register' ? 'new-password' : 'current-password'"
-          required
-        />
-      </label>
-      <label v-if="view === 'sign-in' && staySignedInOption" :class="styles.check"
-        ><input v-model="staySignedIn" type="checkbox" data-stay-signed-in />Stay signed in</label
-      >
-      <label v-if="view === 'register'" :class="styles.field"
-        >Confirm password
-        <input
-          v-model="confirm"
-          :class="styles.input"
-          type="password"
-          autocomplete="new-password"
-          required
-          :aria-describedby="showMismatch ? confirmMessageId : undefined"
-          :aria-invalid="showMismatch ? 'true' : undefined"
-        />
-        <span v-if="showMismatch" :id="confirmMessageId" :class="styles.message" role="alert"
-          >The passwords do not match.</span
-        >
-      </label>
-      <label v-if="view === 'register' && needsEmail" :class="styles.field"
-        >Email address
-        <input
-          v-model.trim="email"
-          :class="styles.input"
-          type="email"
-          autocomplete="email"
-          required
-        />
-      </label>
-      <label v-if="view === 'register' && needsInvite" :class="styles.field"
-        >Invitation code
-        <input v-model.trim="invite" :class="styles.input" autocomplete="off" required />
-      </label>
-    </template>
-
-    <p v-if="showNoEmailNote" :class="styles.note" data-no-email>
-      {{ noEmailNote ?? NO_EMAIL_NOTE }}
-    </p>
 
     <div
       v-if="shownError && errorFade.phase.value !== 'gone'"
@@ -216,30 +147,107 @@ function submit() {
       <PynDismissButton @click="errorFade.close" />
     </div>
 
-    <button v-if="showForm" type="submit" :class="styles.primary" :disabled="busy || mismatch">
-      {{ title }}
-    </button>
+    <form :class="styles.card" @submit.prevent="submit">
+      <template v-if="showForm">
+        <label :class="styles.field"
+          >User name
+          <input
+            v-model.trim="username"
+            :class="styles.input"
+            autocomplete="username"
+            required
+            :aria-describedby="nameDescribedBy"
+            :aria-invalid="nameMessage ? 'true' : undefined"
+            @input="emit('nameInput', username)"
+          />
+          <span v-if="showCanonical" :id="canonicalId" :class="styles.hint" data-canonical
+            >Will be created as: {{ nameCanonical }}</span
+          >
+          <span v-if="nameMessage" :id="nameMessageId" :class="styles.message">{{
+            nameMessage
+          }}</span>
+        </label>
+        <label v-if="view === 'sign-in' && rememberOption" :class="styles.check"
+          ><input v-model="remember" type="checkbox" data-remember />Remember me</label
+        >
+        <label :class="styles.field"
+          >Password
+          <input
+            v-model="password"
+            :class="styles.input"
+            type="password"
+            :autocomplete="view === 'register' ? 'new-password' : 'current-password'"
+            required
+          />
+        </label>
+        <label v-if="view === 'sign-in' && staySignedInOption" :class="styles.check"
+          ><input v-model="staySignedIn" type="checkbox" data-stay-signed-in />Stay signed in</label
+        >
+        <label v-if="view === 'register'" :class="styles.field"
+          >Confirm password
+          <input
+            v-model="confirm"
+            :class="styles.input"
+            type="password"
+            autocomplete="new-password"
+            required
+            :aria-describedby="showMismatch ? confirmMessageId : undefined"
+            :aria-invalid="showMismatch ? 'true' : undefined"
+          />
+          <span v-if="showMismatch" :id="confirmMessageId" :class="styles.message" role="alert"
+            >The passwords do not match.</span
+          >
+        </label>
+        <label v-if="view === 'register' && needsEmail" :class="styles.field"
+          >Email address
+          <input
+            v-model.trim="email"
+            :class="styles.input"
+            type="email"
+            autocomplete="email"
+            required
+          />
+        </label>
+        <label v-if="view === 'register' && needsInvite" :class="styles.field"
+          >Invitation code
+          <input v-model.trim="invite" :class="styles.input" autocomplete="off" required />
+        </label>
+      </template>
 
-    <button
-      v-if="passkeys && view === 'sign-in'"
-      type="button"
-      :class="styles.provider"
-      :disabled="busy"
-      @click="emit('passkey')"
-    >
-      Sign in with a passkey
-    </button>
-    <a
-      v-if="external"
-      :class="styles.provider"
-      :href="externalSignInUrl(external.sign_in_url, returnTo)"
-      >Sign in with {{ external.name }}</a
-    >
-    <button v-if="!showForm" type="button" :class="styles.link" @click="adminForm = true">
-      Administrator sign-in
-    </button>
+      <p v-if="showNoEmailNote" :class="styles.note" data-no-email>
+        {{ noEmailNote ?? NO_EMAIL_NOTE }}
+      </p>
 
-    <p v-if="showForm" :class="styles.links">
+      <button v-if="showForm" type="submit" :class="styles.primary" :disabled="busy || mismatch">
+        {{ title }}
+      </button>
+
+      <button
+        v-if="passkeys && view === 'sign-in'"
+        type="button"
+        :class="styles.provider"
+        :disabled="busy"
+        @click="emit('passkey')"
+      >
+        Sign in with a passkey
+      </button>
+      <a
+        v-if="external"
+        :class="styles.provider"
+        :href="externalSignInUrl(external.sign_in_url, returnTo)"
+        >Sign in with {{ external.name }}</a
+      >
+    </form>
+
+    <p v-if="!showForm" :class="styles.aside">
+      <button type="button" :class="styles.link" @click="adminForm = true">
+        Administrator sign-in
+      </button>
+    </p>
+
+    <p v-if="showForm && (view === 'register' || canRegister)" :class="styles.aside">
+      <span v-if="view === 'sign-in' && canRegister" :class="styles.asideText">New here?</span>
+      <span v-else-if="view === 'register'" :class="styles.asideText">Already registered?</span>
       <button
         v-if="view !== 'sign-in'"
         type="button"
@@ -257,5 +265,5 @@ function submit() {
         {{ needsInvite ? 'I have an invitation' : 'Create an account' }}
       </button>
     </p>
-  </form>
+  </div>
 </template>
