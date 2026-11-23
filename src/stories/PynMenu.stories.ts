@@ -11,6 +11,11 @@ const meta: Meta<typeof PynMenu> = {
   }),
 }
 export default meta
+const tick = () => new Promise((resolve) => setTimeout(resolve))
+const open = async (ctx: { canvasElement: HTMLElement }) => {
+  ctx.canvasElement.querySelector<HTMLElement>('button[aria-haspopup]')!.click()
+  await tick()
+}
 type Story = StoryObj<typeof PynMenu>
 
 export const Links: Story = {
@@ -24,4 +29,36 @@ export const Choices: Story = {
       { id: 'dark', label: 'Dark', checked: true },
     ],
   },
+}
+
+export const LinksOpen: Story = {
+  args: {
+    label: 'Create',
+    align: 'start',
+    items: [
+      { id: 'h', label: 'Create', heading: true },
+      { id: 'repo', label: 'New repository', href: '/_/new' },
+      { id: 'org', label: 'New organization', href: '/_/orgs/new' },
+      { id: 's', label: '', separator: true },
+      { id: 'imp', label: 'Import repository', href: '/_/import' },
+    ],
+  },
+  play: open,
+}
+
+export const ChoicesOpen: Story = {
+  args: { ...Choices.args, label: 'Theme' },
+  play: open,
+}
+
+export const WithHeaderAndFooter: Story = {
+  args: { label: 'Account', items: [{ id: 'p', label: 'Your profile', href: '/alice' }] },
+  render: (args) => ({
+    components: { PynMenu },
+    setup: () => ({ args }),
+    template: `<div style="min-height: 14rem"><PynMenu v-bind="args">Menu
+      <template #header><p style="margin:0;padding:8px 16px">Signed in as <strong>alice</strong></p></template>
+      <template #footer>Footer note</template></PynMenu></div>`,
+  }),
+  play: open,
 }

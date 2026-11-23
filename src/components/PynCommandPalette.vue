@@ -181,6 +181,11 @@ function onKeydown(e: KeyboardEvent) {
           <p v-if="loading" :class="styles.note">Loading…</p>
           <p v-else-if="!flat.length" :class="styles.note">{{ empty }}</p>
         </div>
+        <div :class="styles.footer" aria-hidden="true" data-footer>
+          <span><kbd :class="styles.key">↑↓</kbd>to navigate</span>
+          <span><kbd :class="styles.key">↵</kbd>to select</span>
+          <span><kbd :class="styles.key">esc</kbd>to close</span>
+        </div>
         <div role="status" aria-live="polite" :class="styles.live">{{ status }}</div>
       </div>
     </div>
