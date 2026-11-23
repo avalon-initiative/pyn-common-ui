@@ -1,0 +1,150 @@
+@use 'mixins' as m;
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 10vh var(--pyn-space-4) 0;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.5);
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(36rem, 100%);
+  max-height: 70vh;
+  color: var(--pyn-text);
+  background: var(--pyn-surface);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius-lg);
+  box-shadow: 0 0.5rem 2rem rgb(0 0 0 / 0.4);
+  overflow: hidden;
+
+  @include m.narrow {
+    max-height: 80vh;
+  }
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  padding: 0 var(--pyn-space-3);
+  border-bottom: 1px solid var(--pyn-border);
+}
+
+.icon {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--pyn-text-muted);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--pyn-space-3) 0;
+  font: inherit;
+  font-size: var(--pyn-text-md);
+  color: inherit;
+  background: transparent;
+  border: 0;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: var(--pyn-text-muted);
+  }
+}
+
+.search:focus-within {
+  outline: 2px solid var(--pyn-accent);
+  outline-offset: -2px;
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--pyn-space-2);
+}
+
+.heading {
+  padding: var(--pyn-space-2) var(--pyn-space-2) var(--pyn-space-1);
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
+  color: var(--pyn-text-muted);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-2);
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+}
+
+.active_option {
+  background: var(--pyn-selected);
+  outline: 1px solid var(--pyn-accent);
+  outline-offset: -1px;
+}
+
+.optionLabel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.hintText {
+  flex: none;
+  font-size: var(--pyn-text-sm);
+  color: var(--pyn-text-muted);
+}
+
+.note {
+  margin: 0;
+  padding: var(--pyn-space-4);
+  text-align: center;
+  color: var(--pyn-text-muted);
+}
+
+.live {
+  @include m.visually-hidden;
+}
+
+.active {
+  transition: opacity 0.15s ease;
+
+  .panel {
+    transition: transform 0.15s ease;
+  }
+}
+
+.hidden {
+  opacity: 0;
+
+  .panel {
+    transform: translateY(-0.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .active,
+  .active .panel {
+    transition: none;
+  }
+}

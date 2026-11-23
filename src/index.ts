@@ -493,3 +493,22 @@ export { matchedIndex } from './state/policy.state'
 export type { BranchListItem } from './types/branch.types'
 export type { PolicyRule } from './types/policy.types'
 export type { TopBarLink } from './types/top-bar.types'
+export { default as PynCommandPalette } from './components/PynCommandPalette.vue'
+export { default as PynShortcutsHelp } from './components/PynShortcutsHelp.vue'
+export {
+  commandScore,
+  filterCommands,
+  groupCommands,
+  moveActive,
+  resultsText,
+} from './state/command-palette.state'
+export { createShortcutMatcher } from './state/shortcut-matcher.state'
+export { lockBodyScroll } from './utils/scroll-lock'
+export type {
+  CommandGroup,
+  CommandItem,
+  Shortcut,
+  ShortcutBinding,
+  ShortcutGroup,
+  ShortcutMatcher,
+} from './types/command-palette.types'
