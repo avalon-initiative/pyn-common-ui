@@ -13,3 +13,12 @@ export const Owner: Story = { args: { role: 'owner', current: '' } }
 export const OwnerUsage: Story = { args: { role: 'owner', current: 'usage' } }
 export const Member: Story = { args: { role: 'member', current: 'members' } }
 export const Visitor: Story = {}
+export const Full: Story = {
+  args: {
+    role: 'owner',
+    displayName: 'Studio Games',
+    description: 'We make levels, tools and the occasional boss fight.',
+    avatarUrl: null,
+    url: 'https://studio.example',
+  },
+}

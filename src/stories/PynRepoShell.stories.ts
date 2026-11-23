@@ -49,3 +49,8 @@ export const SettingsOpen: Story = { args: { current: 'settings/members' } }
 export const NoAccess: Story = { args: { tabs: undefined } }
 export const HidePath: Story = { args: { hidePath: true } }
 export const OnBranch: Story = { args: { branch: 'feature/levels' } }
+export const LockStrip: Story = {
+  args: { lockedCount: 3, lockHolders: ['jamie', 'riley', 'sam', 'alex', 'lee'], current: 'locks' },
+}
+export const OneLock: Story = { args: { lockedCount: 1, lockHolders: ['jamie'] } }
+export const MoreMenu: Story = { args: { maxTabs: 3, current: 'settings' } }

@@ -1,30 +1,35 @@
 <script setup lang="ts">
-import styles from '../styles/PynAccountSettings.module.scss'
+import { computed } from 'vue'
+import PynSettingsLayout from './PynSettingsLayout.vue'
 import { repoSettingsPath } from '../state/repo.state'
 import type { RepoTab } from '../state/repo.state'
 
-defineProps<{
+const props = defineProps<{
   owner: string
   name: string
   /** Sub-pages from `repoSettingsNav`. */
   items: RepoTab[]
   /** Section of the open sub-page. */
   current: string
+  title?: string
 }>()
+
+const sections = computed(() =>
+  props.items.map((i) => ({
+    id: i.section,
+    label: i.label,
+    href: repoSettingsPath({ owner: props.owner, name: props.name }, i.section),
+  })),
+)
 </script>
 
 <template>
-  <div :class="styles.layout">
-    <nav :class="styles.nav" aria-label="Repository settings">
-      <a
-        v-for="item in items"
-        :key="item.section"
-        :href="repoSettingsPath({ owner, name }, item.section)"
-        :class="styles.link"
-        :aria-current="item.section === current ? 'page' : undefined"
-        >{{ item.label }}</a
-      >
-    </nav>
-    <div :class="styles.body"><slot /></div>
-  </div>
+  <PynSettingsLayout
+    :sections="sections"
+    :current="current"
+    :title="title"
+    label="Repository settings"
+  >
+    <slot />
+  </PynSettingsLayout>
 </template>

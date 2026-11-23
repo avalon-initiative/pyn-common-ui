@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import PynIcon from './PynIcon.vue'
+import PynTabs from './PynTabs.vue'
 import styles from '../styles/PynRepoShell.module.scss'
 import { BRANCH_SECTIONS, repoPath } from '../state/repo.state'
 import type { RepoShellTab } from '../state/repo.state'
@@ -18,12 +21,40 @@ const props = defineProps<{
   branch?: string
   /** Drops the owner and name path, for pages that already show it (breadcrumbs). */
   hidePath?: boolean
+  /** Exclusive files locked now; the lock strip shows when it is above 0 and the Locks tab gets this count unless it has its own. */
+  lockedCount?: number
+  /** Names of the accounts holding locks; the first few show in the lock strip. */
+  lockHolders?: string[]
+  /** Most tabs shown before the rest move into a More menu. */
+  maxTabs?: number
 }>()
+
+const HOLDERS_SHOWN = 3
 
 function isCurrent(section: string): boolean {
   const c = props.current ?? ''
   return section === '' ? c === '' : c === section || c.startsWith(`${section}/`)
 }
+
+const tabItems = computed(() =>
+  (props.tabs ?? []).map((tab) => {
+    const count =
+      tab.count ?? (tab.section === 'locks' && props.lockedCount ? props.lockedCount : undefined)
+    return {
+      label: tab.label,
+      href: repoPath(
+        { owner: props.owner, name: props.name },
+        tab.section,
+        BRANCH_SECTIONS.has(tab.section) ? props.branch : undefined,
+      ),
+      count,
+      countLabel: tab.countLabel ?? (tab.section === 'locks' ? `${count} locked` : undefined),
+      current: isCurrent(tab.section),
+    }
+  }),
+)
+const holders = computed(() => (props.lockHolders ?? []).slice(0, HOLDERS_SHOWN))
+const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.value.length)
 </script>
 
 <template>
@@ -44,27 +75,20 @@ function isCurrent(section: string): boolean {
         </component>
         <div v-if="$slots.actions" :class="styles.actions"><slot name="actions" /></div>
       </div>
-      <nav v-if="tabs" :class="styles.tabs" aria-label="Repository">
-        <a
-          v-for="tab in tabs"
-          :key="tab.section"
-          :href="
-            repoPath(
-              { owner, name },
-              tab.section,
-              BRANCH_SECTIONS.has(tab.section) ? branch : undefined,
-            )
-          "
-          :class="styles.tab"
-          :aria-current="isCurrent(tab.section) ? 'page' : undefined"
-        >
-          {{ tab.label }}
-          <span v-if="tab.count !== undefined" :class="styles.count" data-count>{{
-            tab.count
-          }}</span>
-        </a>
-      </nav>
+      <PynTabs v-if="tabs" :items="tabItems" label="Repository" :max="maxTabs" />
     </header>
+    <p v-if="lockedCount" :class="styles.strip" data-lock-strip>
+      <PynIcon name="lock" :class="styles.stripIcon" />
+      <span
+        >{{ lockedCount }} exclusive {{ lockedCount === 1 ? 'file' : 'files' }} locked now<template
+          v-if="holders.length"
+        >
+          by {{ holders.join(', ')
+          }}<template v-if="otherHolders > 0"> and {{ otherHolders }} more</template></template
+        ></span
+      >
+      <a :href="repoPath({ owner, name }, 'locks')" :class="styles.stripLink">View locks</a>
+    </p>
     <div :class="styles.body"><slot /></div>
   </div>
 </template>

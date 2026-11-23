@@ -4,6 +4,31 @@
   margin-bottom: var(--pyn-space-4);
 }
 
+.identity {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pyn-space-4);
+  margin-bottom: var(--pyn-space-4);
+
+  @include m.narrow {
+    flex-direction: column;
+  }
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+}
+
 .title {
   display: flex;
   flex-wrap: wrap;
@@ -14,6 +39,12 @@
   overflow-wrap: anywhere;
 }
 
+.handle {
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-md);
+  font-weight: 400;
+}
+
 .chip {
   @include m.pill;
   padding: 0 var(--pyn-space-3);
@@ -21,15 +52,15 @@
   line-height: 1.5rem;
 }
 
+.description {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 .meta {
   @include m.muted;
-  margin: var(--pyn-space-1) 0 var(--pyn-space-4);
-}
 
-.nav {
-  @include m.tab-nav;
-}
-
-.tab {
-  @include m.tab;
+  a {
+    color: var(--pyn-accent);
+  }
 }

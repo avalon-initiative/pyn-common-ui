@@ -4,12 +4,14 @@ import PynActivity from './PynActivity.vue'
 import PynBranchBar from './PynBranchBar.vue'
 import PynBreadcrumb from './PynBreadcrumb.vue'
 import PynCheckoutCard from './PynCheckoutCard.vue'
+import PynRepoBranches from './PynRepoBranches.vue'
 import PynLockedFiles from './PynLockedFiles.vue'
 import PynReadme from './PynReadme.vue'
 import PynRepoDetails from './PynRepoDetails.vue'
 import PynTree from './PynTree.vue'
 import styles from '../styles/PynRepoLanding.module.scss'
 import { breadcrumbs, treePath } from '../state/tree.state'
+import type { BranchSummary } from '../types/branch.types'
 import type { ReadmeDoc } from '../types/blob.types'
 import type { RepoInfo } from '../types/repo.types'
 import type { RepoSummary, TreeListing } from '../types/tree.types'
@@ -27,6 +29,10 @@ const props = defineProps<{
   now?: Date
   /** Branch the links keep; omitted is the default branch. */
   branch?: string
+  /** Recent branches for the rail, with ahead and behind against the default branch. */
+  branches?: BranchSummary[]
+  /** Where the rail's Branches panel links to; with `branches` it shows the panel. */
+  branchesHref?: string
 }>()
 
 const crumbs = computed(() => breadcrumbs(props.repo, props.path, props.branch))
@@ -77,6 +83,13 @@ const crumbs = computed(() => breadcrumbs(props.repo, props.path, props.branch))
         :files="summary.files"
         :exclusive-files="summary.exclusive_files"
         :shared-files="summary.shared_files"
+        :now="now"
+      />
+      <PynRepoBranches
+        v-if="branches?.length || branchesHref"
+        :branches="branches"
+        :default-branch="summary.default_branch"
+        :href="branchesHref"
         :now="now"
       />
       <PynLockedFiles

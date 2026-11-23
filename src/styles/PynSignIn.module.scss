@@ -98,3 +98,7 @@
 
   @include m.focus-ring;
 }
+
+.note {
+  @include m.muted;
+}

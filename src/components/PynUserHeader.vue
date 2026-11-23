@@ -1,22 +1,23 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import PynTabs from './PynTabs.vue'
 import styles from '../styles/PynUserHeader.module.scss'
 import { orgPath, userTabs } from '../state/org.state'
 
-defineProps<{ name: string; self?: boolean; current?: string }>()
+const props = defineProps<{ name: string; self?: boolean; current?: string }>()
+
+const tabs = computed(() =>
+  userTabs(!!props.self).map((t) => ({
+    label: t.label,
+    href: orgPath(props.name, t.section),
+    current: t.section === (props.current ?? ''),
+  })),
+)
 </script>
 
 <template>
   <header :class="styles.header">
     <h1 :class="styles.title">{{ name }}</h1>
-    <nav :class="styles.nav" aria-label="User">
-      <a
-        v-for="tab in userTabs(!!self)"
-        :key="tab.section"
-        :href="orgPath(name, tab.section)"
-        :class="styles.tab"
-        :aria-current="tab.section === (current ?? '') ? 'page' : undefined"
-        >{{ tab.label }}</a
-      >
-    </nav>
+    <PynTabs :items="tabs" label="User" />
   </header>
 </template>

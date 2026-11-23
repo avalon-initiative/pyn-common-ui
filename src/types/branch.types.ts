@@ -11,3 +11,12 @@ export interface BranchChange {
   path: string
   kind: BranchChangeKind
 }
+
+/** A branch in the overview rail; ahead and behind count commits against the default branch. */
+export interface BranchSummary {
+  name: string
+  isDefault?: boolean
+  ahead?: number
+  behind?: number
+  updatedAt?: string | null
+}
