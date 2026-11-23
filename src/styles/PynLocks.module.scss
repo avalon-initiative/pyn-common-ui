@@ -24,6 +24,26 @@
   @include m.table-row;
   flex-wrap: wrap;
   @include m.row-hover;
+
+  // Path and action share the first row; the chip and holder follow.
+  @include m.narrow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--pyn-space-2) var(--pyn-space-3);
+    align-items: start;
+  }
+}
+
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2) var(--pyn-space-3);
+
+  @include m.narrow {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 }
 
 .path {
@@ -32,6 +52,7 @@
   font-family: var(--pyn-font-mono);
   font-size: var(--pyn-text-base);
   overflow-wrap: anywhere;
+  hyphens: none;
 }
 
 .lockIcon {
@@ -55,6 +76,11 @@
 .reason {
   display: flex;
   gap: var(--pyn-space-2);
+
+  @include m.narrow {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
 }
 
 .input {
@@ -63,6 +89,13 @@
 
 .danger {
   @include m.button(var(--pyn-danger));
+}
+
+.action {
+  @include m.narrow {
+    grid-column: 2;
+    grid-row: 1;
+  }
 }
 
 .quiet {

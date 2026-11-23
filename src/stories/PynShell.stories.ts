@@ -92,3 +92,16 @@ export const WithBanner: StoryObj<typeof PynShell> = {
       </PynShell>`,
   }),
 }
+
+/** The footer slot renders after the content with a top border, not over it. */
+export const WithFooter: StoryObj<typeof PynShell> = {
+  render: () => ({
+    components: { PynShell, PynTopBar },
+    template: `
+      <PynShell>
+        <template #top><PynTopBar user="alice" :repos="[]" theme="system" /></template>
+        <p v-for="n in 40" :key="n">Page content line {{ n }}</p>
+        <template #footer><small style="display: block; padding: 0.5rem 1rem; text-align: right">web v0.2.1 · server v0.2.1</small></template>
+      </PynShell>`,
+  }),
+}

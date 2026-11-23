@@ -2,6 +2,10 @@
 
 .header {
   margin-bottom: var(--pyn-space-4);
+
+  @include m.narrow {
+    margin-bottom: var(--pyn-space-3);
+  }
 }
 
 .top {
@@ -11,6 +15,11 @@
   justify-content: space-between;
   gap: var(--pyn-space-3);
   padding-block: var(--pyn-space-4);
+
+  @include m.narrow {
+    gap: var(--pyn-space-2);
+    padding-block: var(--pyn-space-3) var(--pyn-space-2);
+  }
 }
 
 .title {
@@ -24,6 +33,10 @@
   font-weight: 600;
   line-height: var(--pyn-leading-tight);
   overflow-wrap: anywhere;
+
+  @include m.narrow {
+    gap: var(--pyn-space-1) var(--pyn-space-2);
+  }
 }
 
 .path {
@@ -82,6 +95,10 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--pyn-space-2);
+
+  &:empty {
+    display: none;
+  }
 }
 
 .strip {

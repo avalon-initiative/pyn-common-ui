@@ -28,6 +28,19 @@ describe('PynCloneMenu', () => {
     expect(inputs.every((i) => i.attributes('readonly') !== undefined)).toBe(true)
   })
 
+  it('focuses the address without scrolling and shows its start selected', async () => {
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
+    const w = make()
+    await w.find('button').trigger('click')
+    await flushPromises()
+    const input = w.find('input').element as HTMLInputElement
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true })
+    expect(document.activeElement).toBe(input)
+    expect(input.selectionEnd! - input.selectionStart!).toBe(props.httpsUrl.length)
+    expect(input.scrollLeft).toBe(0)
+    focus.mockRestore()
+  })
+
   it('uses a custom label', () => {
     expect(make({ label: 'Get code' }).find('button').text()).toBe('Get code')
   })

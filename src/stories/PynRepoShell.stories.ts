@@ -121,3 +121,17 @@ export const Facts: Story = {
     ],
   },
 }
+
+export const FactsWithEmptyActions: Story = {
+  render: (args) => ({
+    components: { PynRepoShell },
+    setup: () => ({ args }),
+    template: `<PynRepoShell v-bind="args">
+      <template #actions><span v-if="false">hidden</span></template>
+      <p>Page content</p>
+    </PynRepoShell>`,
+  }),
+  args: {
+    ...Facts.args,
+  },
+}

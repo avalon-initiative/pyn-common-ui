@@ -846,6 +846,13 @@ describe('PynShell footer', () => {
     const w = mount(PynShell, { slots: { footer: '<footer>f</footer>' } })
     expect(w.find('footer').exists()).toBe(true)
   })
+
+  it('places the footer after the main content', () => {
+    const w = mount(PynShell, { slots: { default: '<p>body</p>', footer: '<footer>f</footer>' } })
+    const kids = [...w.element.children].map((c) => c.tagName)
+    expect(kids.indexOf('MAIN')).toBeLessThan(kids.indexOf('DIV'))
+    expect(w.find('main').find('footer').exists()).toBe(false)
+  })
 })
 
 describe('PynVersionFooter', () => {

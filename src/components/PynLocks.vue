@@ -36,16 +36,23 @@ function confirm() {
       </div>
       <ul :class="styles.list">
         <li v-for="lock in locks" :key="lock.path" :class="styles.item">
-          <span :class="styles.path"><PynLockIcon :class="styles.lockIcon" />{{ lock.path }}</span>
-          <PynModeChip mode="exclusive" />
-          <span :class="styles.meta" :title="`Expires ${formatDateTime(lock.expires_at)}`">
-            <PynPerson :name="lock.owner" :identity="lock.identity" /> ·
-            {{ formatLease(lock.expires_at, now ?? new Date()) }}</span
-          >
+          <span :class="styles.path"
+            ><PynLockIcon :class="styles.lockIcon" /><template
+              v-for="(part, i) in lock.path.split(/(?<=\/)/)"
+              :key="i"
+              >{{ part }}<wbr /></template
+          ></span>
+          <span :class="styles.info">
+            <PynModeChip mode="exclusive" />
+            <span :class="styles.meta" :title="`Expires ${formatDateTime(lock.expires_at)}`">
+              <PynPerson :name="lock.owner" :identity="lock.identity" /> ·
+              {{ formatLease(lock.expires_at, now ?? new Date()) }}</span
+            >
+          </span>
           <button
             v-if="canForce && forcing !== lock.path"
             type="button"
-            :class="styles.danger"
+            :class="[styles.danger, styles.action]"
             @click="forcing = lock.path"
           >
             Force unlock
