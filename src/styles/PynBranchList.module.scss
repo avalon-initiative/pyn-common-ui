@@ -1,0 +1,97 @@
+@use 'mixins' as m;
+
+.list {
+  @include m.card;
+  min-width: 0;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2) var(--pyn-space-3);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  font-size: var(--pyn-text-sm);
+
+  & + & {
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+.icon {
+  flex: none;
+  color: var(--pyn-text-muted);
+}
+
+.name {
+  min-width: 0;
+  max-width: 100%;
+  color: var(--pyn-text);
+  font-family: var(--pyn-font-mono);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+
+  @include m.narrow {
+    flex: 1 1 calc(100% - 2rem);
+  }
+}
+
+a.name {
+  color: var(--pyn-accent);
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include m.narrow {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  @include m.focus-ring;
+}
+
+.badge {
+  @include m.pill;
+}
+
+.meta {
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+}
+
+.compare {
+  margin-left: auto;
+  color: var(--pyn-accent);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include m.narrow {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-left: 0;
+  }
+
+  @include m.focus-ring;
+}
+
+.error {
+  @include m.error;
+  margin: var(--pyn-space-3);
+}
+
+.hidden {
+  @include m.visually-hidden;
+}

@@ -1,0 +1,127 @@
+@use 'mixins' as m;
+
+.view {
+  @include m.card;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  min-width: 0;
+  padding: var(--pyn-space-4);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2) var(--pyn-space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-md);
+}
+
+.file {
+  min-width: 0;
+  color: var(--pyn-text-muted);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-sm);
+  overflow-wrap: anywhere;
+}
+
+.edit {
+  @include m.button;
+  margin-left: auto;
+  text-decoration: none;
+
+  @include m.narrow {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0;
+  }
+}
+
+.default,
+.match,
+.empty {
+  margin: 0;
+}
+
+.explain {
+  @include m.muted;
+  margin: 0;
+  padding-left: var(--pyn-space-4);
+}
+
+.match {
+  padding: var(--pyn-space-2) var(--pyn-space-3);
+  background: var(--pyn-selected);
+  border-radius: var(--pyn-radius);
+  font-size: var(--pyn-text-sm);
+}
+
+.path {
+  font-family: var(--pyn-font-mono);
+  overflow-wrap: anywhere;
+}
+
+.empty {
+  @include m.muted;
+}
+
+.error {
+  @include m.error;
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+.caption {
+  @include m.visually-hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--pyn-text-sm);
+
+  th,
+  td {
+    padding: var(--pyn-space-2) var(--pyn-space-3);
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--pyn-border);
+  }
+
+  thead th {
+    color: var(--pyn-text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+}
+
+.matched {
+  background: var(--pyn-selected);
+  box-shadow: inset 3px 0 0 var(--pyn-accent);
+}
+
+.num {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.flag {
+  color: var(--pyn-accent);
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
+}
+
+.pattern {
+  font-family: var(--pyn-font-mono);
+  overflow-wrap: anywhere;
+}
+
+.comment {
+  color: var(--pyn-text-muted);
+}

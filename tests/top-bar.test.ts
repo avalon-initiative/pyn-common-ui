@@ -268,3 +268,57 @@ describe('top bar narrow menu', () => {
     expect(menu.text()).toContain('Dark theme')
   })
 })
+
+describe('top bar named destinations', () => {
+  const hrefsIn = (w: ReturnType<typeof mount>) =>
+    w.findAll('[role=menu] a[role=menuitem]').map((a) => a.attributes('href'))
+
+  it('shows People and Organizations in the account menu and the narrow main menu', async () => {
+    const w = make()
+    await trigger(w, 'Account menu').trigger('click')
+    expect(hrefsIn(w)).toEqual(expect.arrayContaining(['/_/people', '/_/orgs']))
+    document.body.click()
+    await tick()
+    await trigger(w, 'Main menu').trigger('click')
+    expect(hrefsIn(w)).toEqual(expect.arrayContaining(['/_/people', '/_/orgs']))
+    expect(w.find('[role=menu]').text()).toContain('People')
+    expect(w.find('[role=menu]').text()).toContain('Organizations')
+  })
+
+  it('takes the destinations from hrefs', async () => {
+    const w = make({ hrefs: { people: '/p', orgs: '/o' } })
+    await trigger(w, 'Main menu').trigger('click')
+    expect(hrefsIn(w)).toEqual(expect.arrayContaining(['/p', '/o']))
+    expect(hrefsIn(w)).not.toContain('/_/people')
+  })
+
+  it('shows an extraAccount entry with a named href once', async () => {
+    const w = make({
+      extraAccount: [
+        { id: 'people', label: 'People', href: '/_/people' },
+        { id: 'docs', label: 'Documentation', href: '/docs' },
+      ],
+    })
+    await trigger(w, 'Account menu').trigger('click')
+    const hrefs = hrefsIn(w)
+    expect(hrefs.filter((h) => h === '/_/people')).toHaveLength(1)
+    expect(hrefs).toContain('/docs')
+  })
+
+  it('lists extraLinks in the narrow menu only, without repeating a named one', async () => {
+    const w = make({
+      extraLinks: [
+        { id: 'docs', label: 'Documentation', href: '/docs' },
+        { id: 'orgs2', label: 'Orgs', href: '/_/orgs' },
+      ],
+    })
+    await trigger(w, 'Main menu').trigger('click')
+    const hrefs = hrefsIn(w)
+    expect(hrefs).toContain('/docs')
+    expect(hrefs.filter((h) => h === '/_/orgs')).toHaveLength(1)
+    document.body.click()
+    await tick()
+    await trigger(w, 'Account menu').trigger('click')
+    expect(hrefsIn(w)).not.toContain('/docs')
+  })
+})

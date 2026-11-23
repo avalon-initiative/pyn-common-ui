@@ -1,0 +1,61 @@
+@use 'mixins' as m;
+
+.prompt {
+  @include m.card;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-4);
+  border-left: 4px solid var(--pyn-accent);
+}
+
+.text {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-md);
+}
+
+.message {
+  @include m.muted;
+  margin-top: var(--pyn-space-1);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+
+  @include m.narrow {
+    flex: 1 1 100%;
+  }
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.primary {
+  @include m.button-primary;
+  align-self: auto;
+}
+
+.secondary {
+  @include m.button;
+}
+
+.primary,
+.secondary {
+  @include m.narrow {
+    flex: 1 1 auto;
+  }
+}

@@ -23,13 +23,15 @@
   @include m.narrow {
     grid-template-columns: auto auto 1fr;
     gap: var(--pyn-space-2) var(--pyn-space-3);
+    padding: var(--pyn-space-3) var(--pyn-space-4);
   }
 }
 
 .path {
   font-family: var(--pyn-font-mono);
   font-size: 0.875rem;
-  overflow-wrap: break-word;
+  min-width: 0;
+  overflow-wrap: anywhere;
 
   @include m.narrow {
     grid-column: 1 / -1;

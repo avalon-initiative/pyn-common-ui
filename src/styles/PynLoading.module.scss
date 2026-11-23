@@ -1,0 +1,85 @@
+@use 'mixins' as m;
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  color: var(--pyn-text-muted);
+}
+
+.block {
+  flex-direction: column;
+  align-items: stretch;
+  padding: var(--pyn-space-4);
+}
+
+.compact {
+  gap: var(--pyn-space-1);
+}
+
+.label {
+  @include m.visually-hidden;
+}
+
+.spinner {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--pyn-border);
+  border-top-color: var(--pyn-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.compact .spinner {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
+.line {
+  height: 0.875rem;
+  background: var(--pyn-surface-raised);
+  border-radius: var(--pyn-radius);
+  animation: pulse 1.4s ease-in-out infinite;
+
+  &:nth-child(1) {
+    width: 100%;
+  }
+
+  &:nth-child(2) {
+    width: 80%;
+  }
+
+  &:nth-child(3) {
+    width: 60%;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    border-top-color: var(--pyn-border);
+    animation: none;
+  }
+
+  .line {
+    animation: none;
+  }
+}

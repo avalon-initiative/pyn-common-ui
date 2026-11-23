@@ -74,6 +74,11 @@
     color: var(--pyn-text-muted);
     font-weight: 600;
   }
+
+  @include m.narrow {
+    display: block;
+    overflow-x: auto;
+  }
 }
 
 .folder th {

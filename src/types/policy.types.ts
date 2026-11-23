@@ -1,4 +1,4 @@
-import type { LockInfo } from './lock.types'
+import type { LockInfo, Mode } from './lock.types'
 import type { PublicIdentity } from './profile.types'
 
 export type PolicyNoticeKind =
@@ -38,4 +38,11 @@ export interface PolicyPreview {
   released_locks: LockInfo[]
   stranded?: StrandedVersion[]
   disagreements?: LockableDisagreement[]
+}
+
+/** One rule of a repository's path policy, in the order the server evaluates them. */
+export interface PolicyRule {
+  pattern: string
+  mode: Mode
+  comment?: string
 }

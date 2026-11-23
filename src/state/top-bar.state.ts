@@ -9,6 +9,8 @@ export const defaultHrefs = (user?: string): TopBarHrefs => ({
   profile: user ? `/${user}` : '/',
   settings: '/_/settings',
   admin: '/_/admin',
+  people: '/_/people',
+  orgs: '/_/orgs',
   locks: '/_/locks',
   notifications: '/_/invitations',
   newRepo: '/_/new',
@@ -48,3 +50,7 @@ export function ownerItems(owners: OwnerOption[], current: string, newOrg: strin
     { id: 'new-org', label: 'Create an organization', href: newOrg },
   ]
 }
+
+/** Entries with an href the named destinations already show. */
+export const withoutNamed = (items: MenuItem[], named: MenuItem[]): MenuItem[] =>
+  items.filter((i) => !i.href || !named.some((n) => n.href === i.href))

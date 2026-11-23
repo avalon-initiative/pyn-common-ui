@@ -85,6 +85,12 @@
 
   @include m.narrow {
     width: auto;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+    }
   }
 }
 

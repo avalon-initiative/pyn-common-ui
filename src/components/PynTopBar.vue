@@ -14,10 +14,11 @@ import {
   locksText,
   notificationsText,
   ownerItems,
+  withoutNamed,
 } from '../state/top-bar.state'
 import type { ThemeChoice } from '../state/theme.state'
 import type { MenuItem } from '../types/shell.types'
-import type { OwnerOption, TopBarHrefs } from '../types/top-bar.types'
+import type { OwnerOption, TopBarHrefs, TopBarLink } from '../types/top-bar.types'
 
 const props = withDefaults(
   defineProps<{
@@ -33,6 +34,8 @@ const props = withDefaults(
     signInHref?: string
     admin?: boolean
     extraAccount?: MenuItem[]
+    /** Extra destinations for the narrow-screen main menu, after People and Organizations. */
+    extraLinks?: TopBarLink[]
     /** The person's account and organizations, listed in the owner switcher. */
     owners?: OwnerOption[]
     /** Owner shown in the switcher; defaults to `user`. */
@@ -78,13 +81,18 @@ const create = computed<MenuItem[]>(() => [
   { id: 'new-org', label: 'New organization', href: links.value.newOrg },
 ])
 const switcher = computed(() => ownerItems(props.owners ?? [], owner.value, links.value.newOrg))
+const directory = computed<MenuItem[]>(() => [
+  { id: 'people', label: 'People', href: links.value.people },
+  { id: 'orgs', label: 'Organizations', href: links.value.orgs },
+])
 const account = computed<MenuItem[]>(() => [
   { id: 'profile', label: 'Your profile', href: links.value.profile },
   { id: 'settings', label: 'Account settings', href: links.value.settings },
   ...(props.admin
     ? [{ id: 'admin', label: 'Server administration', href: links.value.admin }]
     : []),
-  ...(props.extraAccount ?? []),
+  ...directory.value,
+  ...withoutNamed(props.extraAccount ?? [], directory.value),
   { id: 'sep-theme', label: '', separator: true },
   ...themeItems.value,
   { id: 'sep-out', label: '', separator: true },
@@ -109,6 +117,8 @@ const globalLinks = computed<MenuItem[]>(() => {
       label: n > 0 ? `Notifications (${countText(n)})` : 'Notifications',
       href: links.value.notifications,
     },
+    ...directory.value,
+    ...withoutNamed(props.extraLinks ?? [], directory.value),
     { id: 'sep-new', label: '', separator: true },
     ...create.value,
     ...(props.owners?.length
@@ -177,7 +187,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', slash))
       align="start"
       :class="styles.wideOnly"
     >
-      <span :class="styles.owner" data-owner>{{ owner }}</span>
+      <span :class="styles.owner" :title="owner" data-owner>{{ owner }}</span>
       <PynIcon name="chevron" :class="styles.chevron" />
     </PynMenu>
     <div
