@@ -13,8 +13,7 @@
 }
 
 .title {
-  margin: 0;
-  font-size: var(--pyn-text-md);
+  @include m.side-title;
 }
 
 .more {
@@ -53,7 +52,6 @@
 
 .name {
   min-width: 0;
-  font-family: var(--pyn-font-mono);
   overflow-wrap: anywhere;
 }
 

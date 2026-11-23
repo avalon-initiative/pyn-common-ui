@@ -1,76 +1,57 @@
 @use 'mixins' as m;
 
-.table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: var(--pyn-surface);
+.box {
+  overflow: hidden;
+  background: var(--pyn-bg);
   border: 1px solid var(--pyn-border);
   border-radius: var(--pyn-radius);
-  overflow: hidden;
-
-  th,
-  td {
-    padding: var(--pyn-space-3) var(--pyn-space-4);
-    text-align: left;
-    vertical-align: middle;
-  }
-
-  @include m.narrow {
-    display: block;
-
-    tbody {
-      display: block;
-    }
-  }
 }
 
-.head {
-  background: var(--pyn-surface-raised);
-  color: var(--pyn-text-muted);
-  font-size: var(--pyn-text-sm);
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: var(--pyn-text-base);
+}
 
-  @include m.narrow {
-    display: none;
-  }
+.caption {
+  @include m.visually-hidden;
+}
+
+.colName {
+  width: 16rem;
+}
+
+.colMode {
+  width: 7rem;
+}
+
+.colLock {
+  width: 9.5rem;
+}
+
+.colTime {
+  width: 7.5rem;
 }
 
 .row {
-  & + & td {
-    border-top: 1px solid var(--pyn-border);
-  }
+  height: var(--pyn-row-height);
+  border-top: 1px solid var(--pyn-border);
 
   &:hover {
     background: var(--pyn-hover);
   }
 
-  @include m.narrow {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--pyn-space-2);
-    padding: var(--pyn-space-3) var(--pyn-space-4);
-
-    & + & {
-      border-top: 1px solid var(--pyn-border);
-    }
-
-    & + & td {
-      border-top: 0;
-    }
-
-    td {
-      padding: 0;
-    }
+  td {
+    padding: 0 var(--pyn-space-4);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
   }
 }
 
 .name {
-  width: 30%;
-  font-family: var(--pyn-font-mono);
-  font-size: 0.875rem;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-
   a {
     color: var(--pyn-text);
     text-decoration: none;
@@ -82,20 +63,12 @@
 
     @include m.focus-ring;
   }
-
-  @include m.touch-target($display: inline-flex);
-
-  @include m.narrow {
-    width: auto;
-    a {
-    }
-  }
 }
 
 .icon {
-  width: 1.125rem;
-  height: 1.125rem;
-  margin-right: var(--pyn-space-2);
+  width: 1rem;
+  height: 1rem;
+  margin-right: var(--pyn-space-3);
   vertical-align: -0.2em;
   color: var(--pyn-text-muted);
 
@@ -104,37 +77,19 @@
   }
 }
 
-.change {
-  font-size: var(--pyn-text-sm);
-}
-
 .message {
-  display: block;
-  overflow-wrap: anywhere;
+  color: var(--pyn-text-muted);
 }
 
-.meta {
-  display: block;
+.row td.mode,
+.row td.lock {
+  padding-inline: var(--pyn-space-2);
+}
+
+.time {
   color: var(--pyn-text-muted);
   font-size: var(--pyn-text-xs);
-}
-
-.rev {
-  @include m.pill;
-  margin-right: var(--pyn-space-1);
-  font-family: var(--pyn-font-mono);
-}
-
-.status {
-  white-space: nowrap;
-
-  > * + * {
-    margin-left: var(--pyn-space-2);
-  }
-
-  @include m.narrow {
-    white-space: normal;
-  }
+  text-align: right;
 }
 
 .empty {
@@ -143,4 +98,52 @@
   padding: var(--pyn-space-6);
   color: var(--pyn-text-muted);
   text-align: center;
+}
+
+@include m.narrow {
+  .table,
+  .table tbody {
+    display: block;
+  }
+
+  .table col {
+    display: none;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'name name name time'
+      'message message message message'
+      'mode lock . .';
+    gap: var(--pyn-space-1) var(--pyn-space-3);
+    height: auto;
+    padding: var(--pyn-space-2) var(--pyn-space-4);
+
+    td {
+      padding: 0;
+    }
+  }
+
+  .name {
+    grid-area: name;
+  }
+
+  .time {
+    grid-area: time;
+  }
+
+  .message {
+    grid-area: message;
+    padding-left: 1.75rem !important;
+  }
+
+  .mode {
+    grid-area: mode;
+  }
+
+  .lock {
+    grid-area: lock;
+  }
 }

@@ -19,6 +19,12 @@ const paths: Record<string, string> = {
   'check-circle': 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM8 12l3 3 5-6',
   alert: 'M12 4 3 20h18zM12 10v4M12 17v.01',
   stop: 'M8 3h8l5 5v8l-5 5H8l-5-5V8zM12 8v5M12 16v.01',
+  code: 'm8 8-5 4 5 4M16 8l5 4-5 4M14 5l-4 14',
+  insights: 'M4 4v16h16M8 16v-4M12 16V8M16 16v-6',
+  check: 'm5 12 5 5 9-10',
+  history: 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2',
+  list: 'M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01',
+  eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
   user: 'M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4 20c1-4 4-6 8-6s7 2 8 6',
 }
 

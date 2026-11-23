@@ -37,6 +37,9 @@ export { default as PynPeopleList } from './components/PynPeopleList.vue'
 export { default as PynPeopleSearch } from './components/PynPeopleSearch.vue'
 export { default as PynProfileLayout } from './components/PynProfileLayout.vue'
 export { default as PynTree } from './components/PynTree.vue'
+export { default as PynLatestChange } from './components/PynLatestChange.vue'
+export { default as PynQuickSetup } from './components/PynQuickSetup.vue'
+export { default as PynRepoAbout } from './components/PynRepoAbout.vue'
 export { default as PynFileList } from './components/PynFileList.vue'
 export { default as PynDialog } from './components/PynDialog.vue'
 export { default as PynDrawer } from './components/PynDrawer.vue'
@@ -342,6 +345,8 @@ export {
   breadcrumbs,
   encodeSegments,
   folderParam,
+  foldersFirst,
+  latestChange,
   treePath,
 } from './state/tree.state'
 export {
@@ -353,9 +358,11 @@ export {
   fileBody,
   fileCrumbs,
   fileKind,
+  formatSize,
   historyLink,
   parentOf,
   readmeEntry,
+  textStats,
 } from './state/blob.state'
 export type { FileKind } from './state/blob.state'
 export {

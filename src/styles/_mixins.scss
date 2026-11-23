@@ -342,3 +342,71 @@
 
   @include focus-ring;
 }
+
+// Flat bordered box for lists and panels: 1px border, 6px radius, no shadow.
+@mixin flat-box {
+  overflow: hidden;
+  background: var(--pyn-surface);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+@mixin flat-list {
+  @include flat-box;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Header row of a flat box: counts and actions on a raised band.
+@mixin list-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-2) var(--pyn-space-4);
+  box-sizing: border-box;
+  min-height: var(--pyn-row-height);
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  color: var(--pyn-text);
+  background: var(--pyn-surface-raised);
+  border-bottom: 1px solid var(--pyn-border);
+  font-size: var(--pyn-text-base);
+  font-weight: 600;
+}
+
+// Row that tints on hover; for lists where the whole row is one target.
+@mixin row-hover {
+  &:hover {
+    background: var(--pyn-hover);
+  }
+}
+
+// Link in the accent color, underlined on hover.
+@mixin accent-link {
+  color: var(--pyn-accent);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include focus-ring;
+}
+
+// Status label: tinted fill and a border in the status color.
+@mixin status-label($color, $bg) {
+  @include label;
+  color: $color;
+  background: $bg;
+  border-color: color-mix(in srgb, #{$color} 40%, transparent);
+  white-space: nowrap;
+}
+
+// Heading of a side column block.
+@mixin side-title {
+  margin: 0;
+  font-size: var(--pyn-text-base);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
+}

@@ -1,0 +1,43 @@
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-6);
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-lg);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
+}
+
+.text {
+  margin: 0;
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-base);
+
+  code {
+    padding: 0.125rem 0.375rem;
+    color: var(--pyn-text);
+    background: var(--pyn-bg-inset);
+    border-radius: var(--pyn-radius-sm);
+    font-family: var(--pyn-font-mono);
+    font-size: var(--pyn-text-xs);
+  }
+}
+
+.code {
+  margin: 0;
+  padding: var(--pyn-space-4);
+  overflow-x: auto;
+  background: var(--pyn-bg-inset);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+  line-height: 1.25rem;
+}

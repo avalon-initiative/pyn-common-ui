@@ -18,3 +18,10 @@ export const NoRevision: Story = {
     entry: { ...lockedEntry, last_change: null, lock: { ...lockedEntry.lock!, owner: 'jamie' } },
   },
 }
+export const WithStatsAndLock: Story = {
+  args: {
+    entry: { ...lockedEntry, lock: null },
+    stats: '9 lines · 196 B',
+    lockable: true,
+  },
+}

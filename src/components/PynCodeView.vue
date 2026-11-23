@@ -10,6 +10,8 @@ const props = defineProps<{
   language?: string | null
   /** Highlighted lines. */
   range?: LineRange | null
+  /** Drops the box border so a parent can frame it. */
+  embedded?: boolean
 }>()
 const emit = defineEmits<{ select: [range: LineRange] }>()
 
@@ -23,7 +25,13 @@ function pick(e: MouseEvent, line: number) {
 </script>
 
 <template>
-  <div :class="styles.code" :data-language="language ?? 'plain'" role="region" aria-label="Code">
+  <div
+    :class="styles.code"
+    :data-language="language ?? 'plain'"
+    :data-embedded="embedded || undefined"
+    role="region"
+    aria-label="Code"
+  >
     <pre :class="styles.pre"><code><span
       v-for="(html, i) in lines"
       :id="`L${i + 1}`"
