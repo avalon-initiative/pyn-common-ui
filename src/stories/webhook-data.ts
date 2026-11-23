@@ -1,4 +1,5 @@
 import type { WebhookDelivery, WebhookSubscription } from '../types/webhook.types'
+import type { MultiSelectOption } from '../types/multi-select.types'
 
 export const webhooks: WebhookSubscription[] = [
   {
@@ -49,4 +50,11 @@ export const deliveries: WebhookDelivery[] = [
     last_status_code: 200,
     event_id: 'evt_3',
   },
+]
+
+export const eventTypeOptions: MultiSelectOption[] = [
+  { value: 'lock.acquired', label: 'lock.acquired', description: 'A lock was taken on a path.' },
+  { value: 'lock.released', label: 'lock.released', description: 'A lock was released.' },
+  { value: 'checkin.created', label: 'checkin.created', description: 'A check-in landed.' },
+  { value: 'member.added', label: 'member.added', description: 'A member was added.' },
 ]

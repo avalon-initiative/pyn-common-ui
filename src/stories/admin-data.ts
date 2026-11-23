@@ -75,3 +75,7 @@ export const adminAccounts: AccountInfo[] = [
   },
   accounts[3],
 ]
+
+export const pendingAccounts: AccountInfo[] = accounts.map((a) =>
+  a.status === 'pending_verification' ? { ...a, pending_verification: true } : a,
+)

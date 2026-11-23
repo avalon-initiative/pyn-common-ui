@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useId } from 'vue'
 import styles from '../styles/PynWebhookForm.module.scss'
-import { parseEventTypes, webhookNameProblem, webhookUrlProblem } from '../state/webhook.state'
+import { webhookNameProblem, webhookUrlProblem } from '../state/webhook.state'
+import PynEventTypesField from './PynEventTypesField.vue'
 import PynSecretReveal from './PynSecretReveal.vue'
+import type { MultiSelectOption } from '../types/multi-select.types'
 import type { WebhookCreate } from '../types/webhook.types'
 
 defineProps<{
@@ -10,11 +12,15 @@ defineProps<{
   secret?: string
   busy?: boolean
   error?: string
+  /** The server's event types; without it the form takes types as text. */
+  eventTypeOptions?: MultiSelectOption[]
+  eventTypesLoading?: boolean
+  eventTypesError?: string
 }>()
 const emit = defineEmits<{ submit: [WebhookCreate]; cancel: []; dismiss: [] }>()
 
 const id = useId()
-const form = reactive({ name: '', url: '', events: '', enabled: true })
+const form = reactive({ name: '', url: '', events: [] as string[], enabled: true })
 const submitted = ref(false)
 
 const nameProblem = computed(() => (submitted.value ? webhookNameProblem(form.name) : null))
@@ -26,7 +32,7 @@ function submit() {
   emit('submit', {
     name: form.name.trim(),
     url: form.url.trim(),
-    event_types: parseEventTypes(form.events),
+    event_types: form.events,
     enabled: form.enabled,
   })
 }
@@ -64,17 +70,21 @@ function submit() {
         'Use https; http only if your server allows it. No user name, password or fragment, at most 2048 bytes.'
       }}</span>
     </label>
-    <label :class="styles.field"
-      >Event types (one per line, empty for all)
-      <textarea v-model="form.events" :class="styles.input" rows="3" />
-    </label>
+    <PynEventTypesField
+      v-model="form.events"
+      :options="eventTypeOptions"
+      :loading="eventTypesLoading"
+      :error="eventTypesError"
+    />
     <label :class="styles.toggle">
       <input v-model="form.enabled" type="checkbox" />
       Enabled
     </label>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
     <div :class="styles.actions">
-      <button type="submit" :class="styles.primary" :disabled="busy">Create</button>
+      <button type="submit" :class="styles.primary" :disabled="busy || eventTypesLoading">
+        Create
+      </button>
       <button type="button" :class="styles.button" @click="emit('cancel')">Cancel</button>
     </div>
   </form>

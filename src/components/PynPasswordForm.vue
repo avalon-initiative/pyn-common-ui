@@ -11,6 +11,8 @@ const props = withDefaults(
     busy?: boolean
     error?: string
     success?: string
+    /** Why a new password is needed, shown above the form (for example a one-time password). */
+    reason?: string
   }>(),
   { hasPassword: true },
 )
@@ -50,6 +52,7 @@ function send() {
 
 <template>
   <form :class="styles.form" novalidate @submit.prevent="send">
+    <p v-if="reason" :class="styles.reason" role="status">{{ reason }}</p>
     <ul v-if="rules?.length" :class="styles.rules" aria-label="Password rules">
       <li v-for="rule in rules" :key="rule">{{ rule }}</li>
     </ul>

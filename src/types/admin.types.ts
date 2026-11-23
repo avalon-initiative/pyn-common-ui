@@ -14,6 +14,8 @@ export interface AccountInfo {
   disabled_reason?: string | null
   /** When a scheduled deletion takes effect; null or absent when none is scheduled. */
   purge_at?: string | null
+  /** True while the account waits on its address confirmation; absent means no resend is offered. */
+  pending_verification?: boolean
 }
 
 export interface DisableRequest {

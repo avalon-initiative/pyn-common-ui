@@ -30,3 +30,10 @@ export const FirstPassword: Story = {
 export const FirstPasswordSet: Story = {
   args: { hasPassword: false, success: 'Password set. You can now sign in with it.' },
 }
+export const OneTimePassword: Story = {
+  args: {
+    hasPassword: true,
+    reason:
+      'An administrator added your account with a one-time password. Choose your own to continue.',
+  },
+}

@@ -1,0 +1,18 @@
+@use 'mixins' as m;
+
+.field {
+  @include m.field;
+}
+
+.input {
+  @include m.input;
+}
+
+.hint {
+  @include m.muted;
+  font-size: 0.8125rem;
+}
+
+.error {
+  @include m.error;
+}

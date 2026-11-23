@@ -1,0 +1,40 @@
+@use 'mixins' as m;
+
+.panel {
+  @include m.card;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--pyn-space-2) var(--pyn-space-4);
+  margin: 0;
+
+  dt {
+    color: var(--pyn-text-muted);
+  }
+
+  dd {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pyn-space-1);
+    margin: 0;
+  }
+
+  @include m.narrow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.meta {
+  @include m.muted;
+}
