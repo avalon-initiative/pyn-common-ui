@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynBranchBar from '../components/PynBranchBar.vue'
-import PynRepoHeader from '../components/PynRepoHeader.vue'
 import PynShell from '../components/PynShell.vue'
 import PynSideNav from '../components/PynSideNav.vue'
 import PynTopBar from '../components/PynTopBar.vue'
 import PynRepoShell from '../components/PynRepoShell.vue'
-import { repoShellTabs, repoTabs } from '../state/repo.state'
+import { repoShellTabs } from '../state/repo.state'
 import { mainNav } from '../state/shell.state'
 
 const meta: Meta<typeof PynShell> = {
@@ -23,14 +22,15 @@ const repos = [
 /** Repository page mockup: top bar, sidebar, header and branch bar. */
 export const RepositoryPage: StoryObj<typeof PynShell> = {
   render: () => ({
-    components: { PynShell, PynTopBar, PynSideNav, PynRepoHeader, PynBranchBar },
-    setup: () => ({ repos, mainNav, tabs: repoTabs(['read'], false) }),
+    components: { PynShell, PynTopBar, PynSideNav, PynRepoShell, PynBranchBar },
+    setup: () => ({ repos, mainNav, tabs: repoShellTabs(['read'], false) }),
     template: `
       <PynShell>
         <template #top><PynTopBar user="alice" :repos="['alice/castle-quest']" theme="system" /></template>
         <template #side><PynSideNav account="alice" :items="mainNav" current="" :repos="repos" current-repo="alice/castle-quest" /></template>
-        <PynRepoHeader owner="alice" name="castle-quest" visibility="private" :lease-hours="24" role="admin" :tabs="tabs" current="" />
-        <PynBranchBar branch="main" :files="128" updated-at="2026-10-08T10:00:00Z" :now="new Date('2026-10-08T12:00:00Z')" />
+        <PynRepoShell owner="alice" name="castle-quest" visibility="private" :tabs="tabs" current="">
+          <PynBranchBar branch="main" :files="128" updated-at="2026-10-08T10:00:00Z" :now="new Date('2026-10-08T12:00:00Z')" />
+        </PynRepoShell>
       </PynShell>`,
   }),
 }
@@ -56,6 +56,25 @@ export const SignedOutPage: StoryObj<typeof PynShell> = {
       <PynShell bare>
         <template #top><PynTopBar signed-out theme="system" /></template>
         <p>Public page content</p>
+      </PynShell>`,
+  }),
+}
+
+/** Breadcrumb trail above the page content. */
+export const WithBreadcrumbs: StoryObj<typeof PynShell> = {
+  render: () => ({
+    components: { PynShell, PynTopBar },
+    setup: () => ({
+      trail: [
+        { label: 'Home', href: '/' },
+        { label: 'Account settings', href: '/_/settings' },
+        { label: 'SSH keys' },
+      ],
+    }),
+    template: `
+      <PynShell bare :breadcrumbs="trail">
+        <template #top><PynTopBar user="alice" theme="system" /></template>
+        <p>Page content</p>
       </PynShell>`,
   }),
 }

@@ -72,6 +72,20 @@
   }
 }
 
+.crumbs {
+  position: sticky;
+  top: var(--pyn-topbar-height);
+  z-index: 5;
+  margin: calc(-1 * var(--pyn-space-6)) calc(-1 * var(--pyn-space-6)) var(--pyn-space-4);
+  padding: var(--pyn-space-2) var(--pyn-space-6) 0;
+  background: var(--pyn-bg);
+
+  @include m.narrow {
+    margin: calc(-1 * var(--pyn-space-4)) calc(-1 * var(--pyn-space-4)) var(--pyn-space-3);
+    padding: var(--pyn-space-2) var(--pyn-space-4) 0;
+  }
+}
+
 .content {
   min-width: 0;
 }

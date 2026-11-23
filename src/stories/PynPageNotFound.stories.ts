@@ -7,4 +7,13 @@ const meta: Meta<typeof PynPageNotFound> = {
 }
 export default meta
 
-export const Default: StoryObj<typeof PynPageNotFound> = {}
+type Story = StoryObj<typeof PynPageNotFound>
+
+export const Default: Story = {}
+export const WithBackLink: Story = { args: { backHref: '/alice', backLabel: 'Go to alice' } }
+export const WithActions: Story = {
+  render: () => ({
+    components: { PynPageNotFound },
+    template: `<PynPageNotFound><template #actions><a href="/explore">Explore</a></template></PynPageNotFound>`,
+  }),
+}
