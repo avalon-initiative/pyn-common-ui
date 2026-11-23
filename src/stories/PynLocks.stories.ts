@@ -32,3 +32,14 @@ export const None: Story = { args: { locks: [], now } }
 export const WithIdentities: Story = {
   args: { locks: locks.map((l, i) => (i === 0 ? { ...l, identity: bobIdentity } : l)), now },
 }
+
+export const LongPaths: Story = {
+  args: {
+    canForce: true,
+    now,
+    locks: [
+      { ...locks[0], path: 'Content/Characters/Heroes/Knight/Animations/Knight_Idle_01.uasset' },
+      { ...locks[1], path: 'Content/Enemies/Boss.uasset' },
+    ],
+  },
+}

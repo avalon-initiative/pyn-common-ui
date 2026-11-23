@@ -120,6 +120,16 @@ describe('people in lists', () => {
     expect(mount(PynLockBadge, { props: { lock, me: 'bob', now } }).text()).toContain('alice')
   })
 
+  it('PynLocks offers a line break after each path slash and keeps the text intact', () => {
+    const w = mount(PynLocks, {
+      props: { locks: [{ ...lock, path: 'Content/Maps/Main.umap' }], now, canForce: true },
+    })
+    const path = w.find('li span')
+    expect(path.findAll('wbr')).toHaveLength(3)
+    expect(path.text()).toBe('Content/Maps/Main.umap')
+    expect(w.find('li button').text()).toBe('Force unlock')
+  })
+
   it('PynMembers and PynOrgMembers show the member identity', () => {
     const members = [{ user: 'alice', role: 'admin', source: 'direct' as const }]
     const plain = mount(PynMembers, { props: { grantees: personGrantees(members), roles: [] } })

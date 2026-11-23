@@ -33,7 +33,12 @@ const rows = computed(() => [
 async function show() {
   open.value = true
   await nextTick()
-  root.value?.querySelector<HTMLElement>('input')?.focus()
+  root.value?.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true })
+}
+function selectAll(e: FocusEvent) {
+  const input = e.target as HTMLInputElement
+  input.select()
+  input.scrollLeft = 0
 }
 const close = (refocus: boolean) => {
   open.value = false
@@ -92,7 +97,7 @@ onBeforeUnmount(stop)
             :class="styles.input"
             :value="row.value"
             readonly
-            @focus="($event.target as HTMLInputElement).select()"
+            @focus="selectAll"
           />
           <button
             type="button"
