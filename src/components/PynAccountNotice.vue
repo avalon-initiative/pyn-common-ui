@@ -9,6 +9,7 @@ import {
   VERIFICATION_NOT_REQUIRED_TEXT,
 } from '../state/account.state'
 import type { BlockedStatus } from '../types/auth.types'
+import PynIcon from './PynIcon.vue'
 import PynResendForm from './PynResendForm.vue'
 
 const props = defineProps<{
@@ -34,6 +35,7 @@ const text = computed(() =>
 
 <template>
   <section :class="[styles.card, status === 'account_disabled' && styles.disabled]">
+    <PynIcon :name="status === 'account_disabled' ? 'stop' : 'alert'" :class="styles.icon" />
     <h2 :class="styles.title">{{ NOTICE_TITLES[status] }}</h2>
     <p :class="styles.text">
       <template v-if="user"

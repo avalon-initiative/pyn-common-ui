@@ -1,22 +1,23 @@
 @use 'mixins' as m;
 
 .notice {
-  display: flex;
+  @include m.alert-role(accent);
+  @include m.alert;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--pyn-space-3);
-  padding: var(--pyn-space-3) var(--pyn-space-4);
-  color: var(--pyn-text);
-  background: var(--pyn-mine-bg);
-  border: 1px solid var(--pyn-mine);
-  border-radius: var(--pyn-radius);
+}
+
+.icon {
+  @include m.alert-icon;
+  margin-top: 0;
 }
 
 .body {
   display: flex;
+  flex: 1;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--pyn-space-1) var(--pyn-space-3);
+  min-width: 0;
 }
 
 .text {
@@ -25,28 +26,25 @@
   align-items: center;
   gap: var(--pyn-space-2);
   margin: 0;
-  font-size: 0.875rem;
 }
 
 .versions {
   font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-sm);
 }
 
 .tag {
-  padding: 0 var(--pyn-space-2);
-  font-size: 0.75rem;
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
+  @include m.pill;
 }
 
 .link {
-  font-size: 0.875rem;
-  color: inherit;
-  text-decoration: underline;
+  color: var(--pyn-accent);
+  font-weight: 600;
 
   @include m.focus-ring;
 }
 
 .dismiss {
   @include m.button;
+  flex: none;
 }

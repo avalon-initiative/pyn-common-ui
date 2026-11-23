@@ -1,13 +1,28 @@
+@use 'mixins' as m;
+
 .notice {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--pyn-space-3);
+  @include m.alert;
   transition: opacity 0.4s ease;
-  padding: var(--pyn-space-3) var(--pyn-space-4);
-  color: var(--pyn-text);
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
+}
+
+.warning {
+  @include m.alert-role(attention);
+}
+
+.info {
+  @include m.alert-role(accent);
+}
+
+.success {
+  @include m.alert-role(success);
+}
+
+.danger {
+  @include m.alert-role(danger);
+}
+
+.icon {
+  @include m.alert-icon;
 }
 
 .fading {
@@ -16,37 +31,26 @@
 
 .body {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: var(--pyn-space-1);
   min-width: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .notice {
-    transition: none;
-  }
-}
-
-.warning {
-  background: var(--pyn-locked-bg);
-  border-color: var(--pyn-locked);
-}
-
-.info {
-  background: var(--pyn-mine-bg);
-  border-color: var(--pyn-mine);
-}
-
 .title {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--pyn-text-base);
+  font-weight: 600;
 }
 
 .text {
-  font-size: 0.875rem;
-
   a {
-    color: inherit;
-    text-decoration: underline;
+    color: var(--pyn-accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notice {
+    transition: none;
   }
 }

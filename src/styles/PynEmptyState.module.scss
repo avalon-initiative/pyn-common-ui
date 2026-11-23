@@ -5,27 +5,41 @@
   flex-direction: column;
   align-items: center;
   gap: var(--pyn-space-2);
-  padding: var(--pyn-space-8) var(--pyn-space-4);
+  box-sizing: border-box;
+  padding: var(--pyn-space-10) var(--pyn-space-4);
   text-align: center;
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+
+  @include m.narrow {
+    padding-block: var(--pyn-space-8);
+  }
 }
 
 .compact {
   gap: var(--pyn-space-1);
   padding: var(--pyn-space-4);
+  border: 0;
+  border-radius: 0;
 }
 
 .icon {
+  display: flex;
+  margin-bottom: var(--pyn-space-2);
   color: var(--pyn-text-muted);
-  font-size: 2.5rem;
+  font-size: 2rem;
 }
 
 .compact .icon {
+  margin-bottom: 0;
   font-size: 1.5rem;
 }
 
 .title {
   margin: 0;
-  font-size: var(--pyn-text-lg);
+  font-size: var(--pyn-text-xl);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
 }
 
 .compact .title {
@@ -35,6 +49,11 @@
 .description {
   @include m.muted;
   max-width: 32rem;
+  font-size: var(--pyn-text-md);
+}
+
+.compact .description {
+  font-size: var(--pyn-text-base);
 }
 
 .actions {
@@ -42,7 +61,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--pyn-space-2);
-  margin-top: var(--pyn-space-2);
+  margin-top: var(--pyn-space-4);
 }
 
 .primary {
@@ -73,9 +92,9 @@
   padding: var(--pyn-space-2) var(--pyn-space-3);
   border: 1px solid var(--pyn-border);
   border-radius: var(--pyn-radius);
-  background: var(--pyn-surface);
+  background: var(--pyn-bg-subtle);
   font-family: var(--pyn-font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--pyn-text-sm);
   overflow-x: auto;
   white-space: pre;
   user-select: all;

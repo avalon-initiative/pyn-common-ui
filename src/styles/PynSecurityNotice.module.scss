@@ -1,14 +1,8 @@
 @use 'mixins' as m;
 
 .notice {
-  display: flex;
+  @include m.alert;
   align-items: center;
-  gap: var(--pyn-space-3);
-  padding: var(--pyn-space-3) var(--pyn-space-4);
-  color: var(--pyn-text);
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
-  font-size: 0.875rem;
 
   @include m.narrow {
     flex-wrap: wrap;
@@ -16,24 +10,22 @@
 }
 
 .advice {
-  background: var(--pyn-mine-bg);
-  border-color: var(--pyn-mine);
+  @include m.alert-role(accent);
 }
 
 .required {
-  background: var(--pyn-locked-bg);
-  border-color: var(--pyn-locked);
+  @include m.alert-role(attention);
 }
 
 .compact {
   gap: var(--pyn-space-2);
   padding: var(--pyn-space-1) var(--pyn-space-3);
-  font-size: 0.8125rem;
+  font-size: var(--pyn-text-sm);
 }
 
 .icon {
-  flex: none;
-  font-size: 1.125rem;
+  @include m.alert-icon;
+  margin-top: 0;
 }
 
 .body {
@@ -51,7 +43,7 @@
 
 .badge {
   @include m.pill;
-  color: var(--pyn-text);
+  color: var(--pyn-alert-color);
   border-color: currentcolor;
   font-weight: 600;
 }

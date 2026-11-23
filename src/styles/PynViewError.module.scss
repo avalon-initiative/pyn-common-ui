@@ -1,17 +1,19 @@
 @use 'mixins' as m;
 
 .error {
-  @include m.error;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--pyn-space-3);
-  padding: var(--pyn-space-3) var(--pyn-space-4);
+  @include m.alert-role(danger);
+  @include m.alert;
   transition: opacity 0.4s ease;
 }
 
+.icon {
+  @include m.alert-icon;
+}
+
 .text {
+  flex: 1;
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .fading {
