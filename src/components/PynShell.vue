@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import PynBreadcrumbs from './PynBreadcrumbs.vue'
 import PynIcon from './PynIcon.vue'
+import PynPage from './PynPage.vue'
 import styles from '../styles/PynShell.module.scss'
 import { MAIN_ID } from '../state/top-bar.state'
 import type { Crumb } from '../types/tree.types'
@@ -14,6 +15,8 @@ withDefaults(
     breadcrumbs?: Crumb[]
     /** Id of the main content; the top bar's skip link targets it. */
     mainId?: string
+    /** Lets the content use the full width instead of the centered page column. */
+    wide?: boolean
   }>(),
   { mainId: MAIN_ID },
 )
@@ -43,9 +46,9 @@ const closeOnLink = (e: MouseEvent) => {
     </aside>
     <main :id="mainId" tabindex="-1" :class="styles.main">
       <div v-if="breadcrumbs && breadcrumbs.length > 1" :class="styles.crumbs">
-        <PynBreadcrumbs :items="breadcrumbs" />
+        <PynPage :wide="wide"><PynBreadcrumbs :items="breadcrumbs" /></PynPage>
       </div>
-      <div :class="styles.content"><slot /></div>
+      <PynPage :wide="wide" :class="styles.content"><slot /></PynPage>
     </main>
     <div v-if="$slots.footer" :class="styles.footer"><slot name="footer" /></div>
   </div>

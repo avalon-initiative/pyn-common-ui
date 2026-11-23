@@ -2,6 +2,7 @@
 import styles from '../styles/PynProfileLayout.module.scss'
 import PynRepoList from './PynRepoList.vue'
 import PynActivity from './PynActivity.vue'
+import PynPageColumns from './PynPageColumns.vue'
 import { orgPath } from '../state/org.state'
 import type { OrgInfo } from '../types/org.types'
 import type { RepoInfo } from '../types/repo.types'
@@ -21,14 +22,14 @@ defineProps<{
 <template>
   <div :class="styles.layout">
     <slot name="header" />
-    <div :class="styles.columns">
+    <PynPageColumns>
       <section :class="styles.main" aria-labelledby="profile-repos-title">
         <h2 id="profile-repos-title" :class="styles.title">Repositories</h2>
         <slot name="repositories">
           <PynRepoList :repos="repos ?? []" empty="No repositories to show." />
         </slot>
       </section>
-      <aside :class="styles.side">
+      <template #side>
         <section v-if="$slots.organizations || orgs?.length" aria-labelledby="profile-orgs-title">
           <h2 id="profile-orgs-title" :class="styles.title">Organizations</h2>
           <slot name="organizations">
@@ -43,7 +44,7 @@ defineProps<{
         <slot name="activity">
           <PynActivity v-if="activityEntries" :entries="activityEntries" :now="now" />
         </slot>
-      </aside>
-    </div>
+      </template>
+    </PynPageColumns>
   </div>
 </template>

@@ -5,6 +5,7 @@ import PynBranchBar from './PynBranchBar.vue'
 import PynBreadcrumb from './PynBreadcrumb.vue'
 import PynCheckoutCard from './PynCheckoutCard.vue'
 import PynRepoBranches from './PynRepoBranches.vue'
+import PynPageColumns from './PynPageColumns.vue'
 import PynLockedFiles from './PynLockedFiles.vue'
 import PynReadme from './PynReadme.vue'
 import PynRepoDetails from './PynRepoDetails.vue'
@@ -39,7 +40,7 @@ const crumbs = computed(() => breadcrumbs(props.repo, props.path, props.branch))
 </script>
 
 <template>
-  <div :class="styles.landing">
+  <PynPageColumns side-label="Repository summary">
     <div :class="styles.main">
       <PynBranchBar
         v-if="summary"
@@ -73,7 +74,7 @@ const crumbs = computed(() => breadcrumbs(props.repo, props.path, props.branch))
       />
       <PynCheckoutCard />
     </div>
-    <aside v-if="summary" :class="styles.rail" aria-label="Repository summary">
+    <template v-if="summary" #side>
       <PynRepoDetails
         :owner="repo.owner"
         :visibility="repo.visibility"
@@ -100,6 +101,6 @@ const crumbs = computed(() => breadcrumbs(props.repo, props.path, props.branch))
         :now="now"
       />
       <PynActivity :entries="summary.activity" :now="now" />
-    </aside>
-  </div>
+    </template>
+  </PynPageColumns>
 </template>

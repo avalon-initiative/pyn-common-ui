@@ -1,0 +1,11 @@
+.page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--pyn-page-max);
+  margin-inline: auto;
+  padding-inline: var(--pyn-page-gutter);
+}
+
+.wide {
+  max-width: none;
+}

@@ -16,6 +16,8 @@ export { default as PynOwnerFrozenNotice } from './components/PynOwnerFrozenNoti
 export { default as PynUpdateNotice } from './components/PynUpdateNotice.vue'
 export { default as PynResendForm } from './components/PynResendForm.vue'
 export { default as PynShell } from './components/PynShell.vue'
+export { default as PynPage } from './components/PynPage.vue'
+export { default as PynPageColumns } from './components/PynPageColumns.vue'
 export { default as PynVersionFooter } from './components/PynVersionFooter.vue'
 export { versionMismatch } from './utils/version'
 export { default as PynTopBar } from './components/PynTopBar.vue'

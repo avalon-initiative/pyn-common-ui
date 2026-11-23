@@ -1,0 +1,39 @@
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--pyn-space-6);
+  align-items: start;
+
+  @media (min-width: 63.25rem) {
+    grid-template-columns: minmax(0, 1fr) var(--pyn-side-width);
+  }
+}
+
+.single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.main {
+  min-width: 0;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+  min-width: 0;
+
+  > * + * {
+    padding-top: var(--pyn-space-4);
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+.sticky {
+  @media (min-width: 63.25rem) {
+    position: sticky;
+    top: calc(var(--pyn-topbar-height) + var(--pyn-space-4));
+    max-height: calc(100vh - var(--pyn-topbar-height) - var(--pyn-space-6));
+    overflow-y: auto;
+  }
+}
