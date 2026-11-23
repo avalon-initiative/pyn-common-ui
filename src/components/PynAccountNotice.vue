@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import styles from '../styles/PynAccountNotice.module.scss'
 import {
   NOTICE_TEXT,
+  NO_EMAIL_NOTE,
   NOTICE_TITLES,
   VERIFICATION_GUIDANCE,
   VERIFICATION_NOT_REQUIRED_TEXT,
@@ -13,12 +14,17 @@ import PynResendForm from './PynResendForm.vue'
 const props = defineProps<{
   status: BlockedStatus
   emailVerification?: boolean
+  /** Replaces the default note shown when the server sends no confirmation email. */
+  noEmailNote?: string
   user?: string
   busy?: boolean
   sent?: boolean
   error?: string
 }>()
 const emit = defineEmits<{ resend: [string]; back: [] }>()
+const showNote = computed(
+  () => props.emailVerification === false && props.status !== 'account_disabled',
+)
 const text = computed(() =>
   props.status === 'pending_verification' && props.emailVerification === false
     ? VERIFICATION_NOT_REQUIRED_TEXT
@@ -38,6 +44,7 @@ const text = computed(() =>
     <p v-if="status === 'pending_verification' && emailVerification" :class="styles.text">
       {{ VERIFICATION_GUIDANCE }}
     </p>
+    <p v-if="showNote" :class="styles.text" data-no-email>{{ noEmailNote ?? NO_EMAIL_NOTE }}</p>
     <PynResendForm
       v-if="status === 'pending_verification'"
       :busy="busy"

@@ -37,3 +37,15 @@ export const WithReadme: Story = {
 export const OnBranch: Story = {
   args: { branch: 'feature/levels', path: 'Content/Levels', listing: folderListing },
 }
+export const WithBranches: Story = {
+  args: {
+    branches: [
+      { name: 'main', isDefault: true },
+      { name: 'feature/levels', ahead: 4, behind: 1 },
+      { name: 'fix/lighting', ahead: 2 },
+      { name: 'old/prototype', updatedAt: '2026-08-01T10:00:00Z' },
+    ],
+    branchesHref: '/studio/game/branches',
+  },
+}
+export const BranchesLinkOnly: Story = { args: { branchesHref: '/studio/game/branches' } }

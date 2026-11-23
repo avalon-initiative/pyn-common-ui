@@ -1,5 +1,3 @@
-@use 'mixins' as m;
-
 .header {
   margin-bottom: var(--pyn-space-4);
 }
@@ -8,12 +6,4 @@
   margin: 0 0 var(--pyn-space-4);
   font-size: var(--pyn-text-xl);
   overflow-wrap: anywhere;
-}
-
-.nav {
-  @include m.tab-nav;
-}
-
-.tab {
-  @include m.tab;
 }

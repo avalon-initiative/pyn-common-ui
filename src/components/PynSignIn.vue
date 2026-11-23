@@ -2,7 +2,7 @@
 import { computed, ref, useId, watch } from 'vue'
 import styles from '../styles/PynSignIn.module.scss'
 import PynAccountNotice from './PynAccountNotice.vue'
-import { externalSignInUrl, signInErrorMessage } from '../state/account.state'
+import { NO_EMAIL_NOTE, externalSignInUrl, signInErrorMessage } from '../state/account.state'
 import type {
   BlockedStatus,
   ExternalProvider,
@@ -20,6 +20,8 @@ const props = withDefaults(
     returnTo?: string
     callbackError?: string
     emailVerification?: boolean
+    /** Replaces the default note shown when the server sends no confirmation email. */
+    noEmailNote?: string
     notice?: { status: BlockedStatus; user?: string } | null
     resent?: boolean
     busy?: boolean
@@ -63,6 +65,10 @@ const email = ref('')
 
 const canRegister = computed(() => props.registration === 'open' || props.registration === 'invite')
 const needsEmail = computed(() => props.registration === 'open' && !!props.emailVerification)
+const showNoEmailNote = computed(
+  () =>
+    view.value === 'register' && props.registration === 'open' && props.emailVerification === false,
+)
 const needsInvite = computed(() => props.registration === 'invite')
 const mismatch = computed(() => view.value === 'register' && password.value !== confirm.value)
 const showMismatch = computed(() => mismatch.value && confirm.value !== '')
@@ -92,6 +98,7 @@ function submit() {
     :sent="resent"
     :error="error"
     :email-verification="emailVerification"
+    :no-email-note="noEmailNote"
     @resend="(address) => emit('resend', address)"
     @back="emit('dismiss')"
   />
@@ -154,6 +161,10 @@ function submit() {
         <input v-model.trim="invite" :class="styles.input" autocomplete="off" required />
       </label>
     </template>
+
+    <p v-if="showNoEmailNote" :class="styles.note" data-no-email>
+      {{ noEmailNote ?? NO_EMAIL_NOTE }}
+    </p>
 
     <p v-if="shownError" :class="styles.error" role="alert">{{ shownError }}</p>
 
