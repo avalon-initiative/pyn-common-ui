@@ -5,12 +5,18 @@
   flex: none;
   align-items: center;
   justify-content: center;
+  margin: calc(var(--pyn-space-1) * -1);
   padding: var(--pyn-space-1);
-  color: inherit;
+  color: var(--pyn-text-muted);
   background: none;
   border: 0;
   border-radius: var(--pyn-radius);
   cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
 
   @include m.focus-ring;
 }

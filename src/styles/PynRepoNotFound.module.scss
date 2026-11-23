@@ -1,25 +1,66 @@
 @use 'mixins' as m;
 
 .box {
-  @include m.card;
-  padding: var(--pyn-space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  box-sizing: border-box;
+  padding: var(--pyn-space-10) var(--pyn-space-4);
   text-align: center;
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+
+  @include m.narrow {
+    padding-block: var(--pyn-space-8);
+  }
+}
+
+.icon {
+  display: flex;
+  margin-bottom: var(--pyn-space-2);
+  color: var(--pyn-text-muted);
+  font-size: 2rem;
 }
 
 .heading {
-  margin: 0 0 var(--pyn-space-2);
-  font-size: 1.125rem;
+  margin: 0;
+  font-size: var(--pyn-text-xl);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
 }
 
 .note {
   @include m.muted;
-  margin-bottom: var(--pyn-space-3);
+  max-width: 32rem;
+  font-size: var(--pyn-text-md);
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--pyn-space-2);
+  margin-top: var(--pyn-space-4);
 }
 
 .link {
-  color: var(--pyn-accent);
+  @include m.button-primary;
+  align-self: auto;
+  text-decoration: none;
 }
 
 .extra {
-  margin-inline-start: var(--pyn-space-4);
+  @include m.button;
+  text-decoration: none;
+}
+
+.slotted {
+  display: contents;
+
+  a {
+    @include m.button;
+    text-decoration: none;
+  }
 }

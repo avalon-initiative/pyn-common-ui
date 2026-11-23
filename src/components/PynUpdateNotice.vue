@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynUpdateNotice.module.scss'
 
 const props = defineProps<{
@@ -15,6 +16,7 @@ const safeUrl = computed(() => (props.url && /^https?:\/\//i.test(props.url) ? p
 
 <template>
   <section v-if="latest" :class="styles.notice" role="status">
+    <PynIcon name="info" :class="styles.icon" />
     <div :class="styles.body">
       <p :class="styles.text">
         <strong>A newer release is available:</strong>

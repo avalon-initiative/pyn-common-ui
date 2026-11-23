@@ -1,0 +1,131 @@
+@use 'mixins' as m;
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--pyn-space-4);
+
+  @include m.narrow {
+    align-items: flex-end;
+    padding: 0;
+  }
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: light-dark(#1f232866, #01040999);
+}
+
+.panel {
+  @include m.floating;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  max-height: min(90vh, 48rem);
+  color: var(--pyn-text);
+
+  &:focus {
+    outline: none;
+  }
+
+  @include m.narrow {
+    max-width: none;
+    max-height: 90vh;
+    border-width: 1px 0 0;
+    border-radius: var(--pyn-radius-lg) var(--pyn-radius-lg) 0 0;
+  }
+}
+
+.sm {
+  max-width: 20rem;
+}
+
+.md {
+  max-width: 30rem;
+}
+
+.lg {
+  max-width: 40rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-3) var(--pyn-space-3) var(--pyn-space-3) var(--pyn-space-4);
+  border-bottom: 1px solid var(--pyn-border);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-md);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
+  overflow-wrap: anywhere;
+}
+
+.close {
+  @include m.control;
+  flex: none;
+  min-width: var(--pyn-control-md);
+  padding: 0;
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  @include m.focus-ring;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  padding: var(--pyn-space-4);
+  overflow-y: auto;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  border-top: 1px solid var(--pyn-border);
+}
+
+.active {
+  transition: opacity 0.15s ease;
+
+  .panel {
+    transition: transform 0.15s ease;
+  }
+}
+
+.hidden {
+  opacity: 0;
+
+  .panel {
+    transform: translateY(0.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .active,
+  .active .panel {
+    transition: none;
+  }
+}

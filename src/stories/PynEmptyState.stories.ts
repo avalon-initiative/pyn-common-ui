@@ -44,6 +44,14 @@ export const WithIcon: Story = {
     template: `<PynEmptyState v-bind="args"><template #icon><PynIcon name="repo" /></template></PynEmptyState>`,
   }),
 }
+export const Bordered: Story = {
+  args: { primaryLabel: 'New repository', primaryHref: '/_/new' },
+  render: (args) => ({
+    components: { PynEmptyState, PynIcon },
+    setup: () => ({ args }),
+    template: `<div style="max-width: 48rem"><PynEmptyState v-bind="args"><template #icon><PynIcon name="repo" /></template></PynEmptyState></div>`,
+  }),
+}
 export const InACard: Story = {
   args: { primaryLabel: 'New repository', primaryHref: '/_/new' },
   render: (args) => ({

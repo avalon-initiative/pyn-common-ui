@@ -5,17 +5,30 @@
   box-sizing: border-box;
   width: min(calc(100% - 2rem), 21.25rem);
   margin: var(--pyn-space-8) auto;
-  border-color: var(--pyn-locked);
+  border-color: color-mix(in srgb, var(--pyn-attention) 40%, transparent);
+  border-top: 3px solid var(--pyn-attention);
 }
 
 .disabled {
-  border-color: var(--pyn-danger);
+  border-color: color-mix(in srgb, var(--pyn-danger) 40%, transparent);
+  border-top-color: var(--pyn-danger);
+
+  .icon {
+    color: var(--pyn-danger);
+  }
+}
+
+.icon {
+  display: flex;
+  color: var(--pyn-attention);
+  font-size: 1.5rem;
 }
 
 .title {
   margin: 0;
   font-size: var(--pyn-text-lg);
   font-weight: 600;
+  line-height: var(--pyn-leading-tight);
 }
 
 .text {

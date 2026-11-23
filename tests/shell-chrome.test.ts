@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
-import { PynCommandPalette, PynDrawer, PynMenu, PynTopBar } from '../src/index'
+import { PynCommandPalette, PynDialog, PynDrawer, PynMenu, PynTopBar } from '../src/index'
 
 const items = [
   { id: 'a', label: 'One', href: '#/one' },
@@ -70,6 +70,47 @@ describe('PynTopBar account header', () => {
     await w.find('button[aria-label="Account menu"]').trigger('click')
     expect(w.find('[role=menu] strong').text()).toBe('Alice Anders (alice)')
     expect(w.find('[role=menu]').text()).toContain('Signed in as')
+    w.unmount()
+  })
+})
+
+describe('PynDialog', () => {
+  const open = (props: Record<string, unknown> = {}, slots: Record<string, string> = {}) =>
+    mount(PynDialog, {
+      props: { open: true, title: 'Delete branch', ...props },
+      slots: { default: '<p>Body</p>', ...slots },
+      attachTo: document.body,
+    })
+
+  it('is a labelled modal with a close button and an optional footer', async () => {
+    const w = open({}, { footer: '<button>Delete</button>' })
+    const dialog = w.get('[role="dialog"]')
+    expect(dialog.attributes('aria-modal')).toBe('true')
+    expect(dialog.attributes('aria-labelledby')).toBe(w.get('h2').attributes('id'))
+    expect(w.get('h2').text()).toBe('Delete branch')
+    expect(w.get('footer').text()).toBe('Delete')
+    await w.get('button[aria-label="Close"]').trigger('click')
+    expect(w.emitted('close')).toHaveLength(1)
+    w.unmount()
+    const bare = open()
+    expect(bare.find('footer').exists()).toBe(false)
+    bare.unmount()
+  })
+
+  it('sizes the panel and closes on Escape and the backdrop', async () => {
+    const w = open({ size: 'sm' })
+    expect(w.get('[role="dialog"]').classes().join(' ')).toMatch(/sm/)
+    await w.get('[role="dialog"]').trigger('keydown', { key: 'Escape' })
+    await w.get('[data-test="backdrop"]').trigger('click')
+    expect(w.emitted('close')).toHaveLength(2)
+    w.unmount()
+  })
+
+  it('locks page scroll while open and restores it', async () => {
+    const w = open()
+    expect(document.body.style.overflow).toBe('hidden')
+    await w.setProps({ open: false })
+    expect(document.body.style.overflow).not.toBe('hidden')
     w.unmount()
   })
 })
