@@ -34,7 +34,7 @@ const props = withDefaults(
     signInHref?: string
     admin?: boolean
     extraAccount?: MenuItem[]
-    /** Extra destinations for the narrow-screen main menu, after People and Organizations. */
+    /** Extra destinations for the narrow-screen main menu, after Explore, People and Organizations. */
     extraLinks?: TopBarLink[]
     /** The person's account and organizations, listed in the owner switcher. */
     owners?: OwnerOption[]
@@ -86,6 +86,11 @@ const directory = computed<MenuItem[]>(() => [
   { id: 'people', label: 'People', href: links.value.people },
   { id: 'orgs', label: 'Organizations', href: links.value.orgs },
 ])
+const exploreItem = computed<MenuItem>(() => ({
+  id: 'explore',
+  label: 'Explore',
+  href: links.value.explore,
+}))
 const account = computed<MenuItem[]>(() => [
   { id: 'profile', label: 'Your profile', href: links.value.profile },
   { id: 'settings', label: 'Account settings', href: links.value.settings },
@@ -106,7 +111,7 @@ const globalLinks = computed<MenuItem[]>(() => {
   if (props.signedOut) {
     return [
       ...items,
-      { id: 'explore', label: 'Explore', href: links.value.explore },
+      exploreItem.value,
       { id: 'sign-in', label: 'Sign in', href: props.signInHref ?? '/_/sign-in' },
       { id: 'sep', label: '', separator: true },
       ...themeItems.value,
@@ -120,8 +125,9 @@ const globalLinks = computed<MenuItem[]>(() => {
       label: n > 0 ? `Notifications (${countText(n)})` : 'Notifications',
       href: links.value.notifications,
     },
+    exploreItem.value,
     ...directory.value,
-    ...withoutNamed(props.extraLinks ?? [], directory.value),
+    ...withoutNamed(props.extraLinks ?? [], [...directory.value, exploreItem.value]),
     { id: 'sep-new', label: '', separator: true },
     ...create.value,
     ...(props.owners?.length
@@ -221,10 +227,8 @@ onBeforeUnmount(() => document.removeEventListener('keydown', slash))
       <PynIcon name="search" />
     </button>
     <span v-if="!showSearch" :class="styles.spacer" />
+    <a :href="links.explore" :class="[styles.exploreLink, styles.wideOnly]" data-explore>Explore</a>
     <template v-if="signedOut">
-      <a :href="links.explore" :class="[styles.exploreLink, styles.wideOnly]" data-explore
-        >Explore</a
-      >
       <PynMenu label="Theme" :items="themeItems" :class="styles.wideOnly" @select="pick"
         >Theme<PynIcon name="chevron" :class="styles.chevron"
       /></PynMenu>
