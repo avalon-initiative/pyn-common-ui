@@ -128,6 +128,10 @@ import {
   contentUrl,
   entryAt,
   eventTypesLabel,
+  foldersFirst,
+  formatSize,
+  latestChange,
+  textStats,
   expiryFromDate,
   expiryAfter,
   expiryPreview,
@@ -1087,15 +1091,60 @@ describe('file components', () => {
     expect(w.find('pre').text()).toBe('# not markdown')
   })
 
-  it('shows mode, holder, revision and history in the file bar', () => {
-    const w = mount(PynFileBar, { props: { ...r, entry: lockedEntry, me: 'jamie', now } })
+  it('shows mode, holder, revision, size and actions in the file bar', () => {
+    const w = mount(PynFileBar, {
+      props: { ...r, entry: lockedEntry, me: 'jamie', now, stats: '9 lines · 188 B' },
+    })
     expect(w.find('[data-mode=exclusive]').exists()).toBe(true)
     expect(w.find('[data-state]').text()).toContain('bob')
     expect(w.text()).toContain('r61')
-    expect(w.text()).toContain('jamie · 2 hours ago')
+    expect(w.text()).toContain('jamie')
+    expect(w.text()).toContain('2 hours ago')
+    expect(w.text()).toContain('9 lines · 188 B')
     const hrefs = w.findAll('a').map((a) => a.attributes('href'))
     expect(hrefs).toContain('/acme/castle-quest/history?path=Content%2FLevel01.umap')
-    expect(hrefs).toContain('/v1/repos/acme/castle-quest/content?path=Content%2FLevel01.umap')
+    expect(hrefs.filter((h) => h?.startsWith('/v1/repos/'))).toHaveLength(2)
+    expect(w.findAll('a').map((a) => a.text())).toEqual(
+      expect.arrayContaining(['Raw', 'History', 'Download']),
+    )
+  })
+
+  it('offers Lock only on an unlocked exclusive file and emits it', async () => {
+    const free = { ...lockedEntry, lock: null }
+    const w = mount(PynFileBar, { props: { ...r, entry: free, now, lockable: true } })
+    await w.find('button').trigger('click')
+    expect(w.emitted('lock')).toHaveLength(1)
+    expect(
+      mount(PynFileBar, { props: { ...r, entry: free, now } })
+        .find('button')
+        .exists(),
+    ).toBe(false)
+    expect(
+      mount(PynFileBar, { props: { ...r, entry: lockedEntry, now, lockable: true } })
+        .find('button')
+        .exists(),
+    ).toBe(false)
+  })
+
+  it('computes line and size stats of a text file', () => {
+    expect(textStats('a\nb\n')).toBe('2 lines · 4 B')
+    expect(textStats('x')).toBe('1 line · 1 B')
+    expect(textStats('')).toBe('0 lines · 0 B')
+    expect(formatSize(1536)).toBe('1.5 KB')
+    expect(formatSize(5 * 1024 * 1024)).toBe('5.0 MB')
+  })
+
+  it('shows the stats of a viewed code file', () => {
+    const w = mount(PynFileView, {
+      props: {
+        ...r,
+        path: fileEntry.path,
+        entry: fileEntry,
+        now,
+        body: { kind: 'code', text: 'a\nb', language: null },
+      },
+    })
+    expect(w.text()).toContain('2 lines')
   })
 
   it('offers no download before the first revision', () => {
@@ -1142,7 +1191,7 @@ describe('file components', () => {
 describe('browse integration', () => {
   it('links files to the viewer and folders to the tree', () => {
     const w = mount(PynTree, { props: { entries: rootEntries, ...r, now } })
-    const hrefs = w.findAll('a').map((a) => a.attributes('href'))
+    const hrefs = w.findAll('tbody a').map((a) => a.attributes('href'))
     expect(hrefs).toContain('/acme/castle-quest/tree/Content')
     expect(hrefs).toContain('/acme/castle-quest/blob/README.md')
     expect(hrefs).toHaveLength(rootEntries.length)
@@ -1185,7 +1234,7 @@ describe('PynTree', () => {
 
   it('links folders to their route and files to the viewer', () => {
     const w = tree()
-    const hrefs = w.findAll('a').map((a) => a.attributes('href'))
+    const hrefs = w.findAll('tbody a').map((a) => a.attributes('href'))
     expect(hrefs).toEqual([
       '/acme/castle-quest/tree/Content',
       '/acme/castle-quest/tree/Config',
@@ -1196,12 +1245,43 @@ describe('PynTree', () => {
     ])
   })
 
-  it('shows the revision, author and age of the last change', () => {
-    const row = tree().findAll('tbody tr')[0]
+  it('shows the message and age per row and the newest change in the header', () => {
+    const w = tree()
+    const row = w.findAll('tbody tr')[0]
     expect(row.text()).toContain('Level design changes')
-    expect(row.text()).toContain('r61')
-    expect(row.text()).toContain('jamie · 2 hours ago')
+    expect(row.text()).toContain('2 hours ago')
     expect(row.find('[data-mode=mixed]').exists()).toBe(true)
+    const header = w.find('table').element.previousElementSibling as HTMLElement
+    expect(header.textContent).toContain('r61')
+    expect(header.textContent).toContain('Level design changes')
+    expect(header.querySelector('a')?.getAttribute('href')).toBe('/acme/castle-quest/history')
+  })
+
+  it('scopes the header History link to the folder and branch', () => {
+    const w = mount(PynTree, {
+      props: { entries: rootEntries, ...r, now, path: 'Content', branch: 'dev' },
+    })
+    expect(w.find('a[href*="history"]').attributes('href')).toBe(
+      '/acme/castle-quest/history?branch=dev&path=Content',
+    )
+  })
+
+  it('lists folders before files', () => {
+    const mixed = [rootEntries[3], rootEntries[0], rootEntries[4], rootEntries[1]]
+    expect(foldersFirst(mixed).map((e) => e.name)).toEqual([
+      'Content',
+      'Config',
+      'Game.uproject',
+      'README.md',
+    ])
+    expect(latestChange(rootEntries)?.id).toBe(61)
+    expect(latestChange([])).toBeNull()
+  })
+
+  it('keeps a lock column only when a row is locked', () => {
+    expect(tree().findAll('col')).toHaveLength(5)
+    const none = mount(PynTree, { props: { entries: rootEntries.slice(0, 3), ...r, now } })
+    expect(none.findAll('col')).toHaveLength(4)
   })
 
   it('shows the holder only on locked files', () => {
@@ -1224,14 +1304,36 @@ describe('PynRepoLanding', () => {
       props: { repo, path: '', listing: rootListing, summary, me: 'jamie', now, ...props },
     })
 
-  it('composes the table, rail and checkout explainer', () => {
+  it('composes the table and rail', () => {
     const w = landing()
     expect(w.findAll('tbody tr')).toHaveLength(rootEntries.length)
     expect(w.text()).toContain('Repository details')
     expect(w.text()).toContain('Locked files')
     expect(w.text()).toContain('Recent activity')
-    expect(w.text()).toContain('Exclusive File Checkout')
     expect(w.text()).toContain('main')
+  })
+
+  it('renders About only with data', () => {
+    expect(landing().find('#about-title').exists()).toBe(false)
+    const w = landing({ about: { description: 'A game', topics: ['unreal'] } })
+    expect(w.find('#about-title').exists()).toBe(true)
+    expect(w.text()).toContain('A game')
+    expect(w.text()).toContain('unreal')
+  })
+
+  it('shows the quick setup box for an empty repository only', () => {
+    const empty = landing({ listing: { path: '', entries: [] }, cloneCommand: 'pyn clone acme/x' })
+    expect(empty.find('#quick-setup-title').exists()).toBe(true)
+    expect(empty.find('pre').text()).toContain('pyn clone acme/x')
+    expect(empty.find('pre').text()).toContain('pyn push')
+    expect(landing().find('#quick-setup-title').exists()).toBe(false)
+    const folder = landing({ path: 'Gone', listing: { path: 'Gone', entries: [] } })
+    expect(folder.find('#quick-setup-title').exists()).toBe(false)
+    expect(folder.text()).toContain('empty')
+  })
+
+  it('shows the breadcrumb only inside a folder', () => {
+    expect(landing().find('nav[aria-label=Path]').exists()).toBe(false)
   })
 
   it('does not show what the server cannot provide', () => {

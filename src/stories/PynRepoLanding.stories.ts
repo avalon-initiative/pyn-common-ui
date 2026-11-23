@@ -49,3 +49,13 @@ export const WithBranches: Story = {
   },
 }
 export const BranchesLinkOnly: Story = { args: { branchesHref: '/studio/game/branches' } }
+export const WithAbout: Story = {
+  args: {
+    about: {
+      description: 'An action game about a haunted castle.',
+      website: 'https://castle-quest.example.com',
+      topics: ['unreal', 'game'],
+    },
+    cloneCommand: 'pyn clone acme/castle-quest',
+  },
+}

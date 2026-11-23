@@ -1,0 +1,50 @@
+@use 'mixins' as m;
+
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.title {
+  @include m.side-title;
+}
+
+.description {
+  margin: 0;
+  font-size: var(--pyn-text-base);
+  overflow-wrap: anywhere;
+}
+
+.website {
+  color: var(--pyn-accent);
+  font-size: var(--pyn-text-base);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include m.focus-ring;
+}
+
+.topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topic {
+  padding: 0 var(--pyn-space-3);
+  color: var(--pyn-accent);
+  background: var(--pyn-selected);
+  border-radius: var(--pyn-radius-pill);
+  font-size: var(--pyn-text-xs);
+  font-weight: 500;
+  line-height: 1.5rem;
+}

@@ -1,0 +1,68 @@
+@use 'mixins' as m;
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  box-sizing: border-box;
+  min-height: var(--pyn-control-lg);
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  color: var(--pyn-text-muted);
+  background: var(--pyn-bg-subtle);
+  font-size: var(--pyn-text-base);
+}
+
+.author {
+  flex: none;
+  max-width: 12rem;
+  overflow: hidden;
+  color: var(--pyn-text);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.message {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rev {
+  flex: none;
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+}
+
+.time {
+  flex: none;
+  font-size: var(--pyn-text-xs);
+}
+
+.history {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pyn-space-1);
+  margin-left: var(--pyn-space-2);
+  color: var(--pyn-text);
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--pyn-accent);
+  }
+
+  @include m.touch-target($display: inline-flex);
+  @include m.focus-ring;
+}
+
+@include m.narrow {
+  .rev,
+  .history {
+    display: none;
+  }
+}

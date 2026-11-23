@@ -7,13 +7,26 @@
   min-width: 0;
 }
 
+.box {
+  overflow: clip;
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
 .panel {
-  @include m.card;
-  padding: var(--pyn-space-4) var(--pyn-space-6);
+  padding: var(--pyn-space-6) var(--pyn-space-8);
 
   @include m.narrow {
     padding: var(--pyn-space-4);
   }
+}
+
+.inner {
+  margin: 0;
+  padding: var(--pyn-space-6);
+  color: var(--pyn-text-muted);
+  text-align: center;
 }
 
 .image {

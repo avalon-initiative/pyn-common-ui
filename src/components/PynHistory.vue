@@ -54,32 +54,38 @@ onBeforeUnmount(() => clearTimeout(timer))
     </div>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
     <p v-if="loading && !revisions.length" :class="styles.empty">Loading history…</p>
-    <ul v-else-if="revisions.length" :class="styles.list">
-      <li v-for="rev in revisions" :key="`${rev.id}:${rev.path}`" :class="styles.item">
-        <div :class="styles.main">
-          <div>
-            <strong :class="styles.rev">r{{ rev.id }}</strong>
-            <span :class="[styles.path, styles.revPath]">{{ rev.path }}</span>
-            <span v-if="rev.restored_from != null" :class="styles.pill"
-              >restored from r{{ rev.restored_from }}</span
-            >
+    <div v-else-if="revisions.length" :class="styles.box">
+      <div :class="styles.head">
+        {{ revisions.length }}{{ hasMore ? '+' : '' }}
+        {{ revisions.length === 1 && !hasMore ? 'revision' : 'revisions' }}
+      </div>
+      <ul :class="styles.list">
+        <li v-for="rev in revisions" :key="`${rev.id}:${rev.path}`" :class="styles.item">
+          <div :class="styles.main">
+            <div>
+              <strong :class="styles.rev">r{{ rev.id }}</strong>
+              <span :class="[styles.path, styles.revPath]">{{ rev.path }}</span>
+              <span v-if="rev.restored_from != null" :class="styles.pill"
+                >restored from r{{ rev.restored_from }}</span
+              >
+            </div>
+            <div :class="styles.message">{{ commitSubject(rev.message) }}</div>
+            <details v-if="commitBody(rev.message)" :class="styles.body">
+              <summary :class="styles.bodyToggle">Description</summary>
+              <pre :class="styles.bodyText">{{ commitBody(rev.message) }}</pre>
+            </details>
           </div>
-          <div :class="styles.message">{{ commitSubject(rev.message) }}</div>
-          <details v-if="commitBody(rev.message)" :class="styles.body">
-            <summary :class="styles.bodyToggle">Description</summary>
-            <pre :class="styles.bodyText">{{ commitBody(rev.message) }}</pre>
-          </details>
-        </div>
-        <div :class="styles.meta">
-          <PynPerson
-            :name="rev.author"
-            :current="rev.author_current"
-            :identity="rev.author_public"
-          />
-          · {{ formatDateTime(rev.created_at) }}
-        </div>
-      </li>
-    </ul>
+          <div :class="styles.meta">
+            <PynPerson
+              :name="rev.author"
+              :current="rev.author_current"
+              :identity="rev.author_public"
+            />
+            · {{ formatDateTime(rev.created_at) }}
+          </div>
+        </li>
+      </ul>
+    </div>
     <p v-else-if="!error" :class="styles.empty">
       {{ path ? `No revisions of ${path}.` : filter ? 'No revisions match.' : 'No revisions yet.' }}
     </p>

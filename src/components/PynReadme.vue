@@ -17,7 +17,7 @@ defineProps<{
 <template>
   <section :class="styles.readme" aria-label="README">
     <header :class="styles.header">
-      <PynIcon name="file" :class="styles.icon" />
+      <PynIcon name="list" :class="styles.icon" />
       <a :href="blobPath({ owner, name }, readme.path, branch)" :class="styles.title">{{
         readme.name
       }}</a>

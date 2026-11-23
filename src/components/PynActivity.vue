@@ -20,6 +20,7 @@ defineProps<{ entries: ActivityEntry[]; now?: Date }>()
           :username="e.actor_current || e.actor"
           :name="e.actor_public.display_name"
           :src="e.actor_public.avatar_url"
+          size="sm"
         />
         <span v-else :class="styles.avatar" aria-hidden="true">{{
           e.actor.slice(0, 1).toUpperCase()
