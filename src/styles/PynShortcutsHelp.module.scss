@@ -26,7 +26,7 @@
   background: var(--pyn-surface);
   border: 1px solid var(--pyn-border);
   border-radius: var(--pyn-radius-lg);
-  box-shadow: 0 0.5rem 2rem rgb(0 0 0 / 0.4);
+  box-shadow: var(--pyn-shadow-floating);
 
   &:focus {
     outline: none;
