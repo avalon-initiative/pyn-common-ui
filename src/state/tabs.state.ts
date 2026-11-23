@@ -10,6 +10,42 @@ export function splitTabs(items: TabItem[], max?: number): { shown: TabItem[]; m
   return { shown: items.filter((t) => keep.has(t)), more: items.filter((t) => !keep.has(t)) }
 }
 
+/**
+ * Splits tabs by measured width: `widths[i]` is tab i, `more` the More trigger, `gap` the space between items.
+ * The current tab always stays shown; `max` still caps the shown count.
+ */
+export function fitTabs(
+  items: TabItem[],
+  widths: number[],
+  avail: number,
+  more: number,
+  gap: number,
+  max?: number,
+): { shown: TabItem[]; more: TabItem[] } {
+  const cap = max && max >= 1 ? max : items.length
+  const total = widths.reduce((a, w) => a + w, 0) + gap * Math.max(0, items.length - 1)
+  if (items.length <= cap && total <= avail) return { shown: items, more: [] }
+  const cur = items.findIndex((t) => t.current)
+  const keep = new Set<number>()
+  let used = more + gap
+  if (cur >= 0) {
+    keep.add(cur)
+    used += (widths[cur] ?? 0) + gap
+  }
+  for (let i = 0; i < items.length; i++) {
+    if (i === cur) continue
+    const w = (widths[i] ?? 0) + gap
+    if (keep.size >= cap || used + w > avail + gap) break
+    keep.add(i)
+    used += w
+  }
+  if (keep.size === 0 && items.length) keep.add(0)
+  return {
+    shown: items.filter((_, i) => keep.has(i)),
+    more: items.filter((_, i) => !keep.has(i)),
+  }
+}
+
 export const tabCountLabel = (t: TabItem): string => t.countLabel ?? `${t.count} items`
 
 /** Groups consecutive sections that share a `group` label. */

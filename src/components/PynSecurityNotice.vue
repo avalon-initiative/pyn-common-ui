@@ -21,6 +21,7 @@ const emit = defineEmits<{ dismiss: []; action: [event: MouseEvent] }>()
   <div
     :class="[styles.notice, required ? styles.required : styles.advice, compact && styles.compact]"
     role="status"
+    data-banner
   >
     <PynIcon name="lock" :class="styles.icon" />
     <div :class="styles.body">

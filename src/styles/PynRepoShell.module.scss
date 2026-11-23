@@ -21,7 +21,7 @@
   min-width: 0;
   margin: 0;
   font-size: var(--pyn-text-lg);
-  font-weight: 400;
+  font-weight: 600;
   line-height: var(--pyn-leading-tight);
   overflow-wrap: anywhere;
 }
@@ -54,6 +54,20 @@
 }
 
 .sep {
+  color: var(--pyn-text-muted);
+}
+
+.fact {
+  @include m.pill;
+  align-self: center;
+  color: var(--pyn-text);
+  background: var(--pyn-bg-subtle);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.factLabel {
+  margin-right: var(--pyn-space-1);
   color: var(--pyn-text-muted);
 }
 

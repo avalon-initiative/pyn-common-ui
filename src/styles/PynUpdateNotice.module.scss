@@ -4,11 +4,16 @@
   @include m.alert-role(accent);
   @include m.alert;
   align-items: center;
+  @include m.alert-stack;
 }
 
 .icon {
   @include m.alert-icon;
   margin-top: 0;
+
+  @include m.narrow {
+    margin-top: var(--pyn-space-1);
+  }
 }
 
 .body {
@@ -47,4 +52,8 @@
 .dismiss {
   @include m.button;
   flex: none;
+
+  @include m.narrow {
+    flex: 1 1 auto;
+  }
 }

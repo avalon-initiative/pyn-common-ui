@@ -55,6 +55,9 @@ export const OnBranch: Story = { args: { branch: 'feature/levels' } }
 export const LockStrip: Story = {
   args: { lockedCount: 3, lockHolders: ['jamie', 'riley', 'sam', 'alex', 'lee'], current: 'locks' },
 }
+export const HiddenLockStrip: Story = {
+  args: { lockedCount: 2, lockHolders: ['jamie'], hideLockStrip: true },
+}
 export const OneLock: Story = { args: { lockedCount: 1, lockHolders: ['jamie'] } }
 export const MoreMenu: Story = { args: { maxTabs: 3, current: 'settings' } }
 export const LockPending: Story = { args: { lockPending: true } }
@@ -107,5 +110,14 @@ export const CodeTabPickerOpen: Story = {
   play: async ({ canvasElement }) => {
     canvasElement.querySelector<HTMLButtonElement>('button[aria-haspopup=listbox]')?.click()
     await new Promise((resolve) => setTimeout(resolve))
+  },
+}
+export const Facts: Story = {
+  args: {
+    facts: [
+      { label: 'lease', value: '8h', title: 'Locks expire after 8 hours' },
+      { label: 'role', value: 'admin' },
+      { label: 'org', value: 'studio' },
+    ],
   },
 }

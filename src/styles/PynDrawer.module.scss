@@ -11,7 +11,7 @@
 .backdrop {
   position: absolute;
   inset: 0;
-  background: light-dark(#1f232866, #01040999);
+  background: var(--pyn-backdrop);
 }
 
 .panel {

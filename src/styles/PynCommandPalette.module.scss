@@ -7,7 +7,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 10vh var(--pyn-space-4) 0;
+  padding: 12vh var(--pyn-space-4) 0;
 
   @include m.narrow {
     padding-top: var(--pyn-space-4);
@@ -17,7 +17,7 @@
 .backdrop {
   position: absolute;
   inset: 0;
-  background: light-dark(#1f232866, #01040999);
+  background: var(--pyn-backdrop);
 }
 
 .panel {

@@ -287,6 +287,18 @@ $icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' v
   font-size: 1rem;
 }
 
+// Under 40rem the text keeps the full row and the buttons wrap below it.
+@mixin alert-stack($body: '.body') {
+  @include narrow {
+    flex-wrap: wrap;
+    align-items: flex-start;
+
+    #{$body} {
+      flex: 1 1 calc(100% - 2rem);
+    }
+  }
+}
+
 @mixin field-message {
   color: var(--pyn-danger);
   font-size: var(--pyn-text-xs);

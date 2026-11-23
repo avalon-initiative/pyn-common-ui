@@ -36,3 +36,12 @@ export const ReservedCount: Story = {
     ),
   },
 }
+
+/** No `max`: the container width alone decides what moves into More. */
+export const FitsContainer: Story = {
+  render: (args) => ({
+    components: { PynTabs },
+    setup: () => ({ args }),
+    template: `<div style="width: 22rem"><PynTabs v-bind="args" /></div>`,
+  }),
+}

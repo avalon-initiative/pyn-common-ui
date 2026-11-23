@@ -45,6 +45,7 @@
 
   /* shadows: flat by default, dark relies on the 1px border */
   --pyn-shadow-resting: 0 1px 0 light-dark(#1f232808, #0000);
+  --pyn-backdrop: light-dark(#1f23286b, #010409b3);
   --pyn-shadow-floating: 0 8px 24px light-dark(#25292e1f, #01040966);
 
   /* pyn names kept as aliases of the roles above */

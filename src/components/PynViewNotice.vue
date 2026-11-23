@@ -32,6 +32,7 @@ const { phase, handlers, close } = useAutoDismiss({
     v-if="phase !== 'gone'"
     :class="[styles.notice, styles[tone], phase === 'fading' && styles.fading]"
     role="status"
+    data-banner
     v-on="dismissible ? handlers : {}"
   >
     <PynIcon :name="icons[tone]" :class="styles.icon" />

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynBranchBar from '../components/PynBranchBar.vue'
 import PynShell from '../components/PynShell.vue'
+import PynSecurityNotice from '../components/PynSecurityNotice.vue'
 import PynSideNav from '../components/PynSideNav.vue'
 import PynTopBar from '../components/PynTopBar.vue'
 import PynRepoShell from '../components/PynRepoShell.vue'
@@ -75,6 +76,19 @@ export const WithBreadcrumbs: StoryObj<typeof PynShell> = {
       <PynShell :breadcrumbs="trail">
         <template #top><PynTopBar user="alice" theme="system" /></template>
         <p>Page content</p>
+      </PynShell>`,
+  }),
+}
+
+/** A banner directly above the page heading keeps a gap below it. */
+export const WithBanner: StoryObj<typeof PynShell> = {
+  render: () => ({
+    components: { PynShell, PynTopBar, PynSecurityNotice },
+    template: `
+      <PynShell>
+        <template #top><PynTopBar user="alice" :repos="[]" theme="system" /></template>
+        <PynSecurityNotice message="Protect your account: add two-factor authentication." action-label="Set up two-factor authentication" action-href="/_/settings/security" dismissible />
+        <h1>Dashboard</h1>
       </PynShell>`,
   }),
 }

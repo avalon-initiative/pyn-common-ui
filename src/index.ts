@@ -281,7 +281,7 @@ export type {
   RuleRef,
   RuleScope,
 } from './types/org.types'
-export type { RepoRef, Visibility } from './types/repo.types'
+export type { RepoFact, RepoRef, Visibility } from './types/repo.types'
 export type {
   BranchChange,
   BranchChangeKind,

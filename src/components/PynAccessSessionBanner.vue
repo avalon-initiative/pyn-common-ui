@@ -11,7 +11,7 @@ const active = computed(() => props.sessions.filter((s) => s.state === 'active')
 </script>
 
 <template>
-  <div v-if="active.length" :class="styles.banner" role="status">
+  <div v-if="active.length" :class="styles.banner" role="status" data-banner>
     <section v-for="s in active" :key="s.id" :class="styles.session">
       <h3 :class="styles.title">An administrator is acting as your account</h3>
       <p :class="styles.text">
