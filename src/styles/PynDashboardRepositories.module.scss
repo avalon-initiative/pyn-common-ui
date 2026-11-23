@@ -2,7 +2,7 @@
 
 .create {
   @include m.button(var(--pyn-on-accent));
-  background: var(--pyn-accent);
+  background: var(--pyn-accent-fill);
   border: 0;
   font-size: var(--pyn-text-sm);
   font-weight: 600;

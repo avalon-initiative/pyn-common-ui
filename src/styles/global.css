@@ -10,7 +10,8 @@ body {
   background: var(--pyn-bg);
   color: var(--pyn-text);
   font-family: var(--pyn-font);
-  line-height: 1.5;
+  font-size: var(--pyn-text-base);
+  line-height: var(--pyn-leading-body);
 }
 
 a {

@@ -75,7 +75,7 @@
   padding: var(--pyn-space-2) var(--pyn-space-3);
   color: var(--pyn-text);
   background: var(--pyn-bg);
-  border: 1px solid var(--pyn-border);
+  border: 1px solid var(--pyn-border-strong);
   border-radius: var(--pyn-radius);
   font: inherit;
 
@@ -111,7 +111,7 @@
   @include button(var(--pyn-on-accent));
   align-self: flex-start;
   padding: var(--pyn-space-2) var(--pyn-space-4);
-  background: var(--pyn-accent);
+  background: var(--pyn-accent-fill);
   border: 0;
   font-weight: 600;
 }
