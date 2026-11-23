@@ -1,0 +1,62 @@
+@use 'mixins' as m;
+
+.clone {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  @include m.button;
+  gap: var(--pyn-space-2);
+}
+
+.chevron {
+  color: var(--pyn-text-muted);
+}
+
+.panel {
+  @include m.floating;
+  position: absolute;
+  top: calc(100% + var(--pyn-space-1));
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  box-sizing: border-box;
+  width: min(26rem, calc(100vw - 2 * var(--pyn-space-4)));
+  padding: var(--pyn-space-3);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+}
+
+.title {
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-sm);
+  font-weight: 600;
+}
+
+.field {
+  display: flex;
+  gap: var(--pyn-space-2);
+}
+
+.input {
+  @include m.input;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-sm);
+}
+
+.copy {
+  @include m.button;
+}
+
+.error {
+  @include m.error;
+}
