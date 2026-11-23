@@ -83,13 +83,11 @@
     @include m.focus-ring;
   }
 
+  @include m.touch-target($display: inline-flex);
+
   @include m.narrow {
     width: auto;
-
     a {
-      display: inline-flex;
-      align-items: center;
-      min-height: 2.75rem;
     }
   }
 }

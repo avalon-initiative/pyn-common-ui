@@ -25,10 +25,56 @@
   border: 0;
 }
 
+// Touch devices get the 44px target at any width; mouse users keep the compact height.
+@mixin touch-target($square: false, $display: null) {
+  @media (pointer: coarse) {
+    min-height: var(--pyn-control-touch);
+
+    @if $display {
+      display: $display;
+      align-items: center;
+    }
+
+    @if $square {
+      min-width: var(--pyn-control-touch);
+    }
+  }
+}
+
+// Shared height for every interactive control; `$size` is a --pyn-control-* token.
+@mixin control($size: var(--pyn-control-md)) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: $size;
+  padding-block: 0;
+  line-height: var(--pyn-leading-tight);
+
+  @include touch-target;
+}
+
+// Comfortable density: a container opts in with data-density="comfortable".
+@mixin density-hook {
+  &[data-density='comfortable'] {
+    --pyn-control-md: var(--pyn-control-lg);
+    --pyn-row-padding-block: var(--pyn-space-3);
+  }
+}
+
 @mixin card {
   background: var(--pyn-surface);
   border: 1px solid var(--pyn-border);
   border-radius: var(--pyn-radius);
+  box-shadow: var(--pyn-shadow-resting);
+}
+
+// Floating layer: menus, pickers, dialogs.
+@mixin floating {
+  background: var(--pyn-surface);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  box-shadow: var(--pyn-shadow-floating);
 }
 
 @mixin list {
@@ -43,7 +89,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--pyn-space-4);
-  padding: var(--pyn-space-3) var(--pyn-space-4);
+  padding: var(--pyn-row-padding-block, var(--pyn-space-2)) var(--pyn-space-4);
 
   & + & {
     border-top: 1px solid var(--pyn-border);
@@ -68,40 +114,38 @@
   flex-direction: column;
   gap: var(--pyn-space-1);
   color: var(--pyn-text-muted);
-  font-size: 0.875rem;
+  font-size: var(--pyn-text-base);
+  font-weight: 500;
 }
 
 @mixin input {
-  padding: var(--pyn-space-2) var(--pyn-space-3);
+  @include control;
+  justify-content: flex-start;
+  padding-inline: var(--pyn-space-3);
   color: var(--pyn-text);
   background: var(--pyn-bg);
   border: 1px solid var(--pyn-border-strong);
   border-radius: var(--pyn-radius);
   font: inherit;
-
-  @include narrow {
-    min-height: 2.75rem;
-  }
+  line-height: var(--pyn-leading-tight);
 
   @include focus-ring;
 }
 
 @mixin button($color: var(--pyn-text)) {
-  padding: var(--pyn-space-1) var(--pyn-space-3);
+  @include control;
+  padding-inline: var(--pyn-space-3);
   color: $color;
   background: none;
   border: 1px solid var(--pyn-border);
   border-radius: var(--pyn-radius);
   font: inherit;
+  line-height: var(--pyn-leading-tight);
   cursor: pointer;
 
   &:disabled {
     opacity: 0.6;
     cursor: progress;
-  }
-
-  @include narrow {
-    min-height: 2.75rem;
   }
 
   @include focus-ring;
@@ -110,7 +154,7 @@
 @mixin button-primary {
   @include button(var(--pyn-on-accent));
   align-self: flex-start;
-  padding: var(--pyn-space-2) var(--pyn-space-4);
+  padding-inline: var(--pyn-space-4);
   background: var(--pyn-accent-fill);
   border: 0;
   font-weight: 600;
@@ -143,11 +187,64 @@
 }
 
 @mixin pill {
+  display: inline-flex;
+  align-items: center;
   padding: 0 var(--pyn-space-2);
   color: var(--pyn-text-muted);
   border: 1px solid var(--pyn-border);
   border-radius: var(--pyn-radius-pill);
-  font-size: 0.75rem;
+  font-size: var(--pyn-text-xs);
+  font-weight: 500;
+  line-height: 1.25rem;
+}
+
+// Small status label.
+@mixin label {
+  @include pill;
+  font-weight: 500;
+}
+
+// Table or list row: 40px default, density hook for comfortable, condensed 32px.
+@mixin table-row($condensed: false) {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-4);
+  box-sizing: border-box;
+  min-height: if($condensed, var(--pyn-control-md), var(--pyn-row-height));
+  padding: if($condensed, var(--pyn-space-1), var(--pyn-row-padding-block, var(--pyn-space-2)))
+    var(--pyn-space-4);
+  font-size: var(--pyn-text-base);
+  line-height: 1.25rem;
+
+  & + & {
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+@mixin menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  box-sizing: border-box;
+  min-height: var(--pyn-control-md);
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-text);
+  border-radius: var(--pyn-radius-sm);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--pyn-hover);
+  }
+
+  @include touch-target;
+}
+
+@mixin section-title {
+  margin: 0;
+  font-size: var(--pyn-text-md);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
 }
 
 // highlight.js token classes are global names in the markup it produces.
@@ -198,17 +295,12 @@
 }
 
 @mixin tab {
+  @include control;
   flex: none;
-  padding: var(--pyn-space-2) var(--pyn-space-4);
+  padding-inline: var(--pyn-space-3);
   color: var(--pyn-text-muted);
   border-bottom: 2px solid transparent;
   text-decoration: none;
-
-  @include narrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-  }
 
   &:hover {
     color: var(--pyn-text);

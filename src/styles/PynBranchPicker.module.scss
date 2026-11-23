@@ -7,12 +7,10 @@
 
 .trigger {
   @include m.button;
-  display: inline-flex;
-  align-items: center;
   gap: var(--pyn-space-2);
   background: var(--pyn-surface-raised);
   font-family: var(--pyn-font-mono);
-  font-size: 0.875rem;
+  font-size: var(--pyn-text-base);
 }
 
 .hidden {
@@ -42,7 +40,7 @@
   min-width: 18rem;
   padding: var(--pyn-space-2);
   background: var(--pyn-surface-raised);
-  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.35);
+  box-shadow: var(--pyn-shadow-floating);
 
   @include m.narrow {
     min-width: 0;

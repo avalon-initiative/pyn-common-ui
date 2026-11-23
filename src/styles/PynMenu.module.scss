@@ -20,9 +20,9 @@
     background: var(--pyn-hover);
   }
 
+  @include m.touch-target($square: true);
+
   @include m.narrow {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
     justify-content: center;
   }
 
@@ -40,7 +40,7 @@
   min-width: 12rem;
   padding: var(--pyn-space-1);
   background: var(--pyn-surface-raised);
-  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.35);
+  box-shadow: var(--pyn-shadow-floating);
 }
 
 .start {
@@ -73,9 +73,7 @@
     background: var(--pyn-hover);
   }
 
-  @include m.narrow {
-    min-height: 2.75rem;
-  }
+  @include m.touch-target;
 
   @include m.focus-ring;
 }

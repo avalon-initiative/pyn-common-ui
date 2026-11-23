@@ -22,9 +22,7 @@
   padding-right: var(--pyn-space-8);
   background: var(--pyn-surface);
 
-  @include m.narrow {
-    min-height: 2.75rem;
-  }
+  @include m.touch-target;
 }
 
 .hint {

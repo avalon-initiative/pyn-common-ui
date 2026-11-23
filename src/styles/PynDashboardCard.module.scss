@@ -32,11 +32,7 @@
   color: var(--pyn-accent);
   font-size: var(--pyn-text-sm);
 
-  @include m.narrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-  }
+  @include m.touch-target($display: inline-flex);
 
   @include m.focus-ring;
 }

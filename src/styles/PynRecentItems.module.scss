@@ -20,9 +20,7 @@
   font: inherit;
   cursor: pointer;
 
-  @include m.narrow {
-    min-height: 2.75rem;
-  }
+  @include m.touch-target;
 
   @include m.focus-ring;
 }
@@ -49,11 +47,7 @@
     text-decoration: underline;
   }
 
-  @include m.narrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-  }
+  @include m.touch-target($display: inline-flex);
 
   @include m.focus-ring;
 }

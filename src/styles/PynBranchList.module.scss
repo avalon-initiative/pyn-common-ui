@@ -50,11 +50,7 @@ a.name {
     text-decoration: underline;
   }
 
-  @include m.narrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-  }
+  @include m.touch-target($display: inline-flex);
 
   @include m.focus-ring;
 }
@@ -77,10 +73,9 @@ a.name {
     text-decoration: underline;
   }
 
+  @include m.touch-target($display: inline-flex);
+
   @include m.narrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
     margin-left: 0;
   }
 

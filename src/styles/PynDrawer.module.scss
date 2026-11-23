@@ -23,7 +23,7 @@
   color: var(--pyn-text);
   background: var(--pyn-surface);
   border-left: 1px solid var(--pyn-border);
-  box-shadow: 0 0 1.5rem rgb(0 0 0 / 0.4);
+  box-shadow: var(--pyn-shadow-floating);
 
   &:focus {
     outline: none;

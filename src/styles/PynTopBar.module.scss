@@ -38,10 +38,9 @@
   letter-spacing: 0.08em;
   text-decoration: none;
 
+  @include m.touch-target($display: inline-flex);
+
   @include m.narrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
     padding: 0 var(--pyn-space-2);
   }
 
@@ -80,12 +79,9 @@
 
 .iconButton {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2rem;
-  min-height: 2rem;
-  padding: var(--pyn-space-1) var(--pyn-space-2);
+  @include m.control;
+  min-width: var(--pyn-control-md);
+  padding-inline: var(--pyn-space-2);
   color: var(--pyn-text);
   background: none;
   border: 1px solid transparent;
@@ -98,10 +94,7 @@
     background: var(--pyn-hover);
   }
 
-  @include m.narrow {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-  }
+  @include m.touch-target($square: true);
 
   @include m.focus-ring;
 }
@@ -124,7 +117,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--pyn-space-1);
-  padding: var(--pyn-space-1) var(--pyn-space-3);
+  min-height: var(--pyn-control-md);
+  padding: 0 var(--pyn-space-3);
   color: var(--pyn-mine);
   background: var(--pyn-mine-bg);
   border-radius: var(--pyn-radius-pill);
@@ -137,9 +131,7 @@
     background: var(--pyn-locked-bg);
   }
 
-  @include m.narrow {
-    min-height: 2.75rem;
-  }
+  @include m.touch-target;
 
   @include m.focus-ring;
 }
@@ -185,12 +177,6 @@
 .signIn {
   @include m.button;
   text-decoration: none;
-
-  @include m.narrow {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-  }
 }
 
 // Last so they win over the control rules above.

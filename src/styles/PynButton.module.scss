@@ -1,16 +1,13 @@
 @use 'mixins' as m;
 
 .pynButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include m.control;
   gap: var(--pyn-space-2);
-  padding: var(--pyn-space-2) var(--pyn-space-4);
+  padding-inline: var(--pyn-space-4);
   border: 1px solid var(--pyn-border);
   border-radius: var(--pyn-radius);
   font: inherit;
   font-weight: 600;
-  line-height: 1.2;
   cursor: pointer;
   transition:
     background-color 120ms ease,

@@ -113,10 +113,9 @@
     font-weight: 600;
   }
 
+  @include m.touch-target($display: flex);
+
   @include m.narrow {
-    display: flex;
-    align-items: center;
-    min-height: 2.75rem;
     overflow-wrap: anywhere;
   }
 
