@@ -1,7 +1,7 @@
 @use 'mixins' as m;
 
 .nav {
-  margin-bottom: var(--pyn-space-3);
+  margin: 0;
 }
 
 .more {
@@ -13,9 +13,14 @@
 }
 
 .toggle {
-  @include m.button(var(--pyn-accent));
+  @include m.button(var(--pyn-text-muted));
+  min-height: var(--pyn-control-sm);
   padding: 0 var(--pyn-space-2);
-  line-height: 1.4;
+  border-color: transparent;
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
 }
 
 .middle {

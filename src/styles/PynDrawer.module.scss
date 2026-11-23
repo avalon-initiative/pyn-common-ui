@@ -11,7 +11,7 @@
 .backdrop {
   position: absolute;
   inset: 0;
-  background: rgb(0 0 0 / 0.5);
+  background: light-dark(#1f232866, #01040999);
 }
 
 .panel {
@@ -40,21 +40,38 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--pyn-space-3);
-  padding: var(--pyn-space-3) var(--pyn-space-4);
+  min-height: 3.5rem;
+  box-sizing: border-box;
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  background: var(--pyn-bg-subtle);
   border-bottom: 1px solid var(--pyn-border);
 }
 
 .title {
   margin: 0;
-  font-size: var(--pyn-text-lg);
+  font-size: var(--pyn-text-md);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
   overflow-wrap: anywhere;
 }
 
 .close {
-  @include m.button;
-  padding: 0 var(--pyn-space-2);
-  font-size: var(--pyn-text-lg);
-  line-height: 1.5;
+  @include m.control;
+  flex: none;
+  min-width: var(--pyn-control-md);
+  padding: 0;
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  @include m.focus-ring;
 }
 
 .body {
@@ -68,6 +85,7 @@
   justify-content: flex-end;
   gap: var(--pyn-space-2);
   padding: var(--pyn-space-3) var(--pyn-space-4);
+  background: var(--pyn-bg-subtle);
   border-top: 1px solid var(--pyn-border);
 }
 

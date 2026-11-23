@@ -32,6 +32,10 @@ export const WithFooter: Story = {
 
 export const OpenedByButton: Story = {
   args: { title: 'Details', open: false },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLElement>('button')!.click()
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  },
   render: (args) => ({
     components: { PynDrawer },
     setup: () => ({ args, open: ref(false) }),

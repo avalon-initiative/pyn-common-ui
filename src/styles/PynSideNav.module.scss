@@ -47,20 +47,24 @@
   display: flex;
   align-items: center;
   gap: var(--pyn-space-3);
-  padding: var(--pyn-space-2) var(--pyn-space-3);
-  color: var(--pyn-text-muted);
+  box-sizing: border-box;
+  min-height: var(--pyn-control-md);
+  padding: 0 var(--pyn-space-3);
+  color: var(--pyn-text);
   border-radius: var(--pyn-radius);
   text-decoration: none;
 
   &:hover {
-    color: var(--pyn-text);
     background: var(--pyn-hover);
   }
 
   &[aria-current] {
-    color: var(--pyn-text);
-    background: var(--pyn-selected);
+    background: var(--pyn-hover);
+    font-weight: 600;
+    box-shadow: inset 2px 0 0 var(--pyn-accent);
   }
+
+  @include m.touch-target;
 
   @include m.focus-ring;
 }
@@ -75,8 +79,8 @@
   margin: var(--pyn-space-4) 0 0;
   padding: 0 var(--pyn-space-3);
   color: var(--pyn-text-muted);
-  font-size: var(--pyn-text-sm);
-  font-weight: 400;
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
 }
 
 .empty {

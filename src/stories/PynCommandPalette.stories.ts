@@ -41,8 +41,14 @@ export const WithInitialText: Story = {
   render,
 }
 
+const tick = () => new Promise((resolve) => setTimeout(resolve, 50))
+
 export const OpenedByButton: Story = {
   args: { open: false, label: 'Command palette', items: commandItems },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLElement>('button')!.click()
+    await tick()
+  },
   render: (args) => ({
     components: { PynCommandPalette },
     setup: () => ({ args, open: ref(false), last: ref('') }),

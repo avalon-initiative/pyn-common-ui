@@ -4,11 +4,10 @@
   gap: var(--pyn-space-2);
   align-items: center;
   justify-content: flex-end;
-  padding: var(--pyn-space-1) var(--pyn-space-4);
-  font-family: var(--pyn-font-mono);
+  padding: var(--pyn-space-2) var(--pyn-page-gutter);
   font-size: var(--pyn-text-xs);
   color: var(--pyn-text-muted);
-  background: var(--pyn-surface);
+  background: var(--pyn-bg-subtle);
   border-top: 1px solid var(--pyn-border);
 }
 
