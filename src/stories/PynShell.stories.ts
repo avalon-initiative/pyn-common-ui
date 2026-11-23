@@ -19,7 +19,7 @@ const repos = [
   { owner: 'alice', name: 'core-engine' },
 ]
 
-/** Repository page mockup: top bar, sidebar, header and branch bar. */
+/** Repository page mockup with the legacy sidebar slot: top bar, sidebar, header and branch bar. */
 export const RepositoryPage: StoryObj<typeof PynShell> = {
   render: () => ({
     components: { PynShell, PynTopBar, PynSideNav, PynRepoShell, PynBranchBar },
@@ -35,14 +35,14 @@ export const RepositoryPage: StoryObj<typeof PynShell> = {
   }),
 }
 
-/** Repository page without the sidebar: the top bar stays as the way back. */
-export const BareRepositoryPage: StoryObj<typeof PynShell> = {
+/** Repository page: the same top bar, no side navigation. */
+export const RepositoryPageWithoutSidebar: StoryObj<typeof PynShell> = {
   render: () => ({
     components: { PynShell, PynTopBar, PynRepoShell },
     setup: () => ({ tabs: repoShellTabs(['read'], false) }),
     template: `
-      <PynShell bare>
-        <template #top><PynTopBar user="alice" :repos="['alice/castle-quest']" theme="system" /></template>
+      <PynShell>
+        <template #top><PynTopBar user="alice" :repos="['alice/castle-quest']" theme="system" :locks-held="2" /></template>
         <PynRepoShell owner="alice" name="castle-quest" visibility="private" :tabs="tabs" current=""><p>Page content</p></PynRepoShell>
       </PynShell>`,
   }),
@@ -53,7 +53,7 @@ export const SignedOutPage: StoryObj<typeof PynShell> = {
   render: () => ({
     components: { PynShell, PynTopBar },
     template: `
-      <PynShell bare>
+      <PynShell>
         <template #top><PynTopBar signed-out theme="system" /></template>
         <p>Public page content</p>
       </PynShell>`,
@@ -72,7 +72,7 @@ export const WithBreadcrumbs: StoryObj<typeof PynShell> = {
       ],
     }),
     template: `
-      <PynShell bare :breadcrumbs="trail">
+      <PynShell :breadcrumbs="trail">
         <template #top><PynTopBar user="alice" theme="system" /></template>
         <p>Page content</p>
       </PynShell>`,

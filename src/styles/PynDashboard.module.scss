@@ -1,0 +1,44 @@
+@use 'mixins' as m;
+
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+  grid-template-areas:
+    'head head'
+    'main side';
+  gap: var(--pyn-space-4) var(--pyn-space-6);
+  align-items: start;
+
+  @include m.narrow {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'head'
+      'main'
+      'side';
+  }
+}
+
+.header {
+  grid-area: head;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+}
+
+.main,
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+  min-width: 0;
+}
+
+.main {
+  grid-area: main;
+}
+
+.side {
+  grid-area: side;
+}

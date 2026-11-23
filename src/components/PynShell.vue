@@ -3,14 +3,20 @@ import { ref } from 'vue'
 import PynBreadcrumbs from './PynBreadcrumbs.vue'
 import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynShell.module.scss'
+import { MAIN_ID } from '../state/top-bar.state'
 import type { Crumb } from '../types/tree.types'
 
-defineProps<{
-  /** Renders without the side navigation, keeping the top bar. */
-  bare?: boolean
-  /** Path to the open page, shown above the content; the last item is the current page. */
-  breadcrumbs?: Crumb[]
-}>()
+withDefaults(
+  defineProps<{
+    /** Deprecated and ignored: the side navigation now shows only when the `side` slot is given. */
+    bare?: boolean
+    /** Path to the open page, shown above the content; the last item is the current page. */
+    breadcrumbs?: Crumb[]
+    /** Id of the main content; the top bar's skip link targets it. */
+    mainId?: string
+  }>(),
+  { mainId: MAIN_ID },
+)
 const open = ref(false)
 const closeOnLink = (e: MouseEvent) => {
   if ((e.target as HTMLElement).closest('a')) open.value = false
@@ -18,10 +24,10 @@ const closeOnLink = (e: MouseEvent) => {
 </script>
 
 <template>
-  <div :class="[styles.shell, bare && styles.bare]">
+  <div :class="[styles.shell, !$slots.side && styles.noSide]">
     <header :class="styles.top">
       <button
-        v-if="!bare"
+        v-if="$slots.side"
         type="button"
         :class="styles.toggle"
         aria-label="Toggle navigation"
@@ -32,10 +38,10 @@ const closeOnLink = (e: MouseEvent) => {
       </button>
       <slot name="top" />
     </header>
-    <aside v-if="!bare" :class="[styles.side, open && styles.open]" @click="closeOnLink">
+    <aside v-if="$slots.side" :class="[styles.side, open && styles.open]" @click="closeOnLink">
       <slot name="side" />
     </aside>
-    <main :class="styles.main">
+    <main :id="mainId" tabindex="-1" :class="styles.main">
       <div v-if="breadcrumbs && breadcrumbs.length > 1" :class="styles.crumbs">
         <PynBreadcrumbs :items="breadcrumbs" />
       </div>

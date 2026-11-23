@@ -20,6 +20,12 @@
     background: var(--pyn-hover);
   }
 
+  @include m.narrow {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    justify-content: center;
+  }
+
   @include m.focus-ring;
 }
 
@@ -42,6 +48,12 @@
   left: 0;
 }
 
+.heading {
+  @include m.muted;
+  padding: var(--pyn-space-2) var(--pyn-space-3) var(--pyn-space-1);
+  font-size: var(--pyn-text-xs);
+}
+
 .item {
   display: flex;
   align-items: center;
@@ -56,8 +68,13 @@
   text-decoration: none;
   cursor: pointer;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--pyn-hover);
+  }
+
+  @include m.narrow {
+    min-height: 2.75rem;
   }
 
   @include m.focus-ring;

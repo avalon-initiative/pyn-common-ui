@@ -6,4 +6,6 @@ export interface MenuItem {
   /** Marks the current option of a choice item. */
   checked?: boolean
   separator?: boolean
+  /** A non-interactive group label inside the menu. */
+  heading?: boolean
 }
