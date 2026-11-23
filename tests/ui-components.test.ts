@@ -814,15 +814,17 @@ describe('PynShell', () => {
   })
 })
 
-describe('PynShell bare', () => {
-  it('omits the side navigation and its toggle but keeps the top bar', () => {
+describe('PynShell side navigation', () => {
+  it('shows the side navigation only when the side slot is given; bare is ignored', () => {
     const slots = { top: '<b>top</b>', side: '<a href="#x">x</a>', default: 'body' }
-    const bare = mount(PynShell, { props: { bare: true }, slots })
-    expect(bare.find('aside').exists()).toBe(false)
-    expect(bare.find('button').exists()).toBe(false)
-    expect(bare.find('header').text()).toContain('top')
-    expect(bare.text()).toContain('body')
-    expect(mount(PynShell, { slots }).find('aside').exists()).toBe(true)
+    const withSide = mount(PynShell, { props: { bare: true }, slots })
+    expect(withSide.find('aside').exists()).toBe(true)
+    const { side: _side, ...noSide } = slots
+    const without = mount(PynShell, { slots: noSide })
+    expect(without.find('aside').exists()).toBe(false)
+    expect(without.find('button').exists()).toBe(false)
+    expect(without.find('header').text()).toContain('top')
+    expect(without.text()).toContain('body')
   })
 })
 

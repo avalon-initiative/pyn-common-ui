@@ -1,0 +1,76 @@
+@use 'mixins' as m;
+
+.card {
+  @include m.card;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  border-bottom: 1px solid var(--pyn-border);
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--pyn-text-md);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-3);
+}
+
+.seeAll {
+  color: var(--pyn-accent);
+  font-size: var(--pyn-text-sm);
+
+  @include m.narrow {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  @include m.focus-ring;
+}
+
+.body > ul {
+  border: 0;
+  border-radius: 0;
+}
+
+.body,
+.status,
+.errorBox {
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+}
+
+.status {
+  @include m.muted;
+}
+
+.errorBox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-3);
+}
+
+.error {
+  @include m.error;
+}
+
+.retry {
+  @include m.button;
+}
+
+.hidden {
+  @include m.visually-hidden;
+}

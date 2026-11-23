@@ -61,17 +61,16 @@ describe('PynPeopleSearch', () => {
 })
 
 describe('signed-out top bar', () => {
-  it('shows a sign-in link and no account or create menus', () => {
+  it('shows a sign-in link and search, with no account or create menus', () => {
     const w = mount(PynTopBar, { props: { signedOut: true, theme: 'light' } })
     expect(w.find('[data-sign-in]').attributes('href')).toBe('/_/sign-in')
-    expect(w.find('[role="search"]').exists()).toBe(false)
+    expect(w.find('[role="search"]').exists()).toBe(true)
     expect(w.text()).toContain('Theme')
-    expect(w.text()).not.toContain('Create')
+    expect(w.find('[aria-label="Create"]').exists()).toBe(false)
   })
 
   it('takes a custom sign-in link and renders in the shell', () => {
     const w = mount(PynShell, {
-      props: { bare: true },
       slots: { top: '<div id="t"></div>' },
     })
     expect(w.find('#t').exists()).toBe(true)

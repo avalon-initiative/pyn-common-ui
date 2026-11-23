@@ -1,0 +1,16 @@
+@use 'mixins' as m;
+
+.create {
+  @include m.button(var(--pyn-on-accent));
+  background: var(--pyn-accent);
+  border: 0;
+  font-size: var(--pyn-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+
+  @include m.narrow {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+}

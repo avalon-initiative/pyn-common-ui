@@ -1,0 +1,63 @@
+@use 'mixins' as m;
+
+.recent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
+.note,
+.empty {
+  @include m.muted;
+  font-size: var(--pyn-text-sm);
+}
+
+.clear {
+  padding: 0;
+  color: var(--pyn-accent);
+  background: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+
+  @include m.narrow {
+    min-height: 2.75rem;
+  }
+
+  @include m.focus-ring;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  @include m.item;
+  padding-inline: 0;
+}
+
+.link {
+  min-width: 0;
+  color: var(--pyn-text);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include m.narrow {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  @include m.focus-ring;
+}
+
+.kind {
+  @include m.pill;
+}

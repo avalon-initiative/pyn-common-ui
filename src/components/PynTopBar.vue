@@ -1,38 +1,71 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import PynAvatar from './PynAvatar.vue'
+import PynGlobalSearch from './PynGlobalSearch.vue'
 import PynIcon from './PynIcon.vue'
 import PynMenu from './PynMenu.vue'
-import PynAvatar from './PynAvatar.vue'
-import PynSearch from './PynSearch.vue'
 import styles from '../styles/PynTopBar.module.scss'
+import { matchRepos } from '../state/shell.state'
 import { themeChoices } from '../state/theme.state'
+import {
+  MAIN_ID,
+  countText,
+  defaultHrefs,
+  locksText,
+  notificationsText,
+  ownerItems,
+} from '../state/top-bar.state'
 import type { ThemeChoice } from '../state/theme.state'
 import type { MenuItem } from '../types/shell.types'
+import type { OwnerOption, TopBarHrefs } from '../types/top-bar.types'
 
-const props = defineProps<{
-  user?: string
-  /** Shown beside the account name and used for the avatar initials. */
-  displayName?: string | null
-  avatarUrl?: string | null
-  repos?: string[]
-  theme: ThemeChoice
-  /** Public variant: sign-in link and theme control, no search, create or account menus. */
-  signedOut?: boolean
-  signInHref?: string
-  admin?: boolean
-  extraAccount?: MenuItem[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    user?: string
+    /** Shown beside the account name and used for the avatar initials. */
+    displayName?: string | null
+    avatarUrl?: string | null
+    /** Repository slugs offered while typing; Enter on a match emits `open`. */
+    repos?: string[]
+    theme: ThemeChoice
+    /** Public variant: brand, search, theme and a sign-in link. */
+    signedOut?: boolean
+    signInHref?: string
+    admin?: boolean
+    extraAccount?: MenuItem[]
+    /** The person's account and organizations, listed in the owner switcher. */
+    owners?: OwnerOption[]
+    /** Owner shown in the switcher; defaults to `user`. */
+    currentOwner?: string
+    /** Locks the person holds; the pill is hidden at zero. */
+    locksHeld?: number
+    /** True when one of those locks expires within the hour. */
+    locksExpiring?: boolean
+    /** Pending invitations and notices; the bell stays, its count hides at zero. */
+    notifications?: number
+    /** Overrides for the link destinations. */
+    hrefs?: Partial<TopBarHrefs>
+    /** Set false to leave the search box off (signed-out pages without public browsing). */
+    showSearch?: boolean
+    /** Id of the main content the skip link jumps to. */
+    mainId?: string
+  }>(),
+  { showSearch: true, mainId: MAIN_ID },
+)
 const emit = defineEmits<{
   open: [slug: string]
+  input: [text: string]
+  search: [text: string]
   theme: [ThemeChoice]
   signOut: []
   account: [id: string]
 }>()
 
-const create: MenuItem[] = [
-  { id: 'new-repo', label: 'New repository', href: '/_/new' },
-  { id: 'new-org', label: 'New organization', href: '/_/new-org' },
-]
+const links = computed(() => ({ ...defaultHrefs(props.user), ...props.hrefs }))
+const owner = computed(() => props.currentOwner ?? props.user ?? '')
+const locks = computed(() => countText(props.locksHeld))
+const bell = computed(() => countText(props.notifications))
+
 const themeItems = computed<MenuItem[]>(() =>
   themeChoices.map((t) => ({
     id: `theme:${t.id}`,
@@ -40,38 +73,164 @@ const themeItems = computed<MenuItem[]>(() =>
     checked: props.theme === t.id,
   })),
 )
+const create = computed<MenuItem[]>(() => [
+  { id: 'new-repo', label: 'New repository', href: links.value.newRepo },
+  { id: 'new-org', label: 'New organization', href: links.value.newOrg },
+])
+const switcher = computed(() => ownerItems(props.owners ?? [], owner.value, links.value.newOrg))
 const account = computed<MenuItem[]>(() => [
-  { id: 'settings', label: 'Account settings', href: '/_/settings' },
-  ...(props.admin ? [{ id: 'admin', label: 'Server administration', href: '/_/admin' }] : []),
+  { id: 'profile', label: 'Your profile', href: links.value.profile },
+  { id: 'settings', label: 'Account settings', href: links.value.settings },
+  ...(props.admin
+    ? [{ id: 'admin', label: 'Server administration', href: links.value.admin }]
+    : []),
   ...(props.extraAccount ?? []),
   { id: 'sep-theme', label: '', separator: true },
   ...themeItems.value,
   { id: 'sep-out', label: '', separator: true },
   { id: 'sign-out', label: 'Sign out' },
 ])
+const globalLinks = computed<MenuItem[]>(() => {
+  const n = props.notifications ?? 0
+  const items: MenuItem[] = [{ id: 'home', label: 'Dashboard', href: links.value.home }]
+  if (props.signedOut) {
+    return [
+      ...items,
+      { id: 'sign-in', label: 'Sign in', href: props.signInHref ?? '/_/sign-in' },
+      { id: 'sep', label: '', separator: true },
+      ...themeItems.value,
+    ]
+  }
+  return [
+    ...items,
+    { id: 'locks', label: 'Your locks', href: links.value.locks },
+    {
+      id: 'notifications',
+      label: n > 0 ? `Notifications (${countText(n)})` : 'Notifications',
+      href: links.value.notifications,
+    },
+    { id: 'sep-new', label: '', separator: true },
+    ...create.value,
+    ...(props.owners?.length
+      ? [{ id: 'sep-owners', label: '', separator: true }, ...switcher.value]
+      : []),
+  ]
+})
 
 function pick(id: string) {
   if (id === 'sign-out') emit('signOut')
   else if (id.startsWith('theme:')) emit('theme', id.slice(6) as ThemeChoice)
   else if (props.extraAccount?.some((i) => i.id === id)) emit('account', id)
 }
+
+function submit(text: string) {
+  const hit = props.repos ? matchRepos(props.repos, text) : []
+  const exact = props.repos?.find((r) => r === text)
+  if (exact ?? hit[0]) emit('open', (exact ?? hit[0])!)
+  else emit('search', text)
+}
+
+const searching = ref(false)
+const box = ref<InstanceType<typeof PynGlobalSearch> | null>(null)
+const searchButton = ref<HTMLButtonElement | null>(null)
+async function startSearch() {
+  searching.value = true
+  await nextTick()
+  box.value?.focus()
+}
+function closeSearch() {
+  searching.value = false
+  searchButton.value?.focus()
+}
+function leaveSearch(e: FocusEvent) {
+  if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) searching.value = false
+}
+
+function slash(e: KeyboardEvent) {
+  if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || !props.showSearch) return
+  const t = e.target as HTMLElement | null
+  if (t?.closest('input, textarea, select, [contenteditable]')) return
+  e.preventDefault()
+  void startSearch()
+}
+onMounted(() => document.addEventListener('keydown', slash))
+onBeforeUnmount(() => document.removeEventListener('keydown', slash))
 </script>
 
 <template>
   <div :class="styles.bar">
-    <a href="/" :class="styles.brand">PYN</a>
+    <a :href="`#${mainId}`" :class="styles.skip" data-skip>Skip to content</a>
+    <PynMenu
+      label="Main menu"
+      :items="globalLinks"
+      align="start"
+      :class="styles.narrowOnly"
+      @select="pick"
+    >
+      <PynIcon name="menu" />
+    </PynMenu>
+    <a :href="links.home" :class="styles.brand">PYN</a>
+    <PynMenu
+      v-if="!signedOut && owner"
+      :label="`Switch owner, ${owner}`"
+      :items="switcher"
+      align="start"
+      :class="styles.wideOnly"
+    >
+      <span :class="styles.owner" data-owner>{{ owner }}</span>
+      <PynIcon name="chevron" :class="styles.chevron" />
+    </PynMenu>
+    <div
+      v-if="showSearch"
+      :class="[styles.searchWrap, searching && styles.searching]"
+      @focusout="leaveSearch"
+    >
+      <PynGlobalSearch
+        ref="box"
+        :options="repos"
+        @input="emit('input', $event)"
+        @search="submit"
+        @keydown.esc="closeSearch"
+      />
+    </div>
+    <button
+      v-if="showSearch"
+      ref="searchButton"
+      type="button"
+      :class="[styles.iconButton, styles.searchButton]"
+      aria-label="Search"
+      :aria-expanded="searching"
+      @click="startSearch"
+    >
+      <PynIcon name="search" />
+    </button>
+    <span v-if="!showSearch" :class="styles.spacer" />
     <template v-if="signedOut">
-      <span :class="styles.spacer" />
-      <PynMenu label="Theme" :items="themeItems" @select="pick"
+      <PynMenu label="Theme" :items="themeItems" :class="styles.wideOnly" @select="pick"
         >Theme<PynIcon name="chevron" :class="styles.chevron"
       /></PynMenu>
       <a :href="signInHref ?? '/_/sign-in'" :class="styles.signIn" data-sign-in>Sign in</a>
     </template>
     <template v-else>
-      <PynSearch :options="repos ?? []" :class="styles.search" @open="emit('open', $event)" />
-      <PynMenu label="Create" :items="create">
+      <PynMenu label="Create" :items="create" :class="styles.wideOnly">
         <PynIcon name="plus" /><PynIcon name="chevron" :class="styles.chevron" />
       </PynMenu>
+      <a
+        v-if="locks"
+        :href="links.locks"
+        :class="styles.pill"
+        :data-expiring="locksExpiring || undefined"
+        data-locks
+      >
+        <PynIcon name="lock" />
+        <span aria-hidden="true">{{ locks }}</span>
+        <span :class="styles.hidden">{{ locksText(locksHeld ?? 0, locksExpiring) }}</span>
+      </a>
+      <a :href="links.notifications" :class="[styles.iconButton, styles.wideOnly]" data-bell>
+        <PynIcon name="bell" />
+        <span v-if="bell" :class="styles.badge" aria-hidden="true" data-badge>{{ bell }}</span>
+        <span :class="styles.hidden">{{ notificationsText(notifications) }}</span>
+      </a>
       <PynMenu label="Account menu" :items="account" @select="pick">
         <template #header>
           <p :class="styles.who">

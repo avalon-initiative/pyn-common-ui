@@ -1,0 +1,44 @@
+@use 'mixins' as m;
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 32rem;
+}
+
+.icon {
+  position: absolute;
+  left: var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  pointer-events: none;
+}
+
+.input {
+  @include m.input;
+  width: 100%;
+  padding-left: var(--pyn-space-8);
+  padding-right: var(--pyn-space-8);
+  background: var(--pyn-surface);
+
+  @include m.narrow {
+    min-height: 2.75rem;
+  }
+}
+
+.hint {
+  position: absolute;
+  right: var(--pyn-space-2);
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-text-muted);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+  pointer-events: none;
+
+  @include m.narrow {
+    display: none;
+  }
+}
