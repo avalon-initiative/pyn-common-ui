@@ -15,7 +15,7 @@ const safeUrl = computed(() => (props.url && /^https?:\/\//i.test(props.url) ? p
 </script>
 
 <template>
-  <section v-if="latest" :class="styles.notice" role="status">
+  <section v-if="latest" :class="styles.notice" role="status" data-banner>
     <PynIcon name="info" :class="styles.icon" />
     <div :class="styles.body">
       <p :class="styles.text">

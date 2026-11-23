@@ -1,6 +1,15 @@
 import type { MemberSource } from './team.types'
 import type { PublicIdentity } from './profile.types'
 
+/** A small header label such as a lease length, the viewer's role or the owning organization. */
+export interface RepoFact {
+  /** Muted lead-in, such as "role"; omitted shows the value alone. */
+  label?: string
+  value: string
+  /** Tooltip with the full explanation. */
+  title?: string
+}
+
 export type Visibility = 'public' | 'private'
 
 /** The identity of a repository, as far as navigation needs it. */

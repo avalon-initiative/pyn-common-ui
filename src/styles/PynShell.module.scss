@@ -87,6 +87,12 @@
 
 .content {
   min-width: 0;
+
+  // A banner, directly or in one wrapper, keeps a gap before what follows.
+  > [data-banner]:not(:last-child),
+  > * > [data-banner]:not(:last-child) {
+    margin-bottom: var(--pyn-space-4);
+  }
 }
 
 .footer {

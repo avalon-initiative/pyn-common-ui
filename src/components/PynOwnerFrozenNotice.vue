@@ -7,7 +7,7 @@ defineProps<{ freeze: OwnerFreeze }>()
 </script>
 
 <template>
-  <section v-if="freeze.frozen" :class="styles.notice" role="status">
+  <section v-if="freeze.frozen" :class="styles.notice" role="status" data-banner>
     <h2 :class="styles.title">
       {{ freeze.kind === 'org' ? 'Organization' : 'User' }}
       <strong>{{ freeze.owner }}</strong> is frozen

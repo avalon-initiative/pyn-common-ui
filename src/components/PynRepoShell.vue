@@ -5,7 +5,7 @@ import PynTabs from './PynTabs.vue'
 import styles from '../styles/PynRepoShell.module.scss'
 import { BRANCH_SECTIONS, TAB_ICONS, repoPath } from '../state/repo.state'
 import type { RepoShellTab } from '../state/repo.state'
-import type { Visibility } from '../types/repo.types'
+import type { RepoFact, Visibility } from '../types/repo.types'
 
 const props = defineProps<{
   owner: string
@@ -27,6 +27,10 @@ const props = defineProps<{
   lockHolders?: string[]
   /** Most tabs shown before the rest move into a More menu. */
   maxTabs?: number
+  /** Hides the lock strip; the Locks tab keeps its count. */
+  hideLockStrip?: boolean
+  /** Small labels after the visibility badge (lease, role, organization); the `labels` slot replaces them. */
+  facts?: RepoFact[]
   /** While the lock count loads, reserves the lock strip and the Locks tab count so the page does not shift. */
   lockPending?: boolean
 }>()
@@ -77,6 +81,19 @@ const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.v
           <span :class="styles.badge" data-visibility>{{
             visibility === 'public' ? 'Public' : 'Private'
           }}</span>
+          <slot name="labels">
+            <span
+              v-for="(fact, i) in facts ?? []"
+              :key="i"
+              :class="styles.fact"
+              :title="fact.title"
+              data-fact
+            >
+              <template v-if="fact.label"
+                ><span :class="styles.factLabel">{{ fact.label }}</span></template
+              >{{ fact.value }}
+            </span>
+          </slot>
         </component>
         <div
           v-if="$slots.watch || $slots.fork || $slots.star || $slots.actions"
@@ -90,7 +107,7 @@ const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.v
       </div>
       <PynTabs v-if="tabs" :items="tabItems" label="Repository" :max="maxTabs" />
     </header>
-    <p v-if="lockedCount" :class="styles.strip" data-lock-strip>
+    <p v-if="lockedCount && !hideLockStrip" :class="styles.strip" data-lock-strip>
       <PynIcon name="lock" :class="styles.stripIcon" />
       <span :class="styles.stripText"
         >{{ lockedCount }} exclusive {{ lockedCount === 1 ? 'file' : 'files' }} locked now<template
@@ -103,7 +120,7 @@ const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.v
       <a :href="repoPath({ owner, name }, 'locks')" :class="styles.stripLink">View locks</a>
     </p>
     <p
-      v-else-if="lockPending"
+      v-else-if="lockPending && !hideLockStrip"
       :class="[styles.strip, styles.pending]"
       aria-hidden="true"
       data-lock-pending

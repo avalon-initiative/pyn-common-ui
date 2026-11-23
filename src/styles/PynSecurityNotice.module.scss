@@ -4,9 +4,7 @@
   @include m.alert;
   align-items: center;
 
-  @include m.narrow {
-    flex-wrap: wrap;
-  }
+  @include m.alert-stack;
 }
 
 .advice {
@@ -26,6 +24,10 @@
 .icon {
   @include m.alert-icon;
   margin-top: 0;
+
+  @include m.narrow {
+    margin-top: var(--pyn-space-1);
+  }
 }
 
 .body {
@@ -61,6 +63,11 @@
   color: var(--pyn-text);
   text-decoration: none;
   font-weight: 600;
+
+  @include m.narrow {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
 }
 
 .dismiss {
