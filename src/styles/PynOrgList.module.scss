@@ -1,36 +1,37 @@
 @use 'mixins' as m;
 
 .list {
-  @include m.list;
+  @include m.flat-list;
 }
 
 .item {
-  @include m.item;
+  @include m.table-row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  @include m.row-hover;
 }
 
-.link {
-  font-family: var(--pyn-font-mono);
-  font-weight: 600;
-  color: var(--pyn-text);
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-
-  @include m.focus-ring;
-}
-
-.meta {
+.title {
   display: flex;
   align-items: center;
   gap: var(--pyn-space-2);
-  color: var(--pyn-text-muted);
-  font-size: 0.8125rem;
+  min-width: 0;
+}
+
+.link {
+  @include m.accent-link;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  @include m.muted;
+  font-size: var(--pyn-text-xs);
 }
 
 .pill {
   @include m.pill;
+  text-transform: capitalize;
 }
 
 .empty {

@@ -5,5 +5,7 @@
 .title {
   margin: 0 0 var(--pyn-space-4);
   font-size: var(--pyn-text-xl);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
   overflow-wrap: anywhere;
 }

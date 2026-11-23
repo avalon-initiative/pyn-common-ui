@@ -1,41 +1,54 @@
 @use 'mixins' as m;
 
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.filter {
+  @include m.input;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .list {
-  @include m.list;
+  @include m.flat-list;
 }
 
 .item {
-  @include m.item;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+
+  & + & {
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+.title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
 }
 
 .link {
-  font-family: var(--pyn-font-mono);
+  @include m.accent-link;
+  font-size: var(--pyn-text-md);
   font-weight: 600;
-  color: var(--pyn-text);
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-
-  @include m.focus-ring;
-}
-
-.owner {
-  color: var(--pyn-text-muted);
-  font-weight: 400;
-}
-
-.meta {
-  display: flex;
-  align-items: center;
-  gap: var(--pyn-space-2);
-  color: var(--pyn-text-muted);
-  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
 }
 
 .pill {
   @include m.pill;
+  text-transform: capitalize;
+}
+
+.meta {
+  @include m.muted;
+  font-size: var(--pyn-text-xs);
 }
 
 .empty {

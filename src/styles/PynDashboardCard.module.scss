@@ -1,25 +1,19 @@
 @use 'mixins' as m;
 
 .card {
-  @include m.card;
+  @include m.flat-box;
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
 .header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--pyn-space-2);
-  padding: var(--pyn-space-3) var(--pyn-space-4);
-  border-bottom: 1px solid var(--pyn-border);
+  @include m.list-header;
 }
 
 .heading {
-  margin: 0;
-  font-size: var(--pyn-text-md);
+  @include m.section-title;
+  font-size: var(--pyn-text-base);
 }
 
 .actions {
@@ -29,23 +23,32 @@
 }
 
 .seeAll {
-  color: var(--pyn-accent);
+  @include m.accent-link;
   font-size: var(--pyn-text-sm);
+  font-weight: 400;
 
   @include m.touch-target($display: inline-flex);
-
-  @include m.focus-ring;
-}
-
-.body > ul {
-  border: 0;
-  border-radius: 0;
 }
 
 .body,
 .status,
 .errorBox {
   padding: var(--pyn-space-3) var(--pyn-space-4);
+}
+
+// A list in the card shows as plain rows: the card is the box.
+.body > div > ul,
+.body > ul {
+  border: 0;
+  border-radius: 0;
+}
+
+.body:not([data-flush]) > div > ul > li {
+  padding-inline: 0;
+}
+
+.body[data-flush] {
+  padding: 0;
 }
 
 .status {

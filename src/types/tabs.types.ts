@@ -6,6 +6,10 @@ export interface TabItem {
   /** Read by assistive technology in place of the badge; defaults to "<count> items". */
   countLabel?: string
   current?: boolean
+  /** PynIcon name; icons show only when every tab has one. */
+  icon?: string
+  /** Holds the space of a count pill while the count is unknown, so the tab does not resize. */
+  reserveCount?: boolean
 }
 
 export interface SettingsSection {

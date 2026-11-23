@@ -49,3 +49,45 @@ export const WithBranches: Story = {
   },
 }
 export const BranchesLinkOnly: Story = { args: { branchesHref: '/studio/game/branches' } }
+export const WithAbout: Story = {
+  args: {
+    about: {
+      description: 'An action game about a haunted castle.',
+      website: 'https://castle-quest.example.com',
+      topics: ['unreal', 'game'],
+    },
+    cloneCommand: 'pyn clone acme/castle-quest',
+  },
+}
+
+const toolbarArgs = {
+  branches: [
+    { name: 'main', isDefault: true, updatedAt: '2026-10-08T10:00:00Z' },
+    { name: 'feature/levels', ahead: 4, behind: 1, updatedAt: '2026-10-05T09:30:00Z' },
+    { name: 'fix/lighting', ahead: 2, updatedAt: '2026-10-02T09:30:00Z' },
+  ],
+  branchesHref: '/acme/castle-quest/branches',
+  httpsUrl: 'https://pyn.example.com/acme/castle-quest.pyn',
+  cloneCommand: 'pyn clone acme/castle-quest',
+}
+const tick = () => new Promise((resolve) => setTimeout(resolve))
+
+/** Branch picker, Branches link and Clone menu in the toolbar. */
+export const Toolbar: Story = { args: toolbarArgs }
+export const ToolbarFolder: Story = {
+  args: { ...toolbarArgs, path: 'Content/Levels', listing: folderListing },
+}
+export const ToolbarPickerOpen: Story = {
+  args: toolbarArgs,
+  parameters: { docs: { story: { height: '420px' } } },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLButtonElement>('button')!.click()
+    await tick()
+  },
+}
+export const ToolbarBranchesLoading: Story = {
+  args: { ...toolbarArgs, branches: undefined, branchesLoading: true },
+}
+export const ToolbarBranchesError: Story = {
+  args: { ...toolbarArgs, branches: undefined, branchesError: 'Could not load branches.' },
+}

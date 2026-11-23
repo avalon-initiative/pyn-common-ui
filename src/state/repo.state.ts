@@ -73,6 +73,18 @@ export interface RepoShellTab extends RepoTab {
   count?: number
   /** Read by assistive technology in place of the badge. */
   countLabel?: string
+  /** PynIcon name; defaults to the icon of the section. */
+  icon?: string
+}
+
+/** Tab icons by section; sections without an entry get none, which hides every tab icon. */
+export const TAB_ICONS: Readonly<Record<string, string>> = {
+  '': 'code',
+  locks: 'lock',
+  branches: 'branch',
+  history: 'history',
+  insights: 'insights',
+  settings: 'settings',
 }
 
 /** Settings sub-pages the viewer may open; `settings` is General and the rest live under it. */

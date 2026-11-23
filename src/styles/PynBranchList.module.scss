@@ -1,8 +1,11 @@
 @use 'mixins' as m;
 
 .list {
-  @include m.card;
   min-width: 0;
+  overflow: hidden;
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
 }
 
 .rows {
@@ -16,11 +19,17 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--pyn-space-2) var(--pyn-space-3);
-  padding: var(--pyn-space-3) var(--pyn-space-4);
-  font-size: var(--pyn-text-sm);
+  box-sizing: border-box;
+  min-height: var(--pyn-row-height);
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  font-size: var(--pyn-text-base);
 
   & + & {
     border-top: 1px solid var(--pyn-border);
+  }
+
+  &:hover {
+    background: var(--pyn-hover);
   }
 }
 
@@ -33,7 +42,6 @@
   min-width: 0;
   max-width: 100%;
   color: var(--pyn-text);
-  font-family: var(--pyn-font-mono);
   font-weight: 600;
   overflow-wrap: anywhere;
   text-decoration: none;
@@ -44,9 +52,10 @@
 }
 
 a.name {
-  color: var(--pyn-accent);
+  color: var(--pyn-text);
 
   &:hover {
+    color: var(--pyn-accent);
     text-decoration: underline;
   }
 

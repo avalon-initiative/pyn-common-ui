@@ -16,6 +16,7 @@ type Story = StoryObj<typeof PynDashboardCard>
 
 export const Default: Story = {}
 export const WithSeeAll: Story = { args: { seeAllHref: '/_/repos' } }
+export const Flush: Story = { args: { flush: true } }
 export const Loading: Story = { args: { loading: true } }
 export const Failed: Story = { args: { error: 'Could not load this card.' } }
 export const FailedRetryable: Story = {

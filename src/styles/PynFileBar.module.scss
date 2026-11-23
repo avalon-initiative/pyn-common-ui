@@ -1,61 +1,67 @@
 @use 'mixins' as m;
 
 .bar {
-  @include m.card;
-  display: flex;
-  flex-direction: column;
-  gap: var(--pyn-space-2);
-  padding: var(--pyn-space-3) var(--pyn-space-4);
+  overflow: hidden;
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+
+  &[data-embedded] {
+    border: 0;
+    border-radius: 0;
+  }
 }
 
-.top {
+.none {
+  box-sizing: border-box;
+  min-height: var(--pyn-control-lg);
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  color: var(--pyn-text-muted);
+  background: var(--pyn-bg-subtle);
+  font-size: var(--pyn-text-base);
+  line-height: 1.5rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-2) var(--pyn-space-4);
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  border-top: 1px solid var(--pyn-border);
+
+  .bar[data-embedded] & {
+    border-bottom: 1px solid var(--pyn-border);
+  }
+}
+
+.info {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--pyn-space-2) var(--pyn-space-3);
 }
 
-.file {
-  font-family: var(--pyn-font-mono);
-  font-weight: 600;
-  overflow-wrap: anywhere;
+.stats {
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
 }
 
 .actions {
   display: flex;
   gap: var(--pyn-space-2);
-  margin-left: auto;
-
-  @include m.narrow {
-    margin-left: 0;
-  }
 }
 
 .action {
   @include m.button(var(--pyn-text));
-  text-decoration: none;
-  font-size: var(--pyn-text-sm);
-}
-
-.change {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--pyn-space-1) var(--pyn-space-3);
-  margin: 0;
-  font-size: var(--pyn-text-sm);
-}
-
-.rev {
-  @include m.pill;
-  font-family: var(--pyn-font-mono);
-}
-
-.message {
-  overflow-wrap: anywhere;
-}
-
-.meta {
-  color: var(--pyn-text-muted);
+  min-height: var(--pyn-control-sm);
+  background: var(--pyn-control-bg);
   font-size: var(--pyn-text-xs);
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--pyn-control-bg-hover);
+  }
 }

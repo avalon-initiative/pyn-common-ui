@@ -36,6 +36,8 @@
   gap: var(--pyn-space-2);
   margin: 0;
   font-size: var(--pyn-text-xl);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
   overflow-wrap: anywhere;
 }
 
@@ -47,9 +49,7 @@
 
 .chip {
   @include m.pill;
-  padding: 0 var(--pyn-space-3);
-  font-weight: 400;
-  line-height: 1.5rem;
+  text-transform: capitalize;
 }
 
 .description {
