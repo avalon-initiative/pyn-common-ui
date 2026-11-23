@@ -562,6 +562,13 @@ describe('repository and organization headers', () => {
 })
 
 describe('PynUserHeader', () => {
+  it('shows a 64px avatar beside the name', () => {
+    const w = mount(PynUserHeader, { props: { name: 'alice' } })
+    expect(w.find('[data-size=lg]').exists()).toBe(true)
+    expect(w.find('[data-initials]').text()).toBe('A')
+    expect(w.find('h1').text()).toBe('alice')
+  })
+
   it('links Usage only on the signed-in user own profile', () => {
     const own = mount(PynUserHeader, { props: { name: 'alice', self: true, current: 'usage' } })
     expect(own.findAll('nav a').map((a) => a.attributes('href'))).toEqual([
@@ -1146,6 +1153,29 @@ describe('file components', () => {
       },
     })
     expect(w.text()).toContain('2 lines')
+  })
+
+  it('shows the policy note inside the file header, beside the mode chip', () => {
+    const note = 'Exclusive: matches rule "**/*.umap"'
+    const w = mount(PynFileView, {
+      props: {
+        ...r,
+        path: lockedEntry.path,
+        entry: lockedEntry,
+        now,
+        note,
+        body: { kind: 'none' },
+      },
+    })
+    expect(w.find('[data-note]').text()).toBe(note)
+    expect(w.find('[data-note]').element.parentElement?.querySelector('[data-mode]')).not.toBeNull()
+    const bar = mount(PynFileBar, { props: { ...r, entry: lockedEntry, now } })
+    expect(bar.find('[data-note]').exists()).toBe(false)
+    const slotted = mount(PynFileBar, {
+      props: { ...r, entry: lockedEntry, now },
+      slots: { note: '<b>rule</b>' },
+    })
+    expect(slotted.find('[data-note] b').text()).toBe('rule')
   })
 
   it('offers no download before the first revision', () => {

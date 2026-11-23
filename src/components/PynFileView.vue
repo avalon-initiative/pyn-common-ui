@@ -27,6 +27,8 @@ defineProps<{
   branch?: string
   /** Shows the Lock action on an unlocked exclusive file. */
   lockable?: boolean
+  /** Policy rule line in the file header, e.g. "Exclusive: matches rule ..."; the `note` slot overrides it. */
+  note?: string
 }>()
 
 defineEmits<{ selectLines: [range: LineRange]; lock: [] }>()
@@ -54,9 +56,12 @@ defineEmits<{ selectLines: [range: LineRange]; lock: [] }>()
           :stats="
             body?.kind === 'code' || body?.kind === 'markdown' ? textStats(body.text) : undefined
           "
+          :note="note"
           embedded
           @lock="$emit('lock')"
-        />
+        >
+          <template v-if="$slots.note" #note><slot name="note" /></template>
+        </PynFileBar>
         <p v-if="!body" :class="styles.inner">Loading...</p>
         <div v-else-if="body.kind === 'markdown'" :class="styles.panel">
           <PynMarkdown

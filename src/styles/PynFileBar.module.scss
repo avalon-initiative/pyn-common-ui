@@ -48,6 +48,12 @@
   font-size: var(--pyn-text-xs);
 }
 
+.note {
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+  overflow-wrap: anywhere;
+}
+
 .actions {
   display: flex;
   gap: var(--pyn-space-2);

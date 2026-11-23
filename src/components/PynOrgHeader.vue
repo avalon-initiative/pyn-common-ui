@@ -35,7 +35,13 @@ const tabs = computed(() =>
 <template>
   <header :class="styles.header">
     <div :class="styles.identity">
-      <PynAvatar :username="name" :name="displayName" :src="avatarUrl" size="xl" />
+      <PynAvatar
+        :class="styles.avatar"
+        :username="name"
+        :name="displayName"
+        :src="avatarUrl"
+        size="lg"
+      />
       <div :class="styles.body">
         <h1 :class="styles.title">
           <template v-if="displayName">

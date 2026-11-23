@@ -48,6 +48,19 @@ export const WithBranches: Story = {
     branchesHref: '/studio/game/branches',
   },
 }
+export const SeparateRailBranches: Story = {
+  args: {
+    branches: [
+      { name: 'main', isDefault: true },
+      ...Array.from({ length: 8 }, (_, i) => ({ name: `feature/part-${i + 1}`, ahead: i + 1 })),
+    ],
+    railBranches: [
+      { name: 'main', isDefault: true },
+      { name: 'feature/part-1', ahead: 1 },
+    ],
+    branchesHref: '/studio/game/branches',
+  },
+}
 export const BranchesLinkOnly: Story = { args: { branchesHref: '/studio/game/branches' } }
 export const WithAbout: Story = {
   args: {

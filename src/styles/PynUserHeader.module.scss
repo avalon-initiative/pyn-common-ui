@@ -1,9 +1,29 @@
+@use 'mixins' as m;
+
 .header {
   margin-bottom: var(--pyn-space-4);
 }
 
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-4);
+  margin-bottom: var(--pyn-space-4);
+
+  @include m.narrow {
+    gap: var(--pyn-space-3);
+  }
+}
+
+.identity .avatar[data-size] {
+  @include m.narrow {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
 .title {
-  margin: 0 0 var(--pyn-space-4);
+  margin: 0;
   font-size: var(--pyn-text-xl);
   font-weight: 600;
   line-height: var(--pyn-leading-tight);
