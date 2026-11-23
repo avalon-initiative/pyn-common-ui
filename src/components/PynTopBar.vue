@@ -62,6 +62,7 @@ const emit = defineEmits<{
   theme: [ThemeChoice]
   signOut: []
   account: [id: string]
+  shortcuts: []
 }>()
 
 const links = computed(() => ({ ...defaultHrefs(props.user), ...props.hrefs }))
@@ -93,6 +94,7 @@ const account = computed<MenuItem[]>(() => [
     : []),
   ...directory.value,
   ...withoutNamed(props.extraAccount ?? [], directory.value),
+  { id: 'shortcuts', label: 'Keyboard shortcuts' },
   { id: 'sep-theme', label: '', separator: true },
   ...themeItems.value,
   { id: 'sep-out', label: '', separator: true },
@@ -104,6 +106,7 @@ const globalLinks = computed<MenuItem[]>(() => {
   if (props.signedOut) {
     return [
       ...items,
+      { id: 'explore', label: 'Explore', href: links.value.explore },
       { id: 'sign-in', label: 'Sign in', href: props.signInHref ?? '/_/sign-in' },
       { id: 'sep', label: '', separator: true },
       ...themeItems.value,
@@ -124,11 +127,14 @@ const globalLinks = computed<MenuItem[]>(() => {
     ...(props.owners?.length
       ? [{ id: 'sep-owners', label: '', separator: true }, ...switcher.value]
       : []),
+    { id: 'sep-shortcuts', label: '', separator: true },
+    { id: 'shortcuts', label: 'Keyboard shortcuts' },
   ]
 })
 
 function pick(id: string) {
   if (id === 'sign-out') emit('signOut')
+  else if (id === 'shortcuts') emit('shortcuts')
   else if (id.startsWith('theme:')) emit('theme', id.slice(6) as ThemeChoice)
   else if (props.extraAccount?.some((i) => i.id === id)) emit('account', id)
 }
@@ -216,6 +222,9 @@ onBeforeUnmount(() => document.removeEventListener('keydown', slash))
     </button>
     <span v-if="!showSearch" :class="styles.spacer" />
     <template v-if="signedOut">
+      <a :href="links.explore" :class="[styles.exploreLink, styles.wideOnly]" data-explore
+        >Explore</a
+      >
       <PynMenu label="Theme" :items="themeItems" :class="styles.wideOnly" @select="pick"
         >Theme<PynIcon name="chevron" :class="styles.chevron"
       /></PynMenu>

@@ -396,6 +396,28 @@ describe('createShortcutMatcher', () => {
   })
 })
 
+describe('PynCommandPalette initialText', () => {
+  it('opens with the text, filters, emits input, and applies on every open', async () => {
+    const w = palette({ open: false, initialText: 'org' })
+    await w.setProps({ open: true })
+    await nextTick()
+    expect((w.get('input').element as HTMLInputElement).value).toBe('org')
+    expect(w.emitted('input')?.[0]).toEqual(['org'])
+    expect(w.findAll('[role=option]').map((o) => o.text())).toEqual(['Organizations'])
+    await w.get('input').setValue('xyz')
+    await w.setProps({ open: false })
+    await w.setProps({ open: true, initialText: 'repo' })
+    await nextTick()
+    expect((w.get('input').element as HTMLInputElement).value).toBe('repo')
+  })
+  it('opens empty without it and emits no input', async () => {
+    const w = palette()
+    await nextTick()
+    expect((w.get('input').element as HTMLInputElement).value).toBe('')
+    expect(w.emitted('input')).toBeUndefined()
+  })
+})
+
 describe('PynCommandPalette unfiltered prop', () => {
   const items = [
     { id: 'a', label: 'Alpha', group: 'G' },

@@ -21,6 +21,8 @@ const props = defineProps<{
   emptyLabel?: string
   /** Show the items as given instead of filtering them by the typed text, for results the app loads itself. */
   unfiltered?: boolean
+  /** Text the field holds each time the palette opens, for a search submitted elsewhere. */
+  initialText?: string
 }>()
 const emit = defineEmits<{ close: []; select: [item: CommandItem]; input: [text: string] }>()
 
@@ -52,8 +54,9 @@ watch(
     if (open) {
       opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
       release ??= lockBodyScroll()
-      text.value = ''
+      text.value = props.initialText ?? ''
       active.value = 0
+      if (text.value) emit('input', text.value)
       await nextTick()
       field.value?.focus()
     } else {

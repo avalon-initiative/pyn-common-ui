@@ -11,6 +11,7 @@ export const defaultHrefs = (user?: string): TopBarHrefs => ({
   admin: '/_/admin',
   people: '/_/people',
   orgs: '/_/orgs',
+  explore: '/_/explore',
   locks: '/_/locks',
   notifications: '/_/invitations',
   newRepo: '/_/new',

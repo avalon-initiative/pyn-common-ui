@@ -14,6 +14,7 @@ export interface TopBarHrefs {
   admin: string
   people: string
   orgs: string
+  explore: string
   locks: string
   notifications: string
   newRepo: string
