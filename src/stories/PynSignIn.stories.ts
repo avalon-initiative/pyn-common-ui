@@ -91,3 +91,16 @@ export const RegisterMismatch: Story = {
   args: { registration: 'open' },
   play: ({ canvasElement }) => register(canvasElement, 'a long passw'),
 }
+export const OpenServerNoEmail: Story = {
+  args: { registration: 'open', emailVerification: false },
+}
+export const NoEmailNoteOverride: Story = {
+  args: { registration: 'open', emailVerification: false, noEmailNote: 'No email is sent here.' },
+}
+export const NoEmailAwaitingApproval: Story = {
+  args: {
+    registration: 'open',
+    emailVerification: false,
+    notice: { status: 'pending_approval', user: 'wendy' },
+  },
+}

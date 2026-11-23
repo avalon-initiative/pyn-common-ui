@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import styles from '../styles/PynAccountSettings.module.scss'
+import { computed } from 'vue'
+import PynSettingsLayout from './PynSettingsLayout.vue'
 import type { NavItem } from '../state/shell.state'
 
-defineProps<{
+const props = defineProps<{
   items: Pick<NavItem, 'id' | 'label' | 'href'>[]
   current: string
+  title?: string
 }>()
+
+const sections = computed(() => props.items.map((i) => ({ ...i })))
 </script>
 
 <template>
-  <div :class="styles.layout">
-    <nav :class="styles.nav" aria-label="Account settings">
-      <a
-        v-for="item in items"
-        :key="item.id"
-        :href="item.href"
-        :class="styles.link"
-        :aria-current="item.id === current ? 'page' : undefined"
-        >{{ item.label }}</a
-      >
-    </nav>
-    <div :class="styles.body"><slot /></div>
-  </div>
+  <PynSettingsLayout
+    :sections="sections"
+    :current="current"
+    :title="title"
+    label="Account settings"
+  >
+    <slot />
+  </PynSettingsLayout>
 </template>

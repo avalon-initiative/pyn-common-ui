@@ -1,30 +1,64 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import PynAvatar from './PynAvatar.vue'
+import PynTabs from './PynTabs.vue'
 import styles from '../styles/PynOrgHeader.module.scss'
 import { formatDate } from '../utils/datetime'
 import { orgPath, orgTabs } from '../state/org.state'
+import { isWebLink, linkLabel } from '../state/profile.state'
 import type { OrgRole } from '../types/org.types'
 
-defineProps<{ name: string; createdAt: string; role?: OrgRole | null; current?: string }>()
+const props = defineProps<{
+  name: string
+  createdAt: string
+  role?: OrgRole | null
+  current?: string
+  /** Shown beside the name; the name is shown alone without it. */
+  displayName?: string | null
+  description?: string | null
+  avatarUrl?: string | null
+  /** Only an http(s) URL is shown, as an external link. */
+  url?: string | null
+  /** Most tabs shown before the rest move into a More menu. */
+  maxTabs?: number
+}>()
+
+const tabs = computed(() =>
+  orgTabs(props.role).map((t) => ({
+    label: t.label,
+    href: orgPath(props.name, t.section),
+    current: t.section === (props.current ?? ''),
+  })),
+)
 </script>
 
 <template>
   <header :class="styles.header">
-    <h1 :class="styles.title">
-      {{ name }}
-      <span :class="styles.chip" data-kind>organization</span>
-    </h1>
-    <p :class="styles.meta">
-      created {{ formatDate(createdAt) }}<template v-if="role"> · your role: {{ role }}</template>
-    </p>
-    <nav :class="styles.nav" aria-label="Organization">
-      <a
-        v-for="tab in orgTabs(role)"
-        :key="tab.section"
-        :href="orgPath(name, tab.section)"
-        :class="styles.tab"
-        :aria-current="tab.section === (current ?? '') ? 'page' : undefined"
-        >{{ tab.label }}</a
-      >
-    </nav>
+    <div :class="styles.identity">
+      <PynAvatar :username="name" :name="displayName" :src="avatarUrl" size="xl" />
+      <div :class="styles.body">
+        <h1 :class="styles.title">
+          <template v-if="displayName">
+            {{ displayName }}
+            <span :class="styles.handle">{{ name }}</span>
+          </template>
+          <template v-else>{{ name }}</template>
+          <span :class="styles.chip" data-kind>organization</span>
+        </h1>
+        <p v-if="description" :class="styles.description" data-description>{{ description }}</p>
+        <p :class="styles.meta">
+          created {{ formatDate(createdAt)
+          }}<template v-if="role"> · your role: {{ role }}</template
+          ><template v-if="url && isWebLink(url)">
+            ·
+            <a :href="url" rel="nofollow noopener noreferrer" target="_blank" data-link>{{
+              linkLabel(url)
+            }}</a></template
+          >
+        </p>
+      </div>
+      <div v-if="$slots.actions" :class="styles.actions"><slot name="actions" /></div>
+    </div>
+    <PynTabs :items="tabs" label="Organization" :max="maxTabs" />
   </header>
 </template>

@@ -1,0 +1,120 @@
+@use 'mixins' as m;
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+  margin-bottom: var(--pyn-space-4);
+  padding-bottom: var(--pyn-space-3);
+  border-bottom: 1px solid var(--pyn-border);
+}
+
+.admin .head {
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  background: var(--pyn-surface-raised);
+  border: 1px solid var(--pyn-border);
+  border-left: 4px solid var(--pyn-accent);
+  border-radius: var(--pyn-radius);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-lg);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  gap: var(--pyn-space-6);
+
+  @include m.narrow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--pyn-space-4);
+  }
+}
+
+.toggle {
+  @include m.button;
+  display: none;
+  width: 100%;
+  text-align: left;
+
+  &::after {
+    content: '▾';
+    float: right;
+  }
+
+  @include m.narrow {
+    display: block;
+  }
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+
+  @include m.narrow {
+    display: none;
+    margin-top: var(--pyn-space-1);
+
+    &[data-open] {
+      display: flex;
+    }
+  }
+}
+
+.group {
+  margin: var(--pyn-space-3) 0 var(--pyn-space-1);
+  padding: 0 var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: block;
+  padding: var(--pyn-space-2) var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  border-radius: var(--pyn-radius);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  &[aria-current='page'] {
+    color: var(--pyn-text);
+    background: var(--pyn-selected);
+    font-weight: 600;
+  }
+
+  @include m.focus-ring;
+}
+
+.body {
+  min-width: 0;
+}

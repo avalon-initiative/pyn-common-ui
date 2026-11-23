@@ -71,6 +71,8 @@ export function repoTabs(permissions: string[], isOwner: boolean): RepoTab[] {
 export interface RepoShellTab extends RepoTab {
   /** A count shown as a badge beside the label. */
   count?: number
+  /** Read by assistive technology in place of the badge. */
+  countLabel?: string
 }
 
 /** Settings sub-pages the viewer may open; `settings` is General and the rest live under it. */
