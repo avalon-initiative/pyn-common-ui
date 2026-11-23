@@ -17,21 +17,23 @@ function send() {
 <template>
   <form :class="styles.form" @submit.prevent="send">
     <h3 :class="styles.heading">{{ title }}</h3>
-    <label :class="styles.field"
-      >Current password
-      <input
-        v-model="password"
-        :class="styles.input"
-        type="password"
-        autocomplete="current-password"
-        required
-        :disabled="busy"
-      />
-    </label>
-    <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
+    <div :class="styles.body">
+      <label :class="styles.field"
+        >Current password
+        <input
+          v-model="password"
+          :class="styles.input"
+          type="password"
+          autocomplete="current-password"
+          required
+          :disabled="busy"
+        />
+      </label>
+      <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
+    </div>
     <div :class="styles.actions">
-      <button type="submit" :class="styles.primary" :disabled="busy || !password">Continue</button>
       <button type="button" :class="styles.quiet" @click="emit('cancel')">Cancel</button>
+      <button type="submit" :class="styles.primary" :disabled="busy || !password">Continue</button>
     </div>
   </form>
 </template>

@@ -11,6 +11,7 @@
   flex-direction: column;
   align-items: stretch;
   padding: var(--pyn-space-4);
+  gap: var(--pyn-space-3);
 }
 
 .compact {
@@ -43,8 +44,8 @@
 }
 
 .line {
-  height: 0.875rem;
-  background: var(--pyn-surface-raised);
+  height: 0.75rem;
+  background: var(--pyn-border);
   border-radius: var(--pyn-radius);
   animation: pulse 1.4s ease-in-out infinite;
 

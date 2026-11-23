@@ -15,6 +15,10 @@ const paths: Record<string, string> = {
   file: 'M7 3h7l5 5v13H7zM14 3v5h5',
   branch: 'M7 4v12M17 8a2 2 0 1 0 0-.01M7 18a2 2 0 1 0 0-.01M17 10c0 4-10 2-10 6',
   lock: 'M7 11h10v9H7zM9 11V8a3 3 0 0 1 6 0v3',
+  info: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v5M12 8v.01',
+  'check-circle': 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM8 12l3 3 5-6',
+  alert: 'M12 4 3 20h18zM12 10v4M12 17v.01',
+  stop: 'M8 3h8l5 5v8l-5 5H8l-5-5V8zM12 8v5M12 16v.01',
   user: 'M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4 20c1-4 4-6 8-6s7 2 8 6',
 }
 

@@ -2799,6 +2799,30 @@ describe('view layout components', () => {
     expect(info.classes()).not.toEqual(w.classes())
   })
 
+  it('notice and error carry a leading icon and one class per tone', () => {
+    const tones = ['warning', 'info', 'success', 'danger'] as const
+    const classes = tones.map((tone) => {
+      const w = mount(PynViewNotice, { props: { tone } })
+      expect(w.find('svg').exists()).toBe(true)
+      return w.classes().join(' ')
+    })
+    expect(new Set(classes).size).toBe(4)
+    expect(mount(PynViewError).find('svg').exists()).toBe(true)
+  })
+
+  it('empty state is bordered unless compact', () => {
+    const full = mount(PynEmptyState, { props: { title: 'T' } })
+    const compact = mount(PynEmptyState, { props: { title: 'T', compact: true } })
+    expect(full.classes().join(' ')).not.toMatch(/compact/)
+    expect(compact.classes().join(' ')).toMatch(/compact/)
+  })
+
+  it('not-found pages show an icon and the home link first', () => {
+    const w = mount(PynRepoNotFound, { props: { slug: 'a/b' } })
+    expect(w.find('svg').exists()).toBe(true)
+    expect(w.find('a').attributes('href')).toBe('/')
+  })
+
   it('group titles its content and stack holds its children', () => {
     const g = mount(PynViewGroup, { props: { title: 'Audit' }, slots: { default: '<p>body</p>' } })
     expect(g.find('h2').text()).toBe('Audit')
@@ -4702,7 +4726,9 @@ describe('PynPasswordPrompt', () => {
     await w.find('input').setValue('hunter2')
     await w.find('form').trigger('submit')
     expect(w.emitted('submit')?.[0]).toEqual(['hunter2'])
-    await w.findAll('button')[1].trigger('click')
+    const buttons = w.findAll('button')
+    expect(buttons.map((b) => b.text())).toEqual(['Cancel', 'Continue'])
+    await buttons[0].trigger('click')
     expect(w.emitted('cancel')).toHaveLength(1)
   })
 

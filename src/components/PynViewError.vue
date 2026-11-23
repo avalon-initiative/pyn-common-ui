@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import styles from '../styles/PynViewError.module.scss'
+import PynIcon from './PynIcon.vue'
 import PynDismissButton from './PynDismissButton.vue'
 import { AUTO_DISMISS_MS, useAutoDismiss } from '../state/auto-dismiss.state'
 
@@ -29,6 +30,7 @@ const { phase, handlers, close } = useAutoDismiss({
     role="alert"
     v-on="dismissible ? handlers : {}"
   >
+    <PynIcon name="stop" :class="styles.icon" />
     <span :class="styles.text"><slot /></span>
     <PynDismissButton v-if="dismissible" @click="close" />
   </div>
