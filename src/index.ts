@@ -484,3 +484,22 @@ export { aheadBehind, groupSections, railBranches, splitTabs } from './state/tab
 export { NO_EMAIL_NOTE } from './state/account.state'
 export type { SettingsGroup, SettingsSection, TabItem } from './types/tabs.types'
 export type { BranchSummary } from './types/branch.types'
+export { default as PynCommandPalette } from './components/PynCommandPalette.vue'
+export { default as PynShortcutsHelp } from './components/PynShortcutsHelp.vue'
+export {
+  commandScore,
+  filterCommands,
+  groupCommands,
+  moveActive,
+  resultsText,
+} from './state/command-palette.state'
+export { createShortcutMatcher } from './state/shortcut-matcher.state'
+export { lockBodyScroll } from './utils/scroll-lock'
+export type {
+  CommandGroup,
+  CommandItem,
+  Shortcut,
+  ShortcutBinding,
+  ShortcutGroup,
+  ShortcutMatcher,
+} from './types/command-palette.types'

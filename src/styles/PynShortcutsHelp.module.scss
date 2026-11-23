@@ -1,0 +1,125 @@
+@use 'mixins' as m;
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 8vh var(--pyn-space-4) 0;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.5);
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(40rem, 100%);
+  max-height: 80vh;
+  color: var(--pyn-text);
+  background: var(--pyn-surface);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius-lg);
+  box-shadow: 0 0.5rem 2rem rgb(0 0 0 / 0.4);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  border-bottom: 1px solid var(--pyn-border);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-lg);
+}
+
+.close {
+  @include m.button;
+  padding: 0 var(--pyn-space-2);
+  font-size: var(--pyn-text-lg);
+  line-height: 1.5;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--pyn-space-4) var(--pyn-space-6);
+  padding: var(--pyn-space-4);
+  overflow-y: auto;
+}
+
+.groupTitle {
+  margin: 0 0 var(--pyn-space-2);
+  font-size: var(--pyn-text-sm);
+  color: var(--pyn-text-muted);
+}
+
+.list {
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-1) 0;
+}
+
+.name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.keys {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pyn-space-1);
+  margin: 0;
+}
+
+.then {
+  font-size: var(--pyn-text-xs);
+  color: var(--pyn-text-muted);
+}
+
+.kbd {
+  min-width: 1.5rem;
+  padding: 0.1rem var(--pyn-space-2);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+  text-align: center;
+  color: var(--pyn-text);
+  background: var(--pyn-surface-raised);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.active {
+  transition: opacity 0.15s ease;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .active {
+    transition: none;
+  }
+}
