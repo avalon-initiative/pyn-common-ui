@@ -141,6 +141,41 @@ describe('top bar structure', () => {
   })
 })
 
+describe('top bar shortcuts and explore', () => {
+  const pickItem = (w: ReturnType<typeof mount>, text: string) =>
+    w
+      .findAll('[role=menu] [role=menuitem]')
+      .find((b) => b.text().includes(text))!
+      .trigger('click')
+
+  it('emits shortcuts from the account menu', async () => {
+    const w = make()
+    await trigger(w, 'Account menu').trigger('click')
+    await pickItem(w, 'Keyboard shortcuts')
+    expect(w.emitted('shortcuts')).toHaveLength(1)
+  })
+
+  it('emits shortcuts from the narrow main menu', async () => {
+    const w = make()
+    await trigger(w, 'Main menu').trigger('click')
+    await pickItem(w, 'Keyboard shortcuts')
+    expect(w.emitted('shortcuts')).toHaveLength(1)
+  })
+
+  it('links Explore in the signed-out bar and narrow menu, with an override', async () => {
+    const w = make({ signedOut: true, user: undefined })
+    expect(w.find('[data-explore]').attributes('href')).toBe('/_/explore')
+    await trigger(w, 'Main menu').trigger('click')
+    expect(w.find('[role=menu] a[href="/_/explore"]').text()).toBe('Explore')
+    const o = make({ signedOut: true, user: undefined, hrefs: { explore: '/pub' } })
+    expect(o.find('[data-explore]').attributes('href')).toBe('/pub')
+  })
+
+  it('does not show Explore when signed in', () => {
+    expect(make().find('[data-explore]').exists()).toBe(false)
+  })
+})
+
 describe('top bar menus follow the menu button pattern', () => {
   it('exposes haspopup and expanded', async () => {
     const w = make()

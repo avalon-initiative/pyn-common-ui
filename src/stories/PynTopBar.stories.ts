@@ -72,6 +72,9 @@ export const NarrowSignedOut: Story = {
   args: { signedOut: true, user: undefined },
   play: openMenu('Main menu'),
 }
+export const SignedOutExploreOverride: Story = {
+  args: { signedOut: true, user: undefined, hrefs: { explore: '/public' } },
+}
 export const NamedDestinations: Story = {
   args: { hrefs: { people: '/directory/people', orgs: '/directory/orgs' } },
   play: openMenu('Account menu'),

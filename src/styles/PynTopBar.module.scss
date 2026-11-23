@@ -173,6 +173,15 @@
   flex: 1;
 }
 
+.exploreLink {
+  padding: var(--pyn-space-1) var(--pyn-space-2);
+  color: var(--pyn-text);
+  font-weight: 600;
+  text-decoration: none;
+
+  @include m.focus-ring;
+}
+
 .signIn {
   @include m.button;
   text-decoration: none;

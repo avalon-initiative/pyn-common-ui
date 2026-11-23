@@ -36,6 +36,11 @@ export const LongList: Story = {
   render,
 }
 
+export const WithInitialText: Story = {
+  args: { open: true, label: 'Command palette', items: commandItems, initialText: 'repo' },
+  render,
+}
+
 export const OpenedByButton: Story = {
   args: { open: false, label: 'Command palette', items: commandItems },
   render: (args) => ({
