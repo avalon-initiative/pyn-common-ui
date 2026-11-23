@@ -13,3 +13,11 @@ export const Default: StoryObj<typeof PynViewError> = {
     template: '<PynViewError>Could not load the repositories.</PynViewError>',
   }),
 }
+
+export const Dismissible: StoryObj<typeof PynViewError> = {
+  render: () => ({
+    components: { PynViewError },
+    template:
+      '<PynViewError dismissible>The passkey could not be verified. Try again, or use another passkey.</PynViewError>',
+  }),
+}

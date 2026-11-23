@@ -14,3 +14,4 @@ export const Restricted: Story = { args: { error: 'Only a server administrator c
 export const InvalidName: Story = {
   args: { nameMessage: 'Use lowercase letters, digits, "-" or "_".' },
 }
+export const WithPreview: Story = { args: { nameCanonical: 'my-studio' } }

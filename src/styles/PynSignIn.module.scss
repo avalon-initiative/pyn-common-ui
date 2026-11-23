@@ -71,11 +71,32 @@
   @include m.focus-ring;
 }
 
+.hint {
+  @include m.muted;
+}
+
 .message {
   @include m.field-message;
 }
 
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  color: var(--pyn-text);
+  font-size: 0.875rem;
+}
+
+.fading {
+  opacity: 0;
+}
+
 .error {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+  transition: opacity 0.4s ease;
   margin: 0;
   padding: var(--pyn-space-2) var(--pyn-space-3);
   color: var(--pyn-danger);
@@ -101,4 +122,10 @@
 
 .note {
   @include m.muted;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .error {
+    transition: none;
+  }
 }

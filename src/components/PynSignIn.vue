@@ -2,6 +2,8 @@
 import { computed, ref, useId, watch } from 'vue'
 import styles from '../styles/PynSignIn.module.scss'
 import PynAccountNotice from './PynAccountNotice.vue'
+import PynDismissButton from './PynDismissButton.vue'
+import { AUTO_DISMISS_MS, useAutoDismiss } from '../state/auto-dismiss.state'
 import { NO_EMAIL_NOTE, externalSignInUrl, signInErrorMessage } from '../state/account.state'
 import type {
   BlockedStatus,
@@ -27,22 +29,36 @@ const props = withDefaults(
     busy?: boolean
     error?: string
     nameMessage?: string
+    /** The name as it will be stored; shown as a preview hint in register mode. */
+    nameCanonical?: string
     initialUsername?: string
+    /** Shows a "Remember me" checkbox (v-model:remember) that keeps the user name. */
+    rememberOption?: boolean
+    /** Shows a "Stay signed in" checkbox (v-model:stay-signed-in) under the password. */
+    staySignedInOption?: boolean
+    /** Milliseconds before the error fades; 0 keeps it until it is closed. */
+    errorAutoDismissMs?: number
+    /** Keeps the error until it is closed, for errors that need action. */
+    errorPersistent?: boolean
   }>(),
-  { passwordSignIn: true },
+  { passwordSignIn: true, errorAutoDismissMs: AUTO_DISMISS_MS },
 )
+const remember = defineModel<boolean>('remember', { default: false })
+const staySignedIn = defineModel<boolean>('staySignedIn', { default: false })
 
 const emit = defineEmits<{
   signIn: [SignInForm]
   register: [RegisterForm]
   resend: [string]
   dismiss: []
+  dismissError: []
   nameInput: [name: string]
   passkey: []
 }>()
 
 const nameMessageId = useId()
 const confirmMessageId = useId()
+const canonicalId = useId()
 
 type View = 'sign-in' | 'register'
 const view = ref<View>('sign-in')
@@ -51,6 +67,11 @@ const showForm = computed(() => props.passwordSignIn || adminForm.value)
 const shownError = computed(
   () => props.error || (props.callbackError ? signInErrorMessage(props.callbackError) : ''),
 )
+const errorFade = useAutoDismiss({
+  delay: () => (props.errorPersistent ? 0 : props.errorAutoDismissMs),
+  onDismiss: () => emit('dismissError'),
+})
+watch([shownError, () => props.busy], () => errorFade.restart())
 const username = ref(props.initialUsername ?? '')
 watch(
   () => props.initialUsername,
@@ -63,6 +84,13 @@ const confirm = ref('')
 const invite = ref('')
 const email = ref('')
 
+const showCanonical = computed(() => view.value === 'register' && !!props.nameCanonical)
+const nameDescribedBy = computed(
+  () =>
+    [props.nameMessage ? nameMessageId : '', showCanonical.value ? canonicalId : '']
+      .filter(Boolean)
+      .join(' ') || undefined,
+)
 const canRegister = computed(() => props.registration === 'open' || props.registration === 'invite')
 const needsEmail = computed(() => props.registration === 'open' && !!props.emailVerification)
 const showNoEmailNote = computed(
@@ -76,9 +104,12 @@ const title = computed(() => ({ 'sign-in': 'Sign in', register: 'Create an accou
 
 function submit() {
   if (mismatch.value) return
-  if (view.value === 'sign-in')
-    emit('signIn', { username: username.value, password: password.value })
-  else {
+  if (view.value === 'sign-in') {
+    const form: SignInForm = { username: username.value, password: password.value }
+    if (props.rememberOption) form.remember = remember.value
+    if (props.staySignedInOption) form.staySignedIn = staySignedIn.value
+    emit('signIn', form)
+  } else {
     emit('register', {
       username: username.value,
       password: password.value,
@@ -113,14 +144,20 @@ function submit() {
           :class="styles.input"
           autocomplete="username"
           required
-          :aria-describedby="nameMessage ? nameMessageId : undefined"
+          :aria-describedby="nameDescribedBy"
           :aria-invalid="nameMessage ? 'true' : undefined"
           @input="emit('nameInput', username)"
         />
+        <span v-if="showCanonical" :id="canonicalId" :class="styles.hint" data-canonical
+          >Will be created as: {{ nameCanonical }}</span
+        >
         <span v-if="nameMessage" :id="nameMessageId" :class="styles.message">{{
           nameMessage
         }}</span>
       </label>
+      <label v-if="view === 'sign-in' && rememberOption" :class="styles.check"
+        ><input v-model="remember" type="checkbox" data-remember />Remember me</label
+      >
       <label :class="styles.field"
         >Password
         <input
@@ -131,6 +168,9 @@ function submit() {
           required
         />
       </label>
+      <label v-if="view === 'sign-in' && staySignedInOption" :class="styles.check"
+        ><input v-model="staySignedIn" type="checkbox" data-stay-signed-in />Stay signed in</label
+      >
       <label v-if="view === 'register'" :class="styles.field"
         >Confirm password
         <input
@@ -166,7 +206,15 @@ function submit() {
       {{ noEmailNote ?? NO_EMAIL_NOTE }}
     </p>
 
-    <p v-if="shownError" :class="styles.error" role="alert">{{ shownError }}</p>
+    <div
+      v-if="shownError && errorFade.phase.value !== 'gone'"
+      :class="[styles.error, errorFade.phase.value === 'fading' && styles.fading]"
+      role="alert"
+      v-on="errorFade.handlers"
+    >
+      <span>{{ shownError }}</span>
+      <PynDismissButton @click="errorFade.close" />
+    </div>
 
     <button v-if="showForm" type="submit" :class="styles.primary" :disabled="busy || mismatch">
       {{ title }}

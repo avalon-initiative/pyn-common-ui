@@ -104,3 +104,18 @@ export const NoEmailAwaitingApproval: Story = {
     notice: { status: 'pending_approval', user: 'wendy' },
   },
 }
+export const WithRememberAndStaySignedIn: Story = {
+  args: { rememberOption: true, staySignedInOption: true },
+}
+export const PersistentError: Story = {
+  args: { error: 'Sign-in is blocked for this network.', errorPersistent: true },
+}
+export const RegisterPreview: Story = {
+  args: { registration: 'open', nameCanonical: 'new-user' },
+  play: ({ canvasElement }) => {
+    const link = [...canvasElement.querySelectorAll('button')].find((b) =>
+      b.textContent?.includes('Create an account'),
+    )
+    link?.click()
+  },
+}

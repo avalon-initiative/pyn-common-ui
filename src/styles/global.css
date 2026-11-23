@@ -5,6 +5,11 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Reserve the scrollbar track so a floating layer that adds overflow cannot change the width. */
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   background: var(--pyn-bg);

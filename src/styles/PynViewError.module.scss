@@ -2,5 +2,24 @@
 
 .error {
   @include m.error;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
   padding: var(--pyn-space-3) var(--pyn-space-4);
+  transition: opacity 0.4s ease;
+}
+
+.text {
+  min-width: 0;
+}
+
+.fading {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .error {
+    transition: none;
+  }
 }

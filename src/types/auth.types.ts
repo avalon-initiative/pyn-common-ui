@@ -8,9 +8,12 @@ export type VerifyOutcome = 'verifying' | 'verified' | 'invalid'
 export interface SignInForm {
   username: string
   password: string
+  /** Present only when the form offers the option. */
+  remember?: boolean
+  staySignedIn?: boolean
 }
 
-export interface RegisterForm extends SignInForm {
+export interface RegisterForm extends Pick<SignInForm, 'username' | 'password'> {
   email?: string
   invite?: string
 }

@@ -14,3 +14,4 @@ export const NoPassword: Story = { args: { hasPassword: false } }
 export const NameTaken: Story = { args: { error: 'That name is taken.' } }
 export const WrongPassword: Story = { args: { error: 'The password is incorrect.' } }
 export const Busy: Story = { args: { busy: true } }
+export const WithPreview: Story = { args: { nameCanonical: 'alice-b' } }

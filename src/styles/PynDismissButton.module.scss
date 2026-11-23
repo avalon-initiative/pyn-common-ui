@@ -1,0 +1,16 @@
+@use 'mixins' as m;
+
+.button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--pyn-space-1);
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  @include m.focus-ring;
+}
