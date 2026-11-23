@@ -24,6 +24,7 @@ const emit = defineEmits<{ retry: []; create: [event: MouseEvent] }>()
     :loading="loading"
     :error="error"
     retryable
+    flush
     @retry="emit('retry')"
   >
     <PynOrgList :orgs="orgs">

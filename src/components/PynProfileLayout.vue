@@ -24,9 +24,12 @@ defineProps<{
     <slot name="header" />
     <PynPageColumns>
       <section :class="styles.main" aria-labelledby="profile-repos-title">
-        <h2 id="profile-repos-title" :class="styles.title">Repositories</h2>
+        <h2 id="profile-repos-title" :class="styles.title">
+          Repositories
+          <span v-if="repos?.length" :class="styles.count" data-count>{{ repos.length }}</span>
+        </h2>
         <slot name="repositories">
-          <PynRepoList :repos="repos ?? []" empty="No repositories to show." />
+          <PynRepoList :repos="repos ?? []" empty="No repositories to show." filterable />
         </slot>
       </section>
       <template #side>
@@ -41,9 +44,11 @@ defineProps<{
             </ul>
           </slot>
         </section>
-        <slot name="activity">
-          <PynActivity v-if="activityEntries" :entries="activityEntries" :now="now" />
-        </slot>
+        <div v-if="$slots.activity || activityEntries" :class="styles.panel">
+          <slot name="activity">
+            <PynActivity v-if="activityEntries" :entries="activityEntries" :now="now" />
+          </slot>
+        </div>
       </template>
     </PynPageColumns>
   </div>

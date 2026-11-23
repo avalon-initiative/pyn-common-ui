@@ -31,6 +31,12 @@ export const Repositories: Story = {
     ],
   },
 }
+export const Filterable: Story = {
+  args: {
+    repos: [repo('alice', 'game', 'admin'), repo('bob', 'assets', 'writer')],
+    filterable: true,
+  },
+}
 export const Empty: Story = { args: { repos: [] } }
 export const EmptySilenced: Story = { args: { repos: [], empty: '' } }
 export const EmptySlot: Story = {

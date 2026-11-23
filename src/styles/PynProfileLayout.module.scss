@@ -13,12 +13,22 @@
 }
 
 .title {
-  margin: 0 0 var(--pyn-space-3);
-  font-size: var(--pyn-text-md);
+  @include m.section-title;
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  margin-bottom: var(--pyn-space-3);
+  padding-bottom: var(--pyn-space-2);
+  border-bottom: 1px solid var(--pyn-border);
 }
 
 .main .title {
   margin: 0;
+}
+
+.count {
+  @include m.pill;
+  background: var(--pyn-surface-raised);
 }
 
 .orgs {
@@ -31,13 +41,18 @@
 }
 
 .org {
+  @include m.accent-link;
   margin-right: var(--pyn-space-2);
-  color: var(--pyn-text);
   font-weight: 600;
-
-  @include m.focus-ring;
 }
 
 .pill {
   @include m.pill;
+  text-transform: capitalize;
+}
+
+// The side column divides its blocks; a boxed panel needs no divider of its own.
+.layout .panel {
+  padding-top: 0;
+  border-top: 0;
 }

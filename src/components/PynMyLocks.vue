@@ -33,42 +33,51 @@ function releaseAll() {
 <template>
   <section :class="styles.page">
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-    <div v-if="locks.length" :class="styles.bar">
-      <p :class="styles.count">
-        {{ locks.length }} active {{ locks.length === 1 ? 'lock' : 'locks' }}
-      </p>
-      <form v-if="confirming" :class="styles.confirm" @submit.prevent="releaseAll">
-        <span>Release all {{ locks.length }}?</span>
-        <button type="submit" :class="styles.danger" :disabled="busy">Release all</button>
-        <button type="button" :class="styles.quiet" @click="confirming = false">Cancel</button>
-      </form>
-      <button
-        v-else
-        type="button"
-        :class="styles.danger"
-        :disabled="busy"
-        @click="confirming = true"
-      >
-        Release all
-      </button>
-    </div>
-    <ul v-if="locks.length" :class="styles.list">
-      <li v-for="lock in locks" :key="myLockKey(lock)" :class="styles.item">
-        <span :class="styles.what">
-          <a :href="repoPath(lock)" :class="styles.repo">{{ repoSlug(lock) }}</a>
-          <span :class="styles.path"><PynLockIcon :class="styles.lockIcon" />{{ lock.path }}</span>
-          <span v-if="failureFor(lock)" :class="styles.failure" role="alert">{{
-            failureFor(lock)
-          }}</span>
-        </span>
-        <span :class="styles.meta" :title="`Expires ${formatDateTime(lock.expires_at)}`">{{
-          formatLease(lock.expires_at, now ?? new Date())
-        }}</span>
-        <button type="button" :class="styles.quiet" :disabled="busy" @click="emit('release', lock)">
-          Release
+    <div v-if="locks.length" :class="styles.box">
+      <div :class="styles.bar">
+        <p :class="styles.count">
+          {{ locks.length }} active {{ locks.length === 1 ? 'lock' : 'locks' }}
+        </p>
+        <form v-if="confirming" :class="styles.confirm" @submit.prevent="releaseAll">
+          <span>Release all {{ locks.length }}?</span>
+          <button type="submit" :class="styles.danger" :disabled="busy">Release all</button>
+          <button type="button" :class="styles.quiet" @click="confirming = false">Cancel</button>
+        </form>
+        <button
+          v-else
+          type="button"
+          :class="styles.danger"
+          :disabled="busy"
+          @click="confirming = true"
+        >
+          Release all
         </button>
-      </li>
-    </ul>
+      </div>
+      <ul :class="styles.list">
+        <li v-for="lock in locks" :key="myLockKey(lock)" :class="styles.item">
+          <span :class="styles.what">
+            <a :href="repoPath(lock)" :class="styles.repo">{{ repoSlug(lock) }}</a>
+            <span :class="styles.path"
+              ><PynLockIcon :class="styles.lockIcon" />{{ lock.path }}</span
+            >
+            <span v-if="failureFor(lock)" :class="styles.failure" role="alert">{{
+              failureFor(lock)
+            }}</span>
+          </span>
+          <span :class="styles.meta" :title="`Expires ${formatDateTime(lock.expires_at)}`">{{
+            formatLease(lock.expires_at, now ?? new Date())
+          }}</span>
+          <button
+            type="button"
+            :class="styles.quiet"
+            :disabled="busy"
+            @click="emit('release', lock)"
+          >
+            Release
+          </button>
+        </li>
+      </ul>
+    </div>
     <slot v-else name="empty">
       <p v-if="empty !== ''" :class="styles.empty">{{ empty ?? 'You hold no locks.' }}</p>
     </slot>
