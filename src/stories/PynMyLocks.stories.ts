@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import PynEmptyState from '../components/PynEmptyState.vue'
 import PynMyLocks from '../components/PynMyLocks.vue'
 
 const meta: Meta<typeof PynMyLocks> = {
@@ -42,3 +43,12 @@ export const PartialFailure: Story = {
   },
 }
 export const None: Story = { args: { locks: [], now } }
+export const EmptySilenced: Story = { args: { locks: [], empty: '' } }
+export const EmptySlot: Story = {
+  args: { locks: [] },
+  render: (args) => ({
+    components: { PynMyLocks, PynEmptyState },
+    setup: () => ({ args }),
+    template: `<PynMyLocks v-bind="args"><template #empty><PynEmptyState title="No locks held" description="Custom empty state." compact /></template></PynMyLocks>`,
+  }),
+}

@@ -14,6 +14,8 @@ const props = defineProps<{
   now?: Date
   busy?: boolean
   error?: string
+  /** Replaces the empty message; an empty string or the `empty` slot replaces it entirely. */
+  empty?: string
 }>()
 const emit = defineEmits<{ release: [MyLock]; releaseAll: [] }>()
 
@@ -67,6 +69,8 @@ function releaseAll() {
         </button>
       </li>
     </ul>
-    <p v-else :class="styles.empty">You hold no locks.</p>
+    <slot v-else name="empty">
+      <p v-if="empty !== ''" :class="styles.empty">{{ empty ?? 'You hold no locks.' }}</p>
+    </slot>
   </section>
 </template>

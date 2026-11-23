@@ -47,4 +47,5 @@ export const WithInsights: Story = {
 }
 export const SettingsOpen: Story = { args: { current: 'settings/members' } }
 export const NoAccess: Story = { args: { tabs: undefined } }
+export const HidePath: Story = { args: { hidePath: true } }
 export const OnBranch: Story = { args: { branch: 'feature/levels' } }

@@ -16,6 +16,8 @@ const props = defineProps<{
   ownerHref?: string
   /** Branch the repository link and the Code and History tabs keep; omitted is the default branch. */
   branch?: string
+  /** Drops the owner and name path, for pages that already show it (breadcrumbs). */
+  hidePath?: boolean
 }>()
 
 function isCurrent(section: string): boolean {
@@ -28,8 +30,8 @@ function isCurrent(section: string): boolean {
   <div :class="styles.shell">
     <header :class="styles.header">
       <div :class="styles.top">
-        <h1 :class="styles.title">
-          <nav aria-label="Repository path">
+        <component :is="hidePath ? 'div' : 'h1'" :class="styles.title">
+          <nav v-if="!hidePath" aria-label="Repository path">
             <a :href="ownerHref ?? `/${encodeURIComponent(owner)}`" :class="styles.owner">{{
               owner
             }}</a>
@@ -39,7 +41,7 @@ function isCurrent(section: string): boolean {
           <span :class="styles.badge" data-visibility>{{
             visibility === 'public' ? 'Public' : 'Private'
           }}</span>
-        </h1>
+        </component>
         <div v-if="$slots.actions" :class="styles.actions"><slot name="actions" /></div>
       </div>
       <nav v-if="tabs" :class="styles.tabs" aria-label="Repository">

@@ -6,6 +6,7 @@ export default meta
 type Story = StoryObj<typeof PynOrgForm>
 
 export const Default: Story = {}
+export const WithCancel: Story = { args: { cancelHref: '/' } }
 export const NameTaken: Story = {
   args: { error: 'That name is already taken by a user or an organization.' },
 }

@@ -29,6 +29,13 @@ export const WithBothActions: Story = {
 export const EventActions: Story = {
   args: { primaryLabel: 'Add a person', secondaryLabel: 'Learn more' },
 }
+export const WithCommands: Story = {
+  args: {
+    title: 'This repository is empty',
+    description: 'Create a new repository on the command line:',
+    commands: ['pyn init', 'pyn add .', 'pyn commit -m "First commit"', 'pyn push'],
+  },
+}
 export const WithIcon: Story = {
   args: { primaryLabel: 'New repository', primaryHref: '/_/new' },
   render: (args) => ({

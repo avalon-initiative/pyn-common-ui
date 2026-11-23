@@ -3,6 +3,7 @@ import styles from '../styles/PynRepoList.module.scss'
 import { repoPath, repoSlug } from '../state/repo.state'
 import type { RepoInfo } from '../types/repo.types'
 
+/** `empty` replaces the empty message; an empty string or the `empty` slot replaces it entirely. */
 defineProps<{ repos: RepoInfo[]; empty?: string }>()
 </script>
 
@@ -19,8 +20,10 @@ defineProps<{ repos: RepoInfo[]; empty?: string }>()
       </span>
     </li>
   </ul>
-  <p v-else-if="empty" :class="styles.empty">{{ empty }}</p>
-  <p v-else :class="styles.empty">
-    You are not in any repository yet. <a href="/_/new">Create one</a>.
-  </p>
+  <slot v-else name="empty">
+    <p v-if="empty === undefined" :class="styles.empty">
+      You are not in any repository yet. <a href="/_/new">Create one</a>.
+    </p>
+    <p v-else-if="empty" :class="styles.empty">{{ empty }}</p>
+  </slot>
 </template>

@@ -5,6 +5,8 @@ withDefaults(
   defineProps<{
     title: string
     description?: string
+    /** Commands shown one per line in a monospace block under the description. */
+    commands?: string[]
     primaryLabel?: string
     primaryHref?: string
     secondaryLabel?: string
@@ -22,6 +24,11 @@ const emit = defineEmits<{ primary: [event: MouseEvent]; secondary: [event: Mous
     <div v-if="$slots.icon" :class="styles.icon" aria-hidden="true"><slot name="icon" /></div>
     <component :is="`h${headingLevel}`" :class="styles.title">{{ title }}</component>
     <p v-if="description" :class="styles.description">{{ description }}</p>
+    <ul v-if="commands?.length" :class="styles.commands" aria-label="Commands">
+      <li v-for="(command, i) in commands" :key="i">
+        <code :class="styles.command" data-command>{{ command }}</code>
+      </li>
+    </ul>
     <div v-if="primaryLabel || secondaryLabel" :class="styles.actions">
       <template v-if="primaryLabel">
         <a
