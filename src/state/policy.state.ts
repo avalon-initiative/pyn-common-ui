@@ -1,4 +1,4 @@
-import type { PolicyProblem } from '../types/policy.types'
+import type { PolicyProblem, PolicyRule } from '../types/policy.types'
 
 export const ROOT_FOLDER = '(root)'
 
@@ -38,3 +38,10 @@ export const lineAtOffset = (y: number, scrollTop: number, lineHeight: number, p
 
 /** The 1-based line holding a caret offset. */
 export const lineOfCaret = (text: string, caret: number) => text.slice(0, caret).split('\n').length
+
+/** Zero-based index of the matched rule: a number is the index, a string the first rule with that pattern. */
+export function matchedIndex(rules: PolicyRule[], matched?: number | string | null): number {
+  if (matched === undefined || matched === null) return -1
+  const i = typeof matched === 'number' ? matched : rules.findIndex((r) => r.pattern === matched)
+  return i >= 0 && i < rules.length ? i : -1
+}

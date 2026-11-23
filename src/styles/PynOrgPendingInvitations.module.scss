@@ -26,6 +26,11 @@
   tbody tr {
     border-top: 1px solid var(--pyn-border);
   }
+
+  @include m.narrow {
+    display: block;
+    overflow-x: auto;
+  }
 }
 
 .actions {

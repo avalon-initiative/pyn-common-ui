@@ -72,3 +72,21 @@ export const NarrowSignedOut: Story = {
   args: { signedOut: true, user: undefined },
   play: openMenu('Main menu'),
 }
+export const NamedDestinations: Story = {
+  args: { hrefs: { people: '/directory/people', orgs: '/directory/orgs' } },
+  play: openMenu('Account menu'),
+}
+export const DuplicateExtraAccountShownOnce: Story = {
+  args: {
+    extraAccount: [
+      { id: 'people', label: 'People', href: '/_/people' },
+      { id: 'docs', label: 'Documentation', href: '/docs' },
+    ],
+  },
+  play: openMenu('Account menu'),
+}
+export const NarrowExtraLinks: Story = {
+  parameters: narrow,
+  args: { extraLinks: [{ id: 'docs', label: 'Documentation', href: '/docs' }] },
+  play: openMenu('Main menu'),
+}

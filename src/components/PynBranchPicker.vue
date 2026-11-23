@@ -108,7 +108,7 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
     >
       <PynIcon name="branch" :class="styles.icon" />
       <span :class="styles.hidden">Branch:</span>
-      <span :class="styles.name">{{ current }}</span>
+      <span :class="styles.name" :title="current">{{ current }}</span>
       <PynIcon name="chevron" :class="styles.icon" />
     </button>
     <div v-if="open" :class="styles.panel">

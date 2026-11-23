@@ -79,6 +79,10 @@
   border-radius: var(--pyn-radius);
   font: inherit;
 
+  @include narrow {
+    min-height: 2.75rem;
+  }
+
   @include focus-ring;
 }
 
@@ -94,6 +98,10 @@
   &:disabled {
     opacity: 0.6;
     cursor: progress;
+  }
+
+  @include narrow {
+    min-height: 2.75rem;
   }
 
   @include focus-ring;
@@ -195,6 +203,12 @@
   color: var(--pyn-text-muted);
   border-bottom: 2px solid transparent;
   text-decoration: none;
+
+  @include narrow {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
 
   &:hover {
     color: var(--pyn-text);

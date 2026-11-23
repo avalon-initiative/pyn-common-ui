@@ -39,7 +39,9 @@ const hasBadge = (item: NavItem) =>
         size="sm"
       />
       <span v-else :class="styles.avatar">{{ account.slice(0, 1).toUpperCase() }}</span>
-      <span :class="styles.account">{{ displayName || account }}</span>
+      <span :class="styles.account" :title="displayName || account">{{
+        displayName || account
+      }}</span>
     </p>
     <ul :class="styles.list">
       <li v-for="item in allItems" :key="item.id">
@@ -65,7 +67,9 @@ const hasBadge = (item: NavItem) =>
             :class="styles.link"
             :aria-current="org.name === currentOrg ? 'true' : undefined"
           >
-            <PynIcon name="user" /><span :class="styles.repo">{{ org.name }}</span>
+            <PynIcon name="user" /><span :class="styles.repo" :title="org.name">{{
+              org.name
+            }}</span>
           </a>
         </li>
       </ul>
@@ -78,7 +82,9 @@ const hasBadge = (item: NavItem) =>
           :class="styles.link"
           :aria-current="repoSlug(repo) === currentRepo ? 'true' : undefined"
         >
-          <PynIcon name="repo" /><span :class="styles.repo">{{ repoSlug(repo) }}</span>
+          <PynIcon name="repo" /><span :class="styles.repo" :title="repoSlug(repo)">{{
+            repoSlug(repo)
+          }}</span>
         </a>
       </li>
     </ul>

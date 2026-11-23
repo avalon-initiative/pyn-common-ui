@@ -20,3 +20,9 @@ export interface BranchSummary {
   behind?: number
   updatedAt?: string | null
 }
+
+/** A row of the branches list; `compareHref` opens the comparison with the default branch. */
+export interface BranchListItem extends BranchSummary {
+  href?: string
+  compareHref?: string
+}

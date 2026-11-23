@@ -12,8 +12,17 @@ export interface TopBarHrefs {
   profile: string
   settings: string
   admin: string
+  people: string
+  orgs: string
   locks: string
   notifications: string
   newRepo: string
   newOrg: string
+}
+
+/** An extra destination in the narrow-screen main menu. */
+export interface TopBarLink {
+  id: string
+  label: string
+  href: string
 }
