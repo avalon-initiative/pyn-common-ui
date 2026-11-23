@@ -1,0 +1,57 @@
+@use 'mixins' as m;
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-8) var(--pyn-space-4);
+  text-align: center;
+}
+
+.compact {
+  gap: var(--pyn-space-1);
+  padding: var(--pyn-space-4);
+}
+
+.icon {
+  color: var(--pyn-text-muted);
+  font-size: 2.5rem;
+}
+
+.compact .icon {
+  font-size: 1.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-lg);
+}
+
+.compact .title {
+  font-size: var(--pyn-text-md);
+}
+
+.description {
+  @include m.muted;
+  max-width: 32rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--pyn-space-2);
+  margin-top: var(--pyn-space-2);
+}
+
+.primary {
+  @include m.button-primary;
+  align-self: auto;
+  text-decoration: none;
+}
+
+.secondary {
+  @include m.button;
+  text-decoration: none;
+}

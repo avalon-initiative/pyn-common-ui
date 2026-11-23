@@ -1,0 +1,84 @@
+@use 'mixins' as m;
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  color: var(--pyn-text);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  font-size: 0.875rem;
+
+  @include m.narrow {
+    flex-wrap: wrap;
+  }
+}
+
+.advice {
+  background: var(--pyn-mine-bg);
+  border-color: var(--pyn-mine);
+}
+
+.required {
+  background: var(--pyn-locked-bg);
+  border-color: var(--pyn-locked);
+}
+
+.compact {
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-1) var(--pyn-space-3);
+  font-size: 0.8125rem;
+}
+
+.icon {
+  flex: none;
+  font-size: 1.125rem;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-1) var(--pyn-space-2);
+  min-width: 0;
+}
+
+.message {
+  overflow-wrap: anywhere;
+}
+
+.badge {
+  @include m.pill;
+  color: var(--pyn-text);
+  border-color: currentcolor;
+  font-weight: 600;
+}
+
+.deadline {
+  @include m.muted;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.action {
+  @include m.button;
+  flex: none;
+  color: var(--pyn-text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.dismiss {
+  @include m.button(var(--pyn-text-muted));
+  flex: none;
+  padding: 0 var(--pyn-space-2);
+  border: 0;
+  line-height: 1.5;
+}
+
+.hidden {
+  @include m.visually-hidden;
+}
