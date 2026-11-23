@@ -1,3 +1,17 @@
+// Inline icons drawn through a mask so they take the text color.
+$icon-alert: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'%3E%3Ccircle cx='8' cy='8' r='6.5'/%3E%3Cpath d='M8 4.5v4'/%3E%3Ccircle cx='8' cy='11.2' r='.6' fill='black'/%3E%3C/svg%3E");
+$icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='8' r='6.5'/%3E%3Cpath d='m5.2 8.2 1.9 1.9 3.7-4'/%3E%3C/svg%3E");
+
+@mixin icon($image) {
+  content: '';
+  display: inline-block;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  background: currentcolor;
+  mask: $image center / contain no-repeat;
+}
+
 @mixin focus-ring {
   &:focus-visible {
     outline: 2px solid var(--pyn-accent);
@@ -101,21 +115,19 @@
 }
 
 @mixin form {
-  @include card;
   max-width: 40rem;
   display: flex;
   flex-direction: column;
-  gap: var(--pyn-space-3);
-  padding: var(--pyn-space-4);
+  gap: var(--pyn-space-4);
 }
 
 @mixin field {
   display: flex;
   flex-direction: column;
-  gap: var(--pyn-space-1);
-  color: var(--pyn-text-muted);
+  gap: var(--pyn-space-2);
+  color: var(--pyn-text);
   font-size: var(--pyn-text-base);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 @mixin input {
@@ -127,21 +139,40 @@
   border: 1px solid var(--pyn-border-strong);
   border-radius: var(--pyn-radius);
   font: inherit;
+  font-weight: 400;
   line-height: var(--pyn-leading-tight);
 
-  @include focus-ring;
+  &::placeholder {
+    color: var(--pyn-text-muted);
+  }
+
+  &:is(textarea) {
+    padding-block: var(--pyn-space-2);
+    line-height: var(--pyn-leading-body);
+  }
+
+  &:focus-visible {
+    border-color: var(--pyn-accent);
+    outline: 2px solid var(--pyn-accent);
+    outline-offset: -1px;
+  }
 }
 
 @mixin button($color: var(--pyn-text)) {
   @include control;
   padding-inline: var(--pyn-space-3);
   color: $color;
-  background: none;
+  background: var(--pyn-control-bg);
   border: 1px solid var(--pyn-border);
   border-radius: var(--pyn-radius);
   font: inherit;
+  font-weight: 500;
   line-height: var(--pyn-leading-tight);
   cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--pyn-control-bg-hover);
+  }
 
   &:disabled {
     opacity: 0.6;
@@ -151,13 +182,30 @@
   @include focus-ring;
 }
 
+// Green submit button.
 @mixin button-primary {
   @include button(var(--pyn-on-accent));
   align-self: flex-start;
   padding-inline: var(--pyn-space-4);
-  background: var(--pyn-accent-fill);
-  border: 0;
+  background: var(--pyn-success-fill);
+  border-color: transparent;
   font-weight: 600;
+
+  &:hover:not(:disabled) {
+    background: var(--pyn-success-fill);
+    filter: brightness(1.1);
+  }
+}
+
+// Red text on the default fill; fills red on hover.
+@mixin button-danger {
+  @include button(var(--pyn-danger));
+
+  &:hover:not(:disabled) {
+    color: var(--pyn-on-accent);
+    background: var(--pyn-danger-fill);
+    border-color: transparent;
+  }
 }
 
 @mixin muted {
@@ -167,13 +215,34 @@
 }
 
 @mixin error {
+  position: relative;
   margin: 0;
-  padding: var(--pyn-space-2) var(--pyn-space-3);
-  color: var(--pyn-danger);
+  padding: var(--pyn-space-3) var(--pyn-space-4) var(--pyn-space-3) var(--pyn-space-10);
+  color: var(--pyn-text);
   background: var(--pyn-danger-bg);
   border: 1px solid color-mix(in srgb, var(--pyn-danger) 40%, transparent);
   border-radius: var(--pyn-radius);
-  font-size: 0.875rem;
+  font-size: var(--pyn-text-base);
+
+  &::before {
+    @include icon($icon-alert);
+    position: absolute;
+    top: var(--pyn-space-3);
+    left: var(--pyn-space-4);
+    color: var(--pyn-danger);
+    font-size: 1rem;
+  }
+}
+
+@mixin success {
+  @include error;
+  background: var(--pyn-success-bg);
+  border-color: color-mix(in srgb, var(--pyn-success) 40%, transparent);
+
+  &::before {
+    @include icon($icon-check);
+    color: var(--pyn-success);
+  }
 }
 
 // Full-width alert box; pair with alert-role for the tint and icon color.
@@ -206,7 +275,14 @@
 
 @mixin field-message {
   color: var(--pyn-danger);
-  font-size: 0.8125rem;
+  font-size: var(--pyn-text-xs);
+  font-weight: 400;
+
+  &::before {
+    @include icon($icon-alert);
+    margin-right: var(--pyn-space-1);
+    vertical-align: -0.125em;
+  }
 }
 
 @mixin invalid {
@@ -343,6 +419,115 @@
   @include focus-ring;
 }
 
+// Settings content title: large, light, with a bottom border.
+@mixin settings-title {
+  margin: 0 0 var(--pyn-space-4);
+  padding-bottom: var(--pyn-space-2);
+  border-bottom: 1px solid var(--pyn-border);
+  font-size: var(--pyn-text-xl);
+  font-weight: 400;
+  line-height: var(--pyn-leading-tight);
+}
+
+// Muted help text under a field or a section title.
+@mixin help {
+  margin: 0;
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+  font-weight: 400;
+  line-height: var(--pyn-leading-body);
+}
+
+// Red-bordered box for irreversible actions.
+@mixin danger-zone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  max-width: 40rem;
+  padding: var(--pyn-space-4);
+  border: 1px solid var(--pyn-danger);
+  border-radius: var(--pyn-radius);
+}
+
+// Centered narrow column for sign-in style pages.
+@mixin auth-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+  box-sizing: border-box;
+  width: min(100%, 21.25rem);
+  margin: var(--pyn-space-8) auto;
+  padding-inline: var(--pyn-space-4);
+}
+
+@mixin auth-mark {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 3rem;
+  height: 3rem;
+  color: var(--pyn-text);
+  border: 2px solid currentcolor;
+  border-radius: 50%;
+  font-size: var(--pyn-text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+@mixin auth-title {
+  margin: 0;
+  font-size: var(--pyn-text-xl);
+  font-weight: 300;
+  line-height: var(--pyn-leading-tight);
+  text-align: center;
+}
+
+@mixin auth-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+  padding: var(--pyn-space-4);
+  background: var(--pyn-bg-subtle);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+@mixin auth-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-4);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  text-align: center;
+}
+
+@mixin link-button {
+  padding: 0;
+  color: var(--pyn-accent);
+  background: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include focus-ring;
+}
+
+// Heading of a side column block.
+@mixin side-title {
+  margin: 0;
+  font-size: var(--pyn-text-base);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
+}
+
 // Flat bordered box for lists and panels: 1px border, 6px radius, no shadow.
 @mixin flat-box {
   overflow: hidden;
@@ -401,12 +586,4 @@
   background: $bg;
   border-color: color-mix(in srgb, #{$color} 40%, transparent);
   white-space: nowrap;
-}
-
-// Heading of a side column block.
-@mixin side-title {
-  margin: 0;
-  font-size: var(--pyn-text-base);
-  font-weight: 600;
-  line-height: var(--pyn-leading-tight);
 }

@@ -16,8 +16,7 @@
 }
 
 .hint {
-  @include m.muted;
-  font-size: 0.8125rem;
+  @include m.help;
 }
 
 .message {

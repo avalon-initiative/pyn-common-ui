@@ -1,24 +1,24 @@
 @use 'mixins' as m;
 
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pyn-space-3);
-  max-width: 24rem;
-  margin: var(--pyn-space-8) auto;
-  padding: var(--pyn-space-6);
-  background: var(--pyn-surface);
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
+.page {
+  @include m.auth-page;
+}
+
+.mark {
+  @include m.auth-mark;
 }
 
 .title {
-  margin: 0;
-  font-size: 1.25rem;
+  @include m.auth-title;
+}
+
+.card {
+  @include m.auth-box;
 }
 
 .note {
-  @include m.muted;
+  @include m.help;
+  font-size: var(--pyn-text-base);
 }
 
 .field {
@@ -44,7 +44,8 @@
 }
 
 .heading {
-  @include m.muted;
+  margin: 0;
+  font-size: var(--pyn-text-base);
   font-weight: 600;
 }
 
@@ -65,32 +66,20 @@
 
 .choice {
   @include m.button;
-  padding: var(--pyn-space-2) var(--pyn-space-4);
-  text-align: start;
-  font-weight: 600;
+  justify-content: center;
 }
 
 .hint {
-  @include m.muted;
-  font-size: 0.8125rem;
+  @include m.help;
 }
 
-.links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--pyn-space-3);
+.aside {
+  @include m.auth-aside;
   margin: 0;
 }
 
 .link {
-  padding: 0;
-  color: var(--pyn-accent);
-  background: none;
-  border: 0;
-  font-size: 0.875rem;
-  cursor: pointer;
-
-  @include m.focus-ring;
+  @include m.link-button;
 }
 
 .error {

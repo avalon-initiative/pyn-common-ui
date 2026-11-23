@@ -35,54 +35,57 @@ function send() {
 </script>
 
 <template>
-  <form :class="styles.card" @submit.prevent="send">
+  <div :class="styles.page">
+    <span :class="styles.mark" aria-hidden="true">PYN</span>
     <h2 :class="styles.title">Two-step verification</h2>
-    <p :class="styles.note">
-      {{
-        recovery
-          ? 'Enter one of your recovery codes. Each works once.'
-          : 'Enter the six-digit code from your authenticator app.'
-      }}
-    </p>
-    <label :class="styles.field"
-      >{{ recovery ? 'Recovery code' : 'Authentication code' }}
-      <input
-        v-model="code"
-        :class="styles.input"
-        :inputmode="recovery ? 'text' : 'numeric'"
-        :autocomplete="recovery ? 'off' : 'one-time-code'"
-        required
-        :disabled="busy"
-      />
-    </label>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-    <button type="submit" :class="styles.primary" :disabled="busy">
-      {{ busy ? 'Verifying…' : 'Verify' }}
-    </button>
-    <section :class="styles.alternatives" aria-labelledby="pyn-second-factor-other">
-      <h3 id="pyn-second-factor-other" :class="styles.heading">Other ways to verify</h3>
-      <ul :class="styles.options">
-        <li v-if="recovery" :class="styles.option">
-          <button type="button" :class="styles.choice" :disabled="busy" @click="toggle">
-            Use an authenticator code
-          </button>
-        </li>
-        <li v-if="passkeys" :class="styles.option">
-          <button type="button" :class="styles.choice" :disabled="busy" @click="emit('passkey')">
-            Use a passkey
-          </button>
-        </li>
-        <li v-if="!recovery" :class="styles.option">
-          <button type="button" :class="styles.choice" :disabled="busy" @click="toggle">
-            Use a recovery code
-          </button>
-          <p :class="styles.hint" data-recovery-hint>{{ recoveryHint }}</p>
-        </li>
-      </ul>
-    </section>
-    <p v-if="helpHint" :class="styles.hint" data-help-hint>{{ helpHint }}</p>
-    <p :class="styles.links">
+    <form :class="styles.card" @submit.prevent="send">
+      <p :class="styles.note">
+        {{
+          recovery
+            ? 'Enter one of your recovery codes. Each works once.'
+            : 'Enter the six-digit code from your authenticator app.'
+        }}
+      </p>
+      <label :class="styles.field"
+        >{{ recovery ? 'Recovery code' : 'Authentication code' }}
+        <input
+          v-model="code"
+          :class="styles.input"
+          :inputmode="recovery ? 'text' : 'numeric'"
+          :autocomplete="recovery ? 'off' : 'one-time-code'"
+          required
+          :disabled="busy"
+        />
+      </label>
+      <button type="submit" :class="styles.primary" :disabled="busy">
+        {{ busy ? 'Verifying…' : 'Verify' }}
+      </button>
+      <section :class="styles.alternatives" aria-labelledby="pyn-second-factor-other">
+        <h3 id="pyn-second-factor-other" :class="styles.heading">Other ways to verify</h3>
+        <ul :class="styles.options">
+          <li v-if="recovery" :class="styles.option">
+            <button type="button" :class="styles.choice" :disabled="busy" @click="toggle">
+              Use an authenticator code
+            </button>
+          </li>
+          <li v-if="passkeys" :class="styles.option">
+            <button type="button" :class="styles.choice" :disabled="busy" @click="emit('passkey')">
+              Use a passkey
+            </button>
+          </li>
+          <li v-if="!recovery" :class="styles.option">
+            <button type="button" :class="styles.choice" :disabled="busy" @click="toggle">
+              Use a recovery code
+            </button>
+            <p :class="styles.hint" data-recovery-hint>{{ recoveryHint }}</p>
+          </li>
+        </ul>
+      </section>
+      <p v-if="helpHint" :class="styles.hint" data-help-hint>{{ helpHint }}</p>
+    </form>
+    <p :class="styles.aside">
       <button type="button" :class="styles.link" @click="emit('cancel')">Back to sign in</button>
     </p>
-  </form>
+  </div>
 </template>

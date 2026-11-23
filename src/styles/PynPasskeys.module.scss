@@ -3,12 +3,11 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--pyn-space-3);
+  gap: var(--pyn-space-4);
 }
 
 .heading {
-  margin: 0;
-  font-size: 1.25rem;
+  @include m.settings-title;
 }
 
 .note,
@@ -46,7 +45,7 @@
 }
 
 .remove {
-  @include m.button(var(--pyn-danger));
+  @include m.button-danger;
 }
 
 .primary {

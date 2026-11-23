@@ -1,78 +1,53 @@
 @use 'mixins' as m;
 
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pyn-space-3);
-  max-width: 24rem;
-  margin: var(--pyn-space-8) auto;
-  padding: var(--pyn-space-6);
-  background: var(--pyn-surface);
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
+.page {
+  @include m.auth-page;
+}
+
+.mark {
+  @include m.auth-mark;
 }
 
 .title {
-  margin: 0;
-  font-size: 1.25rem;
+  @include m.auth-title;
+}
+
+.card {
+  @include m.auth-box;
 }
 
 .field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pyn-space-1);
-  color: var(--pyn-text-muted);
-  font-size: 0.875rem;
+  @include m.field;
 }
 
 .input {
-  padding: var(--pyn-space-2) var(--pyn-space-3);
-  color: var(--pyn-text);
-  background: var(--pyn-bg);
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
-
-  @include m.focus-ring;
+  @include m.input;
   @include m.invalid;
 }
 
 .primary {
-  padding: var(--pyn-space-2) var(--pyn-space-4);
-  color: var(--pyn-on-accent);
-  background: var(--pyn-accent-fill);
-  border: 0;
-  border-radius: var(--pyn-radius);
-  font-weight: 600;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: progress;
-  }
-
-  @include m.focus-ring;
+  @include m.button-primary;
+  align-self: stretch;
 }
 
-.links {
-  display: flex;
+.aside {
+  @include m.auth-aside;
+  flex-direction: row;
   flex-wrap: wrap;
-  gap: var(--pyn-space-3);
+  justify-content: center;
   margin: 0;
 }
 
-.link {
-  padding: 0;
-  color: var(--pyn-accent);
-  background: none;
-  border: 0;
-  font-size: 0.875rem;
-  cursor: pointer;
+.asideText {
+  color: var(--pyn-text);
+}
 
-  @include m.focus-ring;
+.link {
+  @include m.link-button;
 }
 
 .hint {
-  @include m.muted;
+  @include m.help;
 }
 
 .message {
@@ -84,7 +59,7 @@
   align-items: center;
   gap: var(--pyn-space-2);
   color: var(--pyn-text);
-  font-size: 0.875rem;
+  font-size: var(--pyn-text-base);
 }
 
 .fading {
@@ -92,36 +67,26 @@
 }
 
 .error {
+  @include m.error;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--pyn-space-3);
   transition: opacity 0.4s ease;
-  margin: 0;
-  padding: var(--pyn-space-2) var(--pyn-space-3);
-  color: var(--pyn-danger);
-  background: var(--pyn-danger-bg);
-  border-radius: var(--pyn-radius);
-  font-size: 0.875rem;
+
+  > span {
+    flex: 1;
+  }
 }
 
 .provider {
-  padding: var(--pyn-space-2) var(--pyn-space-4);
-  color: var(--pyn-text);
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
-  font-weight: 600;
-  text-align: center;
+  @include m.button;
+  align-self: stretch;
   text-decoration: none;
-  background: none;
-  font-size: inherit;
-  cursor: pointer;
-
-  @include m.focus-ring;
 }
 
 .note {
-  @include m.muted;
+  @include m.help;
 }
 
 @media (prefers-reduced-motion: reduce) {

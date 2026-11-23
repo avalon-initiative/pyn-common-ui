@@ -60,139 +60,150 @@ function next() {
 </script>
 
 <template>
-  <section v-if="done" :class="styles.card">
+  <div v-if="done" :class="styles.page">
+    <span :class="styles.mark" aria-hidden="true">PYN</span>
     <h2 :class="styles.title">Your server is ready</h2>
-    <p :class="styles.note">
-      {{ form.username }} is the administrator. Sign in to start creating repositories.
-    </p>
-    <p v-if="suggestSecondAdmin" :class="styles.note">
-      With one administrator, losing this account locks you out of managing the server. After
-      signing in, make a second administrator on the
-      <button type="button" :class="styles.link" @click="emit('manageAdmins')">
-        accounts administration page</button
-      >.
-    </p>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-    <button type="button" :class="styles.primary" :disabled="busy" @click="emit('signIn')">
-      Sign in
-    </button>
-  </section>
-  <form v-else :class="styles.card" @submit.prevent="next">
-    <p :class="styles.progress">Step {{ index + 1 }} of {{ SETUP_STEPS.length }}</p>
-    <h2 :class="styles.title">{{ titles[step] }}</h2>
-
-    <template v-if="step === 'welcome'">
+    <section :class="styles.card">
       <p :class="styles.note">
-        This server has not been set up yet. You will create the first administrator and choose how
-        people join. It takes a minute.
+        {{ form.username }} is the administrator. Sign in to start creating repositories.
       </p>
-    </template>
-
-    <template v-else-if="step === 'token'">
-      <p :class="styles.note">
-        Find the setup token in the server's log when it starts, or in its
-        <code>PYN_SETUP_TOKEN</code> setting.
+      <p v-if="suggestSecondAdmin" :class="styles.note">
+        With one administrator, losing this account locks you out of managing the server. After
+        signing in, make a second administrator on the
+        <button type="button" :class="styles.link" @click="emit('manageAdmins')">
+          accounts administration page</button
+        >.
       </p>
-      <label :class="styles.field"
-        >Setup token
-        <input v-model.trim="form.token" :class="styles.input" autocomplete="off" required />
-      </label>
-    </template>
-
-    <template v-else-if="step === 'admin'">
-      <label :class="styles.field"
-        >User name
-        <input
-          v-model.trim="form.username"
-          :class="styles.input"
-          autocomplete="username"
-          required
-          :aria-describedby="nameMessage ? nameMessageId : undefined"
-          :aria-invalid="nameMessage ? 'true' : undefined"
-          @input="emit('nameInput', form.username)"
-        />
-        <span v-if="nameMessage" :id="nameMessageId" :class="styles.message">{{
-          nameMessage
-        }}</span>
-      </label>
-      <label :class="styles.field"
-        >Password
-        <input
-          v-model="form.password"
-          :class="styles.input"
-          type="password"
-          autocomplete="new-password"
-          required
-        />
-      </label>
-      <label :class="styles.field"
-        >Confirm password
-        <input
-          v-model="confirm"
-          :class="styles.input"
-          type="password"
-          autocomplete="new-password"
-          required
-          :aria-describedby="showMismatch ? confirmMessageId : undefined"
-          :aria-invalid="showMismatch ? 'true' : undefined"
-        />
-        <span v-if="showMismatch" :id="confirmMessageId" :class="styles.message" role="alert"
-          >The passwords do not match.</span
-        >
-      </label>
-      <label :class="styles.field"
-        >Email address (optional)
-        <input v-model.trim="form.email" :class="styles.input" type="email" autocomplete="email" />
-      </label>
-    </template>
-
-    <template v-else-if="step === 'server'">
-      <label :class="styles.field"
-        >Server name (optional)
-        <input v-model.trim="form.server_name" :class="styles.input" />
-      </label>
-      <label :class="styles.field"
-        >Public address
-        <input
-          v-model.trim="form.public_url"
-          :class="styles.input"
-          type="url"
-          placeholder="https://pyn.example.com"
-        />
-      </label>
-    </template>
-
-    <template v-else-if="step === 'registration'">
-      <label v-for="(label, mode) in REGISTRATION_LABELS" :key="mode" :class="styles.choice"
-        ><input v-model="form.registration" type="radio" name="registration" :value="mode" />
-        {{ label }}</label
-      >
-      <p :class="styles.note">
-        Email is only written to the server log until a mail sender is configured, so verification
-        and invitation emails will not reach anyone yet.
-      </p>
-    </template>
-
-    <dl v-else :class="styles.review">
-      <dt>Administrator</dt>
-      <dd>{{ form.username }}</dd>
-      <dt>Email</dt>
-      <dd>{{ form.email || 'none' }}</dd>
-      <dt>Server name</dt>
-      <dd>{{ form.server_name || 'none' }}</dd>
-      <dt>Public address</dt>
-      <dd>{{ form.public_url || 'none' }}</dd>
-      <dt>Registration</dt>
-      <dd>{{ REGISTRATION_LABELS[form.registration] }}</dd>
-    </dl>
-
-    <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-
-    <div :class="styles.actions">
-      <button v-if="index > 0" type="button" :class="styles.link" @click="index -= 1">Back</button>
-      <button type="submit" :class="styles.primary" :disabled="busy || mismatch">
-        {{ last ? 'Finish setup' : step === 'welcome' ? 'Begin' : 'Continue' }}
+      <button type="button" :class="styles.primary" :disabled="busy" @click="emit('signIn')">
+        Sign in
       </button>
-    </div>
-  </form>
+    </section>
+  </div>
+  <div v-else :class="styles.page">
+    <span :class="styles.mark" aria-hidden="true">PYN</span>
+    <h2 :class="styles.title">{{ titles[step] }}</h2>
+    <p :class="styles.progress">Step {{ index + 1 }} of {{ SETUP_STEPS.length }}</p>
+    <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
+    <form :class="styles.card" @submit.prevent="next">
+      <template v-if="step === 'welcome'">
+        <p :class="styles.note">
+          This server has not been set up yet. You will create the first administrator and choose
+          how people join. It takes a minute.
+        </p>
+      </template>
+
+      <template v-else-if="step === 'token'">
+        <p :class="styles.note">
+          Find the setup token in the server's log when it starts, or in its
+          <code>PYN_SETUP_TOKEN</code> setting.
+        </p>
+        <label :class="styles.field"
+          >Setup token
+          <input v-model.trim="form.token" :class="styles.input" autocomplete="off" required />
+        </label>
+      </template>
+
+      <template v-else-if="step === 'admin'">
+        <label :class="styles.field"
+          >User name
+          <input
+            v-model.trim="form.username"
+            :class="styles.input"
+            autocomplete="username"
+            required
+            :aria-describedby="nameMessage ? nameMessageId : undefined"
+            :aria-invalid="nameMessage ? 'true' : undefined"
+            @input="emit('nameInput', form.username)"
+          />
+          <span v-if="nameMessage" :id="nameMessageId" :class="styles.message">{{
+            nameMessage
+          }}</span>
+        </label>
+        <label :class="styles.field"
+          >Password
+          <input
+            v-model="form.password"
+            :class="styles.input"
+            type="password"
+            autocomplete="new-password"
+            required
+          />
+        </label>
+        <label :class="styles.field"
+          >Confirm password
+          <input
+            v-model="confirm"
+            :class="styles.input"
+            type="password"
+            autocomplete="new-password"
+            required
+            :aria-describedby="showMismatch ? confirmMessageId : undefined"
+            :aria-invalid="showMismatch ? 'true' : undefined"
+          />
+          <span v-if="showMismatch" :id="confirmMessageId" :class="styles.message" role="alert"
+            >The passwords do not match.</span
+          >
+        </label>
+        <label :class="styles.field"
+          >Email address (optional)
+          <input
+            v-model.trim="form.email"
+            :class="styles.input"
+            type="email"
+            autocomplete="email"
+          />
+        </label>
+      </template>
+
+      <template v-else-if="step === 'server'">
+        <label :class="styles.field"
+          >Server name (optional)
+          <input v-model.trim="form.server_name" :class="styles.input" />
+        </label>
+        <label :class="styles.field"
+          >Public address
+          <input
+            v-model.trim="form.public_url"
+            :class="styles.input"
+            type="url"
+            placeholder="https://pyn.example.com"
+          />
+        </label>
+      </template>
+
+      <template v-else-if="step === 'registration'">
+        <label v-for="(label, mode) in REGISTRATION_LABELS" :key="mode" :class="styles.choice"
+          ><input v-model="form.registration" type="radio" name="registration" :value="mode" />
+          {{ label }}</label
+        >
+        <p :class="styles.note">
+          Email is only written to the server log until a mail sender is configured, so verification
+          and invitation emails will not reach anyone yet.
+        </p>
+      </template>
+
+      <dl v-else :class="styles.review">
+        <dt>Administrator</dt>
+        <dd>{{ form.username }}</dd>
+        <dt>Email</dt>
+        <dd>{{ form.email || 'none' }}</dd>
+        <dt>Server name</dt>
+        <dd>{{ form.server_name || 'none' }}</dd>
+        <dt>Public address</dt>
+        <dd>{{ form.public_url || 'none' }}</dd>
+        <dt>Registration</dt>
+        <dd>{{ REGISTRATION_LABELS[form.registration] }}</dd>
+      </dl>
+
+      <div :class="styles.actions">
+        <button v-if="index > 0" type="button" :class="styles.link" @click="index -= 1">
+          Back
+        </button>
+        <button type="submit" :class="styles.primary" :disabled="busy || mismatch">
+          {{ last ? 'Finish setup' : step === 'welcome' ? 'Begin' : 'Continue' }}
+        </button>
+      </div>
+    </form>
+  </div>
 </template>

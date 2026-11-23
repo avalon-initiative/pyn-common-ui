@@ -3,7 +3,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--pyn-space-3);
+  gap: var(--pyn-space-4);
   max-width: 40rem;
 }
 
@@ -50,7 +50,7 @@
 }
 
 .remove {
-  @include m.button(var(--pyn-danger));
+  @include m.button-danger;
 }
 
 .note {
@@ -71,7 +71,7 @@
 }
 
 .count {
-  font-size: 0.8125rem;
+  @include m.help;
 }
 
 .error {
@@ -79,12 +79,7 @@
 }
 
 .success {
-  margin: 0;
-  padding: var(--pyn-space-2) var(--pyn-space-3);
-  color: var(--pyn-available);
-  background: var(--pyn-available-bg);
-  border-radius: var(--pyn-radius);
-  font-size: 0.875rem;
+  @include m.success;
 }
 
 .button {

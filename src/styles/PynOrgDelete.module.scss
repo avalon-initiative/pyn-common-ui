@@ -1,13 +1,13 @@
 @use 'mixins' as m;
 
 .form {
-  @include m.form;
-  border-color: var(--pyn-danger);
+  @include m.danger-zone;
 }
 
 .heading {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--pyn-text-md);
+  font-weight: 600;
 }
 
 .note {
@@ -20,7 +20,7 @@
 }
 
 .danger {
-  @include m.button(var(--pyn-danger));
+  @include m.button-danger;
   align-self: flex-start;
 }
 

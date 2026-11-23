@@ -11,11 +11,14 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--pyn-space-3);
+  padding-bottom: var(--pyn-space-2);
+  border-bottom: 1px solid var(--pyn-border);
 }
 
 .heading {
   margin: 0;
-  font-size: var(--pyn-text-lg);
+  font-size: var(--pyn-text-xl);
+  font-weight: 400;
 }
 
 .primary {
@@ -54,6 +57,7 @@
 
   thead th {
     color: var(--pyn-text-muted);
+    background: var(--pyn-bg-subtle);
     white-space: nowrap;
   }
 }

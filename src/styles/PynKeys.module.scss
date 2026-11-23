@@ -3,37 +3,32 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--pyn-space-3);
+  gap: var(--pyn-space-4);
 }
 
-.heading,
 .subheading {
   margin: 0;
 }
 
 .heading {
-  font-size: 1.25rem;
+  @include m.settings-title;
 }
 
 .subheading {
-  font-size: 1rem;
+  padding-bottom: var(--pyn-space-2);
+  border-bottom: 1px solid var(--pyn-border);
+  font-size: var(--pyn-text-lg);
+  font-weight: 400;
 }
 
 .note,
 .meta,
 .empty {
-  margin: 0;
-  color: var(--pyn-text-muted);
-  font-size: 0.875rem;
+  @include m.muted;
 }
 
 .list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  background: var(--pyn-surface);
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
+  @include m.list;
 }
 
 .item {
@@ -55,68 +50,28 @@
 }
 
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pyn-space-3);
-  padding: var(--pyn-space-4);
-  background: var(--pyn-surface);
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
+  @include m.form;
 }
 
 .field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pyn-space-1);
-  color: var(--pyn-text-muted);
-  font-size: 0.875rem;
+  @include m.field;
 }
 
 .input {
-  padding: var(--pyn-space-2) var(--pyn-space-3);
-  color: var(--pyn-text);
-  background: var(--pyn-bg);
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
+  @include m.input;
+  height: auto;
+  padding-block: var(--pyn-space-2);
   font-family: var(--pyn-font-mono);
-
-  @include m.focus-ring;
 }
 
 .primary {
-  align-self: flex-start;
-  padding: var(--pyn-space-2) var(--pyn-space-4);
-  color: var(--pyn-on-accent);
-  background: var(--pyn-accent-fill);
-  border: 0;
-  border-radius: var(--pyn-radius);
-  font-weight: 600;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: progress;
-  }
-
-  @include m.focus-ring;
+  @include m.button-primary;
 }
 
 .remove {
-  padding: var(--pyn-space-1) var(--pyn-space-3);
-  color: var(--pyn-danger);
-  background: none;
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
-  cursor: pointer;
-
-  @include m.focus-ring;
+  @include m.button-danger;
 }
 
 .error {
-  margin: 0;
-  padding: var(--pyn-space-2) var(--pyn-space-3);
-  color: var(--pyn-danger);
-  background: var(--pyn-danger-bg);
-  border-radius: var(--pyn-radius);
-  font-size: 0.875rem;
+  @include m.error;
 }
