@@ -6,8 +6,15 @@ import { copyText } from '../utils/copy'
 import type { CloneKind } from '../types/clone-menu.types'
 
 const props = withDefaults(
-  defineProps<{ httpsUrl: string; command: string; sshUrl?: string; label?: string }>(),
-  { label: 'Clone' },
+  defineProps<{
+    httpsUrl: string
+    command: string
+    sshUrl?: string
+    label?: string
+    /** `primary` is the filled call-to-action; `default` the neutral button. */
+    variant?: 'primary' | 'default'
+  }>(),
+  { label: 'Clone', variant: 'primary' },
 )
 const emit = defineEmits<{ copy: [kind: CloneKind] }>()
 
@@ -69,12 +76,12 @@ onBeforeUnmount(stop)
     <button
       ref="trigger"
       type="button"
-      :class="styles.trigger"
+      :class="[styles.trigger, variant === 'primary' && styles.primary]"
       aria-haspopup="dialog"
       :aria-expanded="open"
       @click="open ? close(false) : show()"
     >
-      {{ label }}<PynIcon name="chevron" :class="styles.chevron" />
+      <PynIcon name="code" />{{ label }}<PynIcon name="chevron" :class="styles.chevron" />
     </button>
     <div v-if="open" :class="styles.panel" role="dialog" :aria-label="label" @focusout="leave">
       <div v-for="row in rows" :key="row.kind" :class="styles.row">
