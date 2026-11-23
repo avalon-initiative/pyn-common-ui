@@ -171,8 +171,22 @@ describe('top bar shortcuts and explore', () => {
     expect(o.find('[data-explore]').attributes('href')).toBe('/pub')
   })
 
-  it('does not show Explore when signed in', () => {
-    expect(make().find('[data-explore]').exists()).toBe(false)
+  it('shows Explore in the signed-in wide bar and narrow menu, once', async () => {
+    const w = make({ extraLinks: [{ id: 'x', label: 'Discover', href: '/_/explore' }] })
+    expect(w.find('[data-explore]').attributes('href')).toBe('/_/explore')
+    await trigger(w, 'Main menu').trigger('click')
+    expect(w.findAll('[role=menu] a[href="/_/explore"]')).toHaveLength(1)
+    expect(
+      make({ hrefs: { explore: '/pub' } })
+        .find('[data-explore]')
+        .attributes('href'),
+    ).toBe('/pub')
+  })
+
+  it('keeps other extra links beside Explore', async () => {
+    const w = make({ extraLinks: [{ id: 'docs', label: 'Docs', href: '/docs' }] })
+    await trigger(w, 'Main menu').trigger('click')
+    expect(w.find('[role=menu] a[href="/docs"]').exists()).toBe(true)
   })
 })
 
