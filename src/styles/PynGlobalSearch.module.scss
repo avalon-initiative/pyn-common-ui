@@ -10,7 +10,7 @@
 
 .icon {
   position: absolute;
-  left: var(--pyn-space-3);
+  left: var(--pyn-space-2);
   color: var(--pyn-text-muted);
   pointer-events: none;
 }
@@ -18,9 +18,15 @@
 .input {
   @include m.input;
   width: 100%;
+  min-height: var(--pyn-control-sm);
   padding-left: var(--pyn-space-8);
   padding-right: var(--pyn-space-8);
-  background: var(--pyn-surface);
+  background: var(--pyn-bg);
+  font-size: var(--pyn-text-base);
+
+  &::placeholder {
+    color: var(--pyn-text-muted);
+  }
 
   @include m.touch-target;
 }
@@ -31,9 +37,10 @@
   padding: 0 var(--pyn-space-2);
   color: var(--pyn-text-muted);
   border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
+  border-radius: var(--pyn-radius-sm);
   font-family: var(--pyn-font-mono);
   font-size: var(--pyn-text-xs);
+  line-height: 1rem;
   pointer-events: none;
 
   @include m.narrow {

@@ -7,14 +7,13 @@
 }
 
 .title {
-  margin: 0;
-  font-size: var(--pyn-text-md);
+  @include m.side-title;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--pyn-space-4);
+  gap: var(--pyn-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -22,31 +21,30 @@
 
 .item {
   display: flex;
-  gap: var(--pyn-space-3);
+  gap: var(--pyn-space-2);
 }
 
 .avatar {
   display: grid;
   flex: none;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
+  width: 1.5rem;
+  height: 1.5rem;
   color: var(--pyn-mine);
   background: var(--pyn-mine-bg);
   border-radius: 50%;
-  font-size: var(--pyn-text-sm);
+  font-size: var(--pyn-text-xs);
   font-weight: 600;
 }
 
 .text {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--pyn-text-base);
   overflow-wrap: anywhere;
 }
 
 .path {
-  font-family: var(--pyn-font-mono);
-  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
 }
 
 .time {

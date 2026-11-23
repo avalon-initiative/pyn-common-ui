@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
+import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynDrawer.module.scss'
 import { trapTarget } from '../state/drawer.state'
 
@@ -81,7 +82,7 @@ function onKeydown(e: KeyboardEvent) {
         <header :class="styles.header">
           <h2 :id="titleId" :class="styles.title">{{ title }}</h2>
           <button type="button" :class="styles.close" aria-label="Close" @click="emit('close')">
-            ×
+            <PynIcon name="close" />
           </button>
         </header>
         <div :class="styles.body"><slot /></div>

@@ -257,8 +257,9 @@ onBeforeUnmount(() => document.removeEventListener('keydown', slash))
       <PynMenu label="Account menu" :items="account" @select="pick">
         <template #header>
           <p :class="styles.who">
-            Signed in as <template v-if="displayName">{{ displayName }} ({{ user }})</template
-            ><template v-else>{{ user }}</template>
+            Signed in as
+            <strong v-if="displayName">{{ displayName }} ({{ user }})</strong>
+            <strong v-else>{{ user }}</strong>
           </p>
         </template>
         <PynAvatar

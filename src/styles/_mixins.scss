@@ -313,3 +313,11 @@
 
   @include focus-ring;
 }
+
+// Heading of a side column block.
+@mixin side-title {
+  margin: 0;
+  font-size: var(--pyn-text-base);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
+}

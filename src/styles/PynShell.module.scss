@@ -21,8 +21,8 @@
   display: flex;
   align-items: center;
   gap: var(--pyn-space-3);
-  padding: 0 var(--pyn-space-4);
-  background: var(--pyn-surface);
+  padding: 0 var(--pyn-page-gutter);
+  background: var(--pyn-bg-subtle);
   border-bottom: 1px solid var(--pyn-border);
   position: sticky;
   top: 0;
@@ -33,7 +33,13 @@
   @include m.button;
   order: -1;
   display: none;
-  padding: var(--pyn-space-2);
+  min-width: var(--pyn-control-md);
+  padding: 0;
+  background: var(--pyn-control-bg);
+
+  &:hover {
+    background: var(--pyn-control-bg-hover);
+  }
 
   @include m.narrow {
     display: inline-flex;
@@ -55,7 +61,7 @@
     z-index: 9;
     display: none;
     width: min(var(--pyn-sidebar-width), 85vw);
-    box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.4);
+    box-shadow: var(--pyn-shadow-floating);
 
     &.open {
       display: block;
@@ -75,18 +81,8 @@
 }
 
 .crumbs {
-  position: sticky;
-  top: var(--pyn-topbar-height);
-  z-index: 5;
-  margin-top: calc(-1 * var(--pyn-space-6));
+  margin-top: calc(-1 * var(--pyn-space-2));
   margin-bottom: var(--pyn-space-4);
-  padding-top: var(--pyn-space-2);
-  background: var(--pyn-bg);
-
-  @include m.narrow {
-    margin-top: calc(-1 * var(--pyn-space-4));
-    margin-bottom: var(--pyn-space-3);
-  }
 }
 
 .content {

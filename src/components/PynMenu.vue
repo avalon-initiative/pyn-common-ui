@@ -120,6 +120,7 @@ function choose(id: string) {
           <span :class="styles.check">{{ item.checked ? '✓' : '' }}</span>{{ item.label }}
         </button>
       </template>
+      <div v-if="$slots.footer" :class="styles.footer"><slot name="footer" /></div>
     </div>
   </div>
 </template>

@@ -90,3 +90,23 @@ export function fileBody(path: string, content: FetchedContent): FileBody {
 /** What a path names in its parent folder's listing; null when it matches nothing. */
 export const entryAt = (entries: TreeEntry[], path: string): TreeEntry | null =>
   entries.find((e) => e.path === clean(path)) ?? null
+
+/** "188 B", "1.2 KB", "3.4 MB". */
+export function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  const units = ['KB', 'MB', 'GB']
+  let v = bytes / 1024
+  let i = 0
+  while (v >= 1024 && i < units.length - 1) {
+    v /= 1024
+    i++
+  }
+  return `${v < 10 ? v.toFixed(1) : Math.round(v)} ${units[i]}`
+}
+
+/** "9 lines · 188 B" for a text file. */
+export function textStats(text: string): string {
+  const lines = text === '' ? 0 : text.replace(/\n$/, '').split('\n').length
+  const size = formatSize(new TextEncoder().encode(text).length)
+  return `${lines} ${lines === 1 ? 'line' : 'lines'} · ${size}`
+}
