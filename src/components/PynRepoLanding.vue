@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import PynActivity from './PynActivity.vue'
 import PynBranchBar from './PynBranchBar.vue'
 import PynBreadcrumb from './PynBreadcrumb.vue'
+import PynCloneMenu from './PynCloneMenu.vue'
 import PynRepoBranches from './PynRepoBranches.vue'
 import PynPageColumns from './PynPageColumns.vue'
 import PynLockedFiles from './PynLockedFiles.vue'
@@ -35,13 +36,27 @@ const props = defineProps<{
   branches?: BranchSummary[]
   /** Where the rail's Branches panel links to; with `branches` it shows the panel. */
   branchesHref?: string
-  /** The clone command shown in the empty-repository setup box. */
+  /** Toolbar count for the Branches link; defaults to the length of `branches`. */
+  branchCount?: number
+  branchesLoading?: boolean
+  branchesError?: string
+  /** The clone command shown in the Clone menu and the empty-repository setup box. */
   cloneCommand?: string
+  /** HTTPS clone address; with it the toolbar shows the Clone menu. */
+  httpsUrl?: string
+  sshUrl?: string
   /** About block data; the block renders nothing without any of it. */
   about?: { description?: string | null; website?: string | null; topics?: string[] }
 }>()
 
+const emit = defineEmits<{ select: [name: string] }>()
+
 const crumbs = computed(() => breadcrumbs(props.repo, props.path, props.branch))
+const toolbarBranches = computed(() =>
+  props.branches?.length || props.branchesLoading || props.branchesError
+    ? (props.branches ?? [])
+    : undefined,
+)
 const emptyRepo = computed(
   () => !props.missing && !props.path && !!props.listing && props.listing.entries.length === 0,
 )
@@ -52,12 +67,24 @@ const emptyRepo = computed(
     <div :class="styles.main">
       <PynBranchBar
         v-if="summary"
-        :branch="summary.default_branch"
-        :files="summary.files"
-        :updated-at="summary.updated_at"
+        :branch="branch ?? summary.default_branch"
+        :branches="toolbarBranches"
+        :branches-loading="branchesLoading"
+        :branches-error="branchesError"
+        :branches-href="branchesHref"
+        :branch-count="branchCount ?? branches?.length"
         :now="now"
-      />
-      <PynBreadcrumb v-if="path" :crumbs="crumbs" />
+        @select="emit('select', $event)"
+      >
+        <PynBreadcrumb v-if="path" :crumbs="crumbs" />
+        <template v-if="httpsUrl" #actions>
+          <PynCloneMenu
+            :https-url="httpsUrl"
+            :ssh-url="sshUrl"
+            :command="cloneCommand ?? `pyn clone ${repo.owner}/${repo.name}`"
+          />
+        </template>
+      </PynBranchBar>
       <div v-if="missing" :class="styles.missing" role="alert">
         <p>
           There is no folder <code>/{{ path }}</code> in this repository.
