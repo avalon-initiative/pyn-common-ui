@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import PynIcon from './PynIcon.vue'
 import PynTabs from './PynTabs.vue'
 import styles from '../styles/PynRepoShell.module.scss'
-import { BRANCH_SECTIONS, repoPath } from '../state/repo.state'
+import { BRANCH_SECTIONS, TAB_ICONS, repoPath } from '../state/repo.state'
 import type { RepoShellTab } from '../state/repo.state'
 import type { Visibility } from '../types/repo.types'
 
@@ -27,6 +27,8 @@ const props = defineProps<{
   lockHolders?: string[]
   /** Most tabs shown before the rest move into a More menu. */
   maxTabs?: number
+  /** While the lock count loads, reserves the lock strip and the Locks tab count so the page does not shift. */
+  lockPending?: boolean
 }>()
 
 const HOLDERS_SHOWN = 3
@@ -50,6 +52,8 @@ const tabItems = computed(() =>
       count,
       countLabel: tab.countLabel ?? (tab.section === 'locks' ? `${count} locked` : undefined),
       current: isCurrent(tab.section),
+      icon: tab.icon ?? TAB_ICONS[tab.section],
+      reserveCount: tab.section === 'locks' && props.lockPending,
     }
   }),
 )
@@ -62,7 +66,8 @@ const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.v
     <header :class="styles.header">
       <div :class="styles.top">
         <component :is="hidePath ? 'div' : 'h1'" :class="styles.title">
-          <nav v-if="!hidePath" aria-label="Repository path">
+          <nav v-if="!hidePath" :class="styles.path" aria-label="Repository path">
+            <PynIcon name="repo" :class="styles.repoIcon" />
             <a :href="ownerHref ?? `/${encodeURIComponent(owner)}`" :class="styles.owner">{{
               owner
             }}</a>
@@ -73,13 +78,21 @@ const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.v
             visibility === 'public' ? 'Public' : 'Private'
           }}</span>
         </component>
-        <div v-if="$slots.actions" :class="styles.actions"><slot name="actions" /></div>
+        <div
+          v-if="$slots.watch || $slots.fork || $slots.star || $slots.actions"
+          :class="styles.actions"
+        >
+          <slot name="watch" />
+          <slot name="fork" />
+          <slot name="star" />
+          <slot name="actions" />
+        </div>
       </div>
       <PynTabs v-if="tabs" :items="tabItems" label="Repository" :max="maxTabs" />
     </header>
     <p v-if="lockedCount" :class="styles.strip" data-lock-strip>
       <PynIcon name="lock" :class="styles.stripIcon" />
-      <span
+      <span :class="styles.stripText"
         >{{ lockedCount }} exclusive {{ lockedCount === 1 ? 'file' : 'files' }} locked now<template
           v-if="holders.length"
         >
@@ -88,6 +101,14 @@ const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.v
         ></span
       >
       <a :href="repoPath({ owner, name }, 'locks')" :class="styles.stripLink">View locks</a>
+    </p>
+    <p
+      v-else-if="lockPending"
+      :class="[styles.strip, styles.pending]"
+      aria-hidden="true"
+      data-lock-pending
+    >
+      &nbsp;
     </p>
     <div :class="styles.body"><slot /></div>
   </div>

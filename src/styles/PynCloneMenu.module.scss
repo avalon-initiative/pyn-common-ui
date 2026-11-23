@@ -10,8 +10,23 @@
   gap: var(--pyn-space-2);
 }
 
+.primary {
+  @include m.button-primary;
+  align-self: auto;
+  padding-inline: var(--pyn-space-3);
+  font-weight: 500;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
 .chevron {
   color: var(--pyn-text-muted);
+
+  .primary & {
+    color: inherit;
+  }
 }
 
 .panel {

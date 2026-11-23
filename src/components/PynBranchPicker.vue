@@ -11,6 +11,8 @@ const props = defineProps<{
   current: string
   loading?: boolean
   error?: string
+  /** Adds a "View all branches" link at the foot of the panel. */
+  allHref?: string
   now?: Date
 }>()
 const emit = defineEmits<{ select: [name: string] }>()
@@ -71,8 +73,10 @@ function key(e: KeyboardEvent) {
     const b = shown.value[active.value]
     if (ready.value && b) choose(b.name)
   } else if (e.key === 'Escape') close(true)
-  else if (e.key === 'Tab') close(false)
-  else return
+  else if (e.key === 'Tab') {
+    if (props.allHref && !e.shiftKey) return
+    close(false)
+  } else return
   e.preventDefault()
 }
 
@@ -86,6 +90,10 @@ function triggerKey(e: KeyboardEvent) {
 const away = (e: Event) => {
   if (root.value && !root.value.contains(e.target as Node)) close(false)
 }
+function leave(e: FocusEvent) {
+  const next = e.relatedTarget as Node | null
+  if (next && root.value && !root.value.contains(next)) close(false)
+}
 watch(open, (o) => {
   if (o) document.addEventListener('click', away)
   else document.removeEventListener('click', away)
@@ -95,7 +103,7 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
 </script>
 
 <template>
-  <div ref="root" :class="styles.picker">
+  <div ref="root" :class="styles.picker" @focusout="leave">
     <button
       ref="trigger"
       type="button"
@@ -111,22 +119,36 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
       <span :class="styles.name" :title="current">{{ current }}</span>
       <PynIcon name="chevron" :class="styles.icon" />
     </button>
-    <div v-if="open" :class="styles.panel">
-      <input
-        ref="search"
-        v-model="query"
-        :class="styles.search"
-        type="text"
-        role="combobox"
-        aria-label="Find a branch"
-        aria-autocomplete="list"
-        aria-expanded="true"
-        :aria-controls="listId"
-        :aria-activedescendant="activeId"
-        autocomplete="off"
-        placeholder="Find a branch"
-        @keydown="key"
-      />
+    <div v-if="open" :class="styles.panel" role="group" :aria-labelledby="`${id}-title`">
+      <div :class="styles.head">
+        <h3 :id="`${id}-title`" :class="styles.title">Switch branches</h3>
+        <button
+          type="button"
+          :class="styles.close"
+          aria-label="Close"
+          tabindex="-1"
+          @click="close(true)"
+        >
+          <PynIcon name="close" />
+        </button>
+      </div>
+      <div :class="styles.filter">
+        <input
+          ref="search"
+          v-model="query"
+          :class="styles.search"
+          type="text"
+          role="combobox"
+          aria-label="Find a branch"
+          aria-autocomplete="list"
+          aria-expanded="true"
+          :aria-controls="listId"
+          :aria-activedescendant="activeId"
+          autocomplete="off"
+          placeholder="Filter branches"
+          @keydown="key"
+        />
+      </div>
       <p v-if="loading" :class="styles.note" role="status">Loading branches…</p>
       <p v-else-if="error" :class="styles.error" role="alert">{{ error }}</p>
       <template v-else>
@@ -145,6 +167,8 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
             @click="choose(b.name)"
             @mousemove="active = i"
           >
+            <PynIcon v-if="b.name === current" name="check" :class="styles.check" />
+            <span v-else :class="styles.check" />
             <span :class="styles.optionName">{{ b.name }}</span>
             <span v-if="b.isDefault" :class="styles.pill">default</span>
             <span v-if="b.updatedAt" :class="styles.when" :title="formatDateTime(b.updatedAt)">{{
@@ -155,6 +179,7 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
         <p v-if="!shown.length" :class="styles.note" role="status">No matching branches</p>
         <p v-else-if="branches.length === 1" :class="styles.note">Only the default branch exists</p>
       </template>
+      <a v-if="allHref" :href="allHref" :class="styles.all">View all branches</a>
     </div>
   </div>
 </template>

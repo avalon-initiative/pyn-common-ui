@@ -13,13 +13,12 @@
 }
 
 .title {
-  margin: 0;
-  font-size: var(--pyn-text-md);
+  @include m.side-title;
 }
 
 .more {
   color: var(--pyn-accent);
-  font-size: var(--pyn-text-sm);
+  font-size: var(--pyn-text-xs);
   text-decoration: none;
 
   &:hover {
@@ -41,8 +40,9 @@
 .item {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: var(--pyn-space-1) var(--pyn-space-3);
+  gap: var(--pyn-space-1) var(--pyn-space-2);
   align-items: start;
+  font-size: var(--pyn-text-base);
 
   > :last-child {
     grid-column: 2;
@@ -51,15 +51,13 @@
 }
 
 .icon {
-  width: 1.125rem;
-  height: 1.125rem;
+  width: 1rem;
+  height: 1rem;
   margin-top: 0.125rem;
   color: var(--pyn-text-muted);
 }
 
 .path {
-  font-family: var(--pyn-font-mono);
-  font-size: 0.8125rem;
   overflow-wrap: anywhere;
 }
 

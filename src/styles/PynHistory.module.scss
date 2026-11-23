@@ -39,25 +39,32 @@
 }
 
 .main {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
 .rev {
-  font-weight: 600;
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+  font-weight: 500;
 }
 
 .path {
   font-family: var(--pyn-font-mono);
-  font-size: 0.875rem;
+  font-size: var(--pyn-text-xs);
 }
 
 .revPath {
   margin-left: var(--pyn-space-2);
+  color: var(--pyn-text-muted);
 }
 
 .message {
-  color: var(--pyn-text-muted);
+  order: -1;
+  color: var(--pyn-text);
+  font-weight: 600;
 }
 
 .body {
@@ -76,16 +83,45 @@
   color: var(--pyn-text-muted);
 }
 
+.box {
+  overflow: hidden;
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.head {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  min-height: var(--pyn-control-lg);
+  padding: 0 var(--pyn-space-4);
+  background: var(--pyn-bg-subtle);
+  border-bottom: 1px solid var(--pyn-border);
+  font-size: var(--pyn-text-base);
+  font-weight: 600;
+}
+
 .list {
-  @include m.list;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .item {
   @include m.item;
+  align-items: flex-start;
+  padding-block: var(--pyn-space-2);
+  font-size: var(--pyn-text-base);
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
 }
 
 .meta {
   @include m.muted;
+  font-size: var(--pyn-text-xs);
   white-space: nowrap;
 }
 
@@ -95,6 +131,7 @@
 
 .pill {
   @include m.pill;
+  margin-left: var(--pyn-space-2);
 }
 
 .error {

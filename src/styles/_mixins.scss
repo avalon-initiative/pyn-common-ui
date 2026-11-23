@@ -373,3 +373,11 @@
   border-color: color-mix(in srgb, #{$color} 40%, transparent);
   white-space: nowrap;
 }
+
+// Heading of a side column block.
+@mixin side-title {
+  margin: 0;
+  font-size: var(--pyn-text-base);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
+}

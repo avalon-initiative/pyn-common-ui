@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynRepoDetails.module.scss'
 import { formatDate, formatDateTime } from '../utils/datetime'
 import { formatAgo } from '../utils/ago'
@@ -19,26 +20,31 @@ defineProps<{
 
 <template>
   <section :class="styles.card" aria-labelledby="details-title">
-    <h2 id="details-title" :class="styles.title">Repository details</h2>
-    <dl :class="styles.list">
-      <dt>Owner</dt>
-      <dd>{{ owner }}</dd>
-      <dt>Visibility</dt>
-      <dd :class="styles.cap">{{ visibility }}</dd>
-      <dt>Lease</dt>
-      <dd>{{ leaseHours }} hours</dd>
-      <dt>Created</dt>
-      <dd>{{ formatDate(createdAt) }}</dd>
-      <dt>Last revision</dt>
-      <dd :title="updatedAt ? formatDateTime(updatedAt) : undefined">
-        {{ updatedAt ? formatAgo(updatedAt, now ?? new Date()) : 'None yet' }}
-      </dd>
-      <dt>Files</dt>
-      <dd>{{ files }}</dd>
-      <dt>Exclusive</dt>
-      <dd>{{ exclusiveFiles }}</dd>
-      <dt>Shared</dt>
-      <dd>{{ sharedFiles }}</dd>
-    </dl>
+    <h2 id="details-title" :class="styles.hidden">Repository details</h2>
+    <ul :class="styles.list">
+      <li><PynIcon name="user" /><strong>Owner</strong> {{ owner }}</li>
+      <li :class="styles.cap">
+        <PynIcon name="eye" /><strong>{{ visibility }}</strong>
+      </li>
+      <li>
+        <PynIcon name="file" /><strong>{{ files }}</strong> files
+      </li>
+      <li>
+        <PynIcon name="lock" /><strong>{{ exclusiveFiles }}</strong> exclusive
+      </li>
+      <li>
+        <PynIcon name="repo" /><strong>{{ sharedFiles }}</strong> shared
+      </li>
+      <li>
+        <PynIcon name="key" /><strong>{{ leaseHours }} hours</strong> lease
+      </li>
+      <li :title="updatedAt ? formatDateTime(updatedAt) : undefined">
+        <PynIcon name="history" />Last revision
+        <strong>{{ updatedAt ? formatAgo(updatedAt, now ?? new Date()) : 'none yet' }}</strong>
+      </li>
+      <li>
+        <PynIcon name="list" />Created <strong>{{ formatDate(createdAt) }}</strong>
+      </li>
+    </ul>
   </section>
 </template>

@@ -2,7 +2,6 @@
 
 .header {
   margin-bottom: var(--pyn-space-4);
-  border-bottom: 1px solid var(--pyn-border);
 }
 
 .top {
@@ -11,7 +10,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--pyn-space-3);
-  padding-bottom: var(--pyn-space-3);
+  padding-block: var(--pyn-space-4);
 }
 
 .title {
@@ -23,11 +22,24 @@
   margin: 0;
   font-size: var(--pyn-text-lg);
   font-weight: 400;
+  line-height: var(--pyn-leading-tight);
   overflow-wrap: anywhere;
+}
+
+.path {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-1);
+}
+
+.repoIcon {
+  margin-right: var(--pyn-space-1);
+  color: var(--pyn-text-muted);
 }
 
 .owner,
 .name {
+  color: var(--pyn-accent);
   text-decoration: none;
 
   &:hover {
@@ -37,22 +49,17 @@
   @include m.focus-ring;
 }
 
-.owner {
-  color: var(--pyn-text-muted);
-}
-
 .name {
-  color: var(--pyn-text);
   font-weight: 600;
 }
 
 .sep {
-  margin: 0 var(--pyn-space-1);
   color: var(--pyn-text-muted);
 }
 
 .badge {
   @include m.pill;
+  align-self: center;
   line-height: 1.25rem;
 }
 
@@ -65,7 +72,6 @@
 
 .strip {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: var(--pyn-space-2);
   margin: 0 0 var(--pyn-space-4);
@@ -74,13 +80,28 @@
   background: var(--pyn-locked-bg);
   border-radius: var(--pyn-radius);
   font-size: var(--pyn-text-sm);
+  line-height: 1.25rem;
+}
+
+.pending {
+  visibility: hidden;
 }
 
 .stripIcon {
   flex: none;
 }
 
+// One line at any width so the reserved strip matches the loaded one.
+.stripText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .stripLink {
+  flex: none;
   margin-left: auto;
   color: var(--pyn-accent);
   text-decoration: none;

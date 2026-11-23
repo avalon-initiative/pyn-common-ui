@@ -1,5 +1,6 @@
 import { repoPath } from './repo.state'
-import type { ActivityEntry, Crumb } from '../types/tree.types'
+import type { Revision } from '../types/repo.types'
+import type { ActivityEntry, Crumb, TreeEntry } from '../types/tree.types'
 
 type Repo = { owner: string; name: string }
 
@@ -42,3 +43,19 @@ const VERBS: Record<string, string> = {
 }
 
 export const activityVerb = (e: ActivityEntry) => VERBS[e.action] ?? e.action
+
+/** Folders before files, each group keeping the server's order. */
+export const foldersFirst = (entries: TreeEntry[]): TreeEntry[] => [
+  ...entries.filter((e) => e.kind === 'folder'),
+  ...entries.filter((e) => e.kind !== 'folder'),
+]
+
+/** The newest last change among the entries. */
+export function latestChange(entries: TreeEntry[]): Revision | null {
+  let best: Revision | null = null
+  for (const e of entries) {
+    const c = e.last_change
+    if (c && (!best || c.created_at > best.created_at)) best = c
+  }
+  return best
+}

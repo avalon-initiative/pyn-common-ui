@@ -1,15 +1,19 @@
 @use 'mixins' as m;
 
 .card {
-  @include m.flat-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
 }
 
 .title {
-  @include m.list-header;
-  margin: 0;
+  @include m.side-title;
 }
 
 .list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -17,38 +21,30 @@
 
 .item {
   display: flex;
-  align-items: flex-start;
-  gap: var(--pyn-space-3);
-  padding: var(--pyn-space-3) var(--pyn-space-4);
-
-  & + & {
-    border-top: 1px solid var(--pyn-border);
-  }
+  gap: var(--pyn-space-2);
 }
 
 .avatar {
   display: grid;
   flex: none;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
+  width: 1.5rem;
+  height: 1.5rem;
   color: var(--pyn-mine);
   background: var(--pyn-mine-bg);
   border-radius: 50%;
-  font-size: var(--pyn-text-sm);
+  font-size: var(--pyn-text-xs);
   font-weight: 600;
 }
 
 .text {
   margin: 0;
   font-size: var(--pyn-text-base);
-  line-height: 1.25rem;
   overflow-wrap: anywhere;
 }
 
 .path {
-  font-family: var(--pyn-font-mono);
-  font-size: var(--pyn-text-sm);
+  overflow-wrap: anywhere;
 }
 
 .time {
@@ -58,5 +54,4 @@
 
 .empty {
   @include m.muted;
-  padding: var(--pyn-space-4);
 }
