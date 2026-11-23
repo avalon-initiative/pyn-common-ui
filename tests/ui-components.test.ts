@@ -25,6 +25,7 @@ import {
   PynBranchCompare,
   PynBranchPicker,
   PynBreadcrumb,
+  PynCloneMenu,
   PynBreadcrumbs,
   PynButton,
   PynCheckoutCard,
@@ -1311,6 +1312,65 @@ describe('PynRepoLanding', () => {
     expect(w.text()).toContain('Locked files')
     expect(w.text()).toContain('Recent activity')
     expect(w.text()).toContain('main')
+  })
+
+  describe('toolbar', () => {
+    const branches = [
+      { name: 'main', isDefault: true },
+      { name: 'dev', updatedAt: '2026-10-05T09:30:00Z' },
+    ]
+    const bar = (w: ReturnType<typeof landing>) => w.findComponent(PynBranchBar)
+
+    it('passes branches, link and count to the bar and drops files and updated text', () => {
+      const w = landing({ branches, branchesHref: '/acme/castle-quest/branches' })
+      expect(bar(w).props('branches')).toEqual(branches)
+      expect(bar(w).props('branchCount')).toBe(2)
+      expect(bar(w).props('branchesHref')).toBe('/acme/castle-quest/branches')
+      expect(bar(w).props('files')).toBeUndefined()
+      expect(bar(w).text()).not.toContain('Last revision')
+      expect(w.find('[data-branches-link]').text()).toContain('2 Branches')
+    })
+
+    it('lets branchCount override and relays select', async () => {
+      const w = landing({ branches, branchCount: 7 })
+      expect(bar(w).props('branchCount')).toBe(7)
+      bar(w).vm.$emit('select', 'dev')
+      expect(w.emitted('select')).toEqual([['dev']])
+    })
+
+    it('shows the current branch when it is not the default', () => {
+      expect(bar(landing({ branch: 'dev' })).props('branch')).toBe('dev')
+      expect(bar(landing()).props('branch')).toBe('main')
+    })
+
+    it('keeps a static label without branches and hands loading and error through', () => {
+      expect(bar(landing()).props('branches')).toBeUndefined()
+      expect(bar(landing({ branchesLoading: true })).props('branchesLoading')).toBe(true)
+      const err = landing({ branchesError: 'nope' })
+      expect(bar(err).props('branches')).toEqual([])
+      expect(bar(err).props('branchesError')).toBe('nope')
+    })
+
+    it('puts the breadcrumb in the bar only inside a folder', () => {
+      expect(bar(landing()).findComponent(PynBreadcrumb).exists()).toBe(false)
+      const w = landing({ path: 'Content/Levels', listing: folderListing })
+      expect(bar(w).findComponent(PynBreadcrumb).exists()).toBe(true)
+      expect(w.findAllComponents(PynBreadcrumb)).toHaveLength(1)
+    })
+
+    it('shows the Clone menu only with httpsUrl and falls back to a derived command', () => {
+      expect(landing().findComponent(PynCloneMenu).exists()).toBe(false)
+      const w = landing({ httpsUrl: 'https://x.example/acme/castle-quest.pyn', sshUrl: 'ssh://x' })
+      const menu = bar(w).findComponent(PynCloneMenu)
+      expect(menu.props('command')).toBe('pyn clone acme/castle-quest')
+      expect(menu.props('sshUrl')).toBe('ssh://x')
+      const own = landing({ httpsUrl: 'https://x', cloneCommand: 'pyn clone me/x' })
+      expect(own.findComponent(PynCloneMenu).props('command')).toBe('pyn clone me/x')
+    })
+
+    it('renders no toolbar while the summary is loading', () => {
+      expect(bar(landing({ summary: null, listing: null })).exists()).toBe(false)
+    })
   })
 
   it('renders About only with data', () => {
