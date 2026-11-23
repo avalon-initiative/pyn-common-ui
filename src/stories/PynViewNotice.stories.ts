@@ -18,3 +18,5 @@ type Story = StoryObj<typeof PynViewNotice>
 export const Warning: Story = {}
 export const Info: Story = { args: { tone: 'info', title: 'Invitations are on' } }
 export const WithoutTitle: Story = { args: { title: undefined } }
+export const Dismissible: Story = { args: { dismissible: true } }
+export const DismissibleStays: Story = { args: { dismissible: true, persistent: true } }

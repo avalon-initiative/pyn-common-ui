@@ -32,6 +32,10 @@ export const OnAnotherBranch: Story = {
   args: { current: 'feature/rig-update' },
   play: ({ canvasElement }) => open(canvasElement),
 }
+export const LongBranchName: Story = {
+  args: { current: 'feature/a-very-long-branch-name-that-keeps-going-and-going' },
+}
+
 export const Loading: Story = {
   args: { loading: true },
   play: ({ canvasElement }) => open(canvasElement),
@@ -54,4 +58,19 @@ export const WithBranchBar: Story = {
       <PynBranchBar :branch="args.current" :files="128" updated-at="2026-10-08T10:00:00Z" :now="args.now" />
     </div>`,
   }),
+}
+
+const toolbar = (args: object) => ({
+  components: { PynBranchBar, PynBranchPicker },
+  setup: () => ({ args }),
+  template: `<div style="display: flex; align-items: center; gap: 1rem">
+    <PynBranchPicker v-bind="args" />
+    <span data-neighbour>128 files</span>
+  </div>`,
+})
+
+export const InToolbar: Story = { render: toolbar }
+export const InToolbarLongName: Story = {
+  args: { current: 'feature/a-very-long-branch-name-that-keeps-going-and-going' },
+  render: toolbar,
 }

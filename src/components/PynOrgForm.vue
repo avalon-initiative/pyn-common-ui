@@ -6,6 +6,8 @@ const props = defineProps<{
   busy?: boolean
   error?: string
   nameMessage?: string
+  /** The name as it will be stored; shown as a preview hint. */
+  nameCanonical?: string
   /** Shows a secondary action next to the submit button: a link with `cancelHref`, else a button. */
   cancelHref?: string
   /** Defaults to "Cancel" when `cancelHref` is set. */
@@ -20,7 +22,13 @@ const emit = defineEmits<{
 const name = ref('')
 const id = useId()
 const describedBy = computed(() =>
-  [`${id}-hint`, props.nameMessage ? `${id}-message` : ''].filter(Boolean).join(' '),
+  [
+    `${id}-hint`,
+    props.nameCanonical ? `${id}-canonical` : '',
+    props.nameMessage ? `${id}-message` : '',
+  ]
+    .filter(Boolean)
+    .join(' '),
 )
 </script>
 
@@ -41,8 +49,11 @@ const describedBy = computed(() =>
         @input="emit('nameInput', name.trim())"
       />
       <span :id="`${id}-hint`" :class="styles.hint"
-        >2 to 39 lowercase letters, digits, "-" or "_". It shares its namespace with user
-        names.</span
+        >2 to 39 letters, digits, "-" or "_". Spaces become "-" and case is ignored. It shares its
+        namespace with user names.</span
+      >
+      <span v-if="nameCanonical" :id="`${id}-canonical`" :class="styles.hint" data-canonical
+        >Will be created as: {{ nameCanonical }}</span
       >
       <span v-if="nameMessage" :id="`${id}-message`" :class="styles.message">{{
         nameMessage

@@ -13,6 +13,10 @@
   @include m.muted;
 }
 
+.hint {
+  @include m.muted;
+}
+
 .name {
   color: var(--pyn-text);
 }

@@ -1,11 +1,30 @@
 .notice {
   display: flex;
-  flex-direction: column;
-  gap: var(--pyn-space-1);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+  transition: opacity 0.4s ease;
   padding: var(--pyn-space-3) var(--pyn-space-4);
   color: var(--pyn-text);
   border: 1px solid var(--pyn-border);
   border-radius: var(--pyn-radius);
+}
+
+.fading {
+  opacity: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notice {
+    transition: none;
+  }
 }
 
 .warning {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import styles from '../styles/PynUsernameChange.module.scss'
 import { usernameProblem } from '../state/account-settings.state'
 import type { RenameForm } from '../types/account.types'
@@ -13,11 +13,14 @@ const props = withDefaults(
     repositories?: string[]
     busy?: boolean
     error?: string
+    /** The new name as it will be stored; shown as a preview hint. */
+    nameCanonical?: string
   }>(),
   { hasPassword: true },
 )
-const emit = defineEmits<{ rename: [RenameForm] }>()
+const emit = defineEmits<{ rename: [RenameForm]; nameInput: [name: string] }>()
 
+const canonicalId = useId()
 const next = ref('')
 const password = ref('')
 const understood = ref(false)
@@ -72,7 +75,12 @@ function submit() {
         spellcheck="false"
         required
         :disabled="busy"
+        :aria-describedby="nameCanonical ? canonicalId : undefined"
+        @input="emit('nameInput', next.trim())"
       />
+      <span v-if="nameCanonical" :id="canonicalId" :class="styles.hint" data-canonical
+        >Will be renamed to: {{ nameCanonical }}</span
+      >
     </label>
     <label v-if="hasPassword" :class="styles.field"
       >Confirm with your password
