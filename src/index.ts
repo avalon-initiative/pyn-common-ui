@@ -587,3 +587,29 @@ export {
   lockViews,
 } from './state/locks-page.state'
 export type { LockListItem, LockRowState, LockView } from './types/lock.types'
+export { default as PynDiffFile } from './components/PynDiffFile.vue'
+export { default as PynDiffStat } from './components/PynDiffStat.vue'
+export { default as PynDiffView } from './components/PynDiffView.vue'
+export {
+  diffAnchor,
+  diffTotals,
+  diffTreeEntries,
+  filterDiffFiles,
+  locksHeldByOthers,
+  markedLines,
+  segments,
+  splitRows,
+  statSquares,
+  wordMarks,
+} from './state/diff.state'
+export type {
+  DiffExpand,
+  DiffFile,
+  DiffFileStatus,
+  DiffHunk,
+  DiffLayout,
+  DiffLine,
+  DiffLineKind,
+  ExpandDirection,
+  SplitRow,
+} from './types/diff.types'
