@@ -33,6 +33,7 @@ defineEmits<{ select: [name: string]; goToFile: [] }>()
   <div :class="styles.bar">
     <PynBranchPicker
       v-if="branches"
+      :class="styles.picker"
       :branches="branches"
       :current="branch"
       :loading="branchesLoading"

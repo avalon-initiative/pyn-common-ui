@@ -110,6 +110,11 @@ export const ToolbarBranchesError: Story = {
   args: { ...toolbarArgs, branches: undefined, branchesError: 'Could not load branches.' },
 }
 
+/** The toolbar keeps the Branches link and the picker's View all; the rail panel is hidden. */
+export const HiddenRailBranches: Story = {
+  args: { ...toolbarArgs, goToFile: true, hideRailBranches: true },
+}
+
 /** The whole repository page: toolbar, file table, README tabs and the About rail. */
 export const FullPage: Story = {
   args: {

@@ -12,6 +12,14 @@ export default meta
 type Story = StoryObj<typeof PynActivity>
 
 export const Default: Story = {}
+const nine = Array.from({ length: 9 }, (_, i) => ({
+  ...summary.activity[i % summary.activity.length]!,
+  id: i + 1,
+}))
+
+/** Nine entries, five shown by default. */
+export const Capped: Story = { args: { entries: nine } }
+export const MaxTwo: Story = { args: { entries: nine, max: 2 } }
 export const Empty: Story = { args: { entries: [] } }
 export const WithIdentities: Story = {
   args: {
