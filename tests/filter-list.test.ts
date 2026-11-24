@@ -48,6 +48,30 @@ describe('PynFilterList', () => {
     expect(w.find('nav[aria-label=Pagination]').exists()).toBe(false)
   })
 
+  it('puts the count, selects and search in one row under the tabs with bar inside', () => {
+    const w = mount(PynFilterList, {
+      props: { count: 2, noun: 'team', controls, bar: 'inside' },
+      slots: { default: rows, tabs: '<button data-tab>Direct</button>' },
+    })
+    const box = w.find('section')
+    const kids = box.findAll(':scope > *').map((e) => e.classes()[0])
+    expect(kids).toHaveLength(3)
+    expect(box.find(':scope > div:first-child [data-tab]').exists()).toBe(true)
+    const bar = w.find('[data-count]')
+    expect(bar.text()).toContain('2 teams')
+    expect(bar.find('select').exists()).toBe(true)
+    expect(bar.find('input[type=search]').exists()).toBe(true)
+    expect(w.findAll('[data-count]')).toHaveLength(1)
+  })
+
+  it('keeps the tabs slot out of the above bar', () => {
+    const w = mount(PynFilterList, {
+      props: { count: 2 },
+      slots: { default: rows, tabs: '<button data-tab>Direct</button>' },
+    })
+    expect(w.find('[data-tab]').exists()).toBe(false)
+  })
+
   it('emits query, control and page changes', async () => {
     const w = mount(PynFilterList, {
       props: { count: 90, pageSize: 30, page: 2, controls },

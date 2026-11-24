@@ -32,8 +32,11 @@ const props = withDefaults(
     emptyDescription?: string
     /** Accessible name of the list. */
     label?: string
+    /** `inside` puts the count, selects and search in one row inside the box, under the `tabs` slot. */
+    bar?: 'above' | 'inside'
   }>(),
   {
+    bar: 'above',
     noun: 'result',
     page: 1,
     pageSize: 30,
@@ -51,6 +54,7 @@ const emit = defineEmits<{
 const pages = computed(() => pageCount(props.count, props.pageSize))
 const numbers = computed(() => pageWindow(props.page, pages.value))
 const isFiltered = computed(() => props.filtered ?? query.value.trim() !== '')
+const inside = computed(() => props.bar === 'inside')
 const heading = computed(() => rowCountText(props.count, props.noun, props.plural))
 const go = (p: number) => {
   if (p >= 1 && p <= pages.value && p !== props.page) emit('update:page', p)
@@ -58,8 +62,10 @@ const go = (p: number) => {
 </script>
 
 <template>
-  <section :class="styles.list">
-    <div :class="styles.bar">
+  <section :class="[styles.list, inside && styles.inside]">
+    <div v-if="$slots.tabs && inside" :class="styles.tabs"><slot name="tabs" /></div>
+    <div :class="styles.bar" :data-count="inside ? '' : undefined">
+      <span v-if="inside" :class="styles.heading" aria-live="polite">{{ heading }}</span>
       <div :class="styles.search" role="search">
         <PynIcon name="search" :class="styles.icon" />
         <input
@@ -83,8 +89,12 @@ const go = (p: number) => {
       <div v-if="$slots.actions" :class="styles.actions"><slot name="actions" /></div>
     </div>
     <div :class="styles.box">
-      <div :class="styles.header" data-count>
-        <span :class="styles.heading" aria-live="polite">{{ heading }}</span>
+      <div
+        v-if="!inside || $slots.header"
+        :class="styles.header"
+        :data-count="inside ? undefined : ''"
+      >
+        <span v-if="!inside" :class="styles.heading" aria-live="polite">{{ heading }}</span>
         <div v-if="$slots.header" :class="styles.tools"><slot name="header" /></div>
       </div>
       <PynLoading v-if="loading" variant="block" :class="styles.state" />

@@ -85,3 +85,19 @@ export const NoMatch = staticStory({ count: 0, filtered: true })
 export const Unsupported = staticStory({ count: 0, emptyKind: 'unsupported' })
 export const Loading = staticStory({ count: 0, loading: true })
 export const ErrorState = staticStory({ count: 0, error: 'Could not load repositories.' })
+
+export const InsideBar: Story = {
+  args: { controls: [typeControl(), sortControl()], count: 3, bar: 'inside' },
+  render: (a) => ({
+    components: { PynFilterList },
+    setup: () => ({ a, pageRows: rows.slice(0, 3) }),
+    template: `<PynFilterList v-bind="a">
+      <template #tabs>
+        <div style="display: flex; gap: 1rem; padding: 0.75rem 1rem">
+          <strong>Direct access</strong><span>Organization access</span>
+        </div>
+      </template>
+      ${rowsTemplate}
+    </PynFilterList>`,
+  }),
+}

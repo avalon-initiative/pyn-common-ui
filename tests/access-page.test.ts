@@ -32,6 +32,13 @@ describe('access page state', () => {
 })
 
 describe('PynAccessPage', () => {
+  it('keeps the tabs and filters inside the list box', () => {
+    const w = make()
+    const list = w.find('section[role=tabpanel]')
+    expect(list.find('[role=tablist]').exists()).toBe(true)
+    expect(list.find('[data-count] select').exists()).toBe(true)
+    expect(list.find('[data-count] input[type=search]').exists()).toBe(true)
+  })
   it('shows the visibility row and the three cards', () => {
     const w = make({
       canManageVisibility: true,
