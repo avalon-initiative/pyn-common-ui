@@ -62,7 +62,13 @@ export const Personal: Story = {
     ],
   },
 }
+export const PersonalBulk: Story = { args: { ...Personal.args, bulk: true } }
+export const BulkInRepository: Story = { args: { bulk: true, canForce: true } }
 export const Mobile: Story = {
   args: { canForce: true },
+  parameters: { viewport: { defaultViewport: 'mobile1' } },
+}
+export const PersonalMobile: Story = {
+  args: { ...Personal.args, bulk: true },
   parameters: { viewport: { defaultViewport: 'mobile1' } },
 }
