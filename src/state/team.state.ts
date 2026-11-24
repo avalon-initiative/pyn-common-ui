@@ -41,3 +41,12 @@ export const splitRepo = (repo: string): { owner: string; name: string } => {
   const [owner, ...rest] = repo.split('/')
   return { owner, name: rest.join('/') }
 }
+
+/** Members whose name contains `query`, case-insensitively. */
+export const matchingMembers = (members: string[], query: string): string[] => {
+  const q = query.trim().toLowerCase()
+  return q ? members.filter((u) => u.toLowerCase().includes(q)) : members
+}
+
+export const toggleMember = (chosen: string[], user: string): string[] =>
+  chosen.includes(user) ? chosen.filter((u) => u !== user) : [...chosen, user]

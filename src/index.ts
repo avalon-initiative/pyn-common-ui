@@ -403,6 +403,8 @@ export {
   personGrantees,
   sourceNote,
   splitRepo,
+  matchingMembers,
+  toggleMember,
   teamCandidates,
   teamGrantees,
   teamPath,
