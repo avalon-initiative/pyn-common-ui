@@ -126,3 +126,67 @@ describe('PynLocksPage', () => {
     expect(make({ error: 'boom' }).find('[role=alert]').text()).toBe('boom')
   })
 })
+
+describe('bulk release', () => {
+  const mineRow = (name: string, path: string) =>
+    lockRowFromMine(
+      {
+        owner: 'o',
+        name,
+        path,
+        acquired_at: '2026-11-22T10:00:00Z',
+        expires_at: '2026-11-22T14:00:00Z',
+      },
+      'alice',
+    )
+  const personal = [mineRow('n', 'a.psd'), mineRow('m', 'b.psd')]
+
+  it('has no checkboxes or bulk buttons without bulk', () => {
+    const w = make()
+    expect(w.find('input[type=checkbox]').exists()).toBe(false)
+    expect(w.text()).not.toContain('Release all')
+  })
+
+  it('selects only the viewer own locks and releases the selection', async () => {
+    const w = make({ bulk: true })
+    expect(w.findAll('tbody input[type=checkbox]')).toHaveLength(1)
+    const selected = w.findAll('button').find((b) => b.text() === 'Release selected')!
+    expect(selected.text()).toBe('Release selected')
+    expect(selected.attributes('disabled')).toBeDefined()
+    await w.find('input[aria-label="Select Content/Maps/Main.umap"]').setValue(true)
+    expect(w.text()).toContain('1 selected')
+    await selected.trigger('click')
+    expect(w.emitted('releaseMany')![0][0]).toEqual([
+      expect.objectContaining({ path: 'Content/Maps/Main.umap' }),
+    ])
+    expect(w.text()).toContain('0 selected')
+  })
+
+  it('select-all picks every own row; Release all ignores the selection', async () => {
+    const w = make({ bulk: true, locks: personal })
+    await w.find('input[aria-label="Select all of your locks"]').setValue(true)
+    expect(w.text()).toContain('2 selected')
+    await w.find('input[aria-label="Select all of your locks"]').setValue(false)
+    expect(w.text()).toContain('0 selected')
+    const all = w.findAll('button').find((b) => b.text() === 'Release all')!
+    await all.trigger('click')
+    expect(w.emitted('releaseMany')![0][0]).toHaveLength(2)
+  })
+
+  it('disables the bulk buttons while busy', () => {
+    const w = make({ bulk: true, locks: personal, busy: true })
+    expect(
+      w
+        .findAll('button')
+        .find((b) => b.text() === 'Release all')!
+        .attributes('disabled'),
+    ).toBeDefined()
+  })
+
+  it('names the repository under the path for narrow rows', () => {
+    const w = make({ locks: personal })
+    const under = w.find('tbody tr td [class*=underRepo]')
+    expect(under.text()).toBe('o/n')
+    expect(under.find('a').attributes('href')).toBe('/o/n')
+  })
+})
