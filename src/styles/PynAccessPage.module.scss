@@ -1,0 +1,161 @@
+@use 'mixins' as m;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-6);
+}
+
+.visibility {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-3);
+}
+
+.visIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--pyn-control-lg, 2.5rem);
+  height: var(--pyn-control-lg, 2.5rem);
+  color: var(--pyn-text-muted);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.visText {
+  display: flex;
+  flex: 1 1 14rem;
+  flex-direction: column;
+}
+
+.muted {
+  @include m.muted;
+  font-size: var(--pyn-text-sm);
+}
+
+.button {
+  @include m.button;
+}
+
+.plainButton {
+  @include m.button;
+  background: transparent;
+  border-color: transparent;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--pyn-space-4);
+
+  @media (max-width: 64rem) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.card {
+  @include m.flat-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-4);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-2);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: var(--pyn-text-base);
+  font-weight: 600;
+}
+
+.cardIcon {
+  color: var(--pyn-text-muted);
+}
+
+.cardText {
+  margin: 0;
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-sm);
+  line-height: var(--pyn-leading-body);
+
+  strong {
+    color: var(--pyn-text);
+  }
+}
+
+.link {
+  @include m.accent-link;
+}
+
+.pill {
+  @include m.pill;
+}
+
+.panel {
+  @include m.flat-box;
+  padding: var(--pyn-space-4);
+}
+
+.tabs {
+  @include m.tab-nav;
+  border-bottom: 0;
+}
+
+.tab {
+  @include m.tab;
+  background: none;
+  border-top: 0;
+  border-inline: 0;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+
+  &[aria-selected='true'] {
+    color: var(--pyn-text);
+    font-weight: 600;
+    border-bottom-color: var(--pyn-accent);
+  }
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-2) var(--pyn-space-4);
+}
+
+.who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-1) var(--pyn-space-3);
+}
+
+.name {
+  color: var(--pyn-text);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.select {
+  @include m.input;
+}
+
+.danger {
+  @include m.button-danger;
+}

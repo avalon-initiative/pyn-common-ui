@@ -45,3 +45,12 @@ export interface Grantee {
   href?: string
   identity?: PublicIdentity | null
 }
+
+/** One row of the manage-access list. */
+export interface AccessRow extends Grantee {
+  kind: 'person' | 'team'
+}
+
+export type AccessTab = 'direct' | 'organization'
+
+export type AccessAdd = 'people' | 'teams'

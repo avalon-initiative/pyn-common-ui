@@ -412,6 +412,9 @@ export { myLockKey } from './state/my-locks.state'
 export { expiringLocks, filterActivity, filterLocks } from './state/dashboard-panels.state'
 export type { FileRow, Mode, MyLock, ReleaseFailure } from './types/lock.types'
 export type {
+  AccessAdd,
+  AccessRow,
+  AccessTab,
   Grantee,
   MemberSource,
   RepoTeam,
@@ -560,6 +563,8 @@ export { availableViews, branchGroups, defaultFirst } from './state/branches-pag
 export type { BranchFilters, BranchGroup } from './state/branches-page.state'
 export type { BranchView } from './types/branch.types'
 export { default as PynLocksPage } from './components/PynLocksPage.vue'
+export { default as PynAccessPage } from './components/PynAccessPage.vue'
+export { ACCESS_TABS, accessControls, accessCounts, accessEmpty } from './state/access-page.state'
 export {
   filterLockRows,
   lockRowFromMine,
