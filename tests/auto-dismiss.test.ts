@@ -6,6 +6,7 @@ import {
   FADE_MS,
   PynBranchPicker,
   PynOrgForm,
+  PynRepoForm,
   PynSignIn,
   PynUsernameChange,
   PynViewError,
@@ -237,6 +238,35 @@ describe('name preview hint', () => {
     expect(w.text()).not.toContain('lowercase')
     expect(w.find('input').attributes('aria-describedby')!.split(' ')).toHaveLength(2)
     expect(mount(PynOrgForm).find('[data-canonical]').exists()).toBe(false)
+  })
+
+  it.each([false, true])(
+    'PynRepoForm (steps %s) emits nameInput and shows the preview',
+    async (steps) => {
+      const props = { owner: 'alice', steps, suggestion: 'octo' }
+      const w = mount(PynRepoForm, { props })
+      expect(w.find('[data-canonical]').exists()).toBe(false)
+      await w.find('input:not([readonly])').setValue(' My Game ')
+      expect(w.emitted('nameInput')?.[0]).toEqual(['My Game'])
+      await w.setProps({ nameCanonical: 'my-game' })
+      expect(w.find('[data-canonical]').text()).toBe('Will be created as: my-game')
+      const input = w.find('input:not([readonly])')
+      expect(input.attributes('aria-describedby')).toBe(w.find('[data-canonical]').attributes('id'))
+      if (steps) {
+        await w.find('button[type="button"]').trigger('click')
+        expect(w.emitted('nameInput')?.[1]).toEqual(['octo'])
+      }
+    },
+  )
+
+  it('turns display ligatures off in the Arcade set only', () => {
+    const tokens = readFileSync('src/styles/tokens.css', 'utf8')
+    const arcade = tokens.match(/\.pyn-font-set-arcade \{[^}]*\}/)![0]
+    expect(arcade).toMatch(/--pyn-display-ligatures: none/)
+    expect(tokens.match(/--pyn-display-ligatures: none/g)).toHaveLength(1)
+    expect(readFileSync('src/styles/global.css', 'utf8')).toMatch(
+      /font-variant-ligatures: var\(--pyn-display-ligatures\)/,
+    )
   })
 
   it('PynUsernameChange emits nameInput and shows the rename preview', async () => {

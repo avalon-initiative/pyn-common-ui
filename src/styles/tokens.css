@@ -80,6 +80,7 @@
   /* Default font set; fonts.css supplies the Geist faces, the system stack covers the gap. */
   --pyn-font: 'Geist Variable', var(--pyn-font-system);
   --pyn-font-display: var(--pyn-font);
+  --pyn-display-ligatures: normal;
   --pyn-font-mono: 'Geist Mono Variable', var(--pyn-font-mono-system);
   --pyn-topbar-height: 3.5rem;
   --pyn-sidebar-width: 15rem;
@@ -124,6 +125,7 @@
   font-family: var(--pyn-font);
   --pyn-font: 'Geist Variable', var(--pyn-font-system);
   --pyn-font-display: var(--pyn-font);
+  --pyn-display-ligatures: normal;
   --pyn-font-mono: 'Geist Mono Variable', var(--pyn-font-mono-system);
 }
 
@@ -132,6 +134,8 @@
   font-family: var(--pyn-font);
   --pyn-font: 'Geist Variable', var(--pyn-font-system);
   --pyn-font-display: 'Pixelify Sans Variable', var(--pyn-font);
+  /* Pixelify Sans joins "fi" into one glyph that reads as another letter. */
+  --pyn-display-ligatures: none;
   --pyn-font-mono: 'Geist Mono Variable', var(--pyn-font-mono-system);
 }
 
@@ -140,5 +144,6 @@
   font-family: var(--pyn-font);
   --pyn-font: var(--pyn-font-system);
   --pyn-font-display: var(--pyn-font-system);
+  --pyn-display-ligatures: normal;
   --pyn-font-mono: var(--pyn-font-mono-system);
 }

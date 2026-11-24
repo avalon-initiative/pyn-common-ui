@@ -34,6 +34,7 @@
 .brand {
   color: var(--pyn-text);
   font-family: var(--pyn-font-display);
+  font-variant-ligatures: var(--pyn-display-ligatures);
   font-size: var(--pyn-text-lg);
   font-weight: 600;
   letter-spacing: 0.08em;

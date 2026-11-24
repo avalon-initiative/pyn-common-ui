@@ -104,3 +104,6 @@ export const StepsWithError: Story = {
   args: { ...steps, error: 'A repository with that name already exists for this owner.' },
 }
 export const StepsWithCancel: Story = { args: { ...steps, cancelHref: '/' } }
+export const StepsWithNamePreview: Story = {
+  args: { ...steps, nameCanonical: 'my-first-game' },
+}

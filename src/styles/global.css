@@ -27,4 +27,5 @@ h1,
 h2,
 h3 {
   font-family: var(--pyn-font-display);
+  font-variant-ligatures: var(--pyn-display-ligatures);
 }
