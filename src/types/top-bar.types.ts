@@ -28,3 +28,16 @@ export interface TopBarLink {
   label: string
   href: string
 }
+
+/** An entry in the bell panel: a notice, or an invitation with Accept and Decline. */
+export interface BellEntry {
+  id: string
+  title: string
+  /** ISO 8601 timestamp shown as a relative time. */
+  at?: string
+  href?: string
+  /** An invitation shows Accept and Decline; a notice shows a dismiss button. Defaults to `notice`. */
+  kind?: 'notice' | 'invitation'
+  /** Disables the entry's actions while a request runs. */
+  busy?: boolean
+}
