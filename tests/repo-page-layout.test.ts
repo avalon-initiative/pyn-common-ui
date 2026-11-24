@@ -1,7 +1,9 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  PynActivity,
   PynBranchBar,
+  PynRepoBranches,
   PynCommandBlock,
   PynLockedFiles,
   PynQuickSetup,
@@ -307,5 +309,69 @@ describe('PynRepoLanding page layout', () => {
     })
     expect(empty.findComponent(PynBranchBar).exists()).toBe(false)
     expect(empty.findComponent(PynQuickSetup).props('httpsUrl')).toBe('https://h/a/b.pyn')
+  })
+
+  it('hides the rail Branches panel on its own and keeps the toolbar link', () => {
+    const w = make(PynRepoLanding, {
+      props: { ...props, branchesHref: '/a/b/branches', hideRailBranches: true },
+    })
+    expect(w.findComponent(PynRepoBranches).exists()).toBe(false)
+    expect(w.find('[data-branches-link]').attributes('href')).toBe('/a/b/branches')
+    const shown = make(PynRepoLanding, { props: { ...props, branchesHref: '/a/b/branches' } })
+    expect(shown.findComponent(PynRepoBranches).exists()).toBe(true)
+  })
+
+  it('does not slot an empty breadcrumb at the root, so the toolbar row stays compact', () => {
+    const root = make(PynRepoLanding, { props: { ...props, goToFile: true } })
+    expect(root.find('nav').exists()).toBe(false)
+    const folder = make(PynRepoLanding, { props: { ...props, path: 'x' } })
+    expect(folder.find('nav').exists()).toBe(true)
+  })
+})
+
+describe('PynActivity cap', () => {
+  const entry = (id: number) => ({
+    id,
+    at: '2026-10-01T00:00:00Z',
+    actor: 'a',
+    action: 'checkout',
+    path: `f${id}`,
+  })
+  const entries = Array.from({ length: 9 }, (_, i) => entry(i + 1))
+
+  it('lists five by default and honors max', () => {
+    expect(make(PynActivity, { props: { entries } }).findAll('li')).toHaveLength(5)
+    expect(make(PynActivity, { props: { entries, max: 2 } }).findAll('li')).toHaveLength(2)
+    expect(
+      make(PynActivity, { props: { entries: entries.slice(0, 3) } }).findAll('li'),
+    ).toHaveLength(3)
+  })
+
+  it('forwards activityMax from the landing', () => {
+    const w = make(PynRepoLanding, {
+      props: {
+        repo: {
+          id: '1',
+          owner_id: 'o',
+          owner: 'a',
+          name: 'b',
+          visibility: 'public',
+          lease_hours: 8,
+          created_at: '2026-10-01T00:00:00Z',
+        },
+        path: '',
+        summary: {
+          default_branch: 'main',
+          files: 1,
+          exclusive_files: 0,
+          shared_files: 1,
+          locks: [],
+          activity: entries,
+        },
+        listing: { path: '', entries: [] },
+        activityMax: 3,
+      },
+    })
+    expect(w.findComponent(PynActivity).findAll('li')).toHaveLength(3)
   })
 })

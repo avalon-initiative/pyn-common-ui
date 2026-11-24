@@ -38,6 +38,10 @@ const props = defineProps<{
   railBranches?: BranchSummary[]
   /** Where the rail's Branches panel links to; with `branches` it shows the panel. */
   branchesHref?: string
+  /** Hides the rail's Branches panel; the toolbar link and picker keep `branchesHref`. */
+  hideRailBranches?: boolean
+  /** Most activity entries the rail lists; defaults to 5. */
+  activityMax?: number
   /** Toolbar count for the Branches link; defaults to the length of `branches`. */
   branchCount?: number
   branchesLoading?: boolean
@@ -105,7 +109,7 @@ const emptyRepo = computed(
         @select="emit('select', $event)"
         @go-to-file="emit('goToFile')"
       >
-        <PynBreadcrumb v-if="path" :crumbs="crumbs" />
+        <template v-if="path" #default><PynBreadcrumb :crumbs="crumbs" /></template>
         <template v-if="httpsUrl" #actions>
           <PynCloneMenu
             :https-url="httpsUrl"
@@ -164,7 +168,7 @@ const emptyRepo = computed(
         :now="now"
       />
       <PynRepoBranches
-        v-if="sideBranches?.length || branchesHref"
+        v-if="!hideRailBranches && (sideBranches?.length || branchesHref)"
         :branches="sideBranches"
         :default-branch="summary.default_branch"
         :href="branchesHref"
@@ -177,7 +181,7 @@ const emptyRepo = computed(
         :me="me"
         :now="now"
       />
-      <PynActivity :entries="summary.activity" :now="now" />
+      <PynActivity :entries="summary.activity" :max="activityMax" :now="now" />
     </template>
   </PynPageColumns>
 </template>

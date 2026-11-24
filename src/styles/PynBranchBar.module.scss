@@ -7,6 +7,12 @@
   gap: var(--pyn-space-2) var(--pyn-space-3);
 }
 
+.picker {
+  --pyn-branch-picker-width: 12rem;
+  flex: 0 1 auto;
+  min-width: 9rem;
+}
+
 .branch {
   @include m.control;
   gap: var(--pyn-space-2);
@@ -88,7 +94,8 @@
   justify-content: flex-start;
   gap: var(--pyn-space-2);
   box-sizing: border-box;
-  flex: 0 1 14rem;
+  flex: 1 1 6rem;
+  max-width: 14rem;
   padding-inline: var(--pyn-space-3);
   color: var(--pyn-text-muted);
   background: var(--pyn-control-bg);
@@ -107,5 +114,6 @@
   @include m.narrow {
     order: 3;
     flex: 1 1 100%;
+    max-width: none;
   }
 }

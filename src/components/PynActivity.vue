@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import PynAvatar from './PynAvatar.vue'
 import PynPerson from './PynPerson.vue'
 import styles from '../styles/PynActivity.module.scss'
@@ -7,14 +8,23 @@ import { formatAgo } from '../utils/ago'
 import { activityVerb } from '../state/tree.state'
 import type { ActivityEntry } from '../types/tree.types'
 
-defineProps<{ entries: ActivityEntry[]; now?: Date }>()
+const props = withDefaults(
+  defineProps<{
+    entries: ActivityEntry[]
+    /** Most entries listed. */
+    max?: number
+    now?: Date
+  }>(),
+  { max: 5 },
+)
+const shown = computed(() => props.entries.slice(0, Math.max(0, props.max)))
 </script>
 
 <template>
   <section :class="styles.card" aria-labelledby="activity-title">
     <h2 id="activity-title" :class="styles.title">Recent activity</h2>
     <ul v-if="entries.length" :class="styles.list">
-      <li v-for="e in entries" :key="e.id" :class="styles.item">
+      <li v-for="e in shown" :key="e.id" :class="styles.item">
         <PynAvatar
           v-if="e.actor_public"
           :username="e.actor_current || e.actor"
