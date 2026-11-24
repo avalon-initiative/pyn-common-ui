@@ -649,3 +649,34 @@ $icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' v
   font-size: var(--pyn-text-xs);
   font-weight: 600;
 }
+
+// Bordered data table: raised header row, hairline rows, hover tint.
+@mixin data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--pyn-text-base);
+
+  th {
+    padding: var(--pyn-space-2) var(--pyn-space-4);
+    color: var(--pyn-text-muted);
+    background: var(--pyn-surface-raised);
+    font-size: var(--pyn-text-sm);
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: var(--pyn-space-2) var(--pyn-space-4);
+    vertical-align: middle;
+  }
+
+  tbody tr + tr,
+  tbody tr:first-child {
+    border-top: 1px solid var(--pyn-border);
+  }
+
+  tbody tr:hover {
+    background: var(--pyn-hover);
+  }
+}

@@ -1,0 +1,151 @@
+@use 'mixins' as m;
+
+.page {
+  min-width: 0;
+}
+
+.create {
+  @include m.button-primary;
+}
+
+.group {
+  margin-top: var(--pyn-space-6);
+}
+
+.heading {
+  margin: 0 0 var(--pyn-space-2);
+  font-size: var(--pyn-text-md);
+  font-weight: 600;
+}
+
+.box {
+  @include m.flat-box;
+  position: relative;
+  overflow-x: auto;
+}
+
+.table {
+  @include m.data-table;
+  min-width: 38rem;
+  table-layout: fixed;
+
+  @include m.narrow {
+    min-width: 0;
+
+    th,
+    td {
+      padding-inline: var(--pyn-space-2);
+    }
+  }
+}
+
+.num {
+  width: 5rem;
+
+  @include m.narrow {
+    width: 3.5rem;
+  }
+
+  white-space: nowrap;
+  text-align: right;
+  color: var(--pyn-text-muted);
+}
+
+th.num {
+  text-align: right;
+}
+
+.actions {
+  width: 6rem;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.tools {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--pyn-space-1);
+}
+
+.branch {
+  min-width: 0;
+}
+
+.chipRow {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.chip {
+  min-width: 0;
+  padding: var(--pyn-space-half) var(--pyn-space-2);
+  color: var(--pyn-accent);
+  background: var(--pyn-accent-bg);
+  border-radius: var(--pyn-radius);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-sm);
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+a.chip:hover {
+  text-decoration: underline;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--pyn-control-md);
+  min-height: var(--pyn-control-md);
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  font-size: var(--pyn-text-md);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  @include m.touch-target($square: true);
+
+  @include m.focus-ring;
+}
+
+.updated {
+  width: 12rem;
+
+  @include m.narrow {
+    display: none;
+  }
+  white-space: nowrap;
+}
+
+.who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.none {
+  color: var(--pyn-text-muted);
+}
+
+.badge {
+  @include m.pill;
+  color: var(--pyn-text);
+}
+
+.error {
+  @include m.error;
+  margin-top: var(--pyn-space-3);
+}
+
+.hidden {
+  @include m.visually-hidden;
+}

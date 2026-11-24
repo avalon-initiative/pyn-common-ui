@@ -547,3 +547,8 @@ export type {
   ShortcutGroup,
   ShortcutMatcher,
 } from './types/command-palette.types'
+export { default as PynBranchesPage } from './components/PynBranchesPage.vue'
+export { default as PynListSearch } from './components/PynListSearch.vue'
+export { availableViews, branchGroups, defaultFirst } from './state/branches-page.state'
+export type { BranchFilters, BranchGroup } from './state/branches-page.state'
+export type { BranchView } from './types/branch.types'
