@@ -15,6 +15,7 @@ const emit = defineEmits<{ select: [id: string] }>()
 const open = ref(false)
 const root = ref<HTMLElement | null>(null)
 const trigger = ref<HTMLButtonElement | null>(null)
+const panel = ref<HTMLElement | null>(null)
 const fixedAt = ref<{ top: string; left: string; maxWidth: string } | null>(null)
 
 const entries = () =>
@@ -23,19 +24,36 @@ const focusAt = (i: number) => {
   const all = entries()
   all[(i + all.length) % all.length]?.focus()
 }
+const EDGE = 8
 async function show(last = false) {
   const box = trigger.value?.getBoundingClientRect()
   fixedAt.value =
     props.fixed && box
       ? {
           top: `${box.bottom + 4}px`,
-          left: `${box.left}px`,
-          maxWidth: `${Math.max(window.innerWidth - box.left - 16, 160)}px`,
+          left: `${EDGE}px`,
+          maxWidth: `${Math.max(window.innerWidth - 2 * EDGE, 160)}px`,
         }
       : null
   open.value = true
   await nextTick()
+  if (props.fixed && box) place(box)
   focusAt(last ? -1 : 0)
+}
+/** Aligns the panel to its trigger, then flips or clamps it inside the viewport. */
+function place(box: DOMRect) {
+  const rect = panel.value?.getBoundingClientRect()
+  if (!rect || !fixedAt.value) return
+  const left = props.align === 'start' ? box.left : box.right - rect.width
+  const top =
+    box.bottom + 4 + rect.height > window.innerHeight - EDGE
+      ? box.top - 4 - rect.height
+      : box.bottom + 4
+  fixedAt.value = {
+    ...fixedAt.value,
+    left: `${Math.max(EDGE, Math.min(left, window.innerWidth - rect.width - EDGE))}px`,
+    top: `${Math.max(EDGE, top)}px`,
+  }
 }
 const close = (refocus: boolean) => {
   open.value = false
@@ -102,6 +120,7 @@ function choose(id: string) {
     </button>
     <div
       v-if="open"
+      ref="panel"
       :class="[styles.panel, align === 'start' && styles.start, fixedAt && styles.fixed]"
       :style="fixedAt ?? undefined"
       role="menu"
