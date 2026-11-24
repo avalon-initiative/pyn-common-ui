@@ -23,6 +23,15 @@
 
 .form {
   @include m.form;
+  @include m.flat-box;
+  max-width: none;
+  padding: var(--pyn-space-4);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 14rem));
+  gap: var(--pyn-space-3);
 }
 
 .subheading {
@@ -46,9 +55,15 @@
   @include m.button-danger;
 }
 
-.meta,
+.meta {
+  @include m.muted;
+}
+
 .empty {
   @include m.muted;
+  @include m.flat-box;
+  margin: 0;
+  padding: var(--pyn-space-4);
 }
 
 .error {

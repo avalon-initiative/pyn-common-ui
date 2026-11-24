@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import PynSettingsSection from '../components/PynSettingsSection.vue'
+import PynTeamDelete from '../components/PynTeamDelete.vue'
 import PynTeamDetail from '../components/PynTeamDetail.vue'
+import PynTeamForm from '../components/PynTeamForm.vue'
 import { teams } from './org-data'
 
 const meta: Meta<typeof PynTeamDetail> = {
@@ -12,6 +15,13 @@ export default meta
 type Story = StoryObj<typeof PynTeamDetail>
 
 export const Owner: Story = {}
+export const WholePage: Story = {
+  render: (args) => ({
+    components: { PynTeamDetail, PynTeamForm, PynTeamDelete, PynSettingsSection },
+    setup: () => ({ args, team: teams[0] }),
+    template: `<div><PynTeamDetail v-bind="args" /><PynTeamForm :team="team" /><PynSettingsSection title="Danger zone" danger plain><PynTeamDelete :slug="team.slug" /></PynSettingsSection></div>`,
+  }),
+}
 export const AddingAMember: Story = { args: { adding: true } }
 export const EveryoneInTeam: Story = { args: { adding: true, candidates: [] } }
 export const Member: Story = { args: { owner: false } }
