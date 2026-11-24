@@ -18,6 +18,14 @@ export interface RepoRef {
   name: string
 }
 
+/** Optional extras a boxed repository row shows when the app has them. */
+export interface RepoRowExtras {
+  description?: string | null
+  language?: string | null
+  topics?: string[]
+  updated_at?: string | null
+}
+
 /** The repository fields the pages show; the rest are filled by the server's repository listing. */
 export interface RepoInfo extends RepoRef {
   id: string
@@ -110,3 +118,6 @@ export interface Revision {
   /** Set when this revision restored the content of an earlier one. */
   restored_from?: number | null
 }
+
+/** A repository row of `PynRepoList`: the listing fields plus the optional extras. */
+export type RepoListItem = RepoInfo & RepoRowExtras

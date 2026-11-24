@@ -79,3 +79,54 @@
   flex-wrap: wrap;
   gap: var(--pyn-space-2);
 }
+
+// Column variant: avatar over the name, bio and a vertical fact list.
+.column {
+  flex-direction: column;
+  align-items: stretch;
+  padding-bottom: 0;
+  border-bottom: 0;
+
+  @include m.narrow {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .avatar[data-size] {
+    width: 100%;
+    max-width: 18.5rem;
+    height: auto;
+    aspect-ratio: 1;
+
+    @include m.narrow {
+      width: 5rem;
+      height: 5rem;
+    }
+  }
+
+  .facts {
+    order: 1;
+    flex-direction: column;
+    gap: var(--pyn-space-2);
+    color: var(--pyn-text);
+
+    li,
+    a {
+      display: flex;
+      align-items: center;
+      gap: var(--pyn-space-2);
+      overflow-wrap: anywhere;
+    }
+
+    svg {
+      flex: none;
+      color: var(--pyn-text-muted);
+    }
+  }
+
+  .actions {
+    > * {
+      flex: 1 1 100%;
+    }
+  }
+}

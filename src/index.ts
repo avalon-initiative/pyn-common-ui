@@ -42,6 +42,9 @@ export { default as PynProfileHeader } from './components/PynProfileHeader.vue'
 export { default as PynPeopleList } from './components/PynPeopleList.vue'
 export { default as PynPeopleSearch } from './components/PynPeopleSearch.vue'
 export { default as PynProfileLayout } from './components/PynProfileLayout.vue'
+export { default as PynOrgHome } from './components/PynOrgHome.vue'
+export { default as PynPinned } from './components/PynPinned.vue'
+export { default as PynRepoRow } from './components/PynRepoRow.vue'
 export { default as PynTree } from './components/PynTree.vue'
 export { default as PynLatestChange } from './components/PynLatestChange.vue'
 export { default as PynQuickSetup } from './components/PynQuickSetup.vue'
@@ -172,7 +175,8 @@ export { formatWait } from './utils/wait'
 export { EXPIRING_SOON_MS, formatLease, lockState } from './utils/lease'
 export type { LockInfo, LockState } from './types/lock.types'
 export type { Crumb, TreeMode } from './types/tree.types'
-export { initials, linkLabel } from './state/profile.state'
+export { initials, linkLabel, profileTabs } from './state/profile.state'
+export type { ProfileView } from './state/profile.state'
 export { personLabel } from './state/person.state'
 export type { PersonLabel } from './state/person.state'
 export type { AvatarSize, PersonEntry, ProfileInfo, PublicIdentity } from './types/profile.types'
@@ -323,6 +327,7 @@ export {
   repoPath,
   withBranch,
   repoSlug,
+  arrangeRepos,
   repoSettingsNav,
   repoSettingsPath,
   repoShellTabs,
@@ -330,7 +335,7 @@ export {
 } from './state/repo.state'
 export { rowCountText, pageCount, pageWindow, rangeText } from './state/filter-list.state'
 export type { FilterListControl, FilterListOption } from './types/filter-list.types'
-export type { RepoShellTab, RepoTab } from './state/repo.state'
+export type { RepoShellTab, RepoTab, RepoListSort, RepoListType } from './state/repo.state'
 export {
   MEMBER_CREATION,
   ORG_INVITATION_AUDIT_LABELS,
@@ -441,6 +446,8 @@ export type {
   NewUser,
   RepoFormValue,
   RepoInfo,
+  RepoListItem,
+  RepoRowExtras,
   RepoSettings,
   Revision,
   RoleGrant,

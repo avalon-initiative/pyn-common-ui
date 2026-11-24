@@ -1,0 +1,59 @@
+@use 'mixins' as m;
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
+.title {
+  @include m.section-title;
+  margin-bottom: var(--pyn-space-2);
+
+  .section > & {
+    margin-bottom: 0;
+  }
+}
+
+.people,
+.languages,
+.topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.more {
+  @include m.accent-link;
+  display: inline-block;
+  margin-top: var(--pyn-space-2);
+  font-size: var(--pyn-text-base);
+}
+
+.language {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-1);
+  color: var(--pyn-text-muted);
+}
+
+.dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  background: var(--pyn-accent);
+  border-radius: 50%;
+}
+
+.topic {
+  @include m.pill;
+  color: var(--pyn-accent);
+}

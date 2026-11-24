@@ -13,6 +13,16 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
+.start {
+  @media (min-width: 63.25rem) {
+    grid-template-columns: var(--pyn-side-width) minmax(0, 1fr);
+  }
+
+  > .side {
+    order: -1;
+  }
+}
+
 .main {
   min-width: 0;
 }

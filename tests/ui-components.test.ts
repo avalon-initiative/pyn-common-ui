@@ -635,8 +635,9 @@ describe('repository and organization headers', () => {
     expect(w.find('[data-kind]').text()).toBe('organization')
     expect(w.findAll('nav a').map((a) => a.attributes('href'))).toEqual([
       '/studio',
-      '/studio/-/members',
+      '/studio/-/repositories',
       '/studio/-/teams',
+      '/studio/-/members',
     ])
   })
 })
@@ -1757,7 +1758,8 @@ describe('PynRepoList', () => {
   it('shows the visibility pill and the lease and creation line', () => {
     const w = mount(PynRepoList, { props: { repos: [listed('alice', 'game')] } })
     expect(w.find('[data-visibility]').text()).toBe('private')
-    expect(w.text()).toContain('8h leases · Created Oct 01 2026')
+    expect(w.text()).toContain('8h leases')
+    expect(w.text()).toContain('Created Oct 01 2026')
     expect(w.find('input').exists()).toBe(false)
   })
 
@@ -2161,12 +2163,18 @@ describe('organization helpers', () => {
     expect(ownerChoices('alice', orgs)).toEqual(['alice', 'modding-club', 'studio'])
     expect(isOrgOwner(orgs[0])).toBe(true)
     expect(isOrgOwner(orgs[1])).toBe(false)
-    expect(orgTabs('member').map((t) => t.section)).toEqual(['', 'members', 'teams'])
-    expect(orgTabs(null).map((t) => t.section)).toEqual([''])
+    expect(orgTabs('member').map((t) => t.section)).toEqual([
+      '',
+      'repositories',
+      'teams',
+      'members',
+    ])
+    expect(orgTabs(null).map((t) => t.section)).toEqual(['', 'repositories'])
     expect(orgTabs('owner').map((t) => t.section)).toEqual([
       '',
-      'members',
+      'repositories',
       'teams',
+      'members',
       'usage',
       'audit',
       'settings',

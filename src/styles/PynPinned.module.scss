@@ -1,0 +1,16 @@
+@use 'mixins' as m;
+
+.pinned {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
+.title {
+  @include m.section-title;
+}
+
+.state {
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}

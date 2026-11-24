@@ -16,41 +16,6 @@
   @include m.flat-list;
 }
 
-.item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pyn-space-1);
-  padding: var(--pyn-space-3) var(--pyn-space-4);
-
-  & + & {
-    border-top: 1px solid var(--pyn-border);
-  }
-}
-
-.title {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--pyn-space-2);
-}
-
-.link {
-  @include m.accent-link;
-  font-size: var(--pyn-text-md);
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.pill {
-  @include m.pill;
-  text-transform: capitalize;
-}
-
-.meta {
-  @include m.muted;
-  font-size: var(--pyn-text-xs);
-}
-
 .empty {
   @include m.muted;
   padding: var(--pyn-space-6);
