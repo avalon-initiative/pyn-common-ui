@@ -36,3 +36,16 @@ export interface ReleaseFailure {
   lock: MyLock
   message: string
 }
+
+/** A row of the locks page; `repo` (`owner/name`) adds a repository column. */
+export interface LockListItem extends LockInfo {
+  repo?: string
+  repoHref?: string
+  /** Defaults to `exclusive`. */
+  mode?: Mode
+  /** A failed release, shown under the path. */
+  error?: string
+}
+
+export type LockView = 'all' | 'mine' | 'expiring' | 'stale'
+export type LockRowState = 'mine' | 'locked' | 'expiring' | 'stale'
