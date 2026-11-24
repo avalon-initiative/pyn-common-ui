@@ -1,7 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import {
+  PynBranchBar,
   PynBranchPicker,
+  PynFileView,
+  PynFilesPanel,
+  PynHistory,
+  PynRepoLanding,
   PynTagDialog,
   PynTagsPage,
   filterTags,
@@ -10,6 +15,8 @@ import {
   tagNameProblem,
 } from '../src'
 import { tagsPageBranches as branches, tagsPageTags as tags } from '../src/stories/tags-page-data'
+import { treeEntries } from '../src/stories/file-data'
+import { repo, rootListing, summary } from '../src/stories/landing-data'
 
 const mounted: ReturnType<typeof mount>[] = []
 const make = ((c: object, o: object) => {
@@ -123,6 +130,81 @@ describe('PynBranchPicker tags', () => {
     await openTags(w)
     expect(w.text()).toContain('Tags are not supported yet')
     expect(w.find('a').attributes('href')).toBe('/b')
+  })
+})
+
+describe('branch picker hosts', () => {
+  const hostBranches = [{ name: 'main', isDefault: true }, { name: 'dev' }]
+  const hostTags = [{ name: 'v1.0' }, { name: 'v2.0' }]
+  const tree = { owner: 'acme', name: 'game' }
+  const hosts = [
+    { label: 'PynBranchBar', c: PynBranchBar, event: 'select', props: { branch: 'v1.0' } },
+    {
+      label: 'PynRepoLanding',
+      c: PynRepoLanding,
+      event: 'select',
+      props: { repo, path: '', listing: rootListing, summary, branch: 'v1.0' },
+    },
+    {
+      label: 'PynFilesPanel',
+      c: PynFilesPanel,
+      event: 'selectBranch',
+      props: { ...tree, entries: treeEntries, branch: 'v1.0', collapsed: false },
+    },
+    {
+      label: 'PynFileView',
+      c: PynFileView,
+      event: 'selectBranch',
+      props: { ...tree, path: 'a.txt', tree: treeEntries, branch: 'v1.0', collapsed: false },
+    },
+    {
+      label: 'PynHistory',
+      c: PynHistory,
+      event: 'selectBranch',
+      props: { revisions: [], branch: 'v1.0' },
+    },
+  ]
+  const picker = (w: ReturnType<typeof mount>) => w.findComponent(PynBranchPicker)
+
+  it.each(hosts)(
+    '$label passes tags through and forwards the kind',
+    async ({ c, event, props }) => {
+      const w = make(c, {
+        props: {
+          ...props,
+          now,
+          branches: hostBranches,
+          tags: hostTags,
+          tagsHref: '/t',
+          currentKind: 'tag',
+        },
+      })
+      await picker(w).find('button').trigger('click')
+      expect(picker(w).find('[data-tab=tags]').attributes('aria-selected')).toBe('true')
+      expect(picker(w).find('[role=option][aria-selected=true]').text()).toBe('v1.0')
+      expect(picker(w).find('a[href="/t"]').text()).toBe('View all tags')
+      await picker(w).findAll('[role=option]')[1]!.trigger('click')
+      await picker(w).find('button').trigger('click')
+      await picker(w).find('[data-tab=branches]').trigger('click')
+      await picker(w).findAll('[role=option]')[1]!.trigger('click')
+      expect(w.emitted(event)).toEqual([
+        ['v2.0', 'tag'],
+        ['dev', 'branch'],
+      ])
+    },
+  )
+
+  it.each(hosts)('$label keeps the not-supported Tags tab without tags', async ({ c, props }) => {
+    const w = make(c, { props: { ...props, branch: 'main', now, branches: hostBranches } })
+    await picker(w).find('button').trigger('click')
+    await picker(w).find('[data-tab=tags]').trigger('click')
+    expect(picker(w).text()).toContain('Tags are not supported yet')
+  })
+
+  it('shows a tag icon on the static label of a tag', () => {
+    const w = make(PynBranchBar, { props: { branch: 'v1.0', currentKind: 'tag' } })
+    expect(w.text()).toContain('v1.0')
+    expect(w.findComponent({ name: 'PynIcon' }).props('name')).toBe('tag')
   })
 })
 

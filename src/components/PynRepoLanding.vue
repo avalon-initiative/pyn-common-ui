@@ -15,6 +15,7 @@ import PynTree from './PynTree.vue'
 import styles from '../styles/PynRepoLanding.module.scss'
 import { breadcrumbs, treePath } from '../state/tree.state'
 import type { BranchSummary } from '../types/branch.types'
+import type { RefKind, TagOption } from '../types/tag.types'
 import type { ReadmeDoc } from '../types/blob.types'
 import type { RepoInfo } from '../types/repo.types'
 import type { RepoSummary, TreeListing } from '../types/tree.types'
@@ -57,9 +58,15 @@ const props = defineProps<{
   downloadZip?: boolean
   /** Shows the Go to file button in the toolbar (emits `goToFile`). */
   goToFile?: boolean
-  /** Tags entry in the toolbar: a link with `tagCount` when `tagsHref` is given, otherwise a not-supported placeholder. */
+  /** Tags entry in the toolbar (a link with `tagCount`, else a not-supported placeholder) and the picker's View all tags. */
   tagsHref?: string
   tagCount?: number
+  /** Tags for the picker's Tags tab; omitted keeps the not-supported state there. */
+  tags?: TagOption[]
+  tagsLoading?: boolean
+  tagsError?: string
+  /** Whether the ref in view is a branch or a tag; omitted is a branch. */
+  currentKind?: RefKind
   /** Other documents (CONTRIBUTING and so on) shown as tabs after README. */
   readmeOthers?: ReadmeDoc[]
   /** About block; shown when given (an empty object shows the placeholders), above the toolbar on narrow screens. */
@@ -73,7 +80,11 @@ const props = defineProps<{
   }
 }>()
 
-const emit = defineEmits<{ select: [name: string]; goToFile: []; download: [] }>()
+const emit = defineEmits<{
+  select: [name: string, kind: RefKind]
+  goToFile: []
+  download: []
+}>()
 
 const crumbs = computed(() => breadcrumbs(props.repo, props.path, props.branch))
 const toolbarBranches = computed(() =>
@@ -104,9 +115,13 @@ const emptyRepo = computed(
         show-tags
         :tags-href="tagsHref"
         :tag-count="tagCount"
+        :tags="tags"
+        :tags-loading="tagsLoading"
+        :tags-error="tagsError"
+        :current-kind="currentKind"
         :go-to-file="goToFile"
         :now="now"
-        @select="emit('select', $event)"
+        @select="(name, kind) => emit('select', name, kind)"
         @go-to-file="emit('goToFile')"
       >
         <template v-if="path" #default><PynBreadcrumb :crumbs="crumbs" /></template>

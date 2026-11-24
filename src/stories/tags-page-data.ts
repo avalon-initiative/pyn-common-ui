@@ -1,5 +1,5 @@
 import type { BranchOption } from '../types/branch.types'
-import type { TagItem } from '../types/tag.types'
+import type { TagItem, TagOption } from '../types/tag.types'
 
 export const tagsPageTags: TagItem[] = [
   {
@@ -36,4 +36,11 @@ export const tagsPageBranches: BranchOption[] = [
   { name: 'main', isDefault: true },
   { name: 'level-3-rework' },
   { name: 'audio-pass' },
+]
+
+/** Tags for the branch picker's Tags tab in the host components' stories. */
+export const pickerTags: TagOption[] = [
+  { name: 'v0.2.0', createdAt: '2026-10-07T09:00:00Z' },
+  { name: 'v0.1.1', createdAt: '2026-09-02T12:00:00Z' },
+  { name: 'v0.1.0', createdAt: '2026-08-28T12:00:00Z' },
 ]

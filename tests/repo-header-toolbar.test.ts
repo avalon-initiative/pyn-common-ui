@@ -143,7 +143,7 @@ describe('PynBranchBar toolbar', () => {
     const w = make(PynBranchBar, { props: { branch: 'main', branches } })
     await w.find('button').trigger('click')
     await w.findAll('[role=option]')[1]!.trigger('click')
-    expect(w.emitted('select')).toEqual([['dev']])
+    expect(w.emitted('select')).toEqual([['dev', 'branch']])
   })
 })
 

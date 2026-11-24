@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynHistory from '../components/PynHistory.vue'
 import { aliciaIdentity } from './person-data'
+import { pickerTags } from './tags-page-data'
 
 const meta: Meta<typeof PynHistory> = {
   title: 'Repository/PynHistory',
@@ -114,4 +115,10 @@ export const TimelineOneFile: Story = {
 }
 export const OnDefaultBranch: Story = {
   args: { ...Timeline.args, branch: undefined, newBranchButton: true },
+}
+export const TimelineWithTags: Story = {
+  args: { ...Timeline.args, tags: pickerTags, tagsHref: '/acme/castle-quest/tags' },
+}
+export const TimelineOnATag: Story = {
+  args: { ...TimelineWithTags.args, branch: 'v0.1.1', currentKind: 'tag' },
 }

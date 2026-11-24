@@ -104,7 +104,7 @@ describe('PynFilesPanel', () => {
     })
     await w.find('button[aria-haspopup=listbox]').trigger('click')
     await w.findAll('[role=option]')[1]!.trigger('click')
-    expect(w.emitted('selectBranch')).toEqual([['dev']])
+    expect(w.emitted('selectBranch')).toEqual([['dev', 'branch']])
   })
 })
 

@@ -71,7 +71,7 @@ describe('PynHistory timeline', () => {
     const w = mount(PynHistory, { props: { revisions: revs, branch: 'main', branches } })
     await w.find('button[aria-haspopup=listbox]').trigger('click')
     await w.findAll('[role=option]')[1]!.trigger('click')
-    expect(w.emitted('selectBranch')).toEqual([['dev']])
+    expect(w.emitted('selectBranch')).toEqual([['dev', 'branch']])
   })
 
   it('copies the short revision and links to browse at it', async () => {

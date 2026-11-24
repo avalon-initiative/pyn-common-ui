@@ -11,6 +11,7 @@ import { baseName, fileCrumbs, parentOf, textStats } from '../state/blob.state'
 import { treePath } from '../state/tree.state'
 import { copyText } from '../utils/copy'
 import type { BranchOption } from '../types/branch.types'
+import type { RefKind, TagOption } from '../types/tag.types'
 import type { LineRange } from '../types/code.types'
 import type { FileBody } from '../types/blob.types'
 import type { TreeEntry } from '../types/tree.types'
@@ -46,6 +47,14 @@ const props = withDefaults(
     branchesError?: string
     /** Where "View all branches" in the picker goes. */
     branchesHref?: string
+    /** Tags for the picker's Tags tab; omitted keeps the not-supported state there. */
+    tags?: TagOption[]
+    tagsLoading?: boolean
+    tagsError?: string
+    /** Where "View all tags" in the picker goes. */
+    tagsHref?: string
+    /** Whether the ref in view is a branch or a tag; omitted is a branch. */
+    currentKind?: RefKind
     /** Offers creating a branch from the picker. */
     creatable?: boolean
     /** Adds a New branch button beside the picker; it emits `newBranch`. */
@@ -60,7 +69,7 @@ const emit = defineEmits<{
   selectLines: [range: LineRange]
   lock: []
   toggleFolder: [path: string]
-  selectBranch: [name: string]
+  selectBranch: [name: string, kind: RefKind]
   createBranch: [name: string]
   newBranch: []
   search: [query: string]
@@ -94,12 +103,17 @@ onBeforeUnmount(() => clearTimeout(timer))
       :branches-loading="branchesLoading"
       :branches-error="branchesError"
       :branches-href="branchesHref"
+      :tags="tags"
+      :tags-loading="tagsLoading"
+      :tags-error="tagsError"
+      :tags-href="tagsHref"
+      :current-kind="currentKind"
       :creatable="creatable"
       :new-branch-button="newBranchButton"
       :collapsed="collapsed"
       :now="now"
       @toggle="emit('toggleFolder', $event)"
-      @select-branch="emit('selectBranch', $event)"
+      @select-branch="(name, kind) => emit('selectBranch', name, kind)"
       @create-branch="emit('createBranch', $event)"
       @new-branch="emit('newBranch')"
       @search="emit('search', $event)"

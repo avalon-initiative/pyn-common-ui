@@ -5,6 +5,7 @@ import styles from '../styles/PynBranchBar.module.scss'
 import { formatDateTime } from '../utils/datetime'
 import { formatAgo } from '../utils/ago'
 import type { BranchOption } from '../types/branch.types'
+import type { RefKind, TagOption } from '../types/tag.types'
 
 defineProps<{
   branch: string
@@ -19,14 +20,21 @@ defineProps<{
   /** Shows the tags entry: a link with `tagCount` when `tagsHref` is given, otherwise a not-supported placeholder. */
   showTags?: boolean
   tagCount?: number
+  /** Where the tags link and "View all tags" in the selector panel go. */
   tagsHref?: string
+  /** Tags for the picker's Tags tab; omitted keeps the not-supported state there. */
+  tags?: TagOption[]
+  tagsLoading?: boolean
+  tagsError?: string
+  /** Whether the ref in view is a branch or a tag; omitted is a branch. */
+  currentKind?: RefKind
   /** Shows the Go to file button, which emits `goToFile`. */
   goToFile?: boolean
   files?: number
   updatedAt?: string | null
   now?: Date
 }>()
-defineEmits<{ select: [name: string]; goToFile: [] }>()
+defineEmits<{ select: [name: string, kind: RefKind]; goToFile: [] }>()
 </script>
 
 <template>
@@ -39,11 +47,18 @@ defineEmits<{ select: [name: string]; goToFile: [] }>()
       :loading="branchesLoading"
       :error="branchesError"
       :all-href="branchesHref"
+      :tags="tags"
+      :tags-loading="tagsLoading"
+      :tags-error="tagsError"
+      :tags-href="tagsHref"
+      :current-kind="currentKind"
       :now="now"
-      @select="$emit('select', $event)"
+      @select="(name, kind) => $emit('select', name, kind)"
     />
     <span v-else :class="styles.branch"
-      ><PynIcon name="branch" :class="styles.icon" />{{ branch }}</span
+      ><PynIcon :name="currentKind === 'tag' ? 'tag' : 'branch'" :class="styles.icon" />{{
+        branch
+      }}</span
     >
     <a v-if="branchesHref" :href="branchesHref" :class="styles.branches" data-branches-link>
       <PynIcon name="branch" :class="styles.icon" />
