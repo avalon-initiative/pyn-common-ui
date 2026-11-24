@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import PynBranchCompare from '../components/PynBranchCompare.vue'
 import PynRepoLanding from '../components/PynRepoLanding.vue'
+import PynRepoShell from '../components/PynRepoShell.vue'
+import { repoShellTabs } from '../state/repo.state'
 import { readmeText } from './file-data'
 import { folderListing, now, repo, rootListing, summary } from './landing-data'
 
@@ -27,6 +30,8 @@ export const EmptyRepository: Story = {
       locks: [],
       activity: [],
     },
+    httpsUrl: 'https://pyn.example.com/acme/castle-quest.pyn',
+    cloneCommand: 'pyn clone acme/castle-quest',
   },
 }
 export const MissingFolder: Story = { args: { path: 'Content/Gone', listing: null, missing: true } }
@@ -103,4 +108,71 @@ export const ToolbarBranchesLoading: Story = {
 }
 export const ToolbarBranchesError: Story = {
   args: { ...toolbarArgs, branches: undefined, branchesError: 'Could not load branches.' },
+}
+
+/** The whole repository page: toolbar, file table, README tabs and the About rail. */
+export const FullPage: Story = {
+  args: {
+    ...toolbarArgs,
+    goToFile: true,
+    downloadZip: true,
+    sshUrl: 'ssh://git@pyn.example.com/acme/castle-quest.pyn',
+    branchesHref: '/acme/castle-quest/branches',
+    readme: { name: 'README.md', path: 'README.md', text: readmeText },
+    readmeOthers: [
+      {
+        name: 'CONTRIBUTING.md',
+        path: 'CONTRIBUTING.md',
+        text: '# Contributing\n\nOpen an issue first.',
+      },
+    ],
+    about: {
+      description: 'An action game about a haunted castle.',
+      website: 'https://castle-quest.example.com',
+      stars: 12,
+      watching: 3,
+      forks: 1,
+    },
+  },
+}
+export const FullPageNarrow: Story = {
+  args: FullPage.args,
+  globals: { viewport: { value: 'mobile1' } },
+}
+export const AboutPlaceholders: Story = { args: { about: {} } }
+export const TagsLinked: Story = {
+  args: { ...toolbarArgs, tagsHref: '/acme/castle-quest/tags', tagCount: 4 },
+}
+
+/** The branch comparison sits under the toolbar with the standard gap. */
+export const BranchComparison: Story = {
+  args: { ...toolbarArgs, branch: 'feature/levels' },
+  render: (args) => ({
+    components: { PynRepoLanding, PynBranchCompare },
+    setup: () => ({ args }),
+    template: `<PynRepoLanding v-bind="args">
+      <template #compare><PynBranchCompare base="main" head="feature/levels" status="ahead" :ahead="4" :behind="0" /></template>
+    </PynRepoLanding>`,
+  }),
+}
+
+/** Header, tabs, toolbar, file table, README and About rail together. */
+export const WholePage: Story = {
+  args: FullPage.args,
+  parameters: { layout: 'padded' },
+  render: (args) => ({
+    components: { PynRepoShell, PynRepoLanding },
+    setup: () => ({
+      args,
+      tabs: repoShellTabs(['read', 'manage_users', 'manage_roles', 'view_audit'], true),
+      social: {
+        watch: { count: 0, menu: [{ id: 'all', label: 'All activity', checked: true }] },
+        fork: { count: 1 },
+        star: { count: 3, menu: [{ id: 'lists', label: 'Add to a list' }] },
+      },
+    }),
+    template: `<PynRepoShell owner="acme" name="castle-quest" visibility="public" :tabs="tabs" current="" :social="social">
+      <PynRepoLanding v-bind="args" />
+    </PynRepoShell>`,
+  }),
 }

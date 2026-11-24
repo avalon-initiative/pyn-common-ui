@@ -10,13 +10,17 @@ const props = withDefaults(
     httpsUrl: string
     command: string
     sshUrl?: string
+    /** The pyn command for the SSH tab; defaults to `command`. */
+    sshCommand?: string
+    /** Adds the Download ZIP row, which emits `download`. */
+    downloadZip?: boolean
     label?: string
     /** `primary` is the filled call-to-action; `default` the neutral button. */
     variant?: 'primary' | 'default'
   }>(),
-  { label: 'Clone', variant: 'primary' },
+  { label: 'Code', variant: 'primary' },
 )
-const emit = defineEmits<{ copy: [kind: CloneKind] }>()
+const emit = defineEmits<{ copy: [kind: CloneKind]; download: [] }>()
 
 const open = ref(false)
 const copied = ref<CloneKind | null>(null)
@@ -24,11 +28,41 @@ const failed = ref(false)
 const root = ref<HTMLElement | null>(null)
 const trigger = ref<HTMLButtonElement | null>(null)
 
-const rows = computed(() => [
-  { kind: 'https' as const, title: 'HTTPS', value: props.httpsUrl },
-  ...(props.sshUrl ? [{ kind: 'ssh' as const, title: 'SSH', value: props.sshUrl }] : []),
-  { kind: 'command' as const, title: 'pyn', value: props.command },
-])
+const tab = ref<'https' | 'ssh'>('https')
+const active = computed(() => (props.sshUrl ? tab.value : 'https'))
+const rows = computed(() =>
+  active.value === 'ssh'
+    ? [
+        { kind: 'ssh' as const, title: 'SSH', value: props.sshUrl! },
+        { kind: 'command' as const, title: 'pyn', value: props.sshCommand ?? props.command },
+      ]
+    : [
+        { kind: 'https' as const, title: 'HTTPS', value: props.httpsUrl },
+        { kind: 'command' as const, title: 'pyn', value: props.command },
+      ],
+)
+const tabs = [
+  { id: 'https' as const, label: 'HTTPS' },
+  { id: 'ssh' as const, label: 'SSH' },
+]
+
+function pick(id: 'https' | 'ssh') {
+  tab.value = id
+  copied.value = null
+  failed.value = false
+}
+function tabKey(e: KeyboardEvent) {
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+  e.preventDefault()
+  pick(tab.value === 'https' ? 'ssh' : 'https')
+  void nextTick(() =>
+    root.value?.querySelector<HTMLElement>('[role=tab][aria-selected=true]')?.focus(),
+  )
+}
+function download() {
+  close(true)
+  emit('download')
+}
 
 async function show() {
   open.value = true
@@ -99,8 +133,31 @@ onBeforeUnmount(stop)
       @focusout="leave"
       @mousedown="hold"
     >
+      <p :class="styles.heading">Clone</p>
+      <div
+        v-if="sshUrl"
+        :class="styles.tabs"
+        role="tablist"
+        aria-label="Clone with"
+        @keydown="tabKey"
+      >
+        <button
+          v-for="t in tabs"
+          :key="t.id"
+          type="button"
+          role="tab"
+          :class="styles.tab"
+          :aria-selected="active === t.id"
+          :tabindex="active === t.id ? 0 : -1"
+          @click="pick(t.id)"
+        >
+          {{ t.label }}
+        </button>
+      </div>
       <div v-for="row in rows" :key="row.kind" :class="styles.row">
-        <label :class="styles.title" :for="`pyn-clone-${row.kind}`">{{ row.title }}</label>
+        <label :class="styles.title" :for="`pyn-clone-${row.kind}`">{{
+          row.kind === 'command' ? 'pyn command' : row.title
+        }}</label>
         <div :class="styles.field">
           <input
             :id="`pyn-clone-${row.kind}`"
@@ -119,6 +176,9 @@ onBeforeUnmount(stop)
           </button>
         </div>
       </div>
+      <button v-if="downloadZip" type="button" :class="styles.download" @click="download">
+        <PynIcon name="download" />Download ZIP
+      </button>
       <p v-if="failed" :class="styles.error" role="status">Could not copy</p>
     </div>
   </div>

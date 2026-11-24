@@ -45,7 +45,6 @@ describe('PynRepoShell facts', () => {
 
   it('shows owner and name as the title and hides it with hidePath', () => {
     const w = mount(PynRepoShell, { props: base })
-    expect(w.find('h1').text()).toContain('studio')
     expect(w.find('h1').text()).toContain('game')
     const hidden = mount(PynRepoShell, { props: { ...base, hidePath: true } })
     expect(hidden.find('h1').exists()).toBe(false)

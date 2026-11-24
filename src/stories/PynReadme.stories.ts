@@ -19,3 +19,16 @@ export const PlainText: Story = {
   args: { readme: { name: 'README', path: 'README', text: 'Plain text\nreadme.' } },
 }
 export const OnBranch: Story = { args: { branch: 'feature/levels' } }
+
+export const WithTabs: Story = {
+  args: {
+    others: [
+      {
+        name: 'CONTRIBUTING.md',
+        path: 'CONTRIBUTING.md',
+        text: '# Contributing\n\nOpen an issue first.',
+      },
+      { name: 'LICENSE', path: 'LICENSE', text: 'Apache License 2.0' },
+    ],
+  },
+}

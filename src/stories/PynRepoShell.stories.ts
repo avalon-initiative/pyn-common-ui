@@ -63,18 +63,26 @@ export const MoreMenu: Story = { args: { maxTabs: 3, current: 'settings' } }
 export const LockPending: Story = { args: { lockPending: true } }
 
 export const HeaderActions: Story = {
+  args: {
+    social: {
+      watch: { count: 0, menu: [{ id: 'all', label: 'All activity', checked: true }] },
+      fork: { count: 1 },
+      star: { count: 3, menu: [{ id: 'lists', label: 'Add to a list' }] },
+    },
+  },
   render: (args) => ({
-    components: { PynRepoShell, PynButton, PynCloneMenu },
+    components: { PynRepoShell, PynCloneMenu },
     setup: () => ({ args }),
     template: `<PynRepoShell v-bind="args">
-      <template #watch><PynButton label="Watch" variant="secondary" /></template>
-      <template #fork><PynButton label="Fork" variant="secondary" /></template>
-      <template #star><PynButton label="Star" variant="secondary" /></template>
       <template #actions><PynCloneMenu https-url="https://pyn.example.com/studio/game.pyn" command="pyn clone studio/game" /></template>
       <p>Page content</p>
     </PynRepoShell>`,
   }),
 }
+export const SocialOnly: Story = {
+  args: { social: { star: { count: 2, active: true } } },
+}
+export const WithOwner: Story = { args: { showOwner: true } }
 
 const branches = [
   { name: 'main', isDefault: true, updatedAt: '2026-10-08T10:00:00Z' },

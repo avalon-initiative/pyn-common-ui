@@ -1,0 +1,61 @@
+@use 'mixins' as m;
+
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.split {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.main {
+  @include m.button;
+  gap: var(--pyn-space-2);
+  font-weight: 500;
+}
+
+.icon {
+  color: var(--pyn-text-muted);
+}
+
+.active .icon {
+  color: var(--pyn-accent);
+}
+
+.count {
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-text);
+  background: var(--pyn-bg-inset);
+  border-radius: var(--pyn-radius-pill);
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+// The caret joins the button: shared edge, one outline.
+.menu > button {
+  @include m.button;
+  align-self: stretch;
+  height: 100%;
+  padding-inline: var(--pyn-space-2);
+  border-left: 0;
+  border-radius: 0 var(--pyn-radius) var(--pyn-radius) 0;
+}
+
+.split:has(.menu) .main {
+  border-radius: var(--pyn-radius) 0 0 var(--pyn-radius);
+}
+
+// On narrow screens the star button shrinks to its icon so the group stays on one row.
+@include m.narrow {
+  .split[data-kind='star'] {
+    .label,
+    .count {
+      @include m.visually-hidden;
+    }
+  }
+}

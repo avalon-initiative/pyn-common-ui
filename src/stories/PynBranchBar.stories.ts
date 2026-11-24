@@ -43,3 +43,12 @@ export const CountPending: Story = {
   args: { ...Toolbar.args, branchCount: undefined },
   render: Toolbar.render,
 }
+
+export const TagsPlaceholder: Story = {
+  args: { ...Toolbar.args, showTags: true, goToFile: true },
+  render: Toolbar.render,
+}
+export const TagsLink: Story = {
+  args: { ...TagsPlaceholder.args, tagsHref: '/studio/game/tags', tagCount: 9 },
+  render: Toolbar.render,
+}

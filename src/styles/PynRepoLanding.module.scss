@@ -7,6 +7,21 @@
   min-width: 0;
 }
 
+.aboveToolbar {
+  padding-bottom: var(--pyn-space-4);
+  border-bottom: 1px solid var(--pyn-border);
+
+  @media (min-width: 63.25rem) {
+    display: none;
+  }
+}
+
+.railAbout {
+  @media (max-width: 63.24rem) {
+    display: none;
+  }
+}
+
 .missing {
   @include m.card;
   padding: var(--pyn-space-6);

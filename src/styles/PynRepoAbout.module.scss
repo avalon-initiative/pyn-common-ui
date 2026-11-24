@@ -48,3 +48,32 @@
   font-weight: 500;
   line-height: 1.5rem;
 }
+
+.none {
+  @include m.muted;
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  margin: 0;
+}
+
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-1) var(--pyn-space-4);
+  margin: 0;
+  padding: 0;
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-base);
+  list-style: none;
+
+  svg {
+    margin-right: var(--pyn-space-2);
+    vertical-align: -0.2em;
+  }
+
+  strong {
+    color: var(--pyn-text);
+    font-weight: 600;
+  }
+}

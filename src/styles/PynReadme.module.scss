@@ -9,23 +9,57 @@
 
 .header {
   display: flex;
-  align-items: center;
-  gap: var(--pyn-space-2);
-  box-sizing: border-box;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
   min-height: var(--pyn-control-lg);
-  padding: var(--pyn-space-2) var(--pyn-space-4);
-  background: var(--pyn-bg-subtle);
+  padding-inline: var(--pyn-space-2);
   border-bottom: 1px solid var(--pyn-border);
 }
 
+.tabs {
+  display: flex;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.tab {
+  @include m.control(var(--pyn-control-lg));
+  flex: none;
+  gap: var(--pyn-space-2);
+  padding-inline: var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+  }
+
+  &[aria-selected='true'] {
+    color: var(--pyn-text);
+    border-bottom-color: var(--pyn-accent);
+    font-weight: 600;
+  }
+
+  @include m.focus-ring;
+}
+
 .icon {
+  flex: none;
   color: var(--pyn-text-muted);
 }
 
 .title {
-  color: var(--pyn-text);
-  font-size: var(--pyn-text-base);
-  font-weight: 600;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-sm);
   text-decoration: none;
 
   &:hover {
@@ -34,6 +68,11 @@
   }
 
   @include m.focus-ring;
+  @include m.narrow {
+    .file {
+      @include m.visually-hidden;
+    }
+  }
 }
 
 .body {

@@ -16,11 +16,17 @@ defineProps<{
   branchesHref?: string
   /** Shown in the branches link; the number's space is held while it is unknown. */
   branchCount?: number
+  /** Shows the tags entry: a link with `tagCount` when `tagsHref` is given, otherwise a not-supported placeholder. */
+  showTags?: boolean
+  tagCount?: number
+  tagsHref?: string
+  /** Shows the Go to file button, which emits `goToFile`. */
+  goToFile?: boolean
   files?: number
   updatedAt?: string | null
   now?: Date
 }>()
-defineEmits<{ select: [name: string] }>()
+defineEmits<{ select: [name: string]; goToFile: [] }>()
 </script>
 
 <template>
@@ -43,6 +49,24 @@ defineEmits<{ select: [name: string] }>()
       <strong :class="styles.count">{{ branchCount ?? '' }}</strong>
       {{ branchCount === 1 ? 'Branch' : 'Branches' }}
     </a>
+    <template v-if="showTags">
+      <a v-if="tagsHref" :href="tagsHref" :class="styles.branches" data-tags-link>
+        <PynIcon name="tag" :class="styles.icon" />
+        <strong :class="styles.count">{{ tagCount ?? '' }}</strong>
+        {{ tagCount === 1 ? 'Tag' : 'Tags' }}
+      </a>
+      <span
+        v-else
+        :class="[styles.branches, styles.unsupported]"
+        title="Tags are not supported yet"
+        data-tags-unsupported
+      >
+        <PynIcon name="tag" :class="styles.icon" />
+        <strong :class="styles.count" aria-hidden="true">&ndash;</strong>
+        Tags
+        <span :class="styles.soon">Not supported yet</span>
+      </span>
+    </template>
     <div :class="$slots.default ? styles.path : styles.spacer"><slot /></div>
     <template v-if="files !== undefined">
       <span :class="styles.meta">{{ files }} {{ files === 1 ? 'file' : 'files' }}</span>
@@ -51,6 +75,9 @@ defineEmits<{ select: [name: string] }>()
       >
       <span v-else :class="styles.meta">No revisions yet</span>
     </template>
+    <button v-if="goToFile" type="button" :class="styles.goto" @click="$emit('goToFile')">
+      <PynIcon name="search" :class="styles.icon" />Go to file
+    </button>
     <div v-if="$slots.actions" :class="styles.actions"><slot name="actions" /></div>
   </div>
 </template>

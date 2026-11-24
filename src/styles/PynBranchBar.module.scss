@@ -48,8 +48,8 @@
 }
 
 .path {
-  flex: 1 1 12rem;
-  min-width: 0;
+  flex: 1 1 0;
+  min-width: 6rem;
 }
 
 .spacer {
@@ -65,4 +65,47 @@
   align-items: center;
   gap: var(--pyn-space-2);
   margin-left: auto;
+
+  @include m.narrow {
+    order: 2;
+  }
+}
+
+.unsupported {
+  cursor: default;
+
+  &:hover {
+    background: none;
+  }
+}
+
+.soon {
+  @include m.visually-hidden;
+}
+
+.goto {
+  @include m.control;
+  justify-content: flex-start;
+  gap: var(--pyn-space-2);
+  box-sizing: border-box;
+  flex: 0 1 14rem;
+  padding-inline: var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  background: var(--pyn-control-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  font: inherit;
+  font-size: var(--pyn-text-base);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--pyn-control-bg-hover);
+  }
+
+  @include m.focus-ring;
+
+  @include m.narrow {
+    order: 3;
+    flex: 1 1 100%;
+  }
 }
