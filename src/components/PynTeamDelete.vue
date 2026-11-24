@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, inject } from 'vue'
 import styles from '../styles/PynTeamDelete.module.scss'
+import { DANGER_ZONE } from '../state/settings-section.state'
 
 const props = defineProps<{ slug: string; busy?: boolean; error?: string }>()
+const bare = inject(DANGER_ZONE, undefined)
 const emit = defineEmits<{ remove: [] }>()
 
 const typed = ref('')
@@ -10,7 +12,11 @@ const matches = computed(() => typed.value === props.slug)
 </script>
 
 <template>
-  <form :class="styles.form" @submit.prevent="matches && emit('remove')">
+  <form
+    :class="styles.form"
+    :data-bare="bare || undefined"
+    @submit.prevent="matches && emit('remove')"
+  >
     <h3 :class="styles.heading">Delete this team</h3>
     <p :class="styles.note">
       Its members lose the access it gave them and its roles on repositories are removed. Type

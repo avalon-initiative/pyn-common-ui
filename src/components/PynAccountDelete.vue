@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, inject } from 'vue'
 import styles from '../styles/PynAccountDelete.module.scss'
+import { DANGER_ZONE } from '../state/settings-section.state'
 import type { AccountDeleteBlockers } from '../types/auth.types'
 
 const props = defineProps<{
@@ -12,6 +13,7 @@ const props = defineProps<{
   busy?: boolean
   error?: string
 }>()
+const bare = inject(DANGER_ZONE, undefined)
 const emit = defineEmits<{ remove: [password?: string] }>()
 
 const password = ref('')
@@ -24,7 +26,7 @@ function submit() {
 </script>
 
 <template>
-  <form :class="styles.form" @submit.prevent="submit">
+  <form :class="styles.form" :data-bare="bare || undefined" @submit.prevent="submit">
     <h3 :class="styles.heading">Delete this account</h3>
     <p :class="styles.note">
       The account is disabled and deleted after

@@ -8,54 +8,20 @@ import PynSettingsSection from './PynSettingsSection.vue'
 import styles from '../styles/PynAccessPage.module.scss'
 import { ACCESS_TABS, accessControls, accessCounts, accessEmpty } from '../state/access-page.state'
 import { isEditable, sourceNote } from '../state/team.state'
-import type { AccessMode } from '../types/access.types'
-import type { AccessAdd, AccessRow, AccessTab } from '../types/team.types'
+import type { AccessAdd, AccessPageProps, AccessTab } from '../types/team.types'
 
-const props = withDefaults(
-  defineProps<{
-    /** Rows of the open tab, already filtered and paged by the app. */
-    rows: AccessRow[]
-    /** Total rows of the open tab across every page. */
-    count: number
-    roles: string[]
-    visibility?: AccessMode
-    /** Shows Manage visibility. */
-    canManageVisibility?: boolean
-    /** Role every organization member holds; absent means none. */
-    baseRole?: string | null
-    baseRoleHref?: string
-    directPeople?: number
-    directTeams?: number
-    /** Absent for a repository owned by a person: the organization card says so. */
-    organization?: string
-    organizationHref?: string
-    orgPeople?: number
-    orgTeams?: number
-    /** Selected type and role filters; `all` shows everything. */
-    type?: string
-    role?: string
-    page?: number
-    pageSize?: number
-    /** Shows Create team, Add people and Add teams, and the row controls. */
-    canManage?: boolean
-    busy?: boolean
-    loading?: boolean
-    error?: string
-    title?: string
-  }>(),
-  {
-    visibility: 'private',
-    directPeople: 0,
-    directTeams: 0,
-    orgPeople: 0,
-    orgTeams: 0,
-    type: 'all',
-    role: 'all',
-    page: 1,
-    pageSize: 30,
-    title: 'Manage access',
-  },
-)
+const props = withDefaults(defineProps<AccessPageProps>(), {
+  visibility: 'private',
+  directPeople: 0,
+  directTeams: 0,
+  orgPeople: 0,
+  orgTeams: 0,
+  type: 'all',
+  role: 'all',
+  page: 1,
+  pageSize: 30,
+  title: 'Manage access',
+})
 const emit = defineEmits<{
   manageVisibility: []
   createTeam: []

@@ -54,6 +54,7 @@ export function orgSettingsNav(role: OrgRole | null | undefined): OrgTab[] {
     { section: 'settings', label: 'General', icon: 'settings' },
     { section: 'members', label: 'Members', group: 'Access', icon: 'user' },
     { section: 'teams', label: 'Teams', group: 'Access', icon: 'users' },
+    { section: 'policy', label: 'Repository policy', group: 'Access', icon: 'shield' },
     { section: 'usage', label: 'Usage', group: 'Storage and audit', icon: 'database' },
     { section: 'audit', label: 'Audit log', group: 'Storage and audit', icon: 'list' },
   ]

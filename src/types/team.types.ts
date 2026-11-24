@@ -1,3 +1,4 @@
+import type { AccessMode } from './access.types'
 import type { PublicIdentity } from './profile.types'
 
 export type MemberSource = 'direct' | 'team' | 'org_owner'
@@ -54,3 +55,36 @@ export interface AccessRow extends Grantee {
 export type AccessTab = 'direct' | 'organization'
 
 export type AccessAdd = 'people' | 'teams'
+
+/** Props of `PynAccessPage`. */
+export interface AccessPageProps {
+  /** Rows of the open tab, already filtered and paged by the app. */
+  rows: AccessRow[]
+  /** Total rows of the open tab across every page. */
+  count: number
+  roles: string[]
+  visibility?: AccessMode
+  /** Shows Manage visibility. */
+  canManageVisibility?: boolean
+  /** Role every organization member holds; absent means none. */
+  baseRole?: string | null
+  baseRoleHref?: string
+  directPeople?: number
+  directTeams?: number
+  /** Absent for a repository owned by a person: the organization card says so. */
+  organization?: string
+  organizationHref?: string
+  orgPeople?: number
+  orgTeams?: number
+  /** Selected type and role filters; `all` shows everything. */
+  type?: string
+  role?: string
+  page?: number
+  pageSize?: number
+  /** Shows Create team, Add people and Add teams, and the row controls. */
+  canManage?: boolean
+  busy?: boolean
+  loading?: boolean
+  error?: string
+  title?: string
+}
