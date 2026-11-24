@@ -4,7 +4,12 @@ import styles from '../styles/PynSignIn.module.scss'
 import PynAccountNotice from './PynAccountNotice.vue'
 import PynDismissButton from './PynDismissButton.vue'
 import { AUTO_DISMISS_MS, useAutoDismiss } from '../state/auto-dismiss.state'
-import { NO_EMAIL_NOTE, externalSignInUrl, signInErrorMessage } from '../state/account.state'
+import {
+  EMAIL_OPTIONAL_HINT,
+  NO_EMAIL_NOTE,
+  externalSignInUrl,
+  signInErrorMessage,
+} from '../state/account.state'
 import type {
   BlockedStatus,
   ExternalProvider,
@@ -21,6 +26,7 @@ const props = withDefaults(
     passkeys?: boolean
     returnTo?: string
     callbackError?: string
+    /** The server can send mail: the email is required at sign-up; otherwise it is an optional field. */
     emailVerification?: boolean
     /** Replaces the default note shown when the server sends no confirmation email. */
     noEmailNote?: string
@@ -59,6 +65,7 @@ const emit = defineEmits<{
 const nameMessageId = useId()
 const confirmMessageId = useId()
 const canonicalId = useId()
+const emailHintId = useId()
 
 type View = 'sign-in' | 'register'
 const view = ref<View>('sign-in')
@@ -92,7 +99,7 @@ const nameDescribedBy = computed(
       .join(' ') || undefined,
 )
 const canRegister = computed(() => props.registration === 'open' || props.registration === 'invite')
-const needsEmail = computed(() => props.registration === 'open' && !!props.emailVerification)
+const emailRequired = computed(() => props.registration === 'open' && !!props.emailVerification)
 const showNoEmailNote = computed(
   () =>
     view.value === 'register' && props.registration === 'open' && props.emailVerification === false,
@@ -113,7 +120,7 @@ function submit() {
     emit('register', {
       username: username.value,
       password: password.value,
-      email: needsEmail.value ? email.value : undefined,
+      email: email.value || undefined,
       invite: invite.value.trim() || undefined,
     })
   }
@@ -198,19 +205,23 @@ function submit() {
             >The passwords do not match.</span
           >
         </label>
-        <label v-if="view === 'register' && needsEmail" :class="styles.field"
-          >Email address
+        <label v-if="view === 'register' && needsInvite" :class="styles.field"
+          >Invitation code
+          <input v-model.trim="invite" :class="styles.input" autocomplete="off" required />
+        </label>
+        <label v-if="view === 'register'" :class="styles.field"
+          >{{ emailRequired ? 'Email address' : 'Email (optional)' }}
           <input
             v-model.trim="email"
             :class="styles.input"
             type="email"
             autocomplete="email"
-            required
+            :required="emailRequired"
+            :aria-describedby="emailRequired ? undefined : emailHintId"
           />
-        </label>
-        <label v-if="view === 'register' && needsInvite" :class="styles.field"
-          >Invitation code
-          <input v-model.trim="invite" :class="styles.input" autocomplete="off" required />
+          <span v-if="!emailRequired" :id="emailHintId" :class="styles.hint" data-email-hint>{{
+            EMAIL_OPTIONAL_HINT
+          }}</span>
         </label>
       </template>
 
