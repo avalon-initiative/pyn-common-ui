@@ -1568,7 +1568,10 @@ describe('PynHistory', () => {
     vi.advanceTimersByTime(400)
     expect(w.emitted('filter')).toEqual([['*.uasset']])
     vi.useRealTimers()
-    await w.find('button').trigger('click')
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Load more')!
+      .trigger('click')
     expect(w.emitted('more')).toHaveLength(1)
   })
 

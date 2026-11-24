@@ -38,17 +38,126 @@
   }
 }
 
-.main {
+// Faces the page: the toolbar and timeline sit in one column.
+.title {
+  margin: 0;
+  padding-bottom: var(--pyn-space-2);
+  border-bottom: 1px solid var(--pyn-border);
+  font-size: var(--pyn-text-xl);
+  font-weight: 400;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-2);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+}
+
+.select {
+  @include m.button;
+  gap: var(--pyn-space-2);
+  padding-inline: var(--pyn-space-2);
+
+  select {
+    color: inherit;
+    background: none;
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: none;
+  }
+}
+
+.selectIcon {
+  flex: none;
+  color: var(--pyn-text-muted);
+}
+
+.timeline {
   display: flex;
   flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
+.day {
+  position: relative;
+  padding-left: var(--pyn-space-6);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 1.75rem;
+    bottom: 0;
+    left: 0.6875rem;
+    border-left: 2px solid var(--pyn-border);
+  }
+}
+
+.dayTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  margin: 0 0 var(--pyn-space-2) calc(-1 * var(--pyn-space-6));
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-base);
+  font-weight: 400;
+}
+
+.dayIcon {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.list {
+  margin: 0 0 var(--pyn-space-2);
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.item {
+  @include m.item;
+  padding-block: var(--pyn-space-3);
+  font-size: var(--pyn-text-base);
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.rev {
-  font-family: var(--pyn-font-mono);
+.message {
+  color: var(--pyn-text);
+  font-weight: 600;
+}
+
+.meta {
+  @include m.muted;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-1) var(--pyn-space-2);
   font-size: var(--pyn-text-xs);
-  font-weight: 500;
 }
 
 .path {
@@ -56,15 +165,44 @@
   font-size: var(--pyn-text-xs);
 }
 
-.revPath {
-  margin-left: var(--pyn-space-2);
-  color: var(--pyn-text-muted);
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pyn-space-1);
 }
 
-.message {
-  order: -1;
-  color: var(--pyn-text);
-  font-weight: 600;
+.rev {
+  margin-right: var(--pyn-space-1);
+  color: var(--pyn-text-muted);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+}
+
+.verified {
+  @include m.pill;
+  margin-right: var(--pyn-space-2);
+  color: var(--pyn-accent);
+}
+
+.icon {
+  @include m.control;
+  justify-content: center;
+  min-width: var(--pyn-control-sm);
+  padding: 0;
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  @include m.touch-target($square: true);
+  @include m.focus-ring;
 }
 
 .body {
@@ -83,55 +221,12 @@
   color: var(--pyn-text-muted);
 }
 
-.box {
-  overflow: hidden;
-  background: var(--pyn-bg);
-  border: 1px solid var(--pyn-border);
-  border-radius: var(--pyn-radius);
-}
-
-.head {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  min-height: var(--pyn-control-lg);
-  padding: 0 var(--pyn-space-4);
-  background: var(--pyn-bg-subtle);
-  border-bottom: 1px solid var(--pyn-border);
-  font-size: var(--pyn-text-base);
-  font-weight: 600;
-}
-
-.list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.item {
-  @include m.item;
-  align-items: flex-start;
-  padding-block: var(--pyn-space-2);
-  font-size: var(--pyn-text-base);
-
-  &:hover {
-    background: var(--pyn-hover);
-  }
-}
-
-.meta {
-  @include m.muted;
-  font-size: var(--pyn-text-xs);
-  white-space: nowrap;
-}
-
 .empty {
   @include m.muted;
 }
 
 .pill {
   @include m.pill;
-  margin-left: var(--pyn-space-2);
 }
 
 .error {

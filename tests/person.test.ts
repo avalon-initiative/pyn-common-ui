@@ -89,7 +89,7 @@ describe('people in lists', () => {
   it('PynHistory shows the author identity and rename', () => {
     const plain = mount(PynHistory, { props: { revisions: [rev] } })
     expect(plain.find('[data-account]').exists()).toBe(false)
-    expect(plain.text()).toContain('alice ·')
+    expect(plain.text()).toContain('alice authored')
     const rich = mount(PynHistory, {
       props: { revisions: [{ ...rev, author_public: aliciaIdentity, author_current: 'alicia' }] },
     })
