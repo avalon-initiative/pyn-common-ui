@@ -55,6 +55,11 @@
   left: 0;
 }
 
+.fixed {
+  position: fixed;
+  right: auto;
+}
+
 .heading {
   margin: 0;
   padding: var(--pyn-space-2) var(--pyn-space-4) var(--pyn-space-1);

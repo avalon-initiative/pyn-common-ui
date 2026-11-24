@@ -52,3 +52,12 @@ export function matchRepos(slugs: string[], query: string): string[] {
   const q = query.trim().toLowerCase()
   return q ? slugs.filter((s) => s.toLowerCase().includes(q)) : []
 }
+
+/** The repositories whose owner/name contains the query; an empty query keeps them all. */
+export function filterRepos<T extends { owner: string; name: string }>(
+  repos: T[],
+  query: string,
+): T[] {
+  const q = query.trim().toLowerCase()
+  return q ? repos.filter((r) => `${r.owner}/${r.name}`.toLowerCase().includes(q)) : repos
+}

@@ -93,6 +93,8 @@ import {
   versionMismatch,
   PynSignIn,
   PynSideNav,
+  PynSideRail,
+  PynSubNav,
   PynTeamDelete,
   PynTeamDetail,
   PynTeamForm,
@@ -5714,5 +5716,92 @@ describe('PynPasswordForm reason', () => {
   it('leaves the output unchanged without a reason', () => {
     const w = mount(PynPasswordForm)
     expect(w.find('[role="status"]').exists()).toBe(false)
+  })
+})
+
+describe('PynSideRail', () => {
+  const repos = Array.from({ length: 12 }, (_, i) => ({ owner: 'alice', name: `repo-${i}` }))
+  const mountRail = (props = {}) =>
+    mount(PynSideRail, {
+      props: {
+        account: 'alice',
+        items: [{ id: 'home', label: 'Home', href: '/', icon: 'home' }],
+        current: 'home',
+        repos,
+        orgs: [{ name: 'studio' }],
+        ...props,
+      },
+    })
+  const repoLinks = (w: ReturnType<typeof mountRail>) =>
+    w.findAll('a').filter((a) => a.attributes('href')?.startsWith('/alice/'))
+
+  it('marks Home current and shows the personal account', () => {
+    const w = mountRail()
+    expect(w.find('[aria-current="page"]').text()).toBe('Home')
+    expect(w.text()).toContain('Personal account')
+  })
+
+  it('caps the repositories and expands on Show more', async () => {
+    const w = mountRail()
+    expect(repoLinks(w)).toHaveLength(10)
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Show more')!
+      .trigger('click')
+    expect(w.text()).not.toContain('Show more')
+    expect(repoLinks(w)).toHaveLength(12)
+  })
+
+  it('filters the repositories from the search toggle', async () => {
+    const w = mountRail()
+    await w.find('button[aria-label="Filter repositories"]').trigger('click')
+    await w.find('input').setValue('repo-1')
+    expect(repoLinks(w).map((a) => a.text())).toEqual([
+      'alice/repo-1',
+      'alice/repo-10',
+      'alice/repo-11',
+    ])
+    await w.find('input').setValue('zzz')
+    expect(w.text()).toContain('No matches.')
+  })
+
+  it('lists the personal account, organizations and create organization in the switcher', async () => {
+    const w = mountRail({ currentOrg: 'studio' })
+    expect(w.text()).toContain('Organization')
+    await w.find('button[aria-haspopup="menu"]').trigger('click')
+    const items = w.findAll('[role^="menuitem"]')
+    expect(items.map((i) => i.attributes('href'))).toEqual(['/', '/studio', '/_/orgs/new'])
+    expect(w.find('[aria-current="true"]').text()).toContain('studio')
+  })
+
+  it('says so when there are no repositories', () => {
+    expect(mountRail({ repos: [] }).text()).toContain('None yet.')
+  })
+})
+
+describe('PynSubNav', () => {
+  const groups = [
+    { id: 'a', items: [{ id: 'x', label: 'X', href: '/x', badge: 3 }] },
+    { id: 'b', heading: 'More', items: [{ id: 'y', label: 'Y', href: '/y' }] },
+  ]
+
+  it('renders headings only for titled groups and marks the current item', () => {
+    const w = mount(PynSubNav, { props: { groups, current: 'y', label: 'Repos' } })
+    expect(w.findAll('h2').map((h) => h.text())).toEqual(['More'])
+    expect(w.find('[aria-current="page"]').text()).toBe('Y')
+    expect(w.find('nav').attributes('aria-label')).toBe('Repos')
+    expect(w.text()).toContain('3 pending')
+  })
+})
+
+describe('PynMenu fixed', () => {
+  it('positions the panel against the viewport', async () => {
+    const w = mount(PynMenu, {
+      props: { label: 'Open', fixed: true, items: [{ id: 'a', label: 'A' }] },
+    })
+    await w.find('button').trigger('click')
+    const style = w.find('[role="menu"]').attributes('style') ?? ''
+    expect(style).toContain('top:')
+    expect(style).toContain('left:')
   })
 })

@@ -44,29 +44,7 @@
 }
 
 .link {
-  display: flex;
-  align-items: center;
-  gap: var(--pyn-space-3);
-  box-sizing: border-box;
-  min-height: var(--pyn-control-md);
-  padding: 0 var(--pyn-space-3);
-  color: var(--pyn-text);
-  border-radius: var(--pyn-radius);
-  text-decoration: none;
-
-  &:hover {
-    background: var(--pyn-hover);
-  }
-
-  &[aria-current] {
-    background: var(--pyn-hover);
-    font-weight: 600;
-    box-shadow: inset 2px 0 0 var(--pyn-accent);
-  }
-
-  @include m.touch-target;
-
-  @include m.focus-ring;
+  @include m.side-link;
 }
 
 .repo {
@@ -76,11 +54,8 @@
 }
 
 .heading {
-  margin: var(--pyn-space-4) 0 0;
-  padding: 0 var(--pyn-space-3);
-  color: var(--pyn-text-muted);
-  font-size: var(--pyn-text-xs);
-  font-weight: 600;
+  @include m.side-heading;
+  margin-top: var(--pyn-space-4);
 }
 
 .empty {
