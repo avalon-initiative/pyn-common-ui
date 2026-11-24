@@ -83,3 +83,69 @@
 
   @include m.focus-ring;
 }
+
+.list {
+  max-height: 20rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.entry {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-2);
+
+  & + & {
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pyn-space-1);
+  min-width: 0;
+}
+
+.title {
+  color: var(--pyn-text);
+  font-size: var(--pyn-text-sm);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+a.title {
+  color: var(--pyn-accent);
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include m.focus-ring;
+}
+
+.time {
+  @include m.muted;
+  font-size: var(--pyn-text-xs);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+  margin-top: var(--pyn-space-1);
+}
+
+.accept {
+  @include m.button-primary;
+}
+
+.decline {
+  @include m.button;
+}

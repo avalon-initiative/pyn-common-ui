@@ -81,6 +81,24 @@ export const NarrowRepositoryPage: Story = {
   args: { currentOwner: 'studio', repo: 'castle-quest' },
 }
 export const BellOpen: Story = { play: openBell }
+const bellEntries = [
+  { id: 'n1', title: 'Two-factor authentication was reset', at: '2026-11-20T09:00:00Z' },
+  {
+    id: 'i1',
+    kind: 'invitation' as const,
+    title: 'Invitation to join acme',
+    at: '2026-11-19T12:00:00Z',
+  },
+]
+export const BellWithEntries: Story = {
+  args: { notificationEntries: bellEntries, now: new Date('2026-11-20T12:00:00Z') },
+  play: openBell,
+}
+export const NarrowBellWithEntries: Story = {
+  args: { notificationEntries: bellEntries, now: new Date('2026-11-20T12:00:00Z') },
+  parameters: narrow,
+  play: openBell,
+}
 export const NarrowBellOpen: Story = { parameters: narrow, play: openBell }
 export const NavigationDrawerOpen: Story = { play: openMenu('Open navigation') }
 export const NarrowMenuOpen: Story = { parameters: narrow, play: openMenu('Open navigation') }
