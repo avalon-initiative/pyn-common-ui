@@ -1,0 +1,35 @@
+@use 'mixins' as m;
+
+.general {
+  display: grid;
+  gap: var(--pyn-space-6);
+  margin-bottom: var(--pyn-space-8);
+}
+
+.withPicture {
+  grid-template-columns: minmax(0, 1fr) 14rem;
+
+  @include m.narrow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+  max-width: 40rem;
+}
+
+.picture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  align-items: flex-start;
+}
+
+.pictureTitle {
+  margin: 0;
+  font-size: var(--pyn-text-base);
+  font-weight: 600;
+}
