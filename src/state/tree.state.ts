@@ -59,3 +59,44 @@ export function latestChange(entries: TreeEntry[]): Revision | null {
   }
   return best
 }
+
+export interface TreeRow {
+  entry: TreeEntry
+  depth: number
+}
+
+const parentPath = (path: string) => path.split('/').slice(0, -1).join('/')
+
+/** Folders along a path from the root, e.g. "a/b/c.ts" gives ["a", "a/b"]. */
+export function ancestorFolders(path: string): string[] {
+  const parts = path.split('/').filter(Boolean).slice(0, -1)
+  return parts.map((_, i) => parts.slice(0, i + 1).join('/'))
+}
+
+/** Flat entries (every loaded path) as depth-first rows, descending only into expanded folders. */
+export function treeRows(entries: TreeEntry[], expanded: string[]): TreeRow[] {
+  const open = new Set(expanded)
+  const children = new Map<string, TreeEntry[]>()
+  for (const e of entries) {
+    const parent = parentPath(e.path)
+    children.set(parent, [...(children.get(parent) ?? []), e])
+  }
+  const rows: TreeRow[] = []
+  const walk = (parent: string, depth: number) => {
+    for (const entry of foldersFirst(children.get(parent) ?? [])) {
+      rows.push({ entry, depth })
+      if (entry.kind === 'folder' && open.has(entry.path)) walk(entry.path, depth + 1)
+    }
+  }
+  walk('', 0)
+  return rows
+}
+
+/** Files whose path contains the query, case-insensitively, in the given order. */
+export function matchFiles(entries: TreeEntry[], query: string, limit = 50): TreeEntry[] {
+  const q = query.trim().toLowerCase()
+  if (!q) return []
+  return entries
+    .filter((e) => e.kind === 'file' && e.path.toLowerCase().includes(q))
+    .slice(0, limit)
+}

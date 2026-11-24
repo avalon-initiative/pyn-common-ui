@@ -171,3 +171,48 @@
 
   @include m.focus-ring;
 }
+
+.tabs {
+  display: flex;
+  gap: var(--pyn-space-1);
+  padding: 0 var(--pyn-space-2);
+  border-top: 1px solid var(--pyn-border);
+  border-bottom: 1px solid var(--pyn-border);
+}
+
+.tab {
+  @include m.control;
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-text);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  font-size: var(--pyn-text-base);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
+
+  @include m.focus-ring;
+}
+
+.tabCurrent {
+  border-bottom-color: var(--pyn-accent);
+  font-weight: 600;
+}
+
+.create {
+  @extend .option;
+  width: calc(100% - 2 * var(--pyn-space-2));
+  margin: 0 var(--pyn-space-2) var(--pyn-space-2);
+  color: inherit;
+  background: none;
+  border: 0;
+  text-align: left;
+
+  &.active {
+    background: var(--pyn-hover);
+  }
+}

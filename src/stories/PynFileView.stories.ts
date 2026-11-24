@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynFileView from '../components/PynFileView.vue'
-import { codeText, fileEntry, imageSrc, lockedEntry, readmeText } from './file-data'
+import { codeText, fileEntry, imageSrc, lockedEntry, readmeText, treeEntries } from './file-data'
 import { now } from './landing-data'
 
 const meta: Meta<typeof PynFileView> = {
@@ -48,5 +48,28 @@ export const OnBranch: Story = {
     branch: 'feature/levels',
     path: 'Source/Notes.md',
     body: { kind: 'markdown', text: readmeText },
+  },
+}
+
+const panel = {
+  tree: treeEntries,
+  expanded: ['Source', 'Content'],
+  branch: 'main',
+  branches: [
+    { name: 'main', isDefault: true, updatedAt: '2026-10-08T10:00:00Z' },
+    { name: 'feature/levels', updatedAt: '2026-10-05T09:30:00Z' },
+  ],
+  branchesHref: '/acme/castle-quest/branches',
+}
+
+export const WithFilesPanel: Story = { args: panel }
+export const PanelCollapsed: Story = { args: { ...panel, collapsed: true } }
+export const PanelWithLockedFile: Story = {
+  args: {
+    ...panel,
+    path: 'Content/Level02.umap',
+    entry: { ...lockedEntry, path: 'Content/Level02.umap', name: 'Level02.umap' },
+    body: { kind: 'binary' },
+    creatable: true,
   },
 }

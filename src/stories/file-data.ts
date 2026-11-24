@@ -68,3 +68,29 @@ export const imageSrc =
   encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="240" height="120"><rect width="240" height="120" fill="#3857d6"/></svg>',
   )
+
+const node = (
+  path: string,
+  kind: 'file' | 'folder',
+  mode: TreeEntry['mode'] = 'shared',
+): TreeEntry => ({
+  kind,
+  mode,
+  path,
+  name: path.slice(path.lastIndexOf('/') + 1),
+})
+
+/** Loaded entries of the root and two open folders, flat. */
+export const treeEntries: TreeEntry[] = [
+  node('Content', 'folder', 'exclusive'),
+  node('Source', 'folder'),
+  node('docs', 'folder'),
+  node('.gitignore', 'file'),
+  node('Makefile', 'file'),
+  node('README.md', 'file'),
+  node('Content/Level01.umap', 'file', 'exclusive'),
+  { ...node('Content/Level02.umap', 'file', 'exclusive'), lock: lockedEntry.lock },
+  node('Content/Textures', 'folder', 'exclusive'),
+  node('Source/Notes.md', 'file'),
+  fileEntry,
+]

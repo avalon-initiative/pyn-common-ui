@@ -1,0 +1,91 @@
+@use 'mixins' as m;
+
+.tree {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  padding-left: calc(var(--depth, 0) * var(--pyn-space-4));
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--pyn-control-md);
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-text);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  font: inherit;
+  font-size: var(--pyn-text-base);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
+
+  @include m.touch-target;
+  @include m.focus-ring;
+}
+
+.current .item {
+  background: var(--pyn-selected);
+  box-shadow: inset 0.1875rem 0 0 var(--pyn-accent);
+  font-weight: 600;
+}
+
+.chevron {
+  flex: none;
+  width: 1em;
+  height: 1em;
+  color: var(--pyn-text-muted);
+  transition: transform 0.1s;
+}
+
+.open {
+  transform: rotate(90deg);
+}
+
+.icon {
+  flex: none;
+  color: var(--pyn-text-muted);
+
+  [data-kind='folder'] > & {
+    color: var(--pyn-accent);
+  }
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lock {
+  flex: none;
+  color: var(--pyn-text-muted);
+}
+
+.held {
+  color: var(--pyn-locked);
+}
+
+.hidden {
+  @include m.visually-hidden;
+}
+
+.loading {
+  @include m.muted;
+  padding-top: var(--pyn-space-1);
+  padding-bottom: var(--pyn-space-1);
+}

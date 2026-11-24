@@ -61,8 +61,7 @@
 }
 
 @include m.narrow {
-  .rev,
-  .history {
+  .rev {
     display: none;
   }
 }

@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { onBeforeUnmount, ref } from 'vue'
+import PynIcon from './PynIcon.vue'
 import PynLatestChange from './PynLatestChange.vue'
 import PynLockBadge from './PynLockBadge.vue'
 import PynModeChip from './PynModeChip.vue'
 import styles from '../styles/PynFileBar.module.scss'
 import { baseName, contentUrl, historyLink } from '../state/blob.state'
+import { copyText } from '../utils/copy'
 import type { TreeEntry } from '../types/tree.types'
 
-defineProps<{
+const props = defineProps<{
   entry: TreeEntry
   owner: string
   name: string
@@ -22,14 +25,37 @@ defineProps<{
   embedded?: boolean
   /** Policy rule line shown beside the mode chip; the `note` slot overrides it. */
   note?: string
+  /** The file's text; shows a Copy button that copies it. */
+  text?: string
 }>()
 
-defineEmits<{ lock: [] }>()
+const emit = defineEmits<{ lock: []; copy: [text: string] }>()
+
+const copied = ref(false)
+const failed = ref(false)
+let timer: ReturnType<typeof setTimeout> | undefined
+
+async function copy() {
+  const ok = await copyText(props.text ?? '')
+  failed.value = !ok
+  copied.value = ok
+  clearTimeout(timer)
+  if (ok) {
+    emit('copy', props.text ?? '')
+    timer = setTimeout(() => (copied.value = false), 2000)
+  }
+}
+onBeforeUnmount(() => clearTimeout(timer))
 </script>
 
 <template>
   <div :class="styles.bar" :data-embedded="embedded || undefined">
-    <PynLatestChange v-if="entry.last_change" :change="entry.last_change" :now="now" />
+    <PynLatestChange
+      v-if="entry.last_change"
+      :change="entry.last_change"
+      :now="now"
+      :history-href="historyLink({ owner, name }, entry.path, branch)"
+    />
     <div v-else :class="styles.none">No revision yet</div>
     <div :class="styles.toolbar">
       <span :class="styles.info">
@@ -47,16 +73,26 @@ defineEmits<{ lock: [] }>()
           :class="styles.action"
           >Raw</a
         >
-        <a :href="historyLink({ owner, name }, entry.path, branch)" :class="styles.action"
-          >History</a
+        <button
+          v-if="text !== undefined"
+          type="button"
+          :class="[styles.action, styles.icon]"
+          aria-label="Copy file contents"
+          :title="copied ? 'Copied' : 'Copy file contents'"
+          @click="copy"
         >
+          <PynIcon :name="copied ? 'check' : 'copy'" />
+        </button>
         <a
           v-if="entry.last_change"
           :href="contentUrl({ owner, name }, entry.path, undefined, branch)"
           :download="baseName(entry.path)"
-          :class="styles.action"
-          >Download</a
+          :class="[styles.action, styles.icon]"
+          aria-label="Download"
+          title="Download"
         >
+          <PynIcon name="download" />
+        </a>
         <button
           v-if="lockable && entry.mode === 'exclusive' && !entry.lock"
           type="button"
@@ -65,6 +101,9 @@ defineEmits<{ lock: [] }>()
         >
           Lock
         </button>
+        <span :class="styles.hidden" role="status">{{
+          failed ? 'Could not copy' : copied ? 'Copied' : ''
+        }}</span>
       </span>
     </div>
   </div>

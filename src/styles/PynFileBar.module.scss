@@ -71,3 +71,14 @@
     background: var(--pyn-control-bg-hover);
   }
 }
+
+.icon {
+  justify-content: center;
+  min-width: var(--pyn-control-sm);
+  padding: 0;
+  font-size: var(--pyn-text-base);
+}
+
+.hidden {
+  @include m.visually-hidden;
+}
