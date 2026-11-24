@@ -1,0 +1,53 @@
+@use 'mixins' as m;
+
+.text {
+  margin: 0;
+}
+
+.mono {
+  font-family: var(--pyn-font-mono);
+  overflow-wrap: anywhere;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
+.field {
+  font-weight: 600;
+
+  &:not(:first-child) {
+    margin-top: var(--pyn-space-2);
+  }
+}
+
+.optional {
+  color: var(--pyn-text-muted);
+  font-weight: 400;
+}
+
+.input {
+  @include m.input;
+  @include m.invalid;
+  width: 100%;
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+.problem {
+  @include m.field-message;
+  margin: 0;
+}
+
+.cancel {
+  @include m.button;
+}
+
+.confirm {
+  @include m.button-primary;
+  align-self: auto;
+}

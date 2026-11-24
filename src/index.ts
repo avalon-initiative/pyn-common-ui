@@ -663,3 +663,7 @@ export type {
 export { default as PynPullRequestList } from './components/PynPullRequestList.vue'
 export { matchesPullQuery, parsePullQuery } from './state/pull-request.state'
 export type { PullQuery } from './state/pull-request.state'
+export { default as PynTagsPage } from './components/PynTagsPage.vue'
+export { default as PynTagDialog } from './components/PynTagDialog.vue'
+export { filterTags, isCommitId, shortCommit, tagNameProblem } from './state/tags.state'
+export type { NewTag, RefKind, TagItem, TagOption } from './types/tag.types'

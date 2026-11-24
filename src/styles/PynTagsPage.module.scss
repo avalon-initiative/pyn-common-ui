@@ -1,0 +1,114 @@
+@use 'mixins' as m;
+
+.page {
+  min-width: 0;
+}
+
+.title {
+  margin: 0 0 var(--pyn-space-4);
+  font-size: var(--pyn-text-xl);
+  font-weight: 600;
+}
+
+.create {
+  @include m.button-primary;
+  align-self: auto;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  list-style: none;
+
+  & + & {
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  min-width: 0;
+}
+
+.name {
+  color: var(--pyn-text);
+  font-size: var(--pyn-text-md);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+a.name:hover {
+  color: var(--pyn-accent);
+  text-decoration: underline;
+}
+
+.message {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.meta {
+  @include m.muted;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-1) var(--pyn-space-4);
+  margin: 0;
+  font-size: var(--pyn-text-sm);
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-1);
+}
+
+.commit {
+  color: inherit;
+  font-family: var(--pyn-font-mono);
+  text-decoration: none;
+}
+
+a.commit:hover {
+  color: var(--pyn-accent);
+  text-decoration: underline;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--pyn-control-sm);
+  min-height: var(--pyn-control-sm);
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  @include m.touch-target($square: true);
+
+  @include m.focus-ring;
+}
+
+.delete {
+  flex: none;
+  min-width: var(--pyn-control-md);
+  min-height: var(--pyn-control-md);
+
+  &:hover {
+    color: var(--pyn-danger);
+  }
+}

@@ -40,6 +40,32 @@ export const TagsTab: Story = {
     await tick()
   },
 }
+const tags = [
+  { name: 'v0.2.0', createdAt: '2026-10-07T09:00:00Z' },
+  { name: 'v0.1.1', createdAt: '2026-09-02T12:00:00Z' },
+  { name: 'v0.1.0', createdAt: '2026-08-28T12:00:00Z' },
+]
+async function openTags(root: HTMLElement) {
+  await open(root)
+  root.querySelector<HTMLButtonElement>('[data-tab=tags]')!.click()
+  await tick()
+}
+export const WithTags: Story = {
+  args: { tags, allHref: '/acme/castle-quest/branches', tagsHref: '/acme/castle-quest/tags' },
+  play: ({ canvasElement }) => openTags(canvasElement),
+}
+export const OnATag: Story = {
+  args: { ...WithTags.args, current: 'v0.1.1', currentKind: 'tag' },
+  play: ({ canvasElement }) => open(canvasElement),
+}
+export const NoTags: Story = {
+  args: { tags: [], tagsHref: '/acme/castle-quest/tags' },
+  play: ({ canvasElement }) => openTags(canvasElement),
+}
+export const TagsLoading: Story = {
+  args: { tags: [], tagsLoading: true },
+  play: ({ canvasElement }) => openTags(canvasElement),
+}
 export const Creatable: Story = {
   args: { creatable: true, allHref: '/acme/castle-quest/branches' },
   play: async ({ canvasElement }) => {
