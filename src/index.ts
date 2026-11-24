@@ -497,6 +497,8 @@ export {
 } from './state/server-invitation.state'
 export { unknownEventTypes, withUnknownTypes } from './state/event-types.state'
 export { default as PynGlobalSearch } from './components/PynGlobalSearch.vue'
+export { groupSearchResults, searchHint, searchResultsText } from './state/global-search.state'
+export type { SearchResult, SearchResultGroup, SearchResultKind } from './types/search.types'
 export { default as PynDashboard } from './components/PynDashboard.vue'
 export { default as PynDashboardCard } from './components/PynDashboardCard.vue'
 export { default as PynDashboardRepositories } from './components/PynDashboardRepositories.vue'

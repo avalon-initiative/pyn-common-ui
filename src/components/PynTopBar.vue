@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import PynAvatar from './PynAvatar.vue'
 import PynDrawer from './PynDrawer.vue'
 import PynGlobalSearch from './PynGlobalSearch.vue'
+import type { SearchResult } from '../types/search.types'
 import PynIcon from './PynIcon.vue'
 import PynMenu from './PynMenu.vue'
 import PynNotificationsBell from './PynNotificationsBell.vue'
@@ -29,6 +30,8 @@ const props = withDefaults(
     avatarUrl?: string | null
     /** Repository slugs offered while typing; Enter on a match emits `open`. */
     repos?: string[]
+    /** Grouped dropdown under the search field; the app loads them on `input`. */
+    searchResults?: SearchResult[]
     theme: ThemeChoice
     /** Public variant: brand, search, theme and a sign-in link. */
     signedOut?: boolean
@@ -62,6 +65,7 @@ const emit = defineEmits<{
   open: [slug: string]
   input: [text: string]
   search: [text: string]
+  selectResult: [result: SearchResult]
   theme: [ThemeChoice]
   signOut: []
   account: [id: string]
@@ -234,8 +238,10 @@ onBeforeUnmount(() => document.removeEventListener('keydown', slash))
       <PynGlobalSearch
         ref="box"
         :options="repos"
+        :results="searchResults"
         @input="emit('input', $event)"
         @search="submit"
+        @select="emit('selectResult', $event)"
         @keydown.esc="closeSearch"
       />
     </div>
