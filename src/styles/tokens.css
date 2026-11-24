@@ -72,11 +72,15 @@
   --pyn-radius: 0.375rem;
   --pyn-radius-lg: 0.75rem;
   --pyn-radius-pill: 999px;
-  --pyn-font:
+  --pyn-font-system:
     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial,
     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
-  --pyn-font-mono:
+  --pyn-font-mono-system:
     ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  /* Default font set; fonts.css supplies the Geist faces, the system stack covers the gap. */
+  --pyn-font: 'Geist Variable', var(--pyn-font-system);
+  --pyn-font-display: var(--pyn-font);
+  --pyn-font-mono: 'Geist Mono Variable', var(--pyn-font-mono-system);
   --pyn-topbar-height: 3.5rem;
   --pyn-sidebar-width: 15rem;
   --pyn-space-half: 0.125rem;
@@ -111,4 +115,30 @@
   :root {
     --pyn-page-gutter: 1.5rem;
   }
+}
+
+/* Font sets: a host picks one with data-pyn-font-set (or the matching class) on the root or any element.
+   font-family is restated so a scoped element re-resolves the tokens instead of inheriting the root's. */
+[data-pyn-font-set='default'],
+.pyn-font-set-default {
+  font-family: var(--pyn-font);
+  --pyn-font: 'Geist Variable', var(--pyn-font-system);
+  --pyn-font-display: var(--pyn-font);
+  --pyn-font-mono: 'Geist Mono Variable', var(--pyn-font-mono-system);
+}
+
+[data-pyn-font-set='arcade'],
+.pyn-font-set-arcade {
+  font-family: var(--pyn-font);
+  --pyn-font: 'Geist Variable', var(--pyn-font-system);
+  --pyn-font-display: 'Pixelify Sans Variable', var(--pyn-font);
+  --pyn-font-mono: 'Geist Mono Variable', var(--pyn-font-mono-system);
+}
+
+[data-pyn-font-set='system'],
+.pyn-font-set-system {
+  font-family: var(--pyn-font);
+  --pyn-font: var(--pyn-font-system);
+  --pyn-font-display: var(--pyn-font-system);
+  --pyn-font-mono: var(--pyn-font-mono-system);
 }
