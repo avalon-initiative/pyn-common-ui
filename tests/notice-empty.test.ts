@@ -97,3 +97,44 @@ describe('PynEmptyState', () => {
     expect(w.classes().join(' ')).toContain('compact')
   })
 })
+
+describe('PynEmptyState kinds', () => {
+  it.each([
+    ['empty', 'Nothing here yet'],
+    ['unsupported', 'Not supported yet'],
+    ['wip', 'Work in progress'],
+  ] as const)('shows the %s defaults', (kind, title) => {
+    const w = mount(PynEmptyState, { props: { kind } })
+    expect(w.find('h2').text()).toBe(title)
+    expect(w.find('p').text().length).toBeGreaterThan(10)
+    expect(w.find('svg').exists()).toBe(true)
+    expect(w.find('a, button').exists()).toBe(false)
+  })
+
+  it('overrides the title, text and icon', () => {
+    const w = mount(PynEmptyState, {
+      props: { kind: 'wip', title: 'Tags', description: 'Soon.', icon: 'bell' },
+    })
+    expect(w.find('h2').text()).toBe('Tags')
+    expect(w.find('p').text()).toBe('Soon.')
+    expect(w.find('path').attributes('d')).toContain('M6 16v-5')
+  })
+
+  it('takes an icon slot over the default and renders an optional action', async () => {
+    const w = mount(PynEmptyState, {
+      props: { kind: 'empty', primaryLabel: 'Add' },
+      slots: { icon: '<i class="mine" />' },
+    })
+    expect(w.find('.mine').exists()).toBe(true)
+    expect(w.find('svg').exists()).toBe(false)
+    await w.find('button').trigger('click')
+    expect(w.emitted('primary')).toHaveLength(1)
+  })
+
+  it('keeps the old behaviour without a kind', () => {
+    const w = mount(PynEmptyState, { props: { title: 'Only title' } })
+    expect(w.find('h2').text()).toBe('Only title')
+    expect(w.find('p').exists()).toBe(false)
+    expect(w.find('svg').exists()).toBe(false)
+  })
+})

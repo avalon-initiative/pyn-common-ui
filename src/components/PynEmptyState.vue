@@ -1,10 +1,39 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import styles from '../styles/PynEmptyState.module.scss'
+import PynIcon from './PynIcon.vue'
 
-withDefaults(
+export type PynEmptyStateKind = 'empty' | 'unsupported' | 'wip'
+
+const KIND_DEFAULTS: Record<
+  PynEmptyStateKind,
+  { title: string; description: string; icon: string }
+> = {
+  empty: {
+    title: 'Nothing here yet',
+    description: 'Items will show up here once there are some.',
+    icon: 'folder',
+  },
+  unsupported: {
+    title: 'Not supported yet',
+    description: 'This feature is not available in pyn yet.',
+    icon: 'info',
+  },
+  wip: {
+    title: 'Work in progress',
+    description: 'This part is still being built and will appear here when it is ready.',
+    icon: 'history',
+  },
+}
+
+const props = withDefaults(
   defineProps<{
-    title: string
+    /** Picks default title, text and icon; each is overridden by its own prop or slot. */
+    kind?: PynEmptyStateKind
+    title?: string
     description?: string
+    /** PynIcon name replacing the kind's default icon. */
+    icon?: string
     /** Commands shown one per line in a monospace block under the description. */
     commands?: string[]
     primaryLabel?: string
@@ -16,20 +45,31 @@ withDefaults(
   }>(),
   { compact: false, headingLevel: 2 },
 )
+const shown = computed(() => {
+  const d = props.kind ? KIND_DEFAULTS[props.kind] : undefined
+  return {
+    title: props.title ?? d?.title ?? '',
+    description: props.description ?? d?.description,
+    icon: props.icon ?? d?.icon,
+  }
+})
 const emit = defineEmits<{ primary: [event: MouseEvent]; secondary: [event: MouseEvent] }>()
 </script>
 
 <template>
   <div :class="[styles.empty, compact && styles.compact]">
-    <div v-if="$slots.icon" :class="styles.icon" aria-hidden="true"><slot name="icon" /></div>
-    <component :is="`h${headingLevel}`" :class="styles.title">{{ title }}</component>
-    <p v-if="description" :class="styles.description">{{ description }}</p>
+    <div v-if="$slots.icon || shown.icon" :class="styles.icon" aria-hidden="true">
+      <slot name="icon"><PynIcon v-if="shown.icon" :name="shown.icon" /></slot>
+    </div>
+    <component :is="`h${headingLevel}`" :class="styles.title">{{ shown.title }}</component>
+    <p v-if="shown.description" :class="styles.description">{{ shown.description }}</p>
     <ul v-if="commands?.length" :class="styles.commands" aria-label="Commands">
       <li v-for="(command, i) in commands" :key="i">
         <code :class="styles.command" data-command>{{ command }}</code>
       </li>
     </ul>
-    <div v-if="primaryLabel || secondaryLabel" :class="styles.actions">
+    <div v-if="primaryLabel || secondaryLabel || $slots.actions" :class="styles.actions">
+      <slot name="actions" />
       <template v-if="primaryLabel">
         <a
           v-if="primaryHref"
