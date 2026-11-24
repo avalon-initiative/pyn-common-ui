@@ -1,0 +1,246 @@
+@use 'mixins' as m;
+
+.file {
+  overflow: clip;
+  min-width: 0;
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  scroll-margin-top: calc(var(--pyn-topbar-height) + var(--pyn-space-4));
+}
+
+.head {
+  position: sticky;
+  top: var(--pyn-topbar-height);
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  box-sizing: border-box;
+  min-height: var(--pyn-control-lg);
+  padding: var(--pyn-space-1) var(--pyn-space-3);
+  background: var(--pyn-surface-raised);
+  border-bottom: 1px solid var(--pyn-border);
+  font-size: var(--pyn-text-sm);
+}
+
+.file[data-collapsed] .head {
+  border-bottom: 0;
+}
+
+.toggle,
+.icon {
+  @include m.control(var(--pyn-control-sm));
+  justify-content: center;
+  min-width: var(--pyn-control-sm);
+  padding: 0;
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
+
+  @include m.touch-target($square: true);
+  @include m.focus-ring;
+}
+
+.chevron {
+  transition: transform 0.1s;
+}
+
+.shut {
+  transform: rotate(-90deg);
+}
+
+.path {
+  min-width: 0;
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-sm);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.old {
+  color: var(--pyn-text-muted);
+  font-weight: 400;
+}
+
+.status {
+  @include m.label;
+  line-height: 1rem;
+}
+
+.lock {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.tools {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-3);
+  margin-left: auto;
+}
+
+.viewed {
+  @include m.control(var(--pyn-control-sm));
+  gap: var(--pyn-space-2);
+  padding: 0 var(--pyn-space-2);
+  background: var(--pyn-control-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--pyn-control-bg-hover);
+  }
+
+  input {
+    margin: 0;
+  }
+}
+
+.message {
+  @include m.muted;
+  margin: 0;
+  padding: var(--pyn-space-4);
+  text-align: center;
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+.diff {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+  line-height: 1.25rem;
+
+  &[data-layout='unified'] {
+    width: max-content;
+    min-width: 100%;
+    table-layout: auto;
+  }
+}
+
+.numCol {
+  width: 3.5rem;
+}
+
+.num {
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-text-muted);
+  text-align: right;
+  vertical-align: top;
+  user-select: none;
+
+  &::before {
+    content: attr(data-line);
+  }
+}
+
+.code {
+  padding: 0 var(--pyn-space-2) 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+
+  .diff[data-layout='unified'] & {
+    white-space: pre;
+  }
+}
+
+.sign {
+  display: inline-block;
+  width: 1.25rem;
+  color: var(--pyn-text-muted);
+  text-align: center;
+  user-select: none;
+}
+
+.add.code,
+.add.num {
+  background: color-mix(in srgb, var(--pyn-success) 14%, var(--pyn-bg));
+}
+
+.delete.code,
+.delete.num {
+  background: color-mix(in srgb, var(--pyn-danger) 14%, var(--pyn-bg));
+}
+
+.blank {
+  background: var(--pyn-bg-subtle);
+}
+
+.mark {
+  color: inherit;
+  border-radius: 2px;
+}
+
+.add .mark {
+  background: color-mix(in srgb, var(--pyn-success) 38%, transparent);
+}
+
+.delete .mark {
+  background: color-mix(in srgb, var(--pyn-danger) 38%, transparent);
+}
+
+.hunk {
+  color: var(--pyn-text-muted);
+  background: var(--pyn-accent-bg);
+}
+
+.expand {
+  padding: 0 var(--pyn-space-1);
+  text-align: right;
+  white-space: nowrap;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: 0;
+    color: inherit;
+    background: none;
+    border: 0;
+    border-radius: var(--pyn-radius-sm);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--pyn-accent);
+      background: var(--pyn-hover);
+    }
+
+    @include m.focus-ring;
+  }
+}
+
+.header {
+  padding: 0 var(--pyn-space-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@include m.narrow {
+  .head {
+    padding-inline: var(--pyn-space-2);
+  }
+
+  .tools {
+    flex: 1 1 100%;
+    justify-content: space-between;
+    margin-left: 0;
+  }
+}

@@ -20,6 +20,8 @@ const props = defineProps<{
   loading?: string[]
   /** Branch the file links keep; omitted is the default branch. */
   branch?: string
+  /** Replaces the file link, for views that point a file at something other than its blob page. */
+  hrefOf?: (path: string) => string
 }>()
 defineEmits<{ toggle: [path: string] }>()
 
@@ -50,7 +52,11 @@ const isOpen = (path: string) => props.expanded?.includes(path) ?? false
           <PynIcon name="folder" :class="styles.icon" />
           <span :class="styles.label">{{ e.name }}</span>
         </button>
-        <a v-else :class="styles.item" :href="blobPath({ owner, name }, e.path, branch)">
+        <a
+          v-else
+          :class="styles.item"
+          :href="hrefOf ? hrefOf(e.path) : blobPath({ owner, name }, e.path, branch)"
+        >
           <span :class="styles.chevron" />
           <PynIcon name="file" :class="styles.icon" />
           <span :class="styles.label">{{ e.name }}</span>

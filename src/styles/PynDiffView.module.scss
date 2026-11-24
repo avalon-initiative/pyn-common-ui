@@ -1,0 +1,156 @@
+@use 'mixins' as m;
+
+.view {
+  display: grid;
+  grid-template-columns: 16rem minmax(0, 1fr);
+  gap: var(--pyn-space-4);
+  align-items: start;
+
+  &[data-tree-shut] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @include m.narrow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.tree {
+  position: sticky;
+  top: calc(var(--pyn-topbar-height) + var(--pyn-space-4));
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  box-sizing: border-box;
+  max-height: calc(100vh - var(--pyn-topbar-height) - var(--pyn-space-8));
+  padding-right: var(--pyn-space-3);
+  overflow-y: auto;
+  border-right: 1px solid var(--pyn-border);
+
+  @include m.narrow {
+    position: static;
+    max-height: 20rem;
+    padding: 0 0 var(--pyn-space-3);
+    border-right: 0;
+    border-bottom: 1px solid var(--pyn-border);
+  }
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-text-muted);
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+
+  &:focus-within {
+    border-color: var(--pyn-accent);
+  }
+}
+
+.icon {
+  flex: none;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--pyn-control-md);
+  color: var(--pyn-text);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: var(--pyn-text-base);
+  outline: none;
+}
+
+.none {
+  @include m.muted;
+  padding: var(--pyn-space-2);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  min-width: 0;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2) var(--pyn-space-3);
+}
+
+.toggle {
+  @include m.control;
+  justify-content: center;
+  min-width: var(--pyn-control-md);
+  padding: 0;
+  color: var(--pyn-text-muted);
+  background: var(--pyn-control-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--pyn-control-bg-hover);
+  }
+
+  @include m.touch-target($square: true);
+  @include m.focus-ring;
+}
+
+.layout {
+  display: inline-flex;
+  margin-left: auto;
+
+  button {
+    @include m.control;
+    gap: var(--pyn-space-1);
+    padding: 0 var(--pyn-space-3);
+    color: var(--pyn-text);
+    background: var(--pyn-control-bg);
+    border: 1px solid var(--pyn-border);
+    font: inherit;
+    font-size: var(--pyn-text-sm);
+    cursor: pointer;
+
+    &:first-child {
+      border-radius: var(--pyn-radius) 0 0 var(--pyn-radius);
+    }
+
+    &:last-child {
+      margin-left: -1px;
+      border-radius: 0 var(--pyn-radius) var(--pyn-radius) 0;
+    }
+
+    &[aria-pressed='true'] {
+      background: var(--pyn-selected);
+      border-color: var(--pyn-accent);
+      position: relative;
+    }
+
+    @include m.touch-target;
+    @include m.focus-ring;
+  }
+}
+
+.progress {
+  @include m.muted;
+}
+
+.error {
+  @include m.error;
+}
+
+.files {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+  min-width: 0;
+}
