@@ -65,13 +65,12 @@ onBeforeUnmount(stop)
       tabindex="-1"
     >
       <PynEmptyState
+        kind="wip"
         compact
         :heading-level="3"
-        title="Work in progress"
+        icon="bell"
         description="Notifications will appear here once the server keeps an inbox."
-      >
-        <template #icon><PynIcon name="bell" /></template>
-      </PynEmptyState>
+      />
       <a v-if="href && countText(props.count)" :href="href" :class="styles.link" data-pending>
         {{ notificationsText(props.count) }} waiting
       </a>
