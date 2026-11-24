@@ -114,3 +114,81 @@ describe('PynDialog', () => {
     w.unmount()
   })
 })
+
+describe('PynTopBar navigation drawer and bell', () => {
+  const bar = (props: Record<string, unknown> = {}, slots: Record<string, string> = {}) =>
+    mount(PynTopBar, {
+      props: { user: 'alice', theme: 'system', ...props },
+      slots,
+      attachTo: document.body,
+    })
+
+  it('opens the drawer from the hamburger on every width and closes it after a link', async () => {
+    const w = bar({}, { drawer: '<p data-extra>Extra</p>' })
+    expect(w.find('[role=dialog]').exists()).toBe(false)
+    await w.find('button[aria-label="Open navigation"]').trigger('click')
+    const nav = w.find('nav[aria-label="Main"]')
+    expect(nav.text()).toContain('Dashboard')
+    expect(nav.text()).toContain('Organizations')
+    expect(w.find('[data-extra]').exists()).toBe(true)
+    await nav.find('a').trigger('click')
+    expect(w.find('[role=dialog]').exists()).toBe(false)
+    w.unmount()
+  })
+
+  it('emits from drawer buttons and closes', async () => {
+    const w = bar()
+    await w.find('button[aria-label="Open navigation"]').trigger('click')
+    const shortcuts = w.findAll('nav button').find((b) => b.text().includes('Keyboard shortcuts'))!
+    await shortcuts.trigger('click')
+    expect(w.emitted('shortcuts')).toHaveLength(1)
+    expect(w.find('[role=dialog]').exists()).toBe(false)
+    w.unmount()
+  })
+
+  it('groups the account menu and keeps sign out last', async () => {
+    const w = bar({ admin: true })
+    await w.find('button[aria-label="Account menu"]').trigger('click')
+    const labels = w.findAll('[role=menu] [role^=menuitem]').map((e) => e.text())
+    expect(labels.slice(0, 4)).toEqual(['Profile', 'Repositories', 'Organizations', 'People'])
+    expect(labels).toContain('Settings')
+    expect(labels).toContain('Server administration')
+    expect(labels.at(-1)).toBe('Sign out')
+    expect(w.findAll('[role=menu] hr').length).toBeGreaterThanOrEqual(3)
+    w.unmount()
+  })
+
+  it('shows owner and repository in the bar', () => {
+    const w = bar({ currentOwner: 'studio', repo: 'castle' })
+    expect(w.find('[data-owner]').text()).toBe('studio')
+    expect(w.find('[data-repo]').attributes('href')).toBe('/studio/castle')
+    w.unmount()
+  })
+
+  it('keeps the bell with a work-in-progress panel and a count badge', async () => {
+    const w = bar({ notifications: 3 })
+    expect(w.find('[data-badge]').text()).toBe('3')
+    await w.find('button[data-bell]').trigger('click')
+    const panel = w.find('[aria-label="Notifications"]')
+    expect(panel.text()).toContain('Work in progress')
+    expect(panel.find('[data-pending]').attributes('href')).toBe('/_/invitations')
+    await panel.trigger('keydown', { key: 'Escape' })
+    await document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await nextTick()
+    expect(w.find('[aria-label="Notifications"]').exists()).toBe(false)
+    w.unmount()
+    const zero = bar({ notifications: 0 })
+    expect(zero.find('button[data-bell]').exists()).toBe(true)
+    expect(zero.find('[data-badge]').exists()).toBe(false)
+    zero.unmount()
+  })
+
+  it('starts the drawer from the start side', async () => {
+    const w = mount(PynDrawer, {
+      props: { open: true, title: 'T', side: 'start' },
+      attachTo: document.body,
+    })
+    expect(w.find('[role=dialog]').element.parentElement!.className).toMatch(/start/)
+    w.unmount()
+  })
+})

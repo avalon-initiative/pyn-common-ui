@@ -38,7 +38,7 @@
   letter-spacing: 0.08em;
   line-height: var(--pyn-leading-tight);
   text-decoration: none;
-  margin-right: var(--pyn-space-2);
+  margin-right: var(--pyn-space-1);
   padding: var(--pyn-space-1) 0;
 
   @include m.touch-target($display: inline-flex);
@@ -46,16 +46,69 @@
   @include m.focus-ring;
 }
 
+.compactBrand {
+  @include m.narrow {
+    display: none;
+  }
+}
+
+.menuButton {
+  flex: none;
+}
+
+.crumb {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  min-width: 0;
+  gap: var(--pyn-space-1);
+
+  > :first-child {
+    flex: 0 1 auto;
+    min-width: 2.5rem;
+  }
+
+  button {
+    max-width: 100%;
+  }
+}
+
+.slash {
+  color: var(--pyn-text-muted);
+}
+
+.repoName {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--pyn-text);
+  font-weight: 600;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include m.focus-ring;
+}
+
 .owner {
+  min-width: 0;
   max-width: 12rem;
   overflow: hidden;
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  @include m.narrow {
+    max-width: 5rem;
+  }
 }
 
 .searchWrap {
   flex: 1 1 18rem;
+  margin-left: auto;
   display: flex;
   max-width: 18rem;
   min-width: 0;
@@ -71,6 +124,7 @@
 
   @include m.narrow {
     display: none;
+    margin-left: 0;
 
     &.searching {
       position: absolute;
@@ -107,23 +161,6 @@
   @include m.focus-ring;
 }
 
-.badge {
-  position: absolute;
-  top: -0.375rem;
-  right: -0.375rem;
-  min-width: 1rem;
-  padding: 0 var(--pyn-space-1);
-  border: 2px solid var(--pyn-bg-subtle);
-  box-sizing: content-box;
-  color: var(--pyn-on-accent);
-  background: var(--pyn-accent-fill);
-  border-radius: var(--pyn-radius-pill);
-  font-size: var(--pyn-text-xs);
-  font-weight: 600;
-  line-height: 1rem;
-  text-align: center;
-}
-
 .pill {
   display: inline-flex;
   align-items: center;
@@ -141,6 +178,10 @@
   &[data-expiring] {
     color: var(--pyn-locked);
     background: var(--pyn-locked-bg);
+  }
+
+  @include m.narrow {
+    padding: 0 var(--pyn-space-2);
   }
 
   @include m.touch-target;
@@ -192,7 +233,6 @@
 
 .exploreLink {
   @include m.control;
-  margin-left: auto;
   padding-inline: var(--pyn-space-2);
   color: var(--pyn-text);
   border-radius: var(--pyn-radius);
@@ -224,14 +264,6 @@
   }
 }
 
-.narrowOnly {
-  display: none;
-
-  @include m.narrow {
-    display: block;
-  }
-}
-
 .searchButton {
   display: none;
 
@@ -239,4 +271,49 @@
     display: inline-flex;
     margin-left: auto;
   }
+}
+
+.drawerNav {
+  display: flex;
+  flex-direction: column;
+}
+
+.drawerItem {
+  @include m.menu-item;
+  width: 100%;
+  min-height: var(--pyn-control-md);
+  background: none;
+  border: 0;
+  font: inherit;
+  line-height: var(--pyn-leading-tight);
+  text-align: left;
+  cursor: pointer;
+}
+
+.drawerCheck {
+  flex: none;
+  width: 1rem;
+  font-size: var(--pyn-text-xs);
+  text-align: center;
+}
+
+.drawerHeading {
+  margin: 0;
+  padding: var(--pyn-space-2) var(--pyn-space-4) var(--pyn-space-1);
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
+}
+
+.drawerRule {
+  width: 100%;
+  margin: var(--pyn-space-2) 0;
+  border: 0;
+  border-top: 1px solid var(--pyn-border);
+}
+
+.drawerExtra {
+  margin-top: var(--pyn-space-2);
+  padding-top: var(--pyn-space-3);
+  border-top: 1px solid var(--pyn-border);
 }

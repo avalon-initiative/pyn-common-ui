@@ -424,7 +424,7 @@ describe('PynTopBar', () => {
     }
     const admin = await open(true)
     expect(admin.find('[href="/_/admin"]').text()).toBe('Server administration')
-    expect(admin.find('[href="/_/settings"]').text()).toBe('Account settings')
+    expect(admin.find('[href="/_/settings"]').text()).toBe('Settings')
     expect((await open()).find('[href="/_/admin"]').exists()).toBe(false)
   })
 
@@ -839,14 +839,9 @@ describe('PynBranchPicker', () => {
 })
 
 describe('PynShell', () => {
-  it('toggles the sidebar and closes it after following a link', async () => {
+  it('leaves the narrow navigation to the top bar drawer', () => {
     const w = mount(PynShell, { slots: { side: '<a href="#x">x</a>', default: 'body' } })
-    const side = w.find('aside')
-    expect(side.classes().length).toBe(1)
-    await w.find('[aria-label="Toggle navigation"]').trigger('click')
-    expect(side.classes().length).toBe(2)
-    await side.find('a').trigger('click')
-    expect(side.classes().length).toBe(1)
+    expect(w.find('button').exists()).toBe(false)
   })
 })
 

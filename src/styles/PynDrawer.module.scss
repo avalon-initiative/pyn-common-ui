@@ -8,6 +8,15 @@
   justify-content: flex-end;
 }
 
+.start {
+  justify-content: flex-start;
+
+  .panel {
+    border-right: 1px solid var(--pyn-border);
+    border-left: 0;
+  }
+}
+
 .backdrop {
   position: absolute;
   inset: 0;
@@ -102,6 +111,10 @@
 
   .panel {
     transform: translateX(100%);
+  }
+
+  &.start .panel {
+    transform: translateX(-100%);
   }
 }
 

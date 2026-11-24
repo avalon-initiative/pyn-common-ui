@@ -23,6 +23,10 @@ const openMenu = (label: string) => async (ctx: { canvasElement: HTMLElement }) 
   ctx.canvasElement.querySelector<HTMLElement>(`button[aria-label^="${label}"]`)!.click()
   await tick()
 }
+const openBell = async (ctx: { canvasElement: HTMLElement }) => {
+  ctx.canvasElement.querySelector<HTMLElement>('button[data-bell]')!.click()
+  await tick()
+}
 const narrow = {
   viewport: { defaultViewport: 'mobile1' },
 }
@@ -60,9 +64,26 @@ export const ExtraAccountEntries: Story = {
 export const InOrganization: Story = { args: { currentOwner: 'studio' } }
 export const OwnerMenuOpen: Story = { play: openMenu('Switch owner') }
 export const CreateMenuOpen: Story = { play: openMenu('Create') }
+export const NavigationDrawerWithExtraContent: Story = {
+  render: (args) => ({
+    components: { PynTopBar },
+    setup: () => ({ args }),
+    template:
+      '<PynTopBar v-bind="args"><template #drawer><p>Top repositories go here</p></template></PynTopBar>',
+  }),
+  play: openMenu('Open navigation'),
+}
 export const AccountMenuOpen: Story = { args: { admin: true }, play: openMenu('Account menu') }
 export const Narrow: Story = { parameters: narrow }
-export const NarrowMenuOpen: Story = { parameters: narrow, play: openMenu('Main menu') }
+export const RepositoryPage: Story = { args: { currentOwner: 'studio', repo: 'castle-quest' } }
+export const NarrowRepositoryPage: Story = {
+  parameters: narrow,
+  args: { currentOwner: 'studio', repo: 'castle-quest' },
+}
+export const BellOpen: Story = { play: openBell }
+export const NarrowBellOpen: Story = { parameters: narrow, play: openBell }
+export const NavigationDrawerOpen: Story = { play: openMenu('Open navigation') }
+export const NarrowMenuOpen: Story = { parameters: narrow, play: openMenu('Open navigation') }
 export const NarrowSearchOpen: Story = {
   parameters: narrow,
   play: openMenu('Search'),
@@ -70,7 +91,7 @@ export const NarrowSearchOpen: Story = {
 export const NarrowSignedOut: Story = {
   parameters: narrow,
   args: { signedOut: true, user: undefined },
-  play: openMenu('Main menu'),
+  play: openMenu('Open navigation'),
 }
 export const SignedOutExploreOverride: Story = {
   args: { signedOut: true, user: undefined, hrefs: { explore: '/public' } },
@@ -91,5 +112,5 @@ export const DuplicateExtraAccountShownOnce: Story = {
 export const NarrowExtraLinks: Story = {
   parameters: narrow,
   args: { extraLinks: [{ id: 'docs', label: 'Documentation', href: '/docs' }] },
-  play: openMenu('Main menu'),
+  play: openMenu('Open navigation'),
 }

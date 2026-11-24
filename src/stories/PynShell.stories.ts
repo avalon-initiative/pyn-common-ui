@@ -45,7 +45,7 @@ export const RepositoryPageWithoutSidebar: StoryObj<typeof PynShell> = {
     setup: () => ({ tabs: repoShellTabs(['read'], false) }),
     template: `
       <PynShell>
-        <template #top><PynTopBar user="alice" :repos="['alice/castle-quest']" theme="system" :locks-held="2" /></template>
+        <template #top><PynTopBar user="alice" current-owner="alice" repo="castle-quest" :repos="['alice/castle-quest']" theme="system" :locks-held="2" :notifications="1" /></template>
         <PynRepoShell owner="alice" name="castle-quest" visibility="private" :tabs="tabs" current=""><p>Page content</p></PynRepoShell>
       </PynShell>`,
   }),
