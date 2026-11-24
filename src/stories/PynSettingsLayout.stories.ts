@@ -3,11 +3,12 @@ import PynSettingsLayout from '../components/PynSettingsLayout.vue'
 import PynButton from '../components/PynButton.vue'
 import PynOrgSettingsLayout from '../components/PynOrgSettingsLayout.vue'
 import PynRepoForm from '../components/PynRepoForm.vue'
+import { orgSettingsNav, orgSettingsPath } from '../state/org.state'
 import { adminNavItems } from '../state/shell.state'
 
 const sections = [
-  { id: 'profile', label: 'Profile', href: '/_/settings/profile' },
-  { id: 'emails', label: 'Emails', href: '/_/settings/emails' },
+  { id: 'profile', label: 'Profile', icon: 'user', href: '/_/settings/profile' },
+  { id: 'emails', label: 'Emails', icon: 'mail', href: '/_/settings/emails' },
   { id: 'password', label: 'Password', group: 'Access', href: '/_/settings/password' },
   { id: 'keys', label: 'SSH keys', group: 'Access', href: '/_/settings/keys' },
   { id: 'tokens', label: 'Access tokens', group: 'Access', href: '/_/settings/tokens' },
@@ -55,12 +56,15 @@ export const Organization: StoryObj<typeof PynOrgSettingsLayout> = {
   render: () => ({
     components: { PynOrgSettingsLayout },
     setup: () => ({
-      sections: [
-        { id: 'general', label: 'General', href: '/studio/-/settings' },
-        { id: 'policy', label: 'Repository policy', href: '/studio/-/settings/policy' },
-      ],
+      sections: orgSettingsNav('owner').map((t) => ({
+        id: t.section,
+        label: t.label,
+        group: t.group,
+        icon: t.icon,
+        href: orgSettingsPath('studio', t.section),
+      })),
     }),
     template:
-      '<PynOrgSettingsLayout :sections="sections" current="general" title="Settings"><p>Page content</p></PynOrgSettingsLayout>',
+      '<PynOrgSettingsLayout :sections="sections" current="settings" title="Settings"><p>Page content</p></PynOrgSettingsLayout>',
   }),
 }

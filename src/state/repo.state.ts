@@ -50,6 +50,10 @@ export const BRANCH_SECTIONS: ReadonlySet<string> = new Set(['', 'history'])
 export interface RepoTab {
   section: string
   label: string
+  /** Heading shared by consecutive items in a grouped settings navigation. */
+  group?: string
+  /** PynIcon name shown beside the label in a grouped settings navigation. */
+  icon?: string
 }
 
 /** Tabs the viewer may use; the server enforces the same permissions. */
@@ -96,17 +100,38 @@ export function repoSettingsNav(
   const has = (p: string) => permissions.includes(p)
   const admin = options.serverAdmin === true
   const items: RepoTab[] = []
-  if (isOwner) items.push({ section: 'settings', label: 'General' })
-  if (has('manage_users')) items.push({ section: 'members', label: 'Members' })
-  if (has('manage_roles')) items.push({ section: 'roles', label: 'Roles' })
-  if (has('manage_users')) items.push({ section: 'invites', label: 'Invitations' })
-  if (has('edit_policy')) items.push({ section: 'policy', label: 'Policy' })
+  const access = 'Access'
+  if (isOwner) items.push({ section: 'settings', label: 'General', icon: 'settings' })
+  if (has('manage_users')) {
+    items.push({
+      section: 'members',
+      label: 'Collaborators and teams',
+      group: access,
+      icon: 'users',
+    })
+  }
+  if (has('manage_roles')) {
+    items.push({ section: 'roles', label: 'Roles', group: access, icon: 'shield' })
+  }
+  if (has('manage_users')) {
+    items.push({ section: 'invites', label: 'Invitations', group: access, icon: 'mail' })
+  }
+  if (has('edit_policy')) {
+    items.push({ section: 'policy', label: 'Policy', group: 'Policy and branches', icon: 'branch' })
+  }
   // Storage sits inside the settings page, which opens for owners, admins and policy editors.
   const opens = isOwner || admin || has('edit_policy')
   if (opens && (isOwner || admin || has('manage_roles'))) {
-    items.push({ section: 'storage', label: 'Storage' })
+    items.push({
+      section: 'storage',
+      label: 'Storage',
+      group: 'Storage and audit',
+      icon: 'database',
+    })
   }
-  if (has('view_audit')) items.push({ section: 'audit', label: 'Audit log' })
+  if (has('view_audit')) {
+    items.push({ section: 'audit', label: 'Audit log', group: 'Storage and audit', icon: 'list' })
+  }
   return items
 }
 
