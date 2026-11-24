@@ -1,3 +1,6 @@
+import { orgPath } from './org.state'
+import type { TabItem } from '../types/tabs.types'
+
 /** Up to two uppercase initials: first and last word of the name; "?" when empty. */
 export function initials(name: string): string {
   const words = name
@@ -17,4 +20,24 @@ export function linkLabel(url: string): string {
 
 export function isWebLink(url: string): boolean {
   return /^https?:\/\/\S+$/i.test(url)
+}
+
+export type ProfileView = '' | 'repositories' | 'stars' | 'usage'
+
+/** Profile tabs; Stars shows only when `stars` is a number, Usage only on the viewer's own profile. */
+export function profileTabs(
+  user: string,
+  o: { current?: ProfileView; repos?: number; stars?: number; self?: boolean } = {},
+): TabItem[] {
+  const tab = (section: ProfileView, label: string, icon: string, count?: number): TabItem => ({
+    label,
+    icon,
+    count,
+    href: orgPath(user, section),
+    current: section === (o.current ?? ''),
+  })
+  const tabs = [tab('', 'Overview', 'book'), tab('repositories', 'Repositories', 'repo', o.repos)]
+  if (o.stars !== undefined) tabs.push(tab('stars', 'Stars', 'star', o.stars))
+  if (o.self) tabs.push(tab('usage', 'Usage', 'insights'))
+  return tabs
 }

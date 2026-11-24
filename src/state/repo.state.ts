@@ -1,3 +1,5 @@
+import type { RepoListItem } from '../types/repo.types'
+
 export const PERMISSIONS = [
   'read',
   'lock',
@@ -166,4 +168,22 @@ export function parseLockLimit(text: string | number | null): number | null {
   const t = String(text ?? '').trim()
   if (t === '') return null
   return /^\d+$/.test(t) ? Number(t) : NaN
+}
+
+export type RepoListType = 'all' | 'public' | 'private'
+export type RepoListSort = 'updated' | 'name'
+
+/** Filters by name or description and type, then orders by last change (newest first) or name. */
+export function arrangeRepos<T extends RepoListItem>(
+  repos: T[],
+  query: string,
+  type: RepoListType,
+  sort: RepoListSort,
+): T[] {
+  const q = query.trim().toLowerCase()
+  const when = (r: T) => Date.parse(r.updated_at ?? r.created_at) || 0
+  return repos
+    .filter((r) => type === 'all' || r.visibility === type)
+    .filter((r) => !q || `${repoSlug(r)} ${r.description ?? ''}`.toLowerCase().includes(q))
+    .sort((a, b) => (sort === 'name' ? a.name.localeCompare(b.name) : when(b) - when(a)))
 }

@@ -7,13 +7,15 @@ withDefaults(
     sticky?: boolean
     /** Accessible name of the side column. */
     sideLabel?: string
+    /** Puts the side column on the left; stacked, it stays above the main column. */
+    start?: boolean
   }>(),
   { sticky: true },
 )
 </script>
 
 <template>
-  <div :class="[styles.columns, !$slots.side && styles.single]">
+  <div :class="[styles.columns, !$slots.side && styles.single, start && styles.start]">
     <div :class="styles.main"><slot /></div>
     <aside
       v-if="$slots.side"
