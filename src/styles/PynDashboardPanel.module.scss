@@ -1,0 +1,105 @@
+@use 'mixins' as m;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-3);
+}
+
+.heading {
+  @include m.section-title;
+  font-size: var(--pyn-text-base);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.viewAll {
+  @include m.accent-link;
+  font-size: var(--pyn-text-sm);
+
+  @include m.touch-target($display: inline-flex);
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--pyn-control-sm);
+  height: var(--pyn-control-sm);
+  padding: 0;
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  @include m.touch-target($square: true, $display: inline-flex);
+
+  @include m.focus-ring;
+}
+
+.filter {
+  @include m.input;
+  font-size: var(--pyn-text-base);
+}
+
+// Rows are a plain list; the card supplies the box and the dividers.
+.card {
+  @include m.flat-box;
+
+  > ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  > ul > li + li {
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+.status,
+.errorBox {
+  @include m.flat-box;
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+}
+
+.status {
+  @include m.muted;
+}
+
+.errorBox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-3);
+}
+
+.error {
+  @include m.error;
+}
+
+.retry {
+  @include m.button;
+}
+
+.hidden {
+  @include m.visually-hidden;
+}

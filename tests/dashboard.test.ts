@@ -3,8 +3,12 @@ import { describe, expect, it } from 'vitest'
 import {
   PynAttention,
   PynDashboard,
+  PynDashboardActivity,
   PynDashboardCard,
   PynDashboardFirstRun,
+  PynDashboardLocks,
+  PynDashboardNotices,
+  PynDashboardPanel,
   PynDashboardOrganizations,
   PynDashboardRepositories,
   PynRecentItems,
@@ -12,10 +16,12 @@ import {
 import {
   dashboardRepos,
   heldLocks,
+  instanceNotices,
   manyLocks,
   notices,
   now,
   recent,
+  repoActivity,
 } from '../src/stories/dashboard-data'
 import { orgInvitations, orgs } from '../src/stories/org-data'
 
@@ -214,5 +220,81 @@ describe('PynDashboardFirstRun', () => {
     await links[1].trigger('click')
     expect(w.emitted('newRepo')).toHaveLength(1)
     expect(w.emitted('newOrg')).toHaveLength(1)
+  })
+})
+
+describe('dashboard panels', () => {
+  it('panel filter toggles a field, emits the query model and clears on close', async () => {
+    const w = mount(PynDashboardPanel, {
+      props: { heading: 'Locks held', viewAllHref: '/l', filterable: true },
+      slots: { default: '<ul><li>x</li></ul>' },
+    })
+    expect(w.find('a').attributes('href')).toBe('/l')
+    expect(w.find('input').exists()).toBe(false)
+    await w.find('button').trigger('click')
+    const input = w.find('input')
+    await input.setValue('abc')
+    expect(w.emitted('update:query')?.at(-1)).toEqual(['abc'])
+    await w.find('button').trigger('click')
+    expect(w.find('input').exists()).toBe(false)
+    expect(w.emitted('update:query')?.at(-1)).toEqual([''])
+  })
+
+  it('panel shows an error with retry', async () => {
+    const w = mount(PynDashboardPanel, { props: { heading: 'X', error: 'Broke', retryable: true } })
+    expect(w.find('[role="alert"]').text()).toBe('Broke')
+    await w.find('button').trigger('click')
+    expect(w.emitted('retry')).toBeTruthy()
+  })
+
+  it('locks held lists every lock soonest first and filters', async () => {
+    const w = mount(PynDashboardLocks, { props: { locks: heldLocks, now } })
+    const rows = w.findAll('[data-lock]')
+    expect(rows).toHaveLength(3)
+    expect(rows[0].text()).toContain('Content/Art/Hero.psd')
+    expect(rows[0].text()).toContain('20m left')
+    await w.find('button').trigger('click')
+    await w.find('input').setValue('ini')
+    expect(w.findAll('[data-lock]')).toHaveLength(1)
+    await w.find('input').setValue('zzz')
+    expect(w.text()).toContain('No matching locks')
+  })
+
+  it('locks about to expire keeps only those inside the window', () => {
+    const w = mount(PynDashboardLocks, {
+      props: { locks: heldLocks, now, kind: 'expiring', withinMs: 4 * 3600_000 },
+    })
+    expect(w.text()).toContain('Locks about to expire')
+    expect(w.findAll('[data-lock]')).toHaveLength(2)
+    const none = mount(PynDashboardLocks, { props: { locks: [], now, kind: 'expiring' } })
+    expect(none.text()).toContain('No locks about to expire')
+  })
+
+  it('locks beyond max point to View all', () => {
+    const w = mount(PynDashboardLocks, { props: { locks: manyLocks, now, max: 3 } })
+    expect(w.findAll('[data-lock]')).toHaveLength(3)
+    expect(w.text()).toContain('5 more')
+  })
+
+  it('activity lists entries with repository and links, with an empty state', async () => {
+    const w = mount(PynDashboardActivity, { props: { entries: repoActivity, now } })
+    const rows = w.findAll('[data-activity]')
+    expect(rows).toHaveLength(4)
+    expect(rows[0].text()).toContain('alice locked')
+    expect(rows[0].text()).toContain('alice/castle-quest')
+    expect(rows[0].text()).toContain('8 minutes ago')
+    expect(rows[0].find('a[href*="/blob/"]').exists()).toBe(true)
+    const empty = mount(PynDashboardActivity, { props: { entries: [] } })
+    expect(empty.text()).toContain('No activity yet')
+  })
+
+  it('notices form a list with View all and an empty state', async () => {
+    const w = mount(PynDashboardNotices, {
+      props: { notices: instanceNotices, now, viewAllHref: '/n', max: 2 },
+    })
+    expect(w.findAll('[data-notice]')).toHaveLength(2)
+    expect(w.find('a[href="/n"]').text()).toContain('View all')
+    const empty = mount(PynDashboardNotices, { props: { notices: [] } })
+    expect(empty.text()).toContain('Nothing new')
   })
 })
