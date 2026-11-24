@@ -5,9 +5,9 @@ import PynAddPerson from './PynAddPerson.vue'
 import PynInvites from './PynInvites.vue'
 import PynTeamGrant from './PynTeamGrant.vue'
 import type { InviteInfo, NewUser } from '../types/repo.types'
-import type { AccessPageProps } from '../types/team.types'
+import type { AccessAdd, AccessPageProps, AccessTab } from '../types/team.types'
 
-// Listeners and v-models of PynAccessPage (manageVisibility, setRole, update:tab, ...) fall through to it.
+// PynAccessPage's other listeners (manageVisibility, setRole, ...) fall through to it.
 const props = defineProps<
   AccessPageProps & {
     /** Teams that hold no role in the repository yet, offered in Add teams. */
@@ -27,6 +27,10 @@ const emit = defineEmits<{
   revokeInvite: [string]
 }>()
 
+const tab = defineModel<AccessTab>('tab', { default: 'direct' })
+const query = defineModel<string>('query', { default: '' })
+const adding = defineModel<AccessAdd | undefined>('adding')
+
 const OWN = ['teams', 'invites', 'inviteCode', 'addPersonError', 'grantError', 'inviteError']
 const access = computed(
   () =>
@@ -38,7 +42,7 @@ const readonly = computed(() => !props.canManage)
 </script>
 
 <template>
-  <PynAccessPage v-bind="access">
+  <PynAccessPage v-bind="access" v-model:tab="tab" v-model:query="query" v-model:adding="adding">
     <template #addPeople>
       <PynAddPerson
         :roles="roles"
