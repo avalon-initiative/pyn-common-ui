@@ -4381,13 +4381,23 @@ describe('repository shell and settings', () => {
     const all = [...admin, 'edit_policy']
     expect(repoSettingsNav(all, true).map((i) => i.label)).toEqual([
       'General',
-      'Members',
+      'Collaborators and teams',
       'Roles',
       'Invitations',
       'Policy',
       'Storage',
       'Audit log',
     ])
+    expect(repoSettingsNav(all, true).map((i) => i.group)).toEqual([
+      undefined,
+      'Access',
+      'Access',
+      'Access',
+      'Policy and branches',
+      'Storage and audit',
+      'Storage and audit',
+    ])
+    expect(repoSettingsNav(all, true).every((i) => i.icon)).toBe(true)
     expect(sections(repoSettingsNav(all, false))).toEqual([
       'members',
       'roles',

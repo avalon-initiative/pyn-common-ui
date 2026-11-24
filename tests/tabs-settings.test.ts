@@ -17,6 +17,8 @@ import {
   PynSignIn,
   PynTabs,
   groupSections,
+  orgSettingsNav,
+  orgSettingsPath,
   railBranches,
   splitTabs,
 } from '../src'
@@ -158,6 +160,44 @@ describe('PynSettingsLayout', () => {
     expect(acct.find('h2').exists()).toBe(false)
     const org = mount(PynOrgSettingsLayout, { props: { sections, current: 'a' } })
     expect(org.find('nav').attributes('aria-label')).toBe('Organization settings')
+  })
+})
+
+describe('settings navigation data', () => {
+  it('passes group and icon through to the grouped navigation', () => {
+    const w = mount(PynRepoSettings, {
+      props: {
+        owner: 'a',
+        name: 'b',
+        items: [
+          { section: 'settings', label: 'General', icon: 'settings' },
+          { section: 'members', label: 'Collaborators', group: 'Access', icon: 'users' },
+          { section: 'roles', label: 'Roles', group: 'Access', icon: 'shield' },
+        ],
+        current: 'roles',
+      },
+    })
+    expect(w.findAll('nav h2').map((p) => p.text())).toEqual(['Access'])
+    expect(w.findAll('nav ul')).toHaveLength(2)
+    expect(w.findAll('nav a svg')).toHaveLength(3)
+    expect(w.find('section:nth-of-type(2)').findAll('a')).toHaveLength(2)
+  })
+
+  it('offers organization settings to owners only, grouped with icons', () => {
+    expect(orgSettingsNav('member')).toEqual([])
+    expect(orgSettingsNav(null)).toEqual([])
+    const nav = orgSettingsNav('owner')
+    expect(nav.map((t) => t.section)).toEqual(['settings', 'members', 'teams', 'usage', 'audit'])
+    expect(nav.map((t) => t.group)).toEqual([
+      undefined,
+      'Access',
+      'Access',
+      'Storage and audit',
+      'Storage and audit',
+    ])
+    expect(nav.every((t) => t.icon)).toBe(true)
+    expect(orgSettingsPath('a b', 'settings')).toBe('/a%20b/-/settings')
+    expect(orgSettingsPath('a', 'teams')).toBe('/a/-/settings/teams')
   })
 })
 
