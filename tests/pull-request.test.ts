@@ -3,13 +3,16 @@ import { afterEach, describe, expect, it } from 'vitest'
 import {
   PynMergeBox,
   PynPullCommits,
+  PynPullRequestForm,
   PynPullRequestHeader,
   PynPullRequestList,
   PynPullRequestPage,
   PynPullSide,
+  PynRepoShell,
 } from '../src'
 import {
   commitDays,
+  isDraft,
   mergeBlockers,
   matchesPullQuery,
   mergeStatus,
@@ -25,6 +28,7 @@ import { now } from '../src/stories/landing-data'
 import {
   closedPull,
   conflictedPull,
+  draftPull,
   emptyPull,
   lockedPull,
   mergedPull,
@@ -32,6 +36,7 @@ import {
   pullCommits,
   pullEvents,
   pullList,
+  prBranches,
 } from '../src/stories/pull-request-data'
 
 const mounted: ReturnType<typeof mount>[] = []
@@ -65,6 +70,19 @@ describe('pull request state', () => {
     expect(mergeStatus({ ...openPull, review: 'approved' }).tone).toBe('success')
   })
 
+  it('treats only an open draft as a draft, which blocks the merge', () => {
+    expect(isDraft(draftPull)).toBe(true)
+    expect(isDraft({ ...draftPull, state: 'merged' })).toBe(false)
+    expect(mergeBlockers(draftPull, 'jamie')).toEqual(['draft'])
+    expect(mergeStatus(draftPull).title).toBe('This pull request is still a draft')
+  })
+
+  it('says a lock override is coming when the viewer may merge over locks', () => {
+    const s = mergeStatus(lockedPull, 'jamie', { overrideLocks: true })
+    expect(s.title).toBe('Merging will override locks')
+    expect(s.text).toContain('1 changed path is locked by someone else')
+  })
+
   it('counts, dates and groups', () => {
     expect(pullCounts(pullList)).toEqual({ open: 3, closed: 2 })
     expect(pullWhen(mergedPull).verb).toBe('merged')
@@ -86,6 +104,34 @@ describe('PynPullRequestHeader', () => {
     expect(w.text()).toContain('12 hours ago')
     await w.find('button[aria-label="Edit title"]').trigger('click')
     expect(w.emitted('editTitle')).toHaveLength(1)
+  })
+
+  it('edits the title inline and closes once the new title arrives', async () => {
+    const w = make(PynPullRequestHeader, { props: { pull: openPull, now, editable: true } })
+    await w.find('button[aria-label="Edit title"]').trigger('click')
+    const input = w.find('[data-title-editor] input')
+    expect((input.element as HTMLInputElement).value).toBe(openPull.title)
+    await input.setValue('  Level two  ')
+    await w.find('[data-title-editor]').trigger('submit')
+    expect(w.emitted('saveTitle')![0]).toEqual(['Level two'])
+    await w.setProps({ titleError: 'Failed.' })
+    expect(w.find('[data-title-editor] [role=alert]').text()).toBe('Failed.')
+    await w.setProps({ pull: { ...openPull, title: 'Level two' }, titleError: undefined })
+    expect(w.find('[data-title-editor]').exists()).toBe(false)
+    expect(w.find('h1').text()).toContain('Level two')
+  })
+
+  it('cancels the title edit without saving', async () => {
+    const w = make(PynPullRequestHeader, { props: { pull: openPull, now, editable: true } })
+    await w.find('button[aria-label="Edit title"]').trigger('click')
+    await w.find('[data-title-editor] button[type=button]').trigger('click')
+    expect(w.find('[data-title-editor]').exists()).toBe(false)
+    expect(w.emitted('saveTitle')).toBeUndefined()
+  })
+
+  it('shows a draft chip', () => {
+    const w = make(PynPullRequestHeader, { props: { pull: draftPull, now } })
+    expect(w.find('[data-draft]').text()).toBe('Draft')
   })
 
   it('says merged for a merged pull request', () => {
@@ -114,6 +160,53 @@ describe('PynMergeBox', () => {
   it('lists conflicts and blocks the merge', () => {
     const w = make(PynMergeBox, { props: { pull: conflictedPull, now } })
     expect(w.findAll('[data-conflict]')).toHaveLength(2)
+    expect(w.find('[data-merge]').attributes('disabled')).toBeDefined()
+  })
+
+  it('says not supported yet on segments without data', () => {
+    const w = make(PynMergeBox, { props: { pull: emptyPull } })
+    expect(w.find('[data-segment=comments]').text()).toContain('Not supported yet')
+    expect(w.find('[data-segment=approvals]').text()).toContain('Not supported yet')
+    const d = make(PynMergeBox, { props: { pull: openPull } })
+    expect(d.find('[data-segment=comments]').text()).not.toContain('Not supported yet')
+  })
+
+  it('offers Ready for review on a draft instead of the merge', async () => {
+    const w = make(PynMergeBox, { props: { pull: draftPull, now } })
+    expect(w.find('[data-status]').text()).toBe('This pull request is still a draft')
+    expect(w.find('[data-merge]').exists()).toBe(false)
+    await w.find('[data-ready]').trigger('click')
+    expect(w.emitted('ready')).toHaveLength(1)
+    const ro = make(PynMergeBox, { props: { pull: draftPull, canMerge: false } })
+    expect(ro.find('[data-ready]').exists()).toBe(false)
+    const author = make(PynMergeBox, {
+      props: { pull: draftPull, canMerge: false, canMarkReady: true },
+    })
+    expect(author.find('[data-ready]').exists()).toBe(true)
+  })
+
+  it('merges over locks after a confirm, keeping the locks listed', async () => {
+    const w = make(PynMergeBox, {
+      props: { pull: lockedPull, me: 'jamie', now, canOverrideLocks: true },
+    })
+    expect(w.findAll('[data-lock]')).toHaveLength(1)
+    expect(w.find('[data-override-warning]').exists()).toBe(true)
+    const button = w.find('[data-merge]')
+    expect(button.attributes('disabled')).toBeUndefined()
+    expect(button.text()).toBe('Merge over locks')
+    await button.trigger('click')
+    expect(w.emitted('merge')).toBeUndefined()
+    const confirm = w.find('[role=dialog]').findAll('button').at(-1)!
+    expect(confirm.text()).toBe('Merge over locks')
+    await confirm.trigger('click')
+    expect(w.emitted('merge')![0]).toEqual(['allow'])
+    expect(w.find('[role=dialog]').exists()).toBe(false)
+  })
+
+  it('still blocks conflicts when it may override locks', () => {
+    const w = make(PynMergeBox, {
+      props: { pull: { ...conflictedPull, locks: lockedPull.locks }, canOverrideLocks: true },
+    })
     expect(w.find('[data-merge]').attributes('disabled')).toBeDefined()
   })
 
@@ -210,6 +303,50 @@ describe('PynPullRequestPage', () => {
     expect(files.find('section[aria-label=Merge]').exists()).toBe(false)
   })
 
+  it('shows the sticky bar only after the header scrolls away', async () => {
+    const w = make(PynPullRequestPage, { props: base })
+    const bar = w.find('[data-pull-bar]')
+    expect(bar.isVisible()).toBe(false)
+    const header = w.find('header').element.parentElement!
+    header.getBoundingClientRect = () => ({ bottom: 10 }) as DOMRect
+    bar.element.parentElement!.getBoundingClientRect = () => ({ top: 64 }) as DOMRect
+    window.dispatchEvent(new Event('scroll'))
+    await w.vm.$nextTick()
+    expect(bar.isVisible()).toBe(true)
+  })
+
+  it('puts notices above the header', () => {
+    const w = make(PynPullRequestPage, {
+      props: base,
+      slots: { notices: '<p data-note>Draft</p>' },
+    })
+    const head = w.find('[data-note]').element.parentElement!.parentElement!
+    expect(head.querySelector('h1')).not.toBeNull()
+  })
+
+  it('edits the description and closes once the new body arrives', async () => {
+    const w = make(PynPullRequestPage, { props: { ...base, editable: true } })
+    await w.find('[data-kind=comment] [data-edit]').trigger('click')
+    const area = w.find('[data-comment-form] textarea')
+    expect((area.element as HTMLTextAreaElement).value).toBe(openPull.body)
+    await area.setValue('New body')
+    await w.find('[data-comment-form]').trigger('submit')
+    expect(w.emitted('saveBody')![0]).toEqual(['New body'])
+    await w.setProps({ pull: { ...openPull, body: 'New body' } })
+    expect(w.find('[data-comment-form]').exists()).toBe(false)
+  })
+
+  it('passes the title save and Ready for review up', async () => {
+    const w = make(PynPullRequestPage, { props: { ...base, pull: draftPull, editable: true } })
+    expect(w.find('[data-pull-bar] [data-draft]').exists()).toBe(true)
+    await w.find('[data-ready]').trigger('click')
+    expect(w.emitted('ready')).toHaveLength(1)
+    await w.find('button[aria-label="Edit title"]').trigger('click')
+    await w.find('[data-title-editor] input').setValue('Renamed')
+    await w.find('[data-title-editor]').trigger('submit')
+    expect(w.emitted('saveTitle')![0]).toEqual(['Renamed'])
+  })
+
   it('passes merge, close and reopen up', async () => {
     const w = make(PynPullRequestPage, { props: { ...base, canManage: true } })
     await w.find('[data-merge]').trigger('click')
@@ -256,6 +393,13 @@ describe('PynPullRequestList', () => {
     expect(w.text()).toContain('3 pull requests')
   })
 
+  it('marks a draft row', () => {
+    const items = make(PynPullRequestList, { props }).findAll('[data-pull]')
+    expect(items[1]!.attributes('data-draft')).toBeDefined()
+    expect(items[1]!.find('[data-draft-label]').text()).toBe('Draft')
+    expect(items[0]!.attributes('data-draft')).toBeUndefined()
+  })
+
   it('switches between Open and Closed with the counts', async () => {
     const w = make(PynPullRequestList, { props })
     expect(w.find('[data-status-tab=open]').attributes('aria-pressed')).toBe('true')
@@ -281,5 +425,59 @@ describe('PynPullRequestList', () => {
     expect(e.find('a[href="/n"]').text()).toBe('New pull request')
     const f = make(PynPullRequestList, { props: { ...props, pulls: [], count: 0, filtered: true } })
     expect(f.text()).toContain('No matches')
+  })
+})
+
+describe('PynPullRequestForm', () => {
+  it('starts on the default branch and submits the pull request', async () => {
+    const w = make(PynPullRequestForm, { props: { branches: prBranches } })
+    expect(w.emitted('update:base')![0]).toEqual(['main'])
+    await w.setProps({ base: 'main', head: 'feature/level-two' })
+    await w.find('input[type=text]').setValue(' Level two ')
+    await w.find('textarea').setValue('Body')
+    await w.find('[data-draft]').setValue(true)
+    expect(w.find('[data-submit]').text()).toBe('Create draft pull request')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')![0]).toEqual([
+      { title: 'Level two', body: 'Body', draft: true, base: 'main', head: 'feature/level-two' },
+    ])
+  })
+
+  it('refuses the same branch twice and a missing title', async () => {
+    const w = make(PynPullRequestForm, {
+      props: { branches: prBranches, base: 'main', head: 'main' },
+    })
+    expect(w.find('[data-branch-problem]').text()).toBe('Choose two different branches.')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')).toBeUndefined()
+    expect(w.text()).toContain('Enter a title.')
+  })
+
+  it('shows the compare slot, the error and the busy state', () => {
+    const w = make(PynPullRequestForm, {
+      props: { branches: prBranches, busy: true, error: 'Already open.' },
+      slots: { compare: '<p data-summary>3 commits</p>' },
+    })
+    expect(w.find('[data-summary]').exists()).toBe(true)
+    expect(w.find('[role=alert]').text()).toBe('Already open.')
+    expect(w.find('[data-submit]').text()).toBe('Creating…')
+  })
+})
+
+describe('PynRepoShell pull request count', () => {
+  it('counts open pull requests on the Pull requests tab', () => {
+    const w = make(PynRepoShell, {
+      props: {
+        owner: 'acme',
+        name: 'castle-quest',
+        visibility: 'private',
+        tabs: [
+          { section: '', label: 'Code' },
+          { section: 'pulls', label: 'Pull requests' },
+        ],
+        pullCount: 3,
+      },
+    })
+    expect(w.find('a[href="/acme/castle-quest/pulls"] [data-count]').text()).toBe('3')
   })
 })

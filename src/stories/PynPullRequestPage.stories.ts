@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import PynCommentForm from '../components/PynCommentForm.vue'
 import PynPullRequestPage from '../components/PynPullRequestPage.vue'
 import { diffFiles } from './diff-data'
 import { now } from './landing-data'
 import {
   closedPull,
   conflictedPull,
+  draftPull,
   emptyPull,
   filesWithLock,
   lockedPull,
@@ -71,4 +73,44 @@ export const Narrow: Story = {
       template: '<div style="width: 22rem; padding-top: var(--pyn-topbar-height)"><story /></div>',
     }),
   ],
+}
+export const Draft: Story = {
+  args: { pull: draftPull },
+  render: (args) => ({
+    components: { PynPullRequestPage },
+    setup: () => ({ args }),
+    template: `<PynPullRequestPage v-bind="args">
+      <template #notices>
+        <div style="padding: var(--pyn-space-3) var(--pyn-space-4); border: 1px solid var(--pyn-border); border-radius: var(--pyn-radius)">
+          This pull request is a draft and cannot be merged until it is marked ready for review.
+        </div>
+      </template>
+    </PynPullRequestPage>`,
+  }),
+}
+export const OverrideLocks: Story = { args: { pull: lockedPull, canOverrideLocks: true } }
+export const EditingDescription: Story = {
+  play: ({ canvasElement }) =>
+    canvasElement.querySelector<HTMLButtonElement>('[data-kind=comment] [data-edit]')!.click(),
+}
+export const WithCommentForm: Story = {
+  render: (args) => ({
+    components: { PynPullRequestPage, PynCommentForm },
+    setup: () => ({ args }),
+    template: `<PynPullRequestPage v-bind="args">
+      <template #comment><PynCommentForm can-close /></template>
+    </PynPullRequestPage>`,
+  }),
+}
+export const ScrolledBar: Story = {
+  decorators: [
+    () => ({
+      template:
+        '<div style="padding-top: var(--pyn-topbar-height); min-height: 300vh"><story /></div>',
+    }),
+  ],
+  play: async () => {
+    window.scrollTo(0, 400)
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  },
 }

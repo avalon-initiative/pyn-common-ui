@@ -4,7 +4,7 @@ import PynIcon from './PynIcon.vue'
 import PynPerson from './PynPerson.vue'
 import PynSubNav from './PynSubNav.vue'
 import styles from '../styles/PynPullRequestList.module.scss'
-import { PULL_STATE_LABEL, REVIEW_LABEL, pullWhen } from '../state/pull-request.state'
+import { PULL_STATE_LABEL, REVIEW_LABEL, isDraft, pullWhen } from '../state/pull-request.state'
 import { formatAgo } from '../utils/ago'
 import type { FilterListControl } from '../types/filter-list.types'
 import type { PullRequestSummary } from '../types/pull-request.types'
@@ -92,11 +92,22 @@ const lockedText = (n: number) => `${n} ${n === 1 ? 'path' : 'paths'} locked`
       <template v-if="newHref" #actions>
         <a :href="newHref" :class="styles.new">New pull request</a>
       </template>
-      <li v-for="p in pulls" :key="p.number" :class="styles.row" :data-state="p.state" data-pull>
-        <PynIcon :name="ICON[p.state]" :class="[styles.icon, styles[p.state]]" />
+      <li
+        v-for="p in pulls"
+        :key="p.number"
+        :class="styles.row"
+        :data-state="p.state"
+        :data-draft="isDraft(p) || undefined"
+        data-pull
+      >
+        <PynIcon
+          :name="isDraft(p) ? 'pull-draft' : ICON[p.state]"
+          :class="[styles.icon, styles[isDraft(p) ? 'draft' : p.state]]"
+        />
         <div :class="styles.main">
           <a v-if="p.href" :href="p.href" :class="styles.title">{{ p.title }}</a>
           <span v-else :class="styles.title">{{ p.title }}</span>
+          <span v-if="isDraft(p)" :class="styles.draftLabel" data-draft-label>Draft</span>
           <span v-if="p.locked" :class="styles.locked" data-locked>
             <PynIcon name="lock" />{{ lockedText(p.locked) }}
           </span>

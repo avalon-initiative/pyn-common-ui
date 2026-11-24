@@ -5,6 +5,26 @@
   min-width: 0;
 }
 
+// Zero-height sticky line: the bar overlays the content instead of taking space.
+.sticky {
+  position: sticky;
+  top: var(--pyn-topbar-height);
+  z-index: 2;
+  height: 0;
+  margin-bottom: calc(-1 * var(--pyn-space-4));
+}
+
+.sticky .bar {
+  position: static;
+  padding-inline: 0;
+}
+
+.notices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
 .head {
   display: flex;
   flex-direction: column;

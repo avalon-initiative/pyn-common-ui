@@ -79,6 +79,14 @@
   border-radius: var(--pyn-radius) 0 0 var(--pyn-radius);
 }
 
+.merge {
+  gap: var(--pyn-space-2);
+}
+
+.ready {
+  @include m.button;
+}
+
 .methods {
   button {
     @include m.control;
@@ -104,6 +112,24 @@
 .locks {
   padding: var(--pyn-space-3) var(--pyn-space-4);
   border-top: 1px solid var(--pyn-border);
+}
+
+.warning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pyn-space-2);
+  margin: var(--pyn-space-2) 0 0;
+  font-size: var(--pyn-text-sm);
+}
+
+.warningIcon {
+  flex: none;
+  margin-top: var(--pyn-space-half);
+  color: var(--pyn-attention);
+}
+
+.confirmText {
+  margin: 0;
 }
 
 .heading {
@@ -209,4 +235,11 @@
       transparent 3px 6px
     );
   }
+}
+
+// Red split button when the merge goes over other people's locks.
+.override .merge,
+.override .methods button,
+.override .merge:hover:not(:disabled) {
+  background: var(--pyn-danger-fill);
 }
