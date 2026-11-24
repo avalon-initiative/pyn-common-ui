@@ -152,12 +152,16 @@ const threads = computed(() => props.pull.threads)
         <h3 :class="styles.heading">
           Comments<span v-if="threads" :class="styles.note">
             {{ threads.resolved }} / {{ threads.total }} resolved</span
+          ><span v-else-if="pull.comments" :class="styles.note" data-comment-count>
+            {{ pull.comments }} {{ pull.comments === 1 ? 'comment' : 'comments' }}</span
           >
         </h3>
         <span :class="styles.bar" :data-empty="!threads?.total || undefined"
           ><span :style="{ width: `${segmentFill(threads?.resolved ?? 0, threads?.total ?? 0)}%` }"
         /></span>
-        <p v-if="!threads" :class="styles.note">Not supported yet</p>
+        <p v-if="!threads" :class="styles.note">
+          {{ pull.comments ? 'Unresolved threads are not supported yet' : 'Not supported yet' }}
+        </p>
       </div>
       <div :class="styles.segment" data-segment="approvals">
         <h3 :class="styles.heading">

@@ -7,6 +7,23 @@
   min-width: 0;
 }
 
+.heading {
+  margin: 0;
+  font-size: var(--pyn-text-lg);
+  font-weight: 600;
+}
+
+.plain {
+  min-width: 0;
+}
+
+.card {
+  min-width: 0;
+  padding: var(--pyn-space-2);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
 .error {
   @include m.error;
 }

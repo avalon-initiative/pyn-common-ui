@@ -44,7 +44,7 @@
 
   .box[data-tone='merged'] & {
     color: var(--pyn-on-accent);
-    background: light-dark(#8250df, #8957e5);
+    background: var(--pyn-done-fill);
   }
 }
 

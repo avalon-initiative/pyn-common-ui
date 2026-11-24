@@ -33,6 +33,9 @@
   --pyn-danger: light-dark(#d1242f, #f85149);
   --pyn-danger-bg: light-dark(#ffebe9, #f851491a);
   --pyn-danger-fill: light-dark(#cf222e, #da3633);
+  --pyn-done: light-dark(#8250df, #ab7df8);
+  --pyn-done-fill: light-dark(#8250df, #8957e5);
+  --pyn-neutral-fill: light-dark(#59636e, #656c76);
   --pyn-selected: var(--pyn-accent-bg);
   --pyn-focus: var(--pyn-accent);
 

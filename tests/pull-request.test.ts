@@ -171,6 +171,20 @@ describe('PynMergeBox', () => {
     expect(d.find('[data-segment=comments]').text()).not.toContain('Not supported yet')
   })
 
+  it('counts comments when there are no review threads', () => {
+    const one = make(PynMergeBox, { props: { pull: { ...emptyPull, comments: 1 } } })
+    expect(one.find('[data-comment-count]').text()).toBe('1 comment')
+    const w = make(PynMergeBox, { props: { pull: { ...emptyPull, comments: 3 } } })
+    const seg = w.find('[data-segment=comments]')
+    expect(seg.find('[data-comment-count]').text()).toBe('3 comments')
+    expect(seg.text()).toContain('Unresolved threads are not supported yet')
+    expect(
+      make(PynMergeBox, { props: { pull: openPull } })
+        .find('[data-comment-count]')
+        .exists(),
+    ).toBe(false)
+  })
+
   it('offers Ready for review on a draft instead of the merge', async () => {
     const w = make(PynMergeBox, { props: { pull: draftPull, now } })
     expect(w.find('[data-status]').text()).toBe('This pull request is still a draft')
@@ -451,6 +465,18 @@ describe('PynPullRequestForm', () => {
     await w.find('form').trigger('submit')
     expect(w.emitted('submit')).toBeUndefined()
     expect(w.text()).toContain('Enter a title.')
+  })
+
+  it('sizes both branch pickers to their names', () => {
+    const name = 'feature/castle-quest-level-two-lighting'
+    const w = make(PynPullRequestForm, {
+      props: { branches: prBranches, base: 'main', head: name },
+    })
+    const head = w.find('[data-head-picker] [aria-haspopup]')
+    expect(head.find('[title]').attributes('title')).toBe(name)
+    for (const p of ['[data-base-picker]', '[data-head-picker]']) {
+      expect(w.find(`${p} [aria-haspopup]`).element.parentElement!.className).toMatch(/fit/)
+    }
   })
 
   it('shows the compare slot, the error and the busy state', () => {

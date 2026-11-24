@@ -155,6 +155,10 @@ if (!accounts.includes('No accounts match'))
 if (built.accountActions({ user: 'a', status: 'disabled' }, 'b').join() !== 'enable,delete')
   throw new Error('accountActions did not run from dist')
 
+// The minifier rewrites light-dark() into variables only a processed color-scheme defines.
+if (readFileSync('dist/style.css', 'utf8').includes('--lightningcss-'))
+  throw new Error('dist/style.css depends on light-dark(); use a token from tokens.css')
+
 const fontsCss = readFileSync('dist/fonts.css', 'utf8')
 for (const family of ['Geist Variable', 'Geist Mono Variable', 'Pixelify Sans Variable']) {
   if (!fontsCss.includes(`font-family: '${family}'`)) throw new Error(`fonts.css lacks ${family}`)

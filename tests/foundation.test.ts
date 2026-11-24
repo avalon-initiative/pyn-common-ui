@@ -1,5 +1,5 @@
 // Tests for tokens, theme handling, mixins and the pure helpers.
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { compileString } from 'sass'
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
@@ -81,6 +81,9 @@ const textPairs: [string, string][] = [
   ['--pyn-on-accent', '--pyn-accent-fill'],
   ['--pyn-on-accent', '--pyn-success-fill'],
   ['--pyn-on-accent', '--pyn-danger-fill'],
+  ['--pyn-on-accent', '--pyn-done-fill'],
+  ['--pyn-on-accent', '--pyn-neutral-fill'],
+  ['--pyn-done', '--pyn-bg'],
   ['--pyn-syntax-keyword', '--pyn-bg'],
   ['--pyn-syntax-string', '--pyn-bg'],
   ['--pyn-syntax-comment', '--pyn-bg'],
@@ -137,6 +140,34 @@ describe('tokens.css', () => {
     it.each(nonTextPairs)(`${theme}: %s on %s meets non-text contrast (3)`, (fg, bg) => {
       expect(contrast(fg, bg, theme)).toBeGreaterThanOrEqual(3)
     })
+  }
+})
+
+describe('component styles', () => {
+  const modules = readdirSync('src/styles').filter((f) => f.endsWith('.module.scss'))
+
+  // The library build minifies light-dark() into variables that the raw tokens.css never sets.
+  it.each(modules)('%s takes colors from tokens only', (file) => {
+    const scss = readFileSync(`src/styles/${file}`, 'utf8')
+    expect(scss).not.toContain('light-dark(')
+    expect(scss).not.toMatch(/#[0-9a-f]{3,8}\b/i)
+  })
+
+  const chip = compileString(readFileSync('src/styles/PynPullStateChip.module.scss', 'utf8'), {
+    loadPaths: ['src/styles'],
+  }).css
+  for (const theme of ['light', 'dark'] as const) {
+    it.each(['open', 'merged', 'closed', 'draft'])(
+      `${theme}: the %s pull chip has an opaque fill under its text`,
+      (state) => {
+        const fill = new RegExp(`\\.${state} \\{\\s*background: var\\((--pyn-[\\w-]+)\\)`).exec(
+          chip,
+        )?.[1]
+        expect(fill).toBeDefined()
+        expect(rgba(color(fill!, theme))[3]).toBe(1)
+        expect(contrast('--pyn-on-accent', fill!, theme)).toBeGreaterThanOrEqual(4.5)
+      },
+    )
   }
 })
 

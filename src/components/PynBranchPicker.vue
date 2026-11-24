@@ -31,6 +31,8 @@ const props = defineProps<{
   currentKind?: RefKind
   /** Visible text before the name, such as `base:`; replaces the hidden "Branch:" prefix. */
   prefix?: string
+  /** Grows with the name up to `--pyn-branch-picker-max` instead of a fixed width. */
+  fit?: boolean
   now?: Date
 }>()
 const emit = defineEmits<{
@@ -169,7 +171,7 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
 
 <template>
   <div :class="styles.wrap">
-    <div ref="root" :class="styles.picker" @focusout="leave">
+    <div ref="root" :class="[styles.picker, fit && styles.fit]" @focusout="leave">
       <button
         ref="trigger"
         type="button"

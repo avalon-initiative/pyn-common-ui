@@ -81,4 +81,15 @@ describe('PynCommentForm', () => {
     expect(w.find('[data-submit]').attributes('disabled')).toBeDefined()
     expect(w.find('textarea').attributes('disabled')).toBeDefined()
   })
+
+  it('titles the form with a heading and frames the text area in a card', () => {
+    const w = make(PynCommentForm, { props: { heading: 'Add a comment', card: true } })
+    const h = w.find('h2')
+    expect(h.text()).toBe('Add a comment')
+    expect(w.find('form').attributes('aria-labelledby')).toBe(h.attributes('id'))
+    expect(w.find('[data-card] textarea').exists()).toBe(true)
+    const plain = make(PynCommentForm, {})
+    expect(plain.find('h2').exists()).toBe(false)
+    expect(plain.find('[data-card]').exists()).toBe(false)
+  })
 })

@@ -41,3 +41,14 @@ export const WithCompareSummary: Story = {
     </PynPullRequestForm>`,
   }),
 }
+export const LongBranchNames: Story = {
+  args: {
+    branches: [
+      ...prBranches,
+      { name: 'release/2026-11-hotfix' },
+      { name: 'feature/castle-quest-level-two-lighting-and-navmesh-rebuild' },
+    ],
+    base: 'release/2026-11-hotfix',
+    head: 'feature/castle-quest-level-two-lighting-and-navmesh-rebuild',
+  },
+}

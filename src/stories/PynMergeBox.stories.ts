@@ -39,3 +39,6 @@ export const OverrideLocksConfirm: Story = {
 export const NoReviewData: Story = {
   args: { pull: { ...openPull, approvals: undefined, threads: undefined } },
 }
+export const CommentsWithoutThreads: Story = {
+  args: { pull: { ...openPull, comments: 3, threads: undefined } },
+}
