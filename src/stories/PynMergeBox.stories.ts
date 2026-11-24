@@ -1,0 +1,23 @@
+import type { Meta, StoryObj } from '@storybook/vue3'
+import PynMergeBox from '../components/PynMergeBox.vue'
+import { now } from './landing-data'
+import { closedPull, conflictedPull, lockedPull, mergedPull, openPull } from './pull-request-data'
+
+const meta: Meta<typeof PynMergeBox> = {
+  title: 'Pull requests/PynMergeBox',
+  component: PynMergeBox,
+  args: { pull: openPull, me: 'jamie', now },
+}
+export default meta
+type Story = StoryObj<typeof PynMergeBox>
+
+export const ReviewRequested: Story = {}
+export const Ready: Story = {
+  args: { pull: { ...openPull, review: 'approved', approvals: { approved: 1, required: 1 } } },
+}
+export const LocksHeldByOthers: Story = { args: { pull: lockedPull } }
+export const Conflicts: Story = { args: { pull: conflictedPull } }
+export const Merged: Story = { args: { pull: mergedPull } }
+export const Closed: Story = { args: { pull: closedPull } }
+export const ReadOnlyViewer: Story = { args: { canMerge: false } }
+export const Busy: Story = { args: { busy: true } }

@@ -74,6 +74,10 @@ export const CompactInAList: Story = {
   }),
 }
 
+export const InlineUnsupported: Story = {
+  args: { kind: 'unsupported', inline: true, description: '', headingLevel: 4 },
+}
+
 const kindStory = (kind: 'empty' | 'unsupported' | 'wip'): Story => ({
   args: { kind, title: undefined, description: undefined },
 })

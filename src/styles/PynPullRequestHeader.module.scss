@@ -1,0 +1,77 @@
+@use 'mixins' as m;
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-display);
+  font-weight: 400;
+  line-height: var(--pyn-leading-tight);
+  overflow-wrap: anywhere;
+}
+
+.edit,
+.copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--pyn-space-1);
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  font-size: var(--pyn-text-base);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  @include m.focus-ring;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2) var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+}
+
+.author strong {
+  color: var(--pyn-text);
+}
+
+.branches {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.branch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-1);
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-accent);
+  background: var(--pyn-accent-bg);
+  border-radius: var(--pyn-radius);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+  line-height: 1.5rem;
+  overflow-wrap: anywhere;
+
+  code {
+    font: inherit;
+  }
+}
+
+.arrow {
+  flex: none;
+}

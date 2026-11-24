@@ -1,0 +1,24 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-1);
+  padding: 0 var(--pyn-space-3);
+  color: var(--pyn-on-accent);
+  border-radius: var(--pyn-radius-pill);
+  font-size: var(--pyn-text-sm);
+  font-weight: 600;
+  line-height: 2rem;
+  white-space: nowrap;
+}
+
+.open {
+  background: var(--pyn-success-fill);
+}
+
+.merged {
+  background: light-dark(#8250df, #8957e5);
+}
+
+.closed {
+  background: var(--pyn-danger-fill);
+}

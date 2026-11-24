@@ -1,0 +1,80 @@
+@use 'mixins' as m;
+
+.commits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  margin: 0 0 var(--pyn-space-2);
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-sm);
+  font-weight: 400;
+}
+
+.list {
+  @include m.flat-list;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+
+  & + & {
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  min-width: 0;
+}
+
+.message {
+  color: var(--pyn-text);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+a.message:hover {
+  color: var(--pyn-accent);
+  text-decoration: underline;
+}
+
+.by {
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+}
+
+.id {
+  color: var(--pyn-text-muted);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+}
+
+.copy {
+  display: inline-flex;
+  padding: var(--pyn-space-1);
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  @include m.focus-ring;
+}
