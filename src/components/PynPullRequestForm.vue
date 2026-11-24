@@ -82,6 +82,7 @@ function submit() {
         :branches="branches"
         :current="base"
         prefix="base:"
+        fit
         :loading="branchesLoading"
         :error="branchesError"
         data-base-picker
@@ -92,6 +93,7 @@ function submit() {
         :branches="branches"
         :current="head || 'choose a branch'"
         prefix="compare:"
+        fit
         :loading="branchesLoading"
         :error="branchesError"
         data-head-picker

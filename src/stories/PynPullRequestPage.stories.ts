@@ -98,7 +98,7 @@ export const WithCommentForm: Story = {
     components: { PynPullRequestPage, PynCommentForm },
     setup: () => ({ args }),
     template: `<PynPullRequestPage v-bind="args">
-      <template #comment><PynCommentForm can-close /></template>
+      <template #comment><PynCommentForm heading="Add a comment" card can-close /></template>
     </PynPullRequestPage>`,
   }),
 }

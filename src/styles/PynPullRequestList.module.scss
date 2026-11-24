@@ -80,7 +80,7 @@
 }
 
 .merged {
-  color: light-dark(#8250df, #ab7df8);
+  color: var(--pyn-done);
 }
 
 .closed {

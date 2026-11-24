@@ -15,6 +15,11 @@
   max-width: 100%;
 }
 
+.fit {
+  width: auto;
+  max-width: min(100%, var(--pyn-branch-picker-max, 24rem));
+}
+
 .tool {
   @include m.button;
   flex: none;
@@ -23,7 +28,7 @@
   color: var(--pyn-text-muted);
 }
 
-// Fixed footprint: the name truncates, so a branch change never moves neighbours.
+// Fixed footprint unless `fit`: the name truncates, so a branch change never moves neighbours.
 .trigger {
   @include m.button;
   width: 100%;

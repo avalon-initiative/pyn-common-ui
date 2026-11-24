@@ -83,6 +83,10 @@ export const OnAnotherBranch: Story = {
 export const LongBranchName: Story = {
   args: { current: 'feature/a-very-long-branch-name-that-keeps-going-and-going' },
 }
+export const FitShortName: Story = { args: { fit: true, current: 'main' } }
+export const FitLongName: Story = {
+  args: { fit: true, current: 'feature/a-very-long-branch-name-that-keeps-going-and-going' },
+}
 
 export const Loading: Story = {
   args: { loading: true },

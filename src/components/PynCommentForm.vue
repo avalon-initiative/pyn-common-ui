@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import PynIcon from './PynIcon.vue'
 import PynTextArea from './PynTextArea.vue'
 import styles from '../styles/PynCommentForm.module.scss'
@@ -21,6 +21,10 @@ const props = withDefaults(
     canClose?: boolean
     /** Adds a Cancel button that emits `cancel`. */
     cancelable?: boolean
+    /** A heading above the form, such as "Add a comment". */
+    heading?: string
+    /** Frames the text area and its help in a bordered card. */
+    card?: boolean
   }>(),
   {
     label: 'Comment',
@@ -37,6 +41,7 @@ const empty = computed(() => !body.value.trim())
 const canSubmit = computed(
   () => !props.busy && !props.disabled && (props.allowEmpty || !empty.value),
 )
+const headingId = useId()
 const area = ref<InstanceType<typeof PynTextArea> | null>(null)
 defineExpose({ focus: () => area.value?.focus() })
 
@@ -46,19 +51,27 @@ function submit() {
 </script>
 
 <template>
-  <form :class="styles.form" data-comment-form @submit.prevent="submit">
-    <PynTextArea
-      ref="area"
-      v-model="body"
-      :label="label"
-      hide-label
-      :placeholder="placeholder"
-      :help="help"
-      :rows="rows"
-      :maxlength="maxlength"
-      :disabled="disabled || busy"
-      @submit="submit"
-    />
+  <form
+    :class="styles.form"
+    :aria-labelledby="heading ? headingId : undefined"
+    data-comment-form
+    @submit.prevent="submit"
+  >
+    <h2 v-if="heading" :id="headingId" :class="styles.heading">{{ heading }}</h2>
+    <div :class="card ? styles.card : styles.plain" :data-card="card || undefined">
+      <PynTextArea
+        ref="area"
+        v-model="body"
+        :label="label"
+        hide-label
+        :placeholder="placeholder"
+        :help="help"
+        :rows="rows"
+        :maxlength="maxlength"
+        :disabled="disabled || busy"
+        @submit="submit"
+      />
+    </div>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
     <div :class="styles.actions">
       <button

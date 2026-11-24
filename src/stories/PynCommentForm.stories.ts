@@ -29,3 +29,6 @@ export const EditDescription: Story = {
     cancelable: true,
   },
 }
+export const CardWithHeading: Story = {
+  args: { heading: 'Add a comment', card: true, canClose: true },
+}
