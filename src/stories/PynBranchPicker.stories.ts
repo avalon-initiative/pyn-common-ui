@@ -28,6 +28,28 @@ async function open(root: HTMLElement) {
 
 export const Closed: Story = {}
 export const Open: Story = { play: ({ canvasElement }) => open(canvasElement) }
+export const WithViewAll: Story = {
+  args: { allHref: '/acme/castle-quest/branches' },
+  play: ({ canvasElement }) => open(canvasElement),
+}
+export const TagsTab: Story = {
+  args: { allHref: '/acme/castle-quest/branches' },
+  play: async ({ canvasElement }) => {
+    await open(canvasElement)
+    canvasElement.querySelector<HTMLButtonElement>('[data-tab=tags]')!.click()
+    await tick()
+  },
+}
+export const Creatable: Story = {
+  args: { creatable: true, allHref: '/acme/castle-quest/branches' },
+  play: async ({ canvasElement }) => {
+    await open(canvasElement)
+    const input = canvasElement.querySelector('input')!
+    input.value = 'feature/new-level'
+    input.dispatchEvent(new Event('input'))
+    await tick()
+  },
+}
 export const OnAnotherBranch: Story = {
   args: { current: 'feature/rig-update' },
   play: ({ canvasElement }) => open(canvasElement),

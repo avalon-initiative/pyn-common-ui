@@ -28,3 +28,5 @@ export const WithStatsAndLock: Story = {
     lockable: true,
   },
 }
+
+export const WithCopy: Story = { args: { text: 'const answer = 42\n' } }

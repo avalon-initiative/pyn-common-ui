@@ -1138,7 +1138,7 @@ describe('file components', () => {
     const hrefs = w.findAll('a').map((a) => a.attributes('href'))
     expect(hrefs).toContain('/acme/castle-quest/history?path=Content%2FLevel01.umap')
     expect(hrefs.filter((h) => h?.startsWith('/v1/repos/'))).toHaveLength(2)
-    expect(w.findAll('a').map((a) => a.text())).toEqual(
+    expect(w.findAll('a').map((a) => a.attributes('aria-label') ?? a.text())).toEqual(
       expect.arrayContaining(['Raw', 'History', 'Download']),
     )
   })

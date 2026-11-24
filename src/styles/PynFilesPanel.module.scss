@@ -1,0 +1,125 @@
+@use 'mixins' as m;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--pyn-space-3);
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+
+  &[data-collapsed] {
+    align-self: flex-start;
+    padding: var(--pyn-space-2);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-lg);
+  font-weight: 600;
+}
+
+.toggle {
+  @include m.control;
+  justify-content: center;
+  min-width: var(--pyn-control-md);
+  padding: 0;
+  color: var(--pyn-text-muted);
+  background: var(--pyn-control-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--pyn-control-bg-hover);
+  }
+
+  @include m.touch-target($square: true);
+  @include m.focus-ring;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  min-width: 0;
+
+  > :first-child {
+    width: 100%;
+  }
+}
+
+.goto {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-text-muted);
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+
+  &:focus-within {
+    border-color: var(--pyn-accent);
+  }
+}
+
+.icon {
+  flex: none;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--pyn-control-md);
+  color: var(--pyn-text);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: var(--pyn-text-base);
+  outline: none;
+}
+
+.results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  min-height: var(--pyn-control-md);
+  padding: 0 var(--pyn-space-2);
+  color: var(--pyn-text);
+  border-radius: var(--pyn-radius);
+  font-size: var(--pyn-text-base);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
+
+  @include m.focus-ring;
+}
+
+.path {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.none {
+  @include m.muted;
+  padding: var(--pyn-space-2);
+}

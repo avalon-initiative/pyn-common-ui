@@ -41,6 +41,10 @@ const paths: Record<string, string> = {
   download: 'M12 4v11M7 11l5 5 5-5M5 20h14',
   trash: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3',
   more: 'M5 12h.01M12 12h.01M19 12h.01',
+  sidebar: 'M4 5h16v14H4zM9 5v14',
+  'chevron-right': 'm9 6 6 6-6 6',
+  calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+  commit: 'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM3 12h6M15 12h6',
 }
 
 defineProps<{ name: string }>()

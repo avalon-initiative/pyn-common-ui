@@ -156,7 +156,7 @@ describe('PynBranchPicker panel', () => {
     await w.find('button').trigger('click')
     const group = w.find('[role=group]')
     const title = w.find(`#${group.attributes('aria-labelledby')}`)
-    expect(title.text()).toBe('Switch branches')
+    expect(title.text()).toBe('Switch branches/tags')
     const opts = w.findAll('[role=option]')
     expect(opts[0]!.find('svg').exists()).toBe(true)
     expect(opts[1]!.find('svg').exists()).toBe(false)
@@ -170,19 +170,44 @@ describe('PynBranchPicker panel', () => {
     expect(document.activeElement).toBe(w.find('button').element)
   })
 
-  it('links to all branches and lets Tab reach the link, while Tab otherwise closes', async () => {
+  it('links to all branches and leaves Tab to the browser, closing only when focus leaves', async () => {
     const w = make(PynBranchPicker, { props: { ...props, allHref: '/a/b/branches' } })
     await w.find('button').trigger('click')
     expect(w.find('a').attributes('href')).toBe('/a/b/branches')
     await w.find('input').trigger('keydown', { key: 'Tab' })
     expect(w.find('[role=listbox]').exists()).toBe(true)
-    await w.find('input').trigger('keydown', { key: 'Tab', shiftKey: true })
-    expect(w.find('[role=listbox]').exists()).toBe(false)
     const plain = make(PynBranchPicker, { props })
     await plain.find('button').trigger('click')
     expect(plain.find('a').exists()).toBe(false)
-    await plain.find('input').trigger('keydown', { key: 'Tab' })
-    expect(plain.find('[role=listbox]').exists()).toBe(false)
+  })
+
+  it('switches between Branches and Tags, the latter showing the not-supported state', async () => {
+    const w = make(PynBranchPicker, { props })
+    await w.find('button').trigger('click')
+    const tabs = w.findAll('[role=tab]')
+    expect(tabs.map((t) => t.text())).toEqual(['Branches', 'Tags'])
+    expect(tabs[0]!.attributes('aria-selected')).toBe('true')
+    await tabs[1]!.trigger('click')
+    expect(w.find('[role=listbox]').exists()).toBe(false)
+    expect(w.text()).toContain('Tags are not supported yet')
+    await tabs[0]!.trigger('click')
+    expect(w.findAll('[role=option]')).toHaveLength(2)
+  })
+
+  it('offers a create row for an unknown name only when creatable, and emits it', async () => {
+    const plain = make(PynBranchPicker, { props })
+    await plain.find('button').trigger('click')
+    await plain.find('input').setValue('feature/x')
+    expect(plain.find('[data-create]').exists()).toBe(false)
+    const w = make(PynBranchPicker, { props: { ...props, creatable: true } })
+    await w.find('button').trigger('click')
+    await w.find('input').setValue('dev')
+    expect(w.find('[data-create]').exists()).toBe(false)
+    await w.find('input').setValue('feature/x')
+    expect(w.find('[data-create]').text()).toContain('feature/x')
+    await w.find('input').trigger('keydown', { key: 'Enter' })
+    expect(w.emitted('create')).toEqual([['feature/x']])
+    expect(w.find('[role=listbox]').exists()).toBe(false)
   })
 
   it('closes when focus leaves the picker', async () => {

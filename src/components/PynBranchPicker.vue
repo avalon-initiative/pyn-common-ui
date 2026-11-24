@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
+import PynEmptyState from './PynEmptyState.vue'
 import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynBranchPicker.module.scss'
 import { formatAgo } from '../utils/ago'
@@ -13,9 +14,11 @@ const props = defineProps<{
   error?: string
   /** Adds a "View all branches" link at the foot of the panel. */
   allHref?: string
+  /** Offers a "Create branch" row for a typed name no branch has; it emits `create`. */
+  creatable?: boolean
   now?: Date
 }>()
-const emit = defineEmits<{ select: [name: string] }>()
+const emit = defineEmits<{ select: [name: string]; create: [name: string] }>()
 
 const id = useId()
 const listId = `${id}-list`
@@ -25,14 +28,24 @@ const search = ref<HTMLInputElement | null>(null)
 const open = ref(false)
 const query = ref('')
 const active = ref(0)
+const tab = ref<'branches' | 'tags'>('branches')
 
 const shown = computed(() => {
   const q = query.value.trim().toLowerCase()
   return q ? props.branches.filter((b) => b.name.toLowerCase().includes(q)) : props.branches
 })
-const ready = computed(() => !props.loading && !props.error)
+const ready = computed(() => !props.loading && !props.error && tab.value === 'branches')
+const typed = computed(() => query.value.trim())
+const canCreate = computed(
+  () =>
+    !!props.creatable &&
+    ready.value &&
+    !!typed.value &&
+    !props.branches.some((b) => b.name === typed.value),
+)
+const count = computed(() => shown.value.length + (canCreate.value ? 1 : 0))
 const activeId = computed(() =>
-  ready.value && shown.value[active.value] ? `${id}-opt-${active.value}` : undefined,
+  ready.value && active.value < count.value ? `${id}-opt-${active.value}` : undefined,
 )
 
 function close(refocus: boolean) {
@@ -42,6 +55,7 @@ function close(refocus: boolean) {
 
 async function show() {
   open.value = true
+  tab.value = 'branches'
   query.value = ''
   const at = shown.value.findIndex((b) => b.name === props.current)
   active.value = at < 0 ? 0 : at
@@ -59,8 +73,14 @@ function choose(name: string) {
   emit('select', name)
 }
 
+function create() {
+  const name = typed.value
+  close(true)
+  emit('create', name)
+}
+
 function move(by: number) {
-  const n = shown.value.length
+  const n = count.value
   if (n) active.value = (active.value + by + n) % n
 }
 
@@ -68,15 +88,14 @@ function key(e: KeyboardEvent) {
   if (e.key === 'ArrowDown') move(1)
   else if (e.key === 'ArrowUp') move(-1)
   else if (e.key === 'Home') active.value = 0
-  else if (e.key === 'End') active.value = Math.max(shown.value.length - 1, 0)
+  else if (e.key === 'End') active.value = Math.max(count.value - 1, 0)
   else if (e.key === 'Enter') {
     const b = shown.value[active.value]
-    if (ready.value && b) choose(b.name)
+    if (!ready.value) return
+    if (b) choose(b.name)
+    else if (canCreate.value) create()
   } else if (e.key === 'Escape') close(true)
-  else if (e.key === 'Tab') {
-    if (props.allHref && !e.shiftKey) return
-    close(false)
-  } else return
+  else return
   e.preventDefault()
 }
 
@@ -102,7 +121,7 @@ watch(open, (o) => {
   if (o) document.addEventListener('click', away)
   else document.removeEventListener('click', away)
 })
-watch(query, () => (active.value = 0))
+watch([query, tab], () => (active.value = 0))
 onBeforeUnmount(() => document.removeEventListener('click', away))
 </script>
 
@@ -131,7 +150,7 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
       @mousedown="hold"
     >
       <div :class="styles.head">
-        <h3 :id="`${id}-title`" :class="styles.title">Switch branches</h3>
+        <h3 :id="`${id}-title`" :class="styles.title">Switch branches/tags</h3>
         <button
           type="button"
           :class="styles.close"
@@ -149,17 +168,39 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
           :class="styles.search"
           type="text"
           role="combobox"
-          aria-label="Find a branch"
+          :aria-label="creatable ? 'Find or create a branch' : 'Find a branch'"
           aria-autocomplete="list"
           aria-expanded="true"
           :aria-controls="listId"
           :aria-activedescendant="activeId"
           autocomplete="off"
-          placeholder="Filter branches"
+          :placeholder="creatable ? 'Find or create a branch…' : 'Filter branches'"
           @keydown="key"
         />
       </div>
-      <p v-if="loading" :class="styles.note" role="status">Loading branches…</p>
+      <div :class="styles.tabs" role="tablist" aria-label="Refs">
+        <button
+          v-for="t in ['branches', 'tags'] as const"
+          :key="t"
+          type="button"
+          role="tab"
+          :class="[styles.tab, tab === t && styles.tabCurrent]"
+          :aria-selected="tab === t"
+          :data-tab="t"
+          @click="tab = t"
+        >
+          {{ t === 'branches' ? 'Branches' : 'Tags' }}
+        </button>
+      </div>
+      <PynEmptyState
+        v-if="tab === 'tags'"
+        kind="unsupported"
+        title="Tags are not supported yet"
+        description="Tags are not available in pyn yet."
+        compact
+        :heading-level="4"
+      />
+      <p v-else-if="loading" :class="styles.note" role="status">Loading branches…</p>
       <p v-else-if="error" :class="styles.error" role="alert">{{ error }}</p>
       <template v-else>
         <ul :id="listId" :class="styles.list" role="listbox" aria-label="Branches">
@@ -186,7 +227,21 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
             }}</span>
           </li>
         </ul>
-        <p v-if="!shown.length" :class="styles.note" role="status">No matching branches</p>
+        <button
+          v-if="canCreate"
+          :id="`${id}-opt-${shown.length}`"
+          type="button"
+          :class="[styles.create, active === shown.length && styles.active]"
+          data-create
+          @click="create"
+          @mousemove="active = shown.length"
+        >
+          <PynIcon name="plus" :class="styles.check" />
+          <span :class="styles.optionName"
+            >Create branch <strong>{{ typed }}</strong> from {{ current }}</span
+          >
+        </button>
+        <p v-else-if="!shown.length" :class="styles.note" role="status">No matching branches</p>
         <p v-else-if="branches.length === 1" :class="styles.note">Only the default branch exists</p>
       </template>
       <a v-if="allHref" :href="allHref" :class="styles.all">View all branches</a>
