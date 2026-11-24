@@ -30,3 +30,9 @@ export const Saved: Story = { args: { success: 'Profile saved.' } }
 export const Saving: Story = { args: { busy: true } }
 export const SaveFailed: Story = { args: { error: 'Could not save the profile.' } }
 export const AvatarFailed: Story = { args: { avatarError: 'The image is too large.' } }
+export const WithVisibility: Story = {
+  args: { visibility: { bio: true, location: true, company: true, links: true, starred: true } },
+}
+export const StarredHidden: Story = {
+  args: { visibility: { starred: false, location: false } },
+}

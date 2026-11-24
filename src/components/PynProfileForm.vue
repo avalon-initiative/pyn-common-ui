@@ -4,16 +4,22 @@ import styles from '../styles/PynProfileForm.module.scss'
 import {
   PROFILE_LIMITS,
   avatarProblem,
+  VISIBILITY_FIELDS,
   cleanProfile,
+  fullVisibility,
   profileProblem,
 } from '../state/account-settings.state'
-import type { ProfileValues } from '../types/account.types'
+import PynSettingsSection from './PynSettingsSection.vue'
+import PynSettingsToggle from './PynSettingsToggle.vue'
+import type { ProfileValues, ProfileVisibility } from '../types/account.types'
 
 const props = defineProps<{
   profile: ProfileValues
   /** The user name, for the initial shown when there is no avatar. */
   user?: string
   avatarUrl?: string | null
+  /** Per-field visibility; the Visibility section shows only when given, and the save payload then carries all flags. */
+  visibility?: ProfileVisibility
   busy?: boolean
   avatarBusy?: boolean
   error?: string
@@ -31,8 +37,16 @@ const fields = (p: ProfileValues) => ({
   links: (p.links ?? []).join('\n'),
 })
 const form = ref(fields(props.profile))
+const flags = ref(fullVisibility(props.visibility ?? {}))
 const tried = ref(false)
 const localAvatarError = ref('')
+
+watch(
+  () => props.visibility,
+  (v) => {
+    flags.value = fullVisibility(v ?? {})
+  },
+)
 
 watch(
   () => props.profile,
@@ -49,7 +63,7 @@ const initial = computed(() => (props.user || props.profile.display_name || '?')
 function save() {
   tried.value = true
   if (problem.value || props.busy) return
-  emit('save', value.value)
+  emit('save', props.visibility ? { ...value.value, visibility: { ...flags.value } } : value.value)
 }
 
 function pick(event: Event) {
@@ -144,6 +158,20 @@ function pick(event: Event) {
         />
         <span :class="styles.count">One address per line, up to {{ L.links }}.</span>
       </label>
+      <PynSettingsSection
+        v-if="visibility"
+        title="Visibility"
+        description="Choose what others see on your profile."
+      >
+        <PynSettingsToggle
+          v-for="f in VISIBILITY_FIELDS"
+          :key="f.key"
+          v-model="flags[f.key]"
+          :title="f.title"
+          :help="f.help"
+          :disabled="busy"
+        />
+      </PynSettingsSection>
       <p v-if="tried && problem" :class="styles.error" role="alert">{{ problem }}</p>
       <p v-else-if="error" :class="styles.error" role="alert">{{ error }}</p>
       <p v-if="success" :class="styles.success" role="status">{{ success }}</p>

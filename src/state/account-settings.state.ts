@@ -1,4 +1,4 @@
-import type { ProfileValues } from '../types/account.types'
+import type { ProfileValues, ProfileVisibility } from '../types/account.types'
 
 export const PROFILE_LIMITS = { name: 64, bio: 160, location: 64, company: 64, links: 5 }
 export const AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/webp']
@@ -23,6 +23,23 @@ export function cleanProfile(f: {
       .map(clean)
       .filter((l) => l !== ''),
   }
+}
+
+export const VISIBILITY_FIELDS: { key: keyof ProfileVisibility; title: string; help: string }[] = [
+  { key: 'avatar', title: 'Avatar', help: 'Show your profile picture.' },
+  { key: 'display_name', title: 'Display name', help: 'Show your display name.' },
+  { key: 'bio', title: 'Bio', help: 'Show your bio.' },
+  { key: 'location', title: 'Location', help: 'Show your location.' },
+  { key: 'company', title: 'Company', help: 'Show your company.' },
+  { key: 'links', title: 'Links', help: 'Show your links.' },
+  { key: 'starred', title: 'Starred repositories', help: 'Show the repositories you starred.' },
+]
+
+/** Every flag set; a flag the server left out counts as visible. */
+export function fullVisibility(v: ProfileVisibility): Required<ProfileVisibility> {
+  const out = {} as Required<ProfileVisibility>
+  for (const f of VISIBILITY_FIELDS) out[f.key] = v[f.key] !== false
+  return out
 }
 
 function isWebUrl(s: string): boolean {
