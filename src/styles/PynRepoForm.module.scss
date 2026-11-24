@@ -49,3 +49,158 @@
   @include m.button;
   text-decoration: none;
 }
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-6);
+  max-width: 44rem;
+  margin-inline: auto;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-xl);
+  font-weight: 600;
+}
+
+.intro {
+  color: var(--pyn-text-muted);
+}
+
+.required {
+  margin: var(--pyn-space-1) 0 0;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// The rule runs from under the number to the end of the step.
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+  padding-block-end: var(--pyn-space-6);
+  padding-inline-start: var(--pyn-space-10);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block: 2.25rem 0;
+    inset-inline-start: calc(0.875rem - 1px);
+    border-inline-start: 2px solid var(--pyn-border);
+  }
+
+  &:last-child {
+    padding-block-end: 0;
+  }
+}
+
+.num {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--pyn-text-muted);
+  background: var(--pyn-control-bg);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius-pill);
+  font-size: var(--pyn-text-sm);
+}
+
+.stepTitle {
+  margin: 0;
+  font-size: var(--pyn-text-lg);
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--pyn-space-2);
+}
+
+.cell {
+  @include m.field;
+  gap: var(--pyn-space-1);
+  font-size: var(--pyn-text-sm);
+}
+
+.grow {
+  flex: 1 1 8rem;
+  min-width: 0;
+
+  .input {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.label {
+  font-weight: 600;
+}
+
+.slash {
+  padding-block-end: var(--pyn-space-1);
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-lg);
+}
+
+.ownerFixed {
+  font-family: var(--pyn-font-mono);
+}
+
+.suggestion {
+  @include m.muted;
+  margin: 0;
+}
+
+.suggest {
+  @include m.link-button;
+}
+
+.counter {
+  @include m.help;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+
+  > * {
+    background: var(--pyn-bg);
+    border: 1px solid var(--pyn-border);
+    border-radius: var(--pyn-radius-lg);
+  }
+}
+
+.number {
+  width: 11rem;
+}
+
+.submit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--pyn-space-2);
+}

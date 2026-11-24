@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynRepoForm from '../components/PynRepoForm.vue'
+import PynSettingsToggle from '../components/PynSettingsToggle.vue'
 
 const meta: Meta<typeof PynRepoForm> = {
   title: 'Repositories/PynRepoForm',
@@ -76,3 +77,30 @@ export const ReadOnly: Story = {
     readonly: true,
   },
 }
+
+const steps = {
+  steps: true,
+  owner: 'alice',
+  owners: ['alice', 'studio'],
+  intro: 'Repositories contain a project’s files and version history.',
+  suggestion: 'bookish-octo-winner',
+  describable: true,
+}
+export const Steps: Story = { args: steps }
+export const StepsSingleOwner: Story = { args: { ...steps, owners: ['alice'] } }
+export const StepsWithPolicyOption: Story = {
+  args: steps,
+  render: (args) => ({
+    components: { PynRepoForm, PynSettingsToggle },
+    setup: () => ({ args }),
+    template: `<PynRepoForm v-bind="args">
+      <template #options>
+        <PynSettingsToggle title="Add starter policy" help="Adds a .pyn/pyn.toml that marks common binary assets exclusive." />
+      </template>
+    </PynRepoForm>`,
+  }),
+}
+export const StepsWithError: Story = {
+  args: { ...steps, error: 'A repository with that name already exists for this owner.' },
+}
+export const StepsWithCancel: Story = { args: { ...steps, cancelHref: '/' } }

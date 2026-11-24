@@ -39,6 +39,8 @@ export interface RepoSettings {
   lease_hours: number
   /** Omitted leaves it alone (or the server default on create); null clears to the default. */
   max_locks_per_user?: number | null
+  /** Present only when the form shows the description field. */
+  description?: string
 }
 
 /** What the repository form edits: the settings plus the lock-limit state the server reports. */
