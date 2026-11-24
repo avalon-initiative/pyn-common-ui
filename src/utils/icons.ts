@@ -45,6 +45,19 @@ import {
   User,
   Users,
   X,
+  ArrowDownToLine,
+  ArrowLeft,
+  ArrowUpToLine,
+  ChevronUp,
+  Circle,
+  Columns2,
+  FileDiff,
+  GitMerge,
+  GitPullRequest,
+  GitPullRequestClosed,
+  MessageSquare,
+  Pencil,
+  Rows2,
 } from '@lucide/icons'
 import type { IconPack, IconSource } from '../types/icon.types'
 
@@ -96,6 +109,19 @@ export const lucideIcons: IconPack = {
   'map-pin': MapPin,
   building: Building2,
   link: Link,
+  'arrow-down-line': ArrowDownToLine,
+  'arrow-left': ArrowLeft,
+  'arrow-up-line': ArrowUpToLine,
+  'chevron-up': ChevronUp,
+  circle: Circle,
+  columns: Columns2,
+  'file-diff': FileDiff,
+  merge: GitMerge,
+  'pull-request': GitPullRequest,
+  'pull-closed': GitPullRequestClosed,
+  comment: MessageSquare,
+  edit: Pencil,
+  rows: Rows2,
 }
 
 const escape = (v: unknown) =>

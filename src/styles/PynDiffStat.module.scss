@@ -1,0 +1,41 @@
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-1);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.add {
+  color: var(--pyn-success);
+}
+
+.delete {
+  color: var(--pyn-danger);
+}
+
+.squares {
+  display: inline-flex;
+  gap: 1px;
+  margin-left: var(--pyn-space-1);
+
+  span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 1px;
+  }
+}
+
+.squares .add {
+  background: var(--pyn-success-fill);
+}
+
+.squares .delete {
+  background: var(--pyn-danger-fill);
+}
+
+.squares .none {
+  background: var(--pyn-border-strong);
+}

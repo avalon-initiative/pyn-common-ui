@@ -5998,3 +5998,55 @@ describe('PynMenu fixed', () => {
     expect(style).toContain('left:')
   })
 })
+
+describe('PynMenu fixed clamp', () => {
+  const rect = (o: Partial<DOMRect>) => ({ ...o, toJSON: () => ({}) }) as DOMRect
+  async function open(
+    box: Partial<DOMRect>,
+    size: { width: number; height: number },
+    align?: 'start',
+  ) {
+    const spy = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: Element,
+    ) {
+      return this.getAttribute('role') === 'menu' ? rect(size) : rect(box)
+    })
+    const w = mount(PynMenu, {
+      props: { label: 'Open', fixed: true, align, items: [{ id: 'a', label: 'A' }] },
+      attachTo: document.body,
+    })
+    await w.find('button').trigger('click')
+    await new Promise((r) => setTimeout(r))
+    const el = w.find('[role="menu"]').element as HTMLElement
+    const at = { left: parseFloat(el.style.left), top: parseFloat(el.style.top) }
+    spy.mockRestore()
+    w.unmount()
+    return at
+  }
+
+  it('opens leftwards from a trigger at the right edge', async () => {
+    const at = await open(
+      { left: 984, right: 1016, top: 100, bottom: 130 },
+      { width: 200, height: 80 },
+    )
+    expect(at.left).toBe(816)
+    expect(at.left + 200).toBeLessThanOrEqual(window.innerWidth)
+  })
+
+  it('clamps a start-aligned panel inside the viewport', async () => {
+    const at = await open(
+      { left: 1000, right: 1020, top: 100, bottom: 130 },
+      { width: 400, height: 80 },
+      'start',
+    )
+    expect(at.left + 400).toBeLessThanOrEqual(window.innerWidth - 8)
+  })
+
+  it('flips above the trigger when there is no room below', async () => {
+    const at = await open(
+      { left: 100, right: 130, top: 740, bottom: 760 },
+      { width: 200, height: 120 },
+    )
+    expect(at.top).toBe(740 - 4 - 120)
+  })
+})
