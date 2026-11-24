@@ -27,6 +27,8 @@ const props = defineProps<{
   title?: string
   /** Text under the heading in the steps layout; the `intro` slot replaces it. */
   intro?: string
+  /** The name as it will be stored; shown as a "Will be created as" preview under the name field. */
+  nameCanonical?: string
   /** A name offered under the name field; choosing it fills the field. */
   suggestion?: string
   /** Shows a description field (steps layout) whose value is sent as `description`. */
@@ -38,6 +40,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   submit: [RepoSettings]
   'update:owner': [string]
+  nameInput: [name: string]
   cancel: [event: MouseEvent]
 }>()
 
@@ -52,6 +55,12 @@ const byPolicy = props.repo?.max_locks_set_by_policy ?? false
 const maxLocks = ref<string | number>(
   byPolicy ? (props.effectiveMaxLocks ?? '') : (props.repo?.max_locks_per_user_setting ?? ''),
 )
+
+const onNameInput = () => emit('nameInput', name.value.trim())
+const suggest = () => {
+  name.value = props.suggestion ?? ''
+  onNameInput()
+}
 
 // Empty clears the setting when editing and takes the server default when creating.
 const submit = () => {
@@ -115,12 +124,17 @@ const submit = () => {
               autocapitalize="none"
               autocomplete="off"
               spellcheck="false"
+              :aria-describedby="nameCanonical ? `${id}-canonical` : undefined"
+              @input="onNameInput"
             />
           </div>
         </div>
+        <p v-if="nameCanonical" :id="`${id}-canonical`" :class="styles.hint" data-canonical>
+          Will be created as: {{ nameCanonical }}
+        </p>
         <p v-if="suggestion" :class="styles.suggestion">
           Great repository names are short and memorable. How about
-          <button type="button" :class="styles.suggest" @click="name = suggestion">
+          <button type="button" :class="styles.suggest" @click="suggest">
             {{ suggestion }}</button>?
         </p>
         <div v-if="describable" :class="styles.cell">
@@ -244,8 +258,13 @@ const submit = () => {
           maxlength="100"
           :disabled="readonly"
           autocapitalize="none"
+          :aria-describedby="nameCanonical ? `${id}-canonical` : undefined"
+          @input="onNameInput"
         />
       </span>
+      <span v-if="nameCanonical" :id="`${id}-canonical`" :class="styles.hint" data-canonical
+        >Will be created as: {{ nameCanonical }}</span
+      >
     </label>
     <label :class="styles.field"
       >Visibility
