@@ -59,3 +59,17 @@ export const AddingPeople: Story = {
     template: `<PynAccessPage v-bind="args"><template #addPeople>Add people form goes here.</template></PynAccessPage>`,
   }),
 }
+export const WithAvatars: Story = {
+  args: {
+    rows: [
+      {
+        kind: 'person',
+        name: 'alice',
+        role: 'admin',
+        source: 'direct',
+        identity: { user: 'alice', display_name: 'Alice Anders' },
+      },
+      ...directRows.slice(1),
+    ],
+  },
+}

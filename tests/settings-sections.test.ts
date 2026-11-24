@@ -3,12 +3,15 @@ import { describe, expect, it, vi } from 'vitest'
 import { accessRoles, directRows } from '../src/stories/access-page-data'
 import { orgMembers, repoPolicy, teams } from '../src/stories/org-data'
 import {
+  PynInvites,
   PynOrgDelete,
   PynOrgRepoPolicy,
   PynOrgSettings,
+  PynAccessPage,
   PynRepoCollaborators,
   PynRepoDelete,
   PynTeamDelete,
+  PynTeamForm,
   PynTwoFactorRequirement,
   PynSettingsGeneral,
   PynSettingsLayout,
@@ -175,5 +178,77 @@ describe('PynRepoCollaborators', () => {
 
   it('omits invitations without an invites list', () => {
     expect(make({ invites: undefined }).text()).not.toContain('Invitations')
+  })
+})
+
+describe('settings polish', () => {
+  it('gives the organization policy page Repository creation, Rules and Add a rule sections', () => {
+    const w = mount(PynOrgRepoPolicy, {
+      props: { policy: repoPolicy, teams: ['artists'], members: ['bob'] },
+    })
+    expect(w.findAll('h3').map((h) => h.text())).toEqual([
+      'Repository creation',
+      'Rules',
+      'Add a rule',
+    ])
+    expect(w.findAll('section[aria-labelledby]')).toHaveLength(3)
+  })
+
+  it('keeps the rules but drops Add a rule when read-only', () => {
+    const w = mount(PynOrgRepoPolicy, {
+      props: { policy: repoPolicy, teams: [], members: [], readonly: true },
+    })
+    expect(w.findAll('h3').map((h) => h.text())).toEqual(['Repository creation', 'Rules'])
+    expect(w.findAll('li')).toHaveLength(3)
+  })
+
+  it('shows the policy error even when read-only', () => {
+    const w = mount(PynOrgRepoPolicy, {
+      props: { policy: repoPolicy, teams: [], members: [], readonly: true, error: 'no' },
+    })
+    expect(w.find('[role=alert]').text()).toBe('no')
+  })
+
+  it('renders Edit team as a settings section and Create a team without one', () => {
+    const edit = mount(PynTeamForm, { props: { team: teams[0] } })
+    expect(edit.find('section h3').text()).toBe('Edit team')
+    const create = mount(PynTeamForm)
+    expect(create.find('section').exists()).toBe(false)
+    expect(create.find('h3').text()).toBe('Create a team')
+  })
+
+  it('shows an avatar on every access row, people and teams', () => {
+    const w = mount(PynAccessPage, {
+      props: {
+        rows: [
+          ...directRows,
+          {
+            kind: 'person',
+            name: 'erin',
+            role: 'reader',
+            identity: { user: 'erin', display_name: 'Erin E', avatar_url: '/a.png' },
+          },
+        ],
+        count: 5,
+        roles: accessRoles,
+        canManage: true,
+      },
+    })
+    expect(w.findAll('[data-avatar]')).toHaveLength(5)
+    expect(
+      w
+        .findAll('li')
+        .find((r) => r.text().includes('artists'))!
+        .find('[data-avatar]')
+        .exists(),
+    ).toBe(true)
+    expect(w.find('[data-avatar] img').attributes('src')).toBe('/a.png')
+    expect(w.findAll('li')[0]!.findAll('[role=img]')).toHaveLength(1)
+  })
+
+  it('shows an empty invitations card and the new-invitation form', () => {
+    const w = mount(PynInvites, { props: { invites: [], roles: ['reader', 'writer'] } })
+    expect(w.find('[data-empty]').text()).toBe('No invitations.')
+    expect(w.find('form h3').text()).toBe('New invitation')
   })
 })
