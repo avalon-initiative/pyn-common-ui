@@ -2,7 +2,11 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import PynHistory from '../components/PynHistory.vue'
 import { aliciaIdentity } from './person-data'
 
-const meta: Meta<typeof PynHistory> = { title: 'Repository/PynHistory', component: PynHistory }
+const meta: Meta<typeof PynHistory> = {
+  title: 'Repository/PynHistory',
+  component: PynHistory,
+  args: { now: new Date('2026-10-09T12:00:00Z') },
+}
 export default meta
 type Story = StoryObj<typeof PynHistory>
 
@@ -78,4 +82,33 @@ export const WithIdentities: Story = {
       i === 0 ? { ...r, author_public: aliciaIdentity, author_current: 'alicia' } : r,
     ),
   },
+}
+
+export const Timeline: Story = {
+  args: {
+    revisions,
+    title: 'History',
+    branch: 'main',
+    branches: [
+      { name: 'main', isDefault: true, updatedAt: '2026-10-08T10:00:00Z' },
+      { name: 'feature/levels', updatedAt: '2026-10-05T09:30:00Z' },
+    ],
+    branchesHref: '/acme/castle-quest/branches',
+    users: ['alice', 'bob'],
+    user: '',
+    range: 'all',
+    browseHref: (rev) => `/acme/castle-quest/blob/${rev.path}?revision=${rev.id}`,
+  },
+}
+export const TimelineFiltered: Story = {
+  args: {
+    ...Timeline.args,
+    revisions: revisions.filter((r) => r.author === 'bob'),
+    user: 'bob',
+    range: 'week',
+  },
+}
+export const WithVerified: Story = { args: { ...Timeline.args, verified: [4, 3] } }
+export const TimelineOneFile: Story = {
+  args: { ...Timeline.args, revisions: revisions.slice(3), path: 'Content/Maps/Main.umap' },
 }
