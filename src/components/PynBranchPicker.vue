@@ -6,6 +6,7 @@ import styles from '../styles/PynBranchPicker.module.scss'
 import { formatAgo } from '../utils/ago'
 import { formatDateTime } from '../utils/datetime'
 import type { BranchOption } from '../types/branch.types'
+import type { RefKind, TagOption } from '../types/tag.types'
 
 const props = defineProps<{
   branches: BranchOption[]
@@ -20,10 +21,18 @@ const props = defineProps<{
   newBranchButton?: boolean
   /** Adds a search button beside the picker that emits `search`. */
   searchButton?: boolean
+  /** Lists tags in the Tags tab; omitted keeps the not-supported state there. */
+  tags?: TagOption[]
+  tagsLoading?: boolean
+  tagsError?: string
+  /** Adds a "View all tags" link at the foot of the Tags tab. */
+  tagsHref?: string
+  /** Whether `current` names a branch or a tag. */
+  currentKind?: RefKind
   now?: Date
 }>()
 const emit = defineEmits<{
-  select: [name: string]
+  select: [name: string, kind: RefKind]
   create: [name: string]
   newBranch: []
   search: []
@@ -39,20 +48,38 @@ const query = ref('')
 const active = ref(0)
 const tab = ref<'branches' | 'tags'>('branches')
 
-const shown = computed(() => {
+const onTags = computed(() => tab.value === 'tags')
+const kind = computed<RefKind>(() => (onTags.value ? 'tag' : 'branch'))
+const currentKind = computed<RefKind>(() => props.currentKind ?? 'branch')
+const isCurrent = (name: string) => name === props.current && kind.value === currentKind.value
+const shown = computed<(BranchOption | TagOption)[]>(() => {
+  const list = onTags.value ? (props.tags ?? []) : props.branches
   const q = query.value.trim().toLowerCase()
-  return q ? props.branches.filter((b) => b.name.toLowerCase().includes(q)) : props.branches
+  return q ? list.filter((b) => b.name.toLowerCase().includes(q)) : list
 })
-const ready = computed(() => !props.loading && !props.error && tab.value === 'branches')
+const ready = computed(() =>
+  onTags.value
+    ? !!props.tags && !props.tagsLoading && !props.tagsError
+    : !props.loading && !props.error,
+)
 const typed = computed(() => query.value.trim())
 const canCreate = computed(
   () =>
     !!props.creatable &&
+    !onTags.value &&
     ready.value &&
     !!typed.value &&
     !props.branches.some((b) => b.name === typed.value),
 )
 const count = computed(() => shown.value.length + (canCreate.value ? 1 : 0))
+const filterLabel = computed(() =>
+  onTags.value ? 'Find a tag' : props.creatable ? 'Find or create a branch' : 'Find a branch',
+)
+const filterPlaceholder = computed(() =>
+  onTags.value ? 'Find a tag…' : props.creatable ? 'Find or create a branch…' : 'Filter branches',
+)
+const when = (b: BranchOption | TagOption) =>
+  'updatedAt' in b ? b.updatedAt : 'createdAt' in b ? b.createdAt : undefined
 const activeId = computed(() =>
   ready.value && active.value < count.value ? `${id}-opt-${active.value}` : undefined,
 )
@@ -64,9 +91,9 @@ function close(refocus: boolean) {
 
 async function show() {
   open.value = true
-  tab.value = 'branches'
+  tab.value = currentKind.value === 'tag' && props.tags ? 'tags' : 'branches'
   query.value = ''
-  const at = shown.value.findIndex((b) => b.name === props.current)
+  const at = shown.value.findIndex((b) => isCurrent(b.name))
   active.value = at < 0 ? 0 : at
   await nextTick()
   search.value?.focus()
@@ -79,7 +106,7 @@ function toggle() {
 
 function choose(name: string) {
   close(true)
-  emit('select', name)
+  emit('select', name, kind.value)
 }
 
 function create() {
@@ -130,7 +157,11 @@ watch(open, (o) => {
   if (o) document.addEventListener('click', away)
   else document.removeEventListener('click', away)
 })
-watch([query, tab], () => (active.value = 0))
+watch(query, () => (active.value = 0))
+watch(tab, () => {
+  const at = shown.value.findIndex((b) => isCurrent(b.name))
+  active.value = at < 0 ? 0 : at
+})
 onBeforeUnmount(() => document.removeEventListener('click', away))
 </script>
 
@@ -147,8 +178,8 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
         @click="toggle"
         @keydown="triggerKey"
       >
-        <PynIcon name="branch" :class="styles.icon" />
-        <span :class="styles.hidden">Branch:</span>
+        <PynIcon :name="currentKind === 'tag' ? 'tag' : 'branch'" :class="styles.icon" />
+        <span :class="styles.hidden">{{ currentKind === 'tag' ? 'Tag:' : 'Branch:' }}</span>
         <span :class="styles.name" :title="current">{{ current }}</span>
         <PynIcon name="chevron" :class="styles.icon" />
       </button>
@@ -178,13 +209,13 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
             :class="styles.search"
             type="text"
             role="combobox"
-            :aria-label="creatable ? 'Find or create a branch' : 'Find a branch'"
+            :aria-label="filterLabel"
             aria-autocomplete="list"
             aria-expanded="true"
             :aria-controls="listId"
             :aria-activedescendant="activeId"
             autocomplete="off"
-            :placeholder="creatable ? 'Find or create a branch…' : 'Filter branches'"
+            :placeholder="filterPlaceholder"
             @keydown="key"
           />
         </div>
@@ -203,37 +234,46 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
           </button>
         </div>
         <PynEmptyState
-          v-if="tab === 'tags'"
+          v-if="onTags && !tags"
           kind="unsupported"
           title="Tags are not supported yet"
           description="Tags are not available in pyn yet."
           compact
           :heading-level="4"
         />
-        <p v-else-if="loading" :class="styles.note" role="status">Loading branches…</p>
-        <p v-else-if="error" :class="styles.error" role="alert">{{ error }}</p>
+        <p v-else-if="onTags ? tagsLoading : loading" :class="styles.note" role="status">
+          {{ onTags ? 'Loading tags…' : 'Loading branches…' }}
+        </p>
+        <p v-else-if="onTags ? tagsError : error" :class="styles.error" role="alert">
+          {{ onTags ? tagsError : error }}
+        </p>
         <template v-else>
-          <ul :id="listId" :class="styles.list" role="listbox" aria-label="Branches">
+          <ul
+            :id="listId"
+            :class="styles.list"
+            role="listbox"
+            :aria-label="onTags ? 'Tags' : 'Branches'"
+          >
             <li
               v-for="(b, i) in shown"
               :id="`${id}-opt-${i}`"
               :key="b.name"
               role="option"
-              :aria-selected="b.name === current"
+              :aria-selected="isCurrent(b.name)"
               :class="[
                 styles.option,
                 i === active && styles.active,
-                b.name === current && styles.current,
+                isCurrent(b.name) && styles.current,
               ]"
               @click="choose(b.name)"
               @mousemove="active = i"
             >
-              <PynIcon v-if="b.name === current" name="check" :class="styles.check" />
+              <PynIcon v-if="isCurrent(b.name)" name="check" :class="styles.check" />
               <span v-else :class="styles.check" />
               <span :class="styles.optionName">{{ b.name }}</span>
-              <span v-if="b.isDefault" :class="styles.pill">default</span>
-              <span v-if="b.updatedAt" :class="styles.when" :title="formatDateTime(b.updatedAt)">{{
-                formatAgo(b.updatedAt, now ?? new Date())
+              <span v-if="'isDefault' in b && b.isDefault" :class="styles.pill">default</span>
+              <span v-if="when(b)" :class="styles.when" :title="formatDateTime(when(b)!)">{{
+                formatAgo(when(b)!, now ?? new Date())
               }}</span>
             </li>
           </ul>
@@ -251,12 +291,20 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
               >Create branch <strong>{{ typed }}</strong> from {{ current }}</span
             >
           </button>
-          <p v-else-if="!shown.length" :class="styles.note" role="status">No matching branches</p>
-          <p v-else-if="branches.length === 1" :class="styles.note">
+          <p v-else-if="onTags && !tags?.length" :class="styles.note" role="status">No tags yet</p>
+          <p v-else-if="!shown.length" :class="styles.note" role="status">
+            {{ onTags ? 'No matching tags' : 'No matching branches' }}
+          </p>
+          <p v-else-if="!onTags && branches.length === 1" :class="styles.note">
             Only the default branch exists
           </p>
         </template>
-        <a v-if="allHref" :href="allHref" :class="styles.all">View all branches</a>
+        <a v-if="onTags && tags && tagsHref" :href="tagsHref" :class="styles.all" data-all-tags
+          >View all tags</a
+        >
+        <a v-else-if="(!onTags || !tags) && allHref" :href="allHref" :class="styles.all"
+          >View all branches</a
+        >
       </div>
     </div>
     <button
