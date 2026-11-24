@@ -73,3 +73,35 @@ export const CompactInAList: Story = {
     template: `<ul style="max-width: 32rem; margin: 0; padding: 0; list-style: none; border: 1px solid var(--pyn-border); border-radius: var(--pyn-radius)"><li><PynEmptyState v-bind="args" /></li></ul>`,
   }),
 }
+
+const kindStory = (kind: 'empty' | 'unsupported' | 'wip'): Story => ({
+  args: { kind, title: undefined, description: undefined },
+})
+export const KindEmpty: Story = kindStory('empty')
+export const KindUnsupported: Story = kindStory('unsupported')
+export const KindWorkInProgress: Story = kindStory('wip')
+export const KindOverridden: Story = {
+  args: {
+    kind: 'wip',
+    title: 'Notifications are coming',
+    description: 'Mentions and lock requests will be listed here.',
+    icon: 'bell',
+  },
+}
+export const KindWithAction: Story = {
+  args: {
+    kind: 'empty',
+    title: undefined,
+    description: undefined,
+    primaryLabel: 'New repository',
+    primaryHref: '/_/new',
+  },
+}
+export const KindInAPanel: Story = {
+  args: { kind: 'unsupported', title: 'Tags are not supported yet', description: undefined },
+  render: (args) => ({
+    components: { PynEmptyState },
+    setup: () => ({ args }),
+    template: `<div style="max-width: 64rem"><PynEmptyState v-bind="args" /></div>`,
+  }),
+}
