@@ -45,6 +45,30 @@ describe('PynCloneMenu', () => {
     expect(make({ label: 'Get code' }).find('button').text()).toBe('Get code')
   })
 
+  it('keeps the panel open through a pointer press on a copy button', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    const w = make()
+    await w.find('button').trigger('click')
+    const outside = document.createElement('main')
+    outside.tabIndex = -1
+    document.body.appendChild(outside)
+    const copyBtn = w.find('button[aria-label="Copy HTTPS"]')
+    const down = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+    copyBtn.element.dispatchEvent(down)
+    if (!down.defaultPrevented) {
+      w.find('input').element.dispatchEvent(
+        new FocusEvent('focusout', { bubbles: true, relatedTarget: outside }),
+      )
+    }
+    await flushPromises()
+    await copyBtn.trigger('click')
+    await flushPromises()
+    expect(w.find('[role=dialog]').exists()).toBe(true)
+    expect(w.emitted('copy')).toEqual([['https']])
+    outside.remove()
+  })
+
   it('copies and emits the kind', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     vi.stubGlobal('navigator', { clipboard: { writeText } })

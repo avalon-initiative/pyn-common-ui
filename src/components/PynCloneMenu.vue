@@ -64,6 +64,9 @@ const leave = (e: FocusEvent) => {
   const next = e.relatedTarget as Node | null
   if (next && root.value && !root.value.contains(next)) close(false)
 }
+const hold = (e: MouseEvent) => {
+  if (!(e.target instanceof HTMLInputElement)) e.preventDefault()
+}
 const stop = () => {
   document.removeEventListener('click', away)
   document.removeEventListener('keydown', escape)
@@ -88,7 +91,14 @@ onBeforeUnmount(stop)
     >
       <PynIcon name="code" />{{ label }}<PynIcon name="chevron" :class="styles.chevron" />
     </button>
-    <div v-if="open" :class="styles.panel" role="dialog" :aria-label="label" @focusout="leave">
+    <div
+      v-if="open"
+      :class="styles.panel"
+      role="dialog"
+      :aria-label="label"
+      @focusout="leave"
+      @mousedown="hold"
+    >
       <div v-for="row in rows" :key="row.kind" :class="styles.row">
         <label :class="styles.title" :for="`pyn-clone-${row.kind}`">{{ row.title }}</label>
         <div :class="styles.field">
