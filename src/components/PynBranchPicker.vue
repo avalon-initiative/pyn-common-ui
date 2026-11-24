@@ -94,6 +94,10 @@ function leave(e: FocusEvent) {
   const next = e.relatedTarget as Node | null
   if (next && root.value && !root.value.contains(next)) close(false)
 }
+// Keeps focus in the filter so a press on an option cannot trigger the focusout close.
+function hold(e: MouseEvent) {
+  if (!(e.target instanceof HTMLInputElement)) e.preventDefault()
+}
 watch(open, (o) => {
   if (o) document.addEventListener('click', away)
   else document.removeEventListener('click', away)
@@ -119,7 +123,13 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
       <span :class="styles.name" :title="current">{{ current }}</span>
       <PynIcon name="chevron" :class="styles.icon" />
     </button>
-    <div v-if="open" :class="styles.panel" role="group" :aria-labelledby="`${id}-title`">
+    <div
+      v-if="open"
+      :class="styles.panel"
+      role="group"
+      :aria-labelledby="`${id}-title`"
+      @mousedown="hold"
+    >
       <div :class="styles.head">
         <h3 :id="`${id}-title`" :class="styles.title">Switch branches</h3>
         <button

@@ -706,6 +706,28 @@ describe('PynBranchPicker', () => {
     await flushPromises()
   }
 
+  it('selects an option after a real pointer press whose default focus move leaves the picker', async () => {
+    const w = mountPicker()
+    await open(w)
+    const outside = document.createElement('main')
+    outside.tabIndex = -1
+    document.body.appendChild(outside)
+    const option = w.findAll('[role=option]')[1]
+    const down = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+    option.element.dispatchEvent(down)
+    if (!down.defaultPrevented) {
+      w.find('[role=combobox]').element.dispatchEvent(
+        new FocusEvent('focusout', { bubbles: true, relatedTarget: outside }),
+      )
+    }
+    await flushPromises()
+    expect(w.find('[role=listbox]').exists()).toBe(true)
+    await option.trigger('click')
+    expect(w.emitted('select')).toEqual([['feature/art']])
+    outside.remove()
+    w.unmount()
+  })
+
   it('shows the current branch and keeps the list closed', () => {
     const w = mountPicker()
     expect(w.find('button').text()).toContain('main')
