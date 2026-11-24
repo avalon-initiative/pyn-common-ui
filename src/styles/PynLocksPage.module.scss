@@ -1,0 +1,215 @@
+@use 'mixins' as m;
+
+.page {
+  min-width: 0;
+}
+
+.box {
+  @include m.flat-box;
+  position: relative;
+  overflow-x: auto;
+  margin-top: var(--pyn-space-4);
+}
+
+.table {
+  @include m.data-table;
+  min-width: 46rem;
+
+  @include m.narrow {
+    min-width: 0;
+
+    th,
+    td {
+      padding-inline: var(--pyn-space-2);
+    }
+  }
+}
+
+.row > td:first-child {
+  box-shadow: inset 3px 0 0 var(--pyn-border);
+}
+
+.row[data-state='mine'] > td:first-child {
+  box-shadow: inset 3px 0 0 var(--pyn-mine);
+}
+
+.row[data-state='locked'] > td:first-child {
+  box-shadow: inset 3px 0 0 var(--pyn-locked);
+}
+
+.row[data-state='expiring'] > td:first-child {
+  box-shadow: inset 3px 0 0 var(--pyn-attention);
+}
+
+.row[data-state='stale'] > td:first-child {
+  box-shadow: inset 3px 0 0 var(--pyn-danger);
+}
+
+.pathCell {
+  min-width: 12rem;
+
+  @include m.narrow {
+    min-width: 7rem;
+  }
+}
+
+.path {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--pyn-space-2);
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-sm);
+  overflow-wrap: anywhere;
+}
+
+.lockIcon {
+  flex: none;
+  margin-top: var(--pyn-space-half);
+  color: var(--pyn-locked);
+}
+
+.row[data-state='mine'] .lockIcon {
+  color: var(--pyn-mine);
+}
+
+.row[data-state='stale'] .lockIcon {
+  color: var(--pyn-danger);
+}
+
+.holder {
+  white-space: nowrap;
+
+  @include m.narrow {
+    display: none;
+  }
+}
+
+.under {
+  display: none;
+  margin-top: var(--pyn-space-1);
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+
+  @include m.narrow {
+    display: block;
+  }
+}
+
+.row[data-state='mine'] .holder {
+  color: var(--pyn-mine);
+  font-weight: 600;
+}
+
+.repo {
+  @include m.accent-link;
+}
+
+.repoCol,
+.takenCol {
+  white-space: nowrap;
+  color: var(--pyn-text-muted);
+
+  @include m.narrow {
+    display: none;
+  }
+}
+
+.modeCol {
+  white-space: nowrap;
+
+  @include m.narrow {
+    display: none;
+  }
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  white-space: nowrap;
+}
+
+.state.mine,
+.state.locked,
+.state.expiring,
+.state.stale {
+  @include m.label;
+}
+
+.state.mine {
+  @include m.status-label(var(--pyn-mine), var(--pyn-mine-bg));
+}
+
+.state.locked {
+  @include m.status-label(var(--pyn-locked), var(--pyn-locked-bg));
+}
+
+.state.expiring {
+  @include m.status-label(var(--pyn-attention), var(--pyn-attention-bg));
+}
+
+.state.stale {
+  @include m.status-label(var(--pyn-danger), var(--pyn-danger-bg));
+}
+
+.lease {
+  font-weight: 400;
+}
+
+.actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.danger {
+  @include m.button(var(--pyn-danger));
+}
+
+.quiet {
+  @include m.button;
+}
+
+.actions .danger,
+.actions .quiet {
+  @include m.narrow {
+    padding-inline: var(--pyn-space-2);
+    font-size: var(--pyn-text-sm);
+  }
+}
+
+.reasonRow td {
+  background: var(--pyn-bg-subtle);
+}
+
+.reason {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.input {
+  @include m.input;
+  flex: 1 1 14rem;
+}
+
+.failure {
+  display: block;
+  margin-top: var(--pyn-space-1);
+  color: var(--pyn-danger);
+  font-size: var(--pyn-text-xs);
+}
+
+.empty {
+  margin-top: var(--pyn-space-4);
+}
+
+.error {
+  @include m.error;
+  margin-top: var(--pyn-space-3);
+}
+
+.hidden {
+  @include m.visually-hidden;
+}
