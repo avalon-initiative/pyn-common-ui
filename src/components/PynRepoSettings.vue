@@ -18,6 +18,8 @@ const sections = computed(() =>
   props.items.map((i) => ({
     id: i.section,
     label: i.label,
+    group: i.group,
+    icon: i.icon,
     href: repoSettingsPath({ owner: props.owner, name: props.name }, i.section),
   })),
 )

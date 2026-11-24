@@ -331,6 +331,8 @@ export {
   isOrgOwner,
   orgAuditLabel,
   orgPath,
+  orgSettingsNav,
+  orgSettingsPath,
   orgTabs,
   ownerChoices,
   ruleKey,

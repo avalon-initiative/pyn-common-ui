@@ -27,6 +27,10 @@ export const isOrgOwner = (org: { role?: OrgRole | null } | null) => org?.role =
 export interface OrgTab {
   section: string
   label: string
+  /** Heading shared by consecutive items in a grouped settings navigation. */
+  group?: string
+  /** PynIcon name shown beside the label in a grouped settings navigation. */
+  icon?: string
 }
 
 /** Tabs the viewer may use; the server enforces the same rules. */
@@ -41,6 +45,23 @@ export function orgTabs(role: OrgRole | null | undefined): OrgTab[] {
       { section: 'settings', label: 'Settings' },
     )
   return tabs
+}
+
+/** Organization settings sub-pages the viewer may open; `settings` is General. Owners only. */
+export function orgSettingsNav(role: OrgRole | null | undefined): OrgTab[] {
+  if (role !== 'owner') return []
+  return [
+    { section: 'settings', label: 'General', icon: 'settings' },
+    { section: 'members', label: 'Members', group: 'Access', icon: 'user' },
+    { section: 'teams', label: 'Teams', group: 'Access', icon: 'users' },
+    { section: 'usage', label: 'Usage', group: 'Storage and audit', icon: 'database' },
+    { section: 'audit', label: 'Audit log', group: 'Storage and audit', icon: 'list' },
+  ]
+}
+
+/** The route of an organization settings sub-page; General is `-/settings`. */
+export function orgSettingsPath(name: string, section: string): string {
+  return orgPath(name, section === 'settings' ? 'settings' : `settings/${section}`)
 }
 
 /** Profile tabs; Usage is for the signed-in user on their own profile. */
