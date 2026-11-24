@@ -47,3 +47,67 @@
     display: none;
   }
 }
+
+.panel {
+  @include m.floating;
+  position: absolute;
+  top: calc(100% + var(--pyn-space-1));
+  left: 0;
+  z-index: 30;
+  box-sizing: border-box;
+  width: max(100%, min(30rem, calc(100vw - var(--pyn-space-4) * 2)));
+  max-height: min(24rem, 70vh);
+  padding-block: var(--pyn-space-1);
+  overflow-y: auto;
+
+  > [role='group'] + [role='group'] {
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+.heading {
+  padding: var(--pyn-space-2) var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  min-height: var(--pyn-control-md);
+  padding: var(--pyn-space-1) var(--pyn-space-3);
+  color: var(--pyn-text);
+  text-decoration: none;
+  cursor: pointer;
+
+  &.current {
+    background: var(--pyn-hover);
+  }
+
+  @include m.touch-target;
+}
+
+.lead {
+  flex: none;
+  color: var(--pyn-text-muted);
+}
+
+.label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionHint {
+  flex: none;
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+}
+
+.live {
+  @include m.visually-hidden;
+}
