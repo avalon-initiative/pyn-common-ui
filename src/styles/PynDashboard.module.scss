@@ -2,7 +2,7 @@
 
 .dashboard {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+  grid-template-columns: minmax(0, 1fr) var(--pyn-side-width);
   grid-template-areas:
     'head head'
     'main side';
@@ -44,7 +44,7 @@
 .side {
   display: flex;
   flex-direction: column;
-  gap: var(--pyn-space-4);
+  gap: var(--pyn-space-6);
   min-width: 0;
 }
 

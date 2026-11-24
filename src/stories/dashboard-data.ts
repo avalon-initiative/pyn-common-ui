@@ -1,4 +1,9 @@
-import type { AttentionNotice, RecentItem } from '../types/dashboard.types'
+import type {
+  AttentionNotice,
+  InstanceNotice,
+  RecentItem,
+  RepoActivityEntry,
+} from '../types/dashboard.types'
 import type { MyLock } from '../types/lock.types'
 import type { RepoInfo } from '../types/repo.types'
 import type { OwnerOption } from '../types/top-bar.types'
@@ -60,4 +65,61 @@ export const recent: RecentItem[] = [
     href: '/studio/core-engine/blob/Config/DefaultGame.ini',
     kind: 'file',
   },
+]
+
+const act = (
+  id: number,
+  owner: string,
+  name: string,
+  actor: string,
+  action: string,
+  path: string,
+  at: string,
+) => ({ id, owner, name, actor, action, path, at }) satisfies RepoActivityEntry
+
+export const repoActivity: RepoActivityEntry[] = [
+  act(
+    1,
+    'alice',
+    'castle-quest',
+    'alice',
+    'checkout',
+    'Content/Maps/Main.umap',
+    '2026-10-08T11:52:00Z',
+  ),
+  act(
+    2,
+    'studio',
+    'core-engine',
+    'bob',
+    'checkin',
+    'Config/DefaultGame.ini',
+    '2026-10-08T10:30:00Z',
+  ),
+  act(
+    3,
+    'alice',
+    'castle-quest',
+    'carol',
+    'release',
+    'Content/Art/Hero.psd',
+    '2026-10-08T08:10:00Z',
+  ),
+  act(4, 'alice', 'notes', 'alice', 'restore', 'todo.md', '2026-10-07T16:00:00Z'),
+]
+
+export const instanceNotices: InstanceNotice[] = [
+  {
+    id: 'i1',
+    title: 'Scheduled maintenance on Saturday at 02:00 UTC',
+    at: '2026-10-08T07:00:00Z',
+    href: '/_/notices/1',
+  },
+  {
+    id: 'i2',
+    title: 'Lock leases now default to eight hours',
+    at: '2026-10-07T12:00:00Z',
+    href: '/_/notices/2',
+  },
+  { id: 'i3', title: 'Storage limits are shown on the usage page', at: '2026-10-05T09:00:00Z' },
 ]

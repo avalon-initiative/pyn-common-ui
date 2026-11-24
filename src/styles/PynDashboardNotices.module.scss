@@ -1,0 +1,84 @@
+@use 'mixins' as m;
+
+.panel {
+  @include m.flat-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  min-width: 0;
+  padding: var(--pyn-space-4);
+}
+
+.heading {
+  @include m.section-title;
+  font-size: var(--pyn-text-base);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// A dot on a rail joins the entries into a timeline.
+.item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-half);
+  padding-left: var(--pyn-space-4);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0.35rem;
+    left: 0.125rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--pyn-border);
+    border-radius: 50%;
+  }
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 1rem;
+    bottom: calc(var(--pyn-space-3) * -1);
+    left: calc(0.375rem - 0.5px);
+    width: 1px;
+    background: var(--pyn-border);
+  }
+}
+
+.time {
+  @include m.muted;
+  font-size: var(--pyn-text-xs);
+}
+
+.title {
+  color: var(--pyn-text);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--pyn-accent);
+    text-decoration: underline;
+  }
+
+  @include m.focus-ring;
+}
+
+.plain {
+  font-weight: 600;
+}
+
+.viewAll {
+  @include m.accent-link;
+  align-self: flex-start;
+  font-size: var(--pyn-text-sm);
+
+  @include m.touch-target($display: inline-flex);
+}

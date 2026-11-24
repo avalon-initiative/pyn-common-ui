@@ -398,6 +398,7 @@ export {
   ungrantedTeams,
 } from './state/team.state'
 export { myLockKey } from './state/my-locks.state'
+export { expiringLocks, filterActivity, filterLocks } from './state/dashboard-panels.state'
 export type { FileRow, Mode, MyLock, ReleaseFailure } from './types/lock.types'
 export type {
   Grantee,
@@ -487,11 +488,21 @@ export { default as PynDashboardCard } from './components/PynDashboardCard.vue'
 export { default as PynDashboardRepositories } from './components/PynDashboardRepositories.vue'
 export { default as PynDashboardOrganizations } from './components/PynDashboardOrganizations.vue'
 export { default as PynDashboardFirstRun } from './components/PynDashboardFirstRun.vue'
+export { default as PynDashboardPanel } from './components/PynDashboardPanel.vue'
+export { default as PynDashboardLocks } from './components/PynDashboardLocks.vue'
+export { default as PynDashboardActivity } from './components/PynDashboardActivity.vue'
+export { default as PynDashboardNotices } from './components/PynDashboardNotices.vue'
 export { default as PynAttention } from './components/PynAttention.vue'
 export { default as PynRecentItems } from './components/PynRecentItems.vue'
 export { MAIN_ID, countText, defaultHrefs, ownerItems } from './state/top-bar.state'
 export type { OwnerOption, TopBarHrefs } from './types/top-bar.types'
-export type { AttentionNotice, RecentItem, RecentKind } from './types/dashboard.types'
+export type {
+  AttentionNotice,
+  InstanceNotice,
+  RecentItem,
+  RecentKind,
+  RepoActivityEntry,
+} from './types/dashboard.types'
 export { default as PynTabs } from './components/PynTabs.vue'
 export { default as PynSettingsLayout } from './components/PynSettingsLayout.vue'
 export { default as PynOrgSettingsLayout } from './components/PynOrgSettingsLayout.vue'
