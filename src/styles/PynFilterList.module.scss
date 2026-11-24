@@ -149,3 +149,56 @@
   min-width: var(--pyn-control-md);
   justify-content: center;
 }
+
+// bar="inside": the list is the box; tabs, count and filters share its top.
+.inside {
+  @include m.flat-box;
+  gap: 0;
+
+  .box {
+    border: 0;
+    border-radius: 0;
+  }
+
+  .bar {
+    gap: var(--pyn-space-2) var(--pyn-space-3);
+    padding: var(--pyn-space-2) var(--pyn-space-4);
+    background: var(--pyn-surface-raised);
+    border-bottom: 1px solid var(--pyn-border);
+  }
+
+  .heading {
+    margin-right: auto;
+  }
+
+  .search {
+    flex: 0 1 16rem;
+    order: 1;
+
+    @include m.narrow {
+      flex: 1 1 100%;
+    }
+  }
+
+  .control {
+    flex: none;
+    padding-inline: var(--pyn-space-2);
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--pyn-text-muted);
+
+    &:hover {
+      color: var(--pyn-text);
+    }
+  }
+
+  .rows > :first-child,
+  .header + .rows > :first-child {
+    border-top: 0;
+  }
+}
+
+.tabs {
+  background: var(--pyn-surface-raised);
+  border-bottom: 1px solid var(--pyn-border);
+}

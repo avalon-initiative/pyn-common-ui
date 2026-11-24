@@ -178,26 +178,10 @@ const change = (name: string, e: Event) =>
       <div v-if="adding === 'teams' && $slots.addTeams" :class="styles.panel" data-add="teams">
         <slot name="addTeams" />
       </div>
-      <div :class="styles.tabs" role="tablist" aria-label="Access source">
-        <button
-          v-for="(t, i) in ACCESS_TABS"
-          :key="t.id"
-          :ref="(el) => (tabRefs[i] = el as HTMLElement)"
-          type="button"
-          role="tab"
-          :class="styles.tab"
-          :aria-selected="tab === t.id"
-          :tabindex="tab === t.id ? 0 : -1"
-          @click="tab = t.id"
-          @keydown.right.prevent="move(i, 1)"
-          @keydown.left.prevent="move(i, -1)"
-        >
-          {{ t.label }}
-        </button>
-      </div>
       <PynFilterList
         v-model:query="query"
         role="tabpanel"
+        bar="inside"
         noun="person"
         plural="people"
         search-label="Search by name"
@@ -215,6 +199,25 @@ const change = (name: string, e: Event) =>
         @control="(id, v) => emit('filter', id, v)"
         @update:page="emit('update:page', $event)"
       >
+        <template #tabs>
+          <div :class="styles.tabs" role="tablist" aria-label="Access source">
+            <button
+              v-for="(t, i) in ACCESS_TABS"
+              :key="t.id"
+              :ref="(el) => (tabRefs[i] = el as HTMLElement)"
+              type="button"
+              role="tab"
+              :class="styles.tab"
+              :aria-selected="tab === t.id"
+              :tabindex="tab === t.id ? 0 : -1"
+              @click="tab = t.id"
+              @keydown.right.prevent="move(i, 1)"
+              @keydown.left.prevent="move(i, -1)"
+            >
+              {{ t.label }}
+            </button>
+          </div>
+        </template>
         <li v-for="r in rows" :key="`${r.kind}:${r.name}`" :class="styles.row">
           <span :class="styles.who">
             <a v-if="r.href" :href="r.href" :class="styles.name"
