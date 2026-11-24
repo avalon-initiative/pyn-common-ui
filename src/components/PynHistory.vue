@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import PynBranchPicker from './PynBranchPicker.vue'
 import PynIcon from './PynIcon.vue'
 import PynPerson from './PynPerson.vue'
@@ -8,6 +8,7 @@ import { formatAgo } from '../utils/ago'
 import { copyText } from '../utils/copy'
 import { formatDateTime } from '../utils/datetime'
 import { commitBody, commitSubject } from '../utils/commit-message'
+import { pickerBranch } from '../state/branch-picker.state'
 import { FILTER_DEBOUNCE_MS, HISTORY_RANGES, groupByDay } from '../state/history.state'
 import type { HistoryRange } from '../state/history.state'
 import type { BranchOption } from '../types/branch.types'
@@ -23,12 +24,14 @@ const props = defineProps<{
   error?: string
   /** Heading above the toolbar; omitted shows none. */
   title?: string
-  /** Shows the branch picker when `branch` and `branches` are both given. */
+  /** Shows the branch picker when `branches` is given; without `branch` it shows the default branch. */
   branch?: string
   branches?: BranchOption[]
   branchesLoading?: boolean
   branchesError?: string
   branchesHref?: string
+  /** Adds a New branch button beside the picker; it emits `newBranch`. */
+  newBranchButton?: boolean
   /** Authors offered by the user filter; omitted hides it. */
   users?: string[]
   /** The chosen author; empty is everyone. */
@@ -46,12 +49,14 @@ const emit = defineEmits<{
   more: []
   clearPath: []
   selectBranch: [name: string]
+  newBranch: []
   selectUser: [user: string]
   selectRange: [range: HistoryRange]
   copy: [rev: Revision]
 }>()
 
 const typed = ref(props.filter ?? '')
+const pickerName = computed(() => pickerBranch(props.branch, props.branches ?? []))
 const copied = ref<number | null>(null)
 let timer: ReturnType<typeof setTimeout> | undefined
 let copyTimer: ReturnType<typeof setTimeout> | undefined
@@ -79,16 +84,18 @@ const pick = (e: Event) => (e.target as HTMLSelectElement).value
 <template>
   <section :class="styles.page">
     <h2 v-if="title" :class="styles.title">{{ title }}</h2>
-    <div v-if="(branch && branches) || users || range" :class="styles.toolbar">
+    <div v-if="(pickerName && branches) || users || range" :class="styles.toolbar">
       <PynBranchPicker
-        v-if="branch && branches"
+        v-if="pickerName && branches"
         :branches="branches"
-        :current="branch"
+        :current="pickerName"
         :loading="branchesLoading"
         :error="branchesError"
         :all-href="branchesHref"
+        :new-branch-button="newBranchButton"
         :now="now"
         @select="emit('selectBranch', $event)"
+        @new-branch="emit('newBranch')"
       />
       <span :class="styles.filters">
         <label v-if="users" :class="styles.select">

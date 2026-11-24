@@ -96,3 +96,6 @@ export const InToolbarLongName: Story = {
   args: { current: 'feature/a-very-long-branch-name-that-keeps-going-and-going' },
   render: toolbar,
 }
+export const WithButtons: Story = {
+  args: { newBranchButton: true, searchButton: true },
+}

@@ -44,3 +44,10 @@ export const Mobile: Story = {
   args: WithFilters.args,
   parameters: { viewport: { defaultViewport: 'mobile1' } },
 }
+export const Renamable: Story = {
+  args: { canRename: true },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLButtonElement>('[aria-label^="More actions for"]')!.click()
+    await new Promise((resolve) => setTimeout(resolve))
+  },
+}
