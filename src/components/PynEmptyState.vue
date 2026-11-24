@@ -41,9 +41,11 @@ const props = withDefaults(
     secondaryLabel?: string
     secondaryHref?: string
     compact?: boolean
+    /** One muted line with the icon beside the title, for a side column section. */
+    inline?: boolean
     headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
   }>(),
-  { compact: false, headingLevel: 2 },
+  { compact: false, inline: false, headingLevel: 2 },
 )
 const shown = computed(() => {
   const d = props.kind ? KIND_DEFAULTS[props.kind] : undefined
@@ -57,7 +59,7 @@ const emit = defineEmits<{ primary: [event: MouseEvent]; secondary: [event: Mous
 </script>
 
 <template>
-  <div :class="[styles.empty, compact && styles.compact]">
+  <div :class="[styles.empty, compact && styles.compact, inline && styles.inline]">
     <div v-if="$slots.icon || shown.icon" :class="styles.icon" aria-hidden="true">
       <slot name="icon"><PynIcon v-if="shown.icon" :name="shown.icon" /></slot>
     </div>

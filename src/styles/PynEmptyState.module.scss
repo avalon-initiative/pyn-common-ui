@@ -23,6 +23,26 @@
   border-radius: 0;
 }
 
+.inline {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: var(--pyn-space-2);
+  padding: 0;
+  text-align: left;
+  border: 0;
+}
+
+.inline .icon {
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.inline .title {
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-sm);
+  font-weight: 400;
+}
+
 .icon {
   display: flex;
   margin-bottom: var(--pyn-space-2);

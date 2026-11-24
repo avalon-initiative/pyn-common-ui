@@ -1,0 +1,47 @@
+@use 'mixins' as m;
+
+.bar {
+  position: sticky;
+  top: var(--pyn-topbar-height);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-3);
+  box-sizing: border-box;
+  min-height: var(--pyn-control-lg);
+  padding: var(--pyn-space-1) var(--pyn-page-gutter, var(--pyn-space-4));
+  background: var(--pyn-bg);
+  border-bottom: 1px solid var(--pyn-border);
+}
+
+.chip {
+  flex: none;
+  line-height: 1.5rem;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.number {
+  color: var(--pyn-text-muted);
+  font-weight: 400;
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+@include m.narrow {
+  .actions {
+    display: none;
+  }
+}

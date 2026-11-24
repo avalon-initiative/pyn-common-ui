@@ -1,0 +1,212 @@
+@use 'mixins' as m;
+
+.box {
+  @include m.flat-box;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-3) var(--pyn-space-4);
+  padding: var(--pyn-space-4);
+}
+
+.icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--pyn-radius-pill);
+  font-size: var(--pyn-text-lg);
+
+  .box[data-tone='success'] & {
+    color: var(--pyn-on-accent);
+    background: var(--pyn-success-fill);
+  }
+
+  .box[data-tone='attention'] & {
+    color: var(--pyn-attention);
+    background: var(--pyn-attention-bg);
+  }
+
+  .box[data-tone='danger'] & {
+    color: var(--pyn-on-accent);
+    background: var(--pyn-danger-fill);
+  }
+
+  .box[data-tone='neutral'] & {
+    color: var(--pyn-text-muted);
+    background: var(--pyn-surface-raised);
+  }
+
+  .box[data-tone='merged'] & {
+    color: var(--pyn-on-accent);
+    background: light-dark(#8250df, #8957e5);
+  }
+}
+
+.status {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-md);
+  font-weight: 600;
+}
+
+.text {
+  @include m.muted;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.split {
+  display: inline-flex;
+}
+
+.merge {
+  @include m.button-primary;
+  align-self: auto;
+  border-radius: var(--pyn-radius) 0 0 var(--pyn-radius);
+}
+
+.methods {
+  button {
+    @include m.control;
+    justify-content: center;
+    padding: 0 var(--pyn-space-2);
+    color: var(--pyn-on-accent);
+    background: var(--pyn-success-fill);
+    border: 0;
+    border-left: 1px solid color-mix(in srgb, var(--pyn-on-accent) 40%, transparent);
+    border-radius: 0 var(--pyn-radius) var(--pyn-radius) 0;
+    cursor: pointer;
+
+    @include m.focus-ring;
+  }
+}
+
+.error {
+  @include m.error;
+  margin: 0;
+  padding: 0 var(--pyn-space-4) var(--pyn-space-3);
+}
+
+.locks {
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  border-top: 1px solid var(--pyn-border);
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--pyn-space-2);
+  margin: 0;
+  font-size: var(--pyn-text-sm);
+  font-weight: 600;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.locks .list {
+  margin-top: var(--pyn-space-2);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2) var(--pyn-space-3);
+  min-height: var(--pyn-control-md);
+  font-size: var(--pyn-text-sm);
+}
+
+.box > .list {
+  padding: 0 var(--pyn-space-4) var(--pyn-space-3);
+}
+
+.mark {
+  flex: none;
+  color: var(--pyn-text-muted);
+}
+
+.path {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--pyn-font-mono);
+  font-size: var(--pyn-text-xs);
+  overflow-wrap: anywhere;
+}
+
+.kind {
+  @include m.muted;
+  font-size: var(--pyn-text-xs);
+}
+
+.segments {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--pyn-border);
+
+  @include m.narrow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.segment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+
+  & + & {
+    border-left: 1px solid var(--pyn-border);
+
+    @include m.narrow {
+      border-top: 1px solid var(--pyn-border);
+      border-left: 0;
+    }
+  }
+}
+
+.note {
+  @include m.muted;
+  font-size: var(--pyn-text-xs);
+  font-weight: 400;
+}
+
+.bar {
+  display: block;
+  height: 0.5rem;
+  overflow: hidden;
+  background: var(--pyn-border-strong);
+  border-radius: var(--pyn-radius-pill);
+
+  span {
+    display: block;
+    height: 100%;
+    background: var(--pyn-success-fill);
+  }
+
+  &[data-empty] {
+    background: repeating-linear-gradient(
+      135deg,
+      var(--pyn-border-strong) 0 3px,
+      transparent 3px 6px
+    );
+  }
+}
