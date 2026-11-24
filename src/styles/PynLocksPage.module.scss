@@ -95,6 +95,16 @@
   }
 }
 
+.underRepo {
+  display: none;
+  margin-top: var(--pyn-space-half);
+  font-size: var(--pyn-text-xs);
+
+  @include m.narrow {
+    display: block;
+  }
+}
+
 .row[data-state='mine'] .holder {
   color: var(--pyn-mine);
   font-weight: 600;
@@ -199,6 +209,29 @@
   margin-top: var(--pyn-space-1);
   color: var(--pyn-danger);
   font-size: var(--pyn-text-xs);
+}
+
+.bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  margin-top: var(--pyn-space-4);
+}
+
+.count {
+  @include m.muted;
+  margin-right: auto;
+}
+
+.selectCol {
+  width: 1%;
+  padding-inline-end: 0;
+}
+
+.check {
+  margin: 0;
+  cursor: pointer;
 }
 
 .empty {
