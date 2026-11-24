@@ -94,7 +94,10 @@ const go = (p: number) => {
         :class="styles.header"
         :data-count="inside ? undefined : ''"
       >
-        <span v-if="!inside" :class="styles.heading" aria-live="polite">{{ heading }}</span>
+        <span :class="styles.lead">
+          <slot name="lead" />
+          <span v-if="!inside" :class="styles.heading" aria-live="polite">{{ heading }}</span>
+        </span>
         <div v-if="$slots.header" :class="styles.tools"><slot name="header" /></div>
       </div>
       <PynLoading v-if="loading" variant="block" :class="styles.state" />

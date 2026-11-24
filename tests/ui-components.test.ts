@@ -2407,27 +2407,67 @@ describe('PynTeamForm', () => {
 describe('PynTeamDetail', () => {
   const props = { team: teams[0], candidates: ['alice'], owner: true }
 
-  it('shows members and granted repositories with roles', () => {
+  it('shows the About card, members and granted repositories with roles', () => {
     const w = mount(PynTeamDetail, { props })
-    expect(w.find('[data-members]').text()).toContain('bob')
+    expect(w.find('[data-about]').text()).toContain('Texture and model work.')
+    expect(w.find('[data-about]').text()).toContain('artists')
+    expect(w.findAll('[data-member] strong').map((m) => m.text())).toEqual(['bob', 'carol'])
     const links = w.findAll('[data-repos] a').map((a) => a.attributes('href'))
     expect(links).toEqual(['/studio/game', '/studio/assets'])
     expect(w.findAll('[data-role]').map((e) => e.text())).toEqual(['writer', 'maintainer'])
   })
 
-  it('lets an owner add from the candidates and remove', async () => {
+  it('finds members by name', async () => {
     const w = mount(PynTeamDetail, { props })
-    await w.find('select').setValue('alice')
-    await w.find('form').trigger('submit')
+    await w.find('input[type=search]').setValue('CA')
+    expect(w.findAll('[data-member] strong').map((m) => m.text())).toEqual(['carol'])
+    expect(w.text()).toContain('1 member')
+  })
+
+  it('opens Add a member and adds from the candidates, then removes one', async () => {
+    const w = mount(PynTeamDetail, { props })
+    expect(w.find('[data-add]').exists()).toBe(false)
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Add a member')!
+      .trigger('click')
+    await w.find('[data-add] select').setValue('alice')
+    await w.find('[data-add] form').trigger('submit')
     expect(w.emitted('add')?.[0]).toEqual(['alice'])
     await w.find('button[aria-label="Remove bob"]').trigger('click')
     expect(w.emitted('remove')?.[0]).toEqual(['bob'])
+  })
+
+  it('selects all and removes the selection in one event', async () => {
+    const w = mount(PynTeamDetail, { props })
+    expect(w.find('[data-remove-selected]').exists()).toBe(false)
+    await w.find('[data-select-all]').setValue(true)
+    await w.find('[data-remove-selected]').trigger('click')
+    expect(w.emitted('removeMany')?.[0]).toEqual([['bob', 'carol']])
+  })
+
+  it('selects a single member', async () => {
+    const w = mount(PynTeamDetail, { props })
+    await w.find('input[aria-label="Select carol"]').setValue(true)
+    expect(w.find('[data-remove-selected]').text()).toContain('1 selected')
+    await w.find('[data-remove-selected]').trigger('click')
+    expect(w.emitted('removeMany')?.[0]).toEqual([['carol']])
+  })
+
+  it('says when every organization member is already in the team', async () => {
+    const w = mount(PynTeamDetail, { props: { ...props, candidates: [] } })
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Add a member')!
+      .trigger('click')
+    expect(w.find('[data-add]').text()).toContain('Every member')
   })
 
   it('is read only for a plain member', () => {
     const w = mount(PynTeamDetail, { props: { ...props, owner: false } })
     expect(w.find('form').exists()).toBe(false)
     expect(w.findAll('button')).toHaveLength(0)
+    expect(w.findAll('input[type=checkbox]')).toHaveLength(0)
   })
 })
 
