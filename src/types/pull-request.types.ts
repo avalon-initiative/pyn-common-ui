@@ -36,6 +36,8 @@ export interface PullRequestSummary {
   href?: string
   /** Locks other people hold on the changed paths. */
   locked?: number
+  /** Not ready for review; it cannot be merged until marked ready. */
+  draft?: boolean
 }
 
 export interface PullConflict {
@@ -74,6 +76,15 @@ export interface PullEvent {
   at: string
   /** Markdown of a comment. */
   body?: string
+}
+
+/** What `PynPullRequestForm` submits. */
+export interface NewPullRequest {
+  title: string
+  body: string
+  draft: boolean
+  base: string
+  head: string
 }
 
 export type PullTab = 'overview' | 'commits' | 'checks' | 'files'

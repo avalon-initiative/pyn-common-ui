@@ -455,6 +455,81 @@ $icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' v
   line-height: var(--pyn-leading-tight);
 }
 
+// Parts of PynTextField and PynTextArea: label, control, help, error and counter.
+@mixin text-field {
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pyn-space-2);
+    min-width: 0;
+  }
+
+  .label {
+    font-weight: 600;
+  }
+
+  .hidden {
+    @include visually-hidden;
+  }
+
+  .optional {
+    color: var(--pyn-text-muted);
+    font-weight: 400;
+  }
+
+  .input {
+    @include input;
+    @include invalid;
+    box-sizing: border-box;
+    width: 100%;
+
+    &:disabled {
+      color: var(--pyn-text-muted);
+      background: var(--pyn-surface-raised);
+      cursor: not-allowed;
+    }
+  }
+
+  .mono {
+    font-family: var(--pyn-font-mono);
+  }
+
+  .foot {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--pyn-space-3);
+  }
+
+  .notes {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--pyn-space-1);
+    min-width: 0;
+  }
+
+  .help {
+    @include help;
+  }
+
+  .error {
+    @include field-message;
+    margin: 0;
+  }
+
+  .counter {
+    flex: none;
+    margin-left: auto;
+    color: var(--pyn-text-muted);
+    font-size: var(--pyn-text-xs);
+    font-variant-numeric: tabular-nums;
+
+    &[data-over] {
+      color: var(--pyn-danger);
+    }
+  }
+}
+
 // Muted help text under a field or a section title.
 @mixin help {
   margin: 0;

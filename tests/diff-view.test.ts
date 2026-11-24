@@ -102,8 +102,19 @@ describe('PynDiffFile', () => {
   it('emits expand requests from the hunk controls', async () => {
     const w = make(PynDiffFile, { props: { file: lockfile, now } })
     await w.findAll('[data-expand="up"]')[0]!.trigger('click')
-    expect(w.emitted('expand')![0]).toEqual([{ path: 'Cargo.lock', hunk: 0, direction: 'up' }])
-    expect(w.findAll('[data-expand="down"]').length).toBeGreaterThan(0)
+    expect(w.emitted('expand')![0]).toEqual([
+      { path: 'Cargo.lock', hunk: 0, direction: 'up', position: 'before' },
+    ])
+  })
+
+  it('tells the last hunk header from the control after the last hunk', async () => {
+    const w = make(PynDiffFile, { props: { file: lockfile, now } })
+    await w.find('[data-expand="down"]').trigger('click')
+    await w.find('[data-expand="after"]').trigger('click')
+    expect(w.emitted('expand')).toEqual([
+      [{ path: 'Cargo.lock', hunk: 1, direction: 'down', position: 'before' }],
+      [{ path: 'Cargo.lock', hunk: 1, direction: 'down', position: 'after' }],
+    ])
   })
 
   it('says why a binary file has no lines, and shows its lock', () => {

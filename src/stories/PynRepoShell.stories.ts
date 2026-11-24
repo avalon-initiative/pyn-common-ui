@@ -42,6 +42,19 @@ export const Counts: Story = {
     current: 'locks',
   },
 }
+export const PullRequestCount: Story = {
+  args: {
+    tabs: [
+      { section: '', label: 'Code' },
+      { section: 'pulls', label: 'Pull requests' },
+      { section: 'locks', label: 'Locks' },
+      { section: 'history', label: 'History' },
+    ],
+    pullCount: 3,
+    lockedCount: 2,
+    current: 'pulls',
+  },
+}
 export const PublicReader: Story = {
   args: { visibility: 'public', tabs: repoShellTabs(['read'], false), current: 'history' },
 }

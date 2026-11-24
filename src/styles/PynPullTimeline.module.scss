@@ -14,7 +14,11 @@
 }
 
 .head {
-  padding: var(--pyn-space-2) var(--pyn-space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-2);
+  padding: var(--pyn-space-2) var(--pyn-space-2) var(--pyn-space-2) var(--pyn-space-4);
   color: var(--pyn-text-muted);
   background: var(--pyn-surface-raised);
   border-bottom: 1px solid var(--pyn-border);
@@ -23,6 +27,27 @@
   strong {
     color: var(--pyn-text);
   }
+}
+
+.edit {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin-block: calc(-1 * var(--pyn-space-1));
+  padding: var(--pyn-space-1);
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  @include m.focus-ring;
 }
 
 .body {

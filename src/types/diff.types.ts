@@ -53,6 +53,8 @@ export interface DiffExpand {
   path: string
   hunk: number
   direction: ExpandDirection
+  /** The gap before `hunk` (its header's controls) or after it (the control after the last hunk). */
+  position: 'before' | 'after'
 }
 
 /** A side-by-side row; a side is null where the other side has the only line. */

@@ -630,6 +630,11 @@ export { default as PynPullCommits } from './components/PynPullCommits.vue'
 export { default as PynPullRequestBar } from './components/PynPullRequestBar.vue'
 export { default as PynPullRequestHeader } from './components/PynPullRequestHeader.vue'
 export { default as PynPullRequestPage } from './components/PynPullRequestPage.vue'
+export { default as PynPullRequestForm } from './components/PynPullRequestForm.vue'
+export { default as PynCommentForm } from './components/PynCommentForm.vue'
+export { default as PynTextField } from './components/PynTextField.vue'
+export { default as PynTextArea } from './components/PynTextArea.vue'
+export type { TextFieldProps } from './types/text-field.types'
 export { default as PynPullSide } from './components/PynPullSide.vue'
 export { default as PynPullStateChip } from './components/PynPullStateChip.vue'
 export { default as PynPullTimeline } from './components/PynPullTimeline.vue'
@@ -638,6 +643,7 @@ export {
   PULL_STATE_LABEL,
   REVIEW_LABEL,
   commitDays,
+  isDraft,
   mergeBlockers,
   mergeStatus,
   pullCounts,
@@ -654,6 +660,7 @@ export type {
   PullEventKind,
   PullMergeMethod,
   PullMergeOutcome,
+  NewPullRequest,
   PullRequest,
   PullRequestState,
   PullRequestSummary,

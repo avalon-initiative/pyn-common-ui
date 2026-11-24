@@ -42,6 +42,8 @@ const props = defineProps<{
   facts?: RepoFact[]
   /** While the lock count loads, reserves the lock strip and the Locks tab count so the page does not shift. */
   lockPending?: boolean
+  /** Open pull requests; the `pulls` tab gets this count unless it has its own. */
+  pullCount?: number
 }>()
 
 const emit = defineEmits<{
@@ -59,7 +61,9 @@ function isCurrent(section: string): boolean {
 const tabItems = computed(() =>
   (props.tabs ?? []).map((tab) => {
     const count =
-      tab.count ?? (tab.section === 'locks' && props.lockedCount ? props.lockedCount : undefined)
+      tab.count ??
+      (tab.section === 'locks' && props.lockedCount ? props.lockedCount : undefined) ??
+      (tab.section === 'pulls' && props.pullCount ? props.pullCount : undefined)
     return {
       label: tab.label,
       href: repoPath(
@@ -68,7 +72,13 @@ const tabItems = computed(() =>
         BRANCH_SECTIONS.has(tab.section) ? props.branch : undefined,
       ),
       count,
-      countLabel: tab.countLabel ?? (tab.section === 'locks' ? `${count} locked` : undefined),
+      countLabel:
+        tab.countLabel ??
+        (tab.section === 'locks'
+          ? `${count} locked`
+          : tab.section === 'pulls'
+            ? `${count} open`
+            : undefined),
       current: isCurrent(tab.section),
       icon: tab.icon ?? TAB_ICONS[tab.section],
       reserveCount: tab.section === 'locks' && props.lockPending,

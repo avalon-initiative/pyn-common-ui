@@ -87,6 +87,7 @@ export interface RepoShellTab extends RepoTab {
 export const TAB_ICONS: Readonly<Record<string, string>> = {
   '': 'code',
   locks: 'lock',
+  pulls: 'pull-request',
   branches: 'branch',
   history: 'history',
   insights: 'insights',

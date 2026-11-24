@@ -11,7 +11,12 @@ defineProps<{
   owner: string
   name: string
   now?: Date
+  /** Comments with an edit button, which emits `edit` with the id. */
+  editableIds?: string[]
+  /** The comment whose body the `editor` slot replaces. */
+  editingId?: string
 }>()
+const emit = defineEmits<{ edit: [id: string] }>()
 
 const VERB = {
   merged: 'merged this pull request',
@@ -30,8 +35,20 @@ const ICON = { merged: 'merge', closed: 'pull-closed', reopened: 'pull-request' 
             ><strong><PynPerson :name="e.actor.user" :identity="e.actor" /></strong> commented
             {{ formatAgo(e.at, now ?? new Date()) }}</span
           >
+          <button
+            v-if="editableIds?.includes(e.id) && editingId !== e.id"
+            type="button"
+            :class="styles.edit"
+            aria-label="Edit"
+            title="Edit"
+            data-edit
+            @click="emit('edit', e.id)"
+          >
+            <PynIcon name="edit" />
+          </button>
         </header>
-        <div :class="styles.body">
+        <div v-if="editingId === e.id" :class="styles.body"><slot name="editor" :event="e" /></div>
+        <div v-else :class="styles.body">
           <PynMarkdown v-if="e.body?.trim()" :source="e.body" :owner="owner" :name="name" />
           <p v-else :class="styles.none">No description provided.</p>
         </div>

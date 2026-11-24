@@ -1,5 +1,6 @@
 import { diffFiles, lockedBinary } from './diff-data'
 import { lock, now } from './landing-data'
+import type { BranchOption } from '../types/branch.types'
 import type {
   PullCommit,
   PullEvent,
@@ -77,6 +78,15 @@ export const closedPull: PullRequest = {
   review: 'none',
 }
 
+export const draftPull: PullRequest = { ...openPull, draft: true, review: 'none' }
+
+export const prBranches: BranchOption[] = [
+  { name: 'main', isDefault: true, updatedAt: ago(3) },
+  { name: 'feature/level-two', updatedAt: ago(12) },
+  { name: 'fix/lease-timer', updatedAt: ago(30) },
+  { name: 'feature/boss-arena', updatedAt: ago(70) },
+]
+
 export const emptyPull: PullRequest = {
   ...openPull,
   number: 43,
@@ -150,7 +160,8 @@ export const pullList: PullRequestSummary[] = [
     author: sam,
     opened_at: ago(30),
     comments: 0,
-    review: 'approved',
+    review: 'none',
+    draft: true,
     head: 'fix/lease-timer',
     additions: 12,
     deletions: 3,

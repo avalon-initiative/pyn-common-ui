@@ -47,8 +47,11 @@ async function copy() {
 onBeforeUnmount(() => clearTimeout(timer))
 
 const sign = (l: DiffLine) => (l.kind === 'add' ? '+' : l.kind === 'delete' ? '−' : ' ')
-const expand = (hunk: number, direction: DiffExpand['direction']) =>
-  emit('expand', { path: props.file.path, hunk, direction })
+const expand = (
+  hunk: number,
+  direction: DiffExpand['direction'],
+  position: DiffExpand['position'] = 'before',
+) => emit('expand', { path: props.file.path, hunk, direction, position })
 </script>
 
 <template>
@@ -186,8 +189,8 @@ const expand = (hunk: number, direction: DiffExpand['direction']) =>
                 <button
                   type="button"
                   :aria-label="`Expand ${lastHidden} hidden lines down`"
-                  data-expand="down"
-                  @click="expand(hunks.length - 1, 'down')"
+                  data-expand="after"
+                  @click="expand(hunks.length - 1, 'down', 'after')"
                 >
                   <PynIcon name="arrow-down-line" />
                 </button>

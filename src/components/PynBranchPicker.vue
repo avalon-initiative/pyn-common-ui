@@ -29,6 +29,8 @@ const props = defineProps<{
   tagsHref?: string
   /** Whether `current` names a branch or a tag. */
   currentKind?: RefKind
+  /** Visible text before the name, such as `base:`; replaces the hidden "Branch:" prefix. */
+  prefix?: string
   now?: Date
 }>()
 const emit = defineEmits<{
@@ -179,7 +181,8 @@ onBeforeUnmount(() => document.removeEventListener('click', away))
         @keydown="triggerKey"
       >
         <PynIcon :name="currentKind === 'tag' ? 'tag' : 'branch'" :class="styles.icon" />
-        <span :class="styles.hidden">{{ currentKind === 'tag' ? 'Tag:' : 'Branch:' }}</span>
+        <span v-if="prefix" :class="styles.prefix">{{ prefix }}</span>
+        <span v-else :class="styles.hidden">{{ currentKind === 'tag' ? 'Tag:' : 'Branch:' }}</span>
         <span :class="styles.name" :title="current">{{ current }}</span>
         <PynIcon name="chevron" :class="styles.icon" />
       </button>

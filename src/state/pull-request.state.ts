@@ -17,6 +17,10 @@ export const PULL_STATE_LABEL: Record<PullRequestState, string> = {
   closed: 'Closed',
 }
 
+/** An open draft; merged and closed pull requests show their state instead. */
+export const isDraft = (pr: Pick<PullRequestSummary, 'state' | 'draft'>) =>
+  pr.state === 'open' && !!pr.draft
+
 export const MERGE_METHODS: { id: PullMergeMethod; label: string; hint: string }[] = [
   {
     id: 'allow',
@@ -59,10 +63,11 @@ export function pullTabs(
 export const pullLocksByOthers = (locks: LockInfo[] | undefined, me?: string): LockInfo[] =>
   (locks ?? []).filter((l) => l.owner !== me)
 
-export type MergeBlocker = 'conflicts' | 'locks'
+export type MergeBlocker = 'draft' | 'conflicts' | 'locks'
 
 export function mergeBlockers(pr: PullRequest, me?: string): MergeBlocker[] {
   const out: MergeBlocker[] = []
+  if (isDraft(pr)) out.push('draft')
   if (pr.outcome === 'conflicted' || pr.conflicts?.length) out.push('conflicts')
   if (pullLocksByOthers(pr.locks, me).length) out.push('locks')
   return out
@@ -74,8 +79,12 @@ export interface MergeStatus {
   text: string
 }
 
-/** The merge box heading for the pull request as it stands. */
-export function mergeStatus(pr: PullRequest, me?: string): MergeStatus {
+/** The merge box heading; `overrideLocks` is for a viewer who may merge over other people's locks. */
+export function mergeStatus(
+  pr: PullRequest,
+  me?: string,
+  options: { overrideLocks?: boolean } = {},
+): MergeStatus {
   if (pr.state === 'merged')
     return {
       tone: 'merged',
@@ -85,6 +94,12 @@ export function mergeStatus(pr: PullRequest, me?: string): MergeStatus {
   if (pr.state === 'closed')
     return { tone: 'neutral', title: 'Pull request closed', text: 'It was closed without merging.' }
   const blockers = mergeBlockers(pr, me)
+  if (blockers.includes('draft'))
+    return {
+      tone: 'neutral',
+      title: 'This pull request is still a draft',
+      text: 'It cannot be merged until it is marked ready for review.',
+    }
   if (blockers.includes('conflicts'))
     return {
       tone: 'danger',
@@ -93,10 +108,17 @@ export function mergeStatus(pr: PullRequest, me?: string): MergeStatus {
     }
   if (blockers.includes('locks')) {
     const n = pullLocksByOthers(pr.locks, me).length
+    const locked = `${n} changed ${n === 1 ? 'path is' : 'paths are'} locked by someone else`
+    if (options.overrideLocks)
+      return {
+        tone: 'attention',
+        title: 'Merging will override locks',
+        text: `${locked}. You may merge anyway; the merge ignores their locks.`,
+      }
     return {
       tone: 'attention',
       title: 'Locked paths block this merge',
-      text: `${n} changed ${n === 1 ? 'path is' : 'paths are'} locked by someone else.`,
+      text: `${locked}.`,
     }
   }
   if (pr.outcome === 'up_to_date')

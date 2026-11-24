@@ -42,6 +42,11 @@
   @include m.visually-hidden;
 }
 
+.prefix {
+  flex: none;
+  color: var(--pyn-text-muted);
+}
+
 .icon {
   flex: none;
   color: var(--pyn-text-muted);
