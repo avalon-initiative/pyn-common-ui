@@ -1,0 +1,41 @@
+@use 'mixins' as m;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+  margin-bottom: var(--pyn-space-8);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--pyn-text-lg);
+  font-weight: 600;
+  line-height: var(--pyn-leading-tight);
+}
+
+.description {
+  @include m.help;
+  font-size: var(--pyn-text-sm);
+}
+
+.rows {
+  @include m.card;
+  box-shadow: none;
+}
+
+.plain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+}
+
+.danger {
+  .title {
+    color: var(--pyn-danger);
+  }
+
+  .rows {
+    border-color: var(--pyn-danger);
+  }
+}

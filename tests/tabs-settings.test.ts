@@ -106,10 +106,9 @@ describe('PynSettingsLayout', () => {
       props: { sections, current: 'c', label: 'Account settings', title: 'Settings' },
       slots: { default: '<p>content</p>' },
     })
-    expect(w.find('h2').text()).toBe('Settings')
+    expect(w.find('[data-head] h2').text()).toBe('Settings')
     expect(w.find('nav').attributes('aria-label')).toBe('Account settings')
-    expect(w.find('nav p').text()).toBe('Access')
-    expect(w.find('nav ul[aria-labelledby]').exists()).toBe(true)
+    expect(w.find('nav h2').text()).toBe('Access')
     expect(w.find('[aria-current=page]').text()).toBe('Tokens')
     expect(w.text()).toContain('content')
   })
@@ -118,11 +117,16 @@ describe('PynSettingsLayout', () => {
     const w = mount(PynSettingsLayout, { props: { sections, current: 'b', label: 'Settings' } })
     const toggle = w.find('button')
     expect(toggle.text()).toBe('Keys')
-    expect(toggle.attributes('aria-controls')).toBe(w.find('nav').attributes('id'))
+    expect(
+      w
+        .find(`#${toggle.attributes('aria-controls')}`)
+        .find('nav')
+        .exists(),
+    ).toBe(true)
     expect(toggle.attributes('aria-expanded')).toBe('false')
     await toggle.trigger('click')
     expect(toggle.attributes('aria-expanded')).toBe('true')
-    expect(w.find('nav').attributes('data-open')).toBeDefined()
+    expect(w.find(`#${toggle.attributes('aria-controls')}`).attributes('data-open')).toBeDefined()
   })
 
   it('has a banded header with actions in the administration variant', () => {

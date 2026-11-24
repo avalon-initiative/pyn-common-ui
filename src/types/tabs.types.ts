@@ -18,6 +18,8 @@ export interface SettingsSection {
   href: string
   /** Consecutive sections with the same group share a heading. */
   group?: string
+  /** PynIcon name shown before the label. */
+  icon?: string
 }
 
 export interface SettingsGroup {
