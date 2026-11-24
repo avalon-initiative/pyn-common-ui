@@ -23,6 +23,8 @@ export { default as PynVersionFooter } from './components/PynVersionFooter.vue'
 export { versionMismatch } from './utils/version'
 export { default as PynTopBar } from './components/PynTopBar.vue'
 export { default as PynSideNav } from './components/PynSideNav.vue'
+export { default as PynSideRail } from './components/PynSideRail.vue'
+export { default as PynSubNav } from './components/PynSubNav.vue'
 export { default as PynRepoShell } from './components/PynRepoShell.vue'
 export { default as PynRepoSettings } from './components/PynRepoSettings.vue'
 export { default as PynBranchBar } from './components/PynBranchBar.vue'
@@ -160,7 +162,7 @@ export { initials, linkLabel } from './state/profile.state'
 export { personLabel } from './state/person.state'
 export type { PersonLabel } from './state/person.state'
 export type { AvatarSize, PersonEntry, ProfileInfo, PublicIdentity } from './types/profile.types'
-export type { MenuItem } from './types/shell.types'
+export type { MenuItem, NavGroup } from './types/shell.types'
 export type {
   AccountDeleteBlockers,
   AccountStatus,

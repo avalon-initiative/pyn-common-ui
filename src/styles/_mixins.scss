@@ -613,3 +613,39 @@ $icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' v
   border-color: color-mix(in srgb, #{$color} 40%, transparent);
   white-space: nowrap;
 }
+
+// Row of a side navigation list; `aria-current` marks the open page.
+@mixin side-link {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-3);
+  box-sizing: border-box;
+  min-height: var(--pyn-control-md);
+  padding: 0 var(--pyn-space-3);
+  color: var(--pyn-text);
+  border-radius: var(--pyn-radius);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
+
+  &[aria-current] {
+    background: var(--pyn-hover);
+    font-weight: 600;
+    box-shadow: inset 2px 0 0 var(--pyn-accent);
+  }
+
+  @include touch-target;
+
+  @include focus-ring;
+}
+
+// Muted small heading above a side navigation group.
+@mixin side-heading {
+  margin: 0;
+  padding: 0 var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+  font-weight: 600;
+}

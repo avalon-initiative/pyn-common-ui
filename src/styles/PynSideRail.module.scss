@@ -1,0 +1,143 @@
+@use 'mixins' as m;
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-2) var(--pyn-space-1) var(--pyn-space-3) var(--pyn-space-2);
+}
+
+.who {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: var(--pyn-leading-tight);
+}
+
+.name {
+  overflow: hidden;
+  color: var(--pyn-text);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-xs);
+}
+
+.menuTitle {
+  margin: 0;
+  padding: var(--pyn-space-1) var(--pyn-space-4) var(--pyn-space-2);
+  font-weight: 600;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-half);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  @include m.side-link;
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  margin-top: var(--pyn-space-1);
+  padding-top: var(--pyn-space-4);
+  border-top: 1px solid var(--pyn-border);
+}
+
+.topHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.heading {
+  @include m.side-heading;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--pyn-control-sm);
+  height: var(--pyn-control-sm);
+  padding: 0;
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  @include m.touch-target($square: true, $display: inline-flex);
+
+  @include m.focus-ring;
+}
+
+.filter {
+  @include m.input;
+  margin-bottom: var(--pyn-space-1);
+  font-size: var(--pyn-text-base);
+}
+
+.repo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  @include m.muted;
+  padding: 0 var(--pyn-space-3);
+}
+
+.more {
+  @include m.side-heading;
+  align-self: flex-start;
+  min-height: var(--pyn-control-md);
+  background: none;
+  border: 0;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    text-decoration: underline;
+  }
+
+  @include m.touch-target;
+
+  @include m.focus-ring;
+}
+
+.badge {
+  @include m.pill;
+  margin-left: auto;
+}
+
+.hidden {
+  @include m.visually-hidden;
+}

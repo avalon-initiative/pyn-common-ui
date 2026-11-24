@@ -3,12 +3,19 @@ import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import styles from '../styles/PynMenu.module.scss'
 import type { MenuItem } from '../types/shell.types'
 
-defineProps<{ label: string; items: MenuItem[]; align?: 'start' | 'end' }>()
+const props = defineProps<{
+  label: string
+  items: MenuItem[]
+  align?: 'start' | 'end'
+  /** Positions the panel against the viewport so a scrolling ancestor cannot clip it. */
+  fixed?: boolean
+}>()
 const emit = defineEmits<{ select: [id: string] }>()
 
 const open = ref(false)
 const root = ref<HTMLElement | null>(null)
 const trigger = ref<HTMLButtonElement | null>(null)
+const fixedAt = ref<{ top: string; left: string; maxWidth: string } | null>(null)
 
 const entries = () =>
   Array.from(root.value?.querySelectorAll<HTMLElement>('[role^="menuitem"]') ?? [])
@@ -17,6 +24,15 @@ const focusAt = (i: number) => {
   all[(i + all.length) % all.length]?.focus()
 }
 async function show(last = false) {
+  const box = trigger.value?.getBoundingClientRect()
+  fixedAt.value =
+    props.fixed && box
+      ? {
+          top: `${box.bottom + 4}px`,
+          left: `${box.left}px`,
+          maxWidth: `${Math.max(window.innerWidth - box.left - 16, 160)}px`,
+        }
+      : null
   open.value = true
   await nextTick()
   focusAt(last ? -1 : 0)
@@ -86,7 +102,8 @@ function choose(id: string) {
     </button>
     <div
       v-if="open"
-      :class="[styles.panel, align === 'start' && styles.start]"
+      :class="[styles.panel, align === 'start' && styles.start, fixedAt && styles.fixed]"
+      :style="fixedAt ?? undefined"
       role="menu"
       :aria-label="label"
       @keydown="onPanelKey"
