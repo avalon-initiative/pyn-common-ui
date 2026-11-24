@@ -5,7 +5,7 @@
 // Playwright is not a dependency of this repo; point PLAYWRIGHT_CORE at an installed copy:
 //   export PLAYWRIGHT_CORE=/path/to/node_modules/playwright-core/index.mjs
 //   npx storybook build -o /tmp/sb                  # build the current stories first
-//   node scripts/screenshots.mjs --dir /tmp/sb --out /tmp/shots [story-id ...]
+//   node scripts/screenshots.mjs --dir /tmp/sb --out /tmp/shots [--font-set default|arcade|system] [story-id ...]
 // Story ids are the keys of <dir>/index.json. Without ids, DEFAULT_STORIES is used.
 import { createReadStream, existsSync, mkdirSync, statSync } from 'node:fs'
 import { createServer } from 'node:http'
@@ -47,10 +47,11 @@ const MIME = {
 }
 
 function parseArgs(argv) {
-  const opts = { dir: 'storybook-static', out: '', ids: [] }
+  const opts = { dir: 'storybook-static', out: '', fontSet: '', ids: [] }
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--dir') opts.dir = argv[++i]
     else if (argv[i] === '--out') opts.out = argv[++i]
+    else if (argv[i] === '--font-set') opts.fontSet = argv[++i]
     else opts.ids.push(argv[i])
   }
   return opts
@@ -71,7 +72,7 @@ function serve(root) {
   return new Promise((ok) => server.listen(0, '127.0.0.1', () => ok(server)))
 }
 
-const { dir, out, ids } = parseArgs(process.argv.slice(2))
+const { dir, out, fontSet, ids } = parseArgs(process.argv.slice(2))
 if (!process.env.PLAYWRIGHT_CORE || !out) {
   console.error(
     'usage: PLAYWRIGHT_CORE=<playwright-core/index.mjs> node scripts/screenshots.mjs --out <dir> [--dir <storybook build>] [story-id ...]',
@@ -95,10 +96,16 @@ try {
       })
       const page = await ctx.newPage()
       for (const id of ids.length ? ids : DEFAULT_STORIES) {
-        await page.goto(`${base}/iframe.html?id=${id}&viewMode=story&globals=theme:${theme}`, {
-          waitUntil: 'networkidle',
+        await page.goto(
+          `${base}/iframe.html?id=${id}&viewMode=story&globals=theme:${theme}${fontSet ? `;fontSet:${fontSet}` : ''}`,
+          {
+            waitUntil: 'networkidle',
+          },
+        )
+        await page.screenshot({
+          path: join(out, `${id}${fontSet ? `-${fontSet}` : ''}-${theme}-${width}.png`),
+          fullPage: true,
         })
-        await page.screenshot({ path: join(out, `${id}-${theme}-${width}.png`), fullPage: true })
       }
       await ctx.close()
     }

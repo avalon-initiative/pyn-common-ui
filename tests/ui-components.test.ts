@@ -2,6 +2,7 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { copyText } from '../src/utils/copy'
+import { PYN_ICON_PACK } from '../src/state/icon-pack.state'
 import {
   PynAccountDelete,
   PynAccountNotice,
@@ -236,18 +237,95 @@ describe('PynButton', () => {
   })
 })
 
+const legacyIconNames = [
+  'home',
+  'repo',
+  'settings',
+  'search',
+  'plus',
+  'bell',
+  'close',
+  'chevron',
+  'menu',
+  'key',
+  'folder',
+  'file',
+  'branch',
+  'lock',
+  'info',
+  'check-circle',
+  'alert',
+  'stop',
+  'code',
+  'insights',
+  'check',
+  'history',
+  'list',
+  'eye',
+  'filter',
+  'user',
+  'star',
+  'fork',
+  'copy',
+  'book',
+  'tag',
+  'users',
+  'shield',
+  'mail',
+  'database',
+  'download',
+  'trash',
+  'more',
+  'sidebar',
+  'chevron-right',
+  'calendar',
+  'commit',
+]
+
 describe('PynIcon and PynLockIcon', () => {
   it('draws a known icon and nothing for an unknown name', () => {
     expect(
       mount(PynIcon, { props: { name: 'repo' } })
         .find('path')
-        .attributes('d'),
-    ).toBeTruthy()
+        .exists(),
+    ).toBe(true)
+    const unknown = mount(PynIcon, { props: { name: 'nope' } })
+    expect(unknown.find('svg').exists()).toBe(true)
+    expect(unknown.find('path').exists()).toBe(false)
+  })
+
+  it('draws every legacy icon name from Lucide', () => {
+    for (const name of legacyIconNames) {
+      const w = mount(PynIcon, { props: { name } })
+      expect(w.element.children.length, name).toBeGreaterThan(0)
+    }
+  })
+
+  it('prefers a provided pack and falls back to Lucide for the rest', () => {
+    const pack = { repo: '<circle cx="12" cy="12" r="5" />', star: [['rect', { width: 4 }]] }
+    const global = { provide: { [PYN_ICON_PACK as symbol]: pack } }
+    const repo = mount(PynIcon, { props: { name: 'repo' }, global })
+    expect(repo.find('circle').exists()).toBe(true)
+    expect(repo.find('path').exists()).toBe(false)
     expect(
-      mount(PynIcon, { props: { name: 'nope' } })
+      mount(PynIcon, { props: { name: 'star' }, global })
+        .find('rect')
+        .exists(),
+    ).toBe(true)
+    expect(
+      mount(PynIcon, { props: { name: 'home' }, global })
         .find('path')
-        .attributes('d'),
-    ).toBe('')
+        .exists(),
+    ).toBe(true)
+  })
+
+  it('accepts a Lucide icon object in a pack', () => {
+    const pack = { home: { name: 'x', size: 24, node: [['line', { x1: 1, x2: 2 }]] } }
+    const w = mount(PynIcon, {
+      props: { name: 'home' },
+      global: { provide: { [PYN_ICON_PACK as symbol]: pack } },
+    })
+    expect(w.find('line').exists()).toBe(true)
   })
 
   it('opens the lock shackle', () => {

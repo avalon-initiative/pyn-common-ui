@@ -155,6 +155,18 @@ if (!accounts.includes('No accounts match'))
 if (built.accountActions({ user: 'a', status: 'disabled' }, 'b').join() !== 'enable,delete')
   throw new Error('accountActions did not run from dist')
 
+const fontsCss = readFileSync('dist/fonts.css', 'utf8')
+for (const family of ['Geist Variable', 'Geist Mono Variable', 'Pixelify Sans Variable']) {
+  if (!fontsCss.includes(`font-family: '${family}'`)) throw new Error(`fonts.css lacks ${family}`)
+}
+for (const [, file] of fontsCss.matchAll(/url\(\.\/(fonts\/[^)]+)\)/g)) {
+  if (!existsSync(`dist/${file}`)) throw new Error(`fonts.css points at missing ${file}`)
+}
+const lock = await renderToString(
+  createSSRApp({ render: () => h(built.PynIcon, { name: 'lock-open' }) }),
+)
+if (!lock.includes('<path')) throw new Error(`PynIcon did not draw a Lucide icon: ${lock}`)
+
 const targets = Object.values(pkg.exports).flatMap((v) =>
   typeof v === 'string' ? [v] : Object.values(v),
 )
