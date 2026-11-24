@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useId } from 'vue'
+import { provide, toRef, useId } from 'vue'
 import styles from '../styles/PynSettingsSection.module.scss'
+import { DANGER_ZONE } from '../state/settings-section.state'
 
-defineProps<{
+const props = defineProps<{
   title: string
   /** Help text under the title. */
   description?: string
@@ -12,6 +13,7 @@ defineProps<{
   plain?: boolean
 }>()
 
+provide(DANGER_ZONE, toRef(props, 'danger'))
 const id = useId()
 </script>
 

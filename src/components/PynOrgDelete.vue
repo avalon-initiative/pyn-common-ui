@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, inject } from 'vue'
 import styles from '../styles/PynOrgDelete.module.scss'
+import { DANGER_ZONE } from '../state/settings-section.state'
 
 const props = defineProps<{
   name: string
@@ -9,6 +10,7 @@ const props = defineProps<{
   readonly?: boolean
   error?: string
 }>()
+const bare = inject(DANGER_ZONE, undefined)
 const emit = defineEmits<{ remove: [] }>()
 
 const typed = ref('')
@@ -16,7 +18,11 @@ const matches = computed(() => typed.value === props.name)
 </script>
 
 <template>
-  <form :class="styles.form" @submit.prevent="matches && !props.readonly && emit('remove')">
+  <form
+    :class="styles.form"
+    :data-bare="bare || undefined"
+    @submit.prevent="matches && !props.readonly && emit('remove')"
+  >
     <h3 :class="styles.heading">Delete this organization</h3>
     <p :class="styles.note">
       It must own no repositories; delete them first. Its members lose their membership and the

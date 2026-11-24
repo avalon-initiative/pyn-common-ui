@@ -187,9 +187,17 @@ describe('settings navigation data', () => {
     expect(orgSettingsNav('member')).toEqual([])
     expect(orgSettingsNav(null)).toEqual([])
     const nav = orgSettingsNav('owner')
-    expect(nav.map((t) => t.section)).toEqual(['settings', 'members', 'teams', 'usage', 'audit'])
+    expect(nav.map((t) => t.section)).toEqual([
+      'settings',
+      'members',
+      'teams',
+      'policy',
+      'usage',
+      'audit',
+    ])
     expect(nav.map((t) => t.group)).toEqual([
       undefined,
+      'Access',
       'Access',
       'Access',
       'Storage and audit',

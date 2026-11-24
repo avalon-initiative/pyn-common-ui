@@ -1,6 +1,15 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { accessRoles, directRows } from '../src/stories/access-page-data'
+import { orgMembers, repoPolicy, teams } from '../src/stories/org-data'
 import {
+  PynOrgDelete,
+  PynOrgRepoPolicy,
+  PynOrgSettings,
+  PynRepoCollaborators,
+  PynRepoDelete,
+  PynTeamDelete,
+  PynTwoFactorRequirement,
   PynSettingsGeneral,
   PynSettingsLayout,
   PynSettingsRow,
@@ -77,5 +86,94 @@ describe('settings section patterns', () => {
     expect(w.find('nav h2').text()).toBe('Access')
     expect(w.findAll('nav svg')).toHaveLength(2)
     expect(w.find('[aria-current=page]').text()).toBe('Members')
+  })
+})
+
+describe('organization settings sections', () => {
+  it('wraps exclusive files and repository creation in titled sections', () => {
+    const files = mount(PynOrgSettings, { props: { settings: { exclusive_read_only: null } } })
+    expect(files.find('section h3').text()).toBe('Exclusive files')
+    const policy = mount(PynOrgRepoPolicy, {
+      props: {
+        policy: repoPolicy,
+        teams: teams.map((t) => t.slug),
+        members: orgMembers.map((m) => m.user),
+      },
+    })
+    expect(policy.find('section h3').text()).toBe('Repository creation')
+  })
+
+  it('wraps the two-factor requirement only when given a title', () => {
+    const setting = { required: false, grace_days: null, since: null }
+    const bare = mount(PynTwoFactorRequirement, { props: { setting } })
+    expect(bare.find('section').exists()).toBe(false)
+    const titled = mount(PynTwoFactorRequirement, {
+      props: { setting, title: 'Two-factor authentication' },
+    })
+    expect(titled.find('section h3').text()).toBe('Two-factor authentication')
+  })
+})
+
+describe('delete components in a danger section', () => {
+  const inDanger = (component: object, props: object) =>
+    mount({
+      components: { PynSettingsSection, C: component },
+      props: { p: { type: Object, default: () => props } },
+      template:
+        '<PynSettingsSection title="Danger zone" danger><C v-bind="p" /></PynSettingsSection>',
+    })
+
+  it.each([
+    ['organization', PynOrgDelete, { name: 'studio' }],
+    ['team', PynTeamDelete, { slug: 'qa' }],
+    ['repository', PynRepoDelete, { slug: 'studio/game' }],
+  ])('renders the %s delete without its own border', (_n, component, props) => {
+    expect(inDanger(component, props).find('form').attributes('data-bare')).toBeDefined()
+    expect(mount(component, { props }).find('form').attributes('data-bare')).toBeUndefined()
+  })
+})
+
+describe('PynRepoCollaborators', () => {
+  const make = (props: Record<string, unknown> = {}) =>
+    mount(PynRepoCollaborators, {
+      props: {
+        rows: directRows,
+        count: directRows.length,
+        roles: accessRoles,
+        teams: ['engine'],
+        invites: [],
+        canManage: true,
+        ...props,
+      },
+      attachTo: document.body,
+    })
+
+  it('shows the access page with the add forms, team grant and invitations in place', async () => {
+    const w = make()
+    expect(w.text()).toContain('Manage access')
+    expect(w.text()).toContain('Invitations')
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Add people')!
+      .trigger('click')
+    expect(w.find('[data-add=people] input').exists()).toBe(true)
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Add teams')!
+      .trigger('click')
+    expect(w.find('[data-add=teams] select').exists()).toBe(true)
+  })
+
+  it('emits grant, invite and access page events', async () => {
+    const onSetRole = vi.fn()
+    const w = make({ adding: 'teams', onSetRole })
+    await w.find('[data-add=teams] form').trigger('submit')
+    expect(w.emitted('grant')?.[0]).toEqual([{ name: 'engine', role: 'reader' }])
+    await w.find('select[aria-label="Role of alice"]').setValue('reader')
+    expect(onSetRole).toHaveBeenCalledWith({ name: 'alice', role: 'reader' })
+  })
+
+  it('omits invitations without an invites list', () => {
+    expect(make({ invites: undefined }).text()).not.toContain('Invitations')
   })
 })

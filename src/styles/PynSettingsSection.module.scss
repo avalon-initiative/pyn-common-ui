@@ -51,6 +51,7 @@
   }
 
   .rows {
-    border-color: var(--pyn-danger);
+    padding: var(--pyn-space-4);
+    border-color: color-mix(in srgb, var(--pyn-danger) 45%, var(--pyn-border));
   }
 }

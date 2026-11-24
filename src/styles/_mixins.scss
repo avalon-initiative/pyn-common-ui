@@ -473,6 +473,12 @@ $icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' v
   padding: var(--pyn-space-4);
   border: 1px solid var(--pyn-danger);
   border-radius: var(--pyn-radius);
+
+  &[data-bare] {
+    max-width: none;
+    padding: 0;
+    border: 0;
+  }
 }
 
 // Centered narrow column for sign-in style pages.

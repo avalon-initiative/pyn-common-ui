@@ -416,6 +416,7 @@ export type { FileRow, Mode, MyLock, ReleaseFailure } from './types/lock.types'
 export type {
   AccessAdd,
   AccessRow,
+  AccessPageProps,
   AccessTab,
   Grantee,
   MemberSource,
@@ -568,6 +569,7 @@ export type { BranchFilters, BranchGroup } from './state/branches-page.state'
 export type { BranchView } from './types/branch.types'
 export { default as PynLocksPage } from './components/PynLocksPage.vue'
 export { default as PynAccessPage } from './components/PynAccessPage.vue'
+export { default as PynRepoCollaborators } from './components/PynRepoCollaborators.vue'
 export { ACCESS_TABS, accessControls, accessCounts, accessEmpty } from './state/access-page.state'
 export {
   filterLockRows,
