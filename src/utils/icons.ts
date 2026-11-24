@@ -2,6 +2,7 @@ import {
   Bell,
   BookMarked,
   BookOpen,
+  Building2,
   Calendar,
   ChartColumn,
   Check,
@@ -23,11 +24,13 @@ import {
   House,
   Info,
   KeyRound,
+  Link,
   List,
   ListFilter,
   Lock,
   LockOpen,
   Mail,
+  MapPin,
   Menu,
   OctagonExclamationPoint,
   PanelLeft,
@@ -90,6 +93,9 @@ export const lucideIcons: IconPack = {
   calendar: Calendar,
   commit: GitCommitHorizontal,
   'lock-open': LockOpen,
+  'map-pin': MapPin,
+  building: Building2,
+  link: Link,
 }
 
 const escape = (v: unknown) =>

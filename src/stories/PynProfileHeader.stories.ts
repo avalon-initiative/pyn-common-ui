@@ -36,3 +36,12 @@ export const WithActions: Story = {
       '<PynProfileHeader v-bind="args"><template #actions><button>Edit profile</button></template></PynProfileHeader>',
   }),
 }
+export const Column: Story = {
+  args: { column: true },
+  render: (args) => ({
+    components: { PynProfileHeader },
+    setup: () => ({ args }),
+    template:
+      '<div style="max-width: 18.5rem"><PynProfileHeader v-bind="args"><template #actions><button>Edit profile</button></template></PynProfileHeader></div>',
+  }),
+}

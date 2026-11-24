@@ -26,3 +26,4 @@ type Story = StoryObj<typeof PynPageColumns>
 
 export const Default: Story = { args: { sideLabel: 'Summary' } }
 export const NotSticky: Story = { args: { sticky: false, sideLabel: 'Summary' } }
+export const SideOnTheLeft: Story = { args: { start: true, sticky: false, sideLabel: 'Profile' } }
