@@ -75,8 +75,8 @@ Conventions:
 - Components are named `Pyn<Name>`.
 - No `<style>` blocks in `.vue` files (lint enforces it) and `<script setup>`
   stays glue-only.
-- Icons are hand-drawn 24x24 stroke paths using `currentColor`; there is no
-  icon-library dependency.
+- Icons are Lucide (ISC), drawn by `PynIcon` as 24x24 strokes using `currentColor`; see
+  Icons and fonts below. Components never import Lucide directly.
 - Responsive behavior lives in each component's own stylesheet. Never fork a
   component into a mobile variant. Three layout pitfalls to check for on any
   row or column layout: a wrapping flex row whose text column is `flex: 1`
@@ -194,3 +194,28 @@ The repository page header and About rail: `PynRepoShell` shows the owner avatar
 `PynBranchesPage` is the repository branches page: a left `PynSubNav` (Branches and All always; Yours, Active and Stale only when `yours`, `active` or `stale` is given as a list of branch names, so a view whose server data does not exist yet stays hidden), the `New branch` button (`canCreate`, default on; event `newBranch`), a search box (`v-model:query`) and bordered tables with the default branch first. Columns are the branch as a monospace chip with a copy button, updated time with the author's avatar (`updatedBy`), behind and ahead, and actions (a delete button when `canDelete`, event `delete(name)`, and a More menu with Compare and Copy name). `view` is the open view, `hrefs` the link of each view, `branches` takes `BranchListItem` (`ahead`, `behind`, `updatedAt`, `updatedBy`, `href`, `compareHref`), `defaultBranch` marks the default one, and `loading`, `error`, `now` work as in `PynBranchList`. `canRename` adds a Rename action to the More menu that opens a `PynBranchDialog` and emits `rename(name, newName)`. Events: `copy(name)` after the name is on the clipboard. `PynListSearch` (`v-model`, `label`, `placeholder`) is the search box shared by list pages.
 
 `PynLocksPage` is the repository and personal locks page, laid out like `PynBranchesPage`: a left sub-nav (All, Mine, Expiring soon, Stale; Mine only when `me` is given), `v-model:query` search over path, holder and repository, and a bordered table with path, holder ("You" for `me`), mode, taken, expires and actions. Each row carries a state (yours, locked, expiring with under 30 minutes left, stale once the lease ran out) shown by a coloured edge, lock icon and label. `locks` takes `LockListItem` (`LockInfo` plus optional `repo`, `repoHref`, `mode`, `error`); a `repo` adds a Repository column and `lockRowFromMine(lock, holder)` turns a `MyLock` into a row. Events: `release(lock)` for the viewer's own locks and `forceRelease({ lock, reason })` for others' locks, shown only with `canForce` (a reason is required); `busy` disables the buttons. `bulk` adds row checkboxes on the viewer's own locks, a select-all header and a bar with Release selected and Release all, both emitting `releaseMany(locks)`. On a narrow screen a row with a `repo` shows it under the path. `view`, `hrefs`, `title`, `loading`, `error`, `now` as on the branches page; an empty view uses `PynEmptyState`.
+
+`PynLocksPage` is the repository and personal locks page, laid out like `PynBranchesPage`: a left sub-nav (All, Mine, Expiring soon, Stale; Mine only when `me` is given), `v-model:query` search over path, holder and repository, and a bordered table with path, holder ("You" for `me`), mode, taken, expires and actions. Each row carries a state (yours, locked, expiring with under 30 minutes left, stale once the lease ran out) shown by a coloured edge, lock icon and label. `locks` takes `LockListItem` (`LockInfo` plus optional `repo`, `repoHref`, `mode`, `error`); a `repo` adds a Repository column and `lockRowFromMine(lock, holder)` turns a `MyLock` into a row. Events: `release(lock)` for the viewer's own locks and `forceRelease({ lock, reason })` for others' locks, shown only with `canForce` (a reason is required); `busy` disables the buttons. `view`, `hrefs`, `title`, `loading`, `error`, `now` as on the branches page; an empty view uses `PynEmptyState`.
+
+## Icons and fonts
+
+`PynIcon` (`name` in, SVG out) is the only icon wrapper. Every existing name maps to the nearest Lucide icon from `@lucide/icons`, bundled tree-shaken (only the icons in `src/utils/icons.ts` ship; `lock-open` is also available). `PynLockIcon` stays a local glyph because its lock states are not a Lucide icon.
+
+An icon pack is a name-to-SVG map that wins over the bundled set; a name missing from the pack falls back to Lucide, and a name in neither draws an empty SVG. A value is SVG inner markup (a string, trusted: host configuration only), Lucide-style element nodes (`[['path', { d }]]`) or a Lucide icon object. A host provides it once:
+
+```ts
+import { PYN_ICON_PACK } from '@avalon-initiative/pyn-common-ui'
+app.provide(PYN_ICON_PACK, { repo: '<rect x="4" y="4" width="16" height="16" rx="3" />' })
+```
+
+Font sets are tokens: `--pyn-font` (body), `--pyn-font-display` (h1 to h3 and the top bar brand) and `--pyn-font-mono` (code). The library defines the sets; the web host chooses one from its own configuration and sets `data-pyn-font-set="<id>"` (or the class `pyn-font-set-<id>`) on `<html>`, or on any element to scope it. With no attribute the Default set applies.
+
+| Set       | Body         | Display       | Code              |
+| --------- | ------------ | ------------- | ----------------- |
+| `default` | Geist        | Geist         | Geist Mono        |
+| `arcade`  | Geist        | Pixelify Sans | Geist Mono        |
+| `system`  | system stack | system stack  | system mono stack |
+
+The faces ship in the package as `fonts.css` (latin subset, variable woff2 in `fonts/`, about 65 KB in all, fetched only when a set uses a face). Import it once next to `tokens.css`: `import '@avalon-initiative/pyn-common-ui/fonts.css'`; the files are served from the host's own origin, with no CDN request. The system set downloads nothing. A host can instead bring its own faces: skip `fonts.css`, declare its own `@font-face` rules and set the three tokens (for example on `:root` or in its own `[data-pyn-font-set='mine']` block). The library does not read configuration; selecting a set is the host's job. `fontSets` lists the shipped ids and labels for a settings screen.
+
+Licences are listed in `NOTICE`: Lucide is ISC; Geist, Geist Mono and Pixelify Sans are SIL OFL 1.1 (licence texts in `fonts/LICENSE-*.txt`). Storybook has a Font set toolbar item and `Foundations/Font sets` stories; `Shell/PynIcon` has a pack-override story.

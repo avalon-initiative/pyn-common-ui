@@ -8,6 +8,7 @@ import {
   formatDate,
   formatDateTime,
   formatLease,
+  fontSets,
   formatWait,
   loadTheme,
   lockState,
@@ -235,5 +236,34 @@ describe('lease text and lock state', () => {
     expect(lockState(lock(3600_000, 'bo'), 'bo', now)).toBe('mine')
     expect(lockState(lock(EXPIRING_SOON_MS - 1), 'bo', now)).toBe('expiring')
     expect(lockState(lock(EXPIRING_SOON_MS + 1), 'bo', now)).toBe('locked')
+  })
+})
+
+describe('font sets', () => {
+  const block = (selector: string) =>
+    new RegExp(`${selector.replace(/[[\]'.]/g, '\\$&')}[^{]*\\{([^}]*)\\}`).exec(tokens)?.[1] ?? ''
+
+  it('defines the three font tokens at the root', () => {
+    for (const t of ['--pyn-font', '--pyn-font-display', '--pyn-font-mono']) {
+      expect(tokens).toMatch(new RegExp(`:root \\{[^}]*${t}:`))
+    }
+  })
+
+  it('selects each shipped set by data attribute or class', () => {
+    for (const { id } of fontSets) {
+      expect(tokens).toContain(`[data-pyn-font-set='${id}']`)
+      expect(tokens).toContain(`.pyn-font-set-${id}`)
+    }
+  })
+
+  it('gives Arcade a pixel display face over Geist body and mono', () => {
+    const arcade = block("[data-pyn-font-set='arcade']")
+    expect(arcade).toMatch(/--pyn-font-display: 'Pixelify Sans Variable'/)
+    expect(arcade).toMatch(/--pyn-font: 'Geist Variable'/)
+    expect(arcade).toMatch(/--pyn-font-mono: 'Geist Mono Variable'/)
+  })
+
+  it('keeps the system set free of bundled faces', () => {
+    expect(block("[data-pyn-font-set='system']")).not.toMatch(/Geist|Pixelify/)
   })
 })
