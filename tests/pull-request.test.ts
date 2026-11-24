@@ -4,13 +4,16 @@ import {
   PynMergeBox,
   PynPullCommits,
   PynPullRequestHeader,
+  PynPullRequestList,
   PynPullRequestPage,
   PynPullSide,
 } from '../src'
 import {
   commitDays,
   mergeBlockers,
+  matchesPullQuery,
   mergeStatus,
+  parsePullQuery,
   pullCounts,
   pullLocksByOthers,
   pullTabs,
@@ -213,5 +216,70 @@ describe('PynPullRequestPage', () => {
     await w.find('[data-close]').trigger('click')
     expect(w.emitted('merge')![0]).toEqual(['allow'])
     expect(w.emitted('close')).toHaveLength(1)
+  })
+})
+
+describe('pull request search', () => {
+  it('splits qualifiers from the text', () => {
+    expect(parsePullQuery('is:open author:sam lease timer')).toEqual({
+      text: 'lease timer',
+      is: 'open',
+      author: 'sam',
+    })
+    expect(parsePullQuery('is:bogus head:fix/x')).toEqual({ text: 'is:bogus', head: 'fix/x' })
+  })
+
+  it('matches by state, author, branch and title', () => {
+    const [open, , , merged] = [pullList[0]!, pullList[1]!, pullList[2]!, pullList[3]!]
+    expect(matchesPullQuery(open, 'is:open')).toBe(true)
+    expect(matchesPullQuery(merged, 'is:open')).toBe(false)
+    expect(matchesPullQuery(merged, 'is:closed')).toBe(true)
+    expect(matchesPullQuery(merged, 'is:merged readme')).toBe(true)
+    expect(matchesPullQuery(open, 'author:SAM')).toBe(false)
+    expect(matchesPullQuery(open, 'head:feature/level-two base:main')).toBe(true)
+    expect(matchesPullQuery(open, '#42')).toBe(true)
+  })
+})
+
+describe('PynPullRequestList', () => {
+  const rows = pullList.filter((p) => p.state === 'open')
+  const props = { pulls: rows, count: rows.length, counts: { open: 3, closed: 2 }, now }
+
+  it('shows bordered rows with number, author, review state, comments and locks', () => {
+    const w = make(PynPullRequestList, { props })
+    const items = w.findAll('[data-pull]')
+    expect(items).toHaveLength(3)
+    expect(items[0]!.text()).toContain('#42')
+    expect(items[0]!.text()).toContain('Jamie Park')
+    expect(items[0]!.find('[data-review]').text()).toBe('Review required')
+    expect(items[2]!.find('[data-locked]').text()).toBe('2 paths locked')
+    expect(w.text()).toContain('3 pull requests')
+  })
+
+  it('switches between Open and Closed with the counts', async () => {
+    const w = make(PynPullRequestList, { props })
+    expect(w.find('[data-status-tab=open]').attributes('aria-pressed')).toBe('true')
+    expect(w.find('[data-status-tab=closed]').text()).toContain('2')
+    await w.find('[data-status-tab=closed]').trigger('click')
+    expect(w.emitted('update:status')![0]).toEqual(['closed'])
+  })
+
+  it('has the left sub-nav only when groups are given', () => {
+    const groups = [{ id: 'g', items: [{ id: 'a', label: 'All', href: '#' }] }]
+    const w = make(PynPullRequestList, { props: { ...props, navGroups: groups, navCurrent: 'a' } })
+    expect(w.find('nav[aria-label="Pull request views"]').exists()).toBe(true)
+    expect(
+      make(PynPullRequestList, { props }).find('nav[aria-label="Pull request views"]').exists(),
+    ).toBe(false)
+  })
+
+  it('shows the empty and no-match states and the New button', () => {
+    const e = make(PynPullRequestList, {
+      props: { ...props, pulls: [], count: 0, newHref: '/n' },
+    })
+    expect(e.text()).toContain('No pull requests')
+    expect(e.find('a[href="/n"]').text()).toBe('New pull request')
+    const f = make(PynPullRequestList, { props: { ...props, pulls: [], count: 0, filtered: true } })
+    expect(f.text()).toContain('No matches')
   })
 })

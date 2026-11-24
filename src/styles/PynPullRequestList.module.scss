@@ -1,0 +1,159 @@
+@use 'mixins' as m;
+
+.page {
+  min-width: 0;
+}
+
+.withNav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--pyn-space-6);
+  align-items: start;
+
+  @media (min-width: 50rem) {
+    grid-template-columns: 14rem minmax(0, 1fr);
+  }
+}
+
+.tabs {
+  display: flex;
+  gap: var(--pyn-space-1);
+  padding: var(--pyn-space-1) var(--pyn-space-2);
+}
+
+.tab {
+  @include m.control;
+  gap: var(--pyn-space-2);
+  padding: 0 var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pyn-text);
+    background: var(--pyn-hover);
+  }
+
+  &[aria-pressed='true'] {
+    color: var(--pyn-text);
+    font-weight: 600;
+  }
+
+  @include m.focus-ring;
+}
+
+.pill {
+  @include m.pill;
+  line-height: 1rem;
+}
+
+.new {
+  @include m.button-primary;
+  align-self: auto;
+  text-decoration: none;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pyn-space-3);
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  list-style: none;
+
+  & + & {
+    border-top: 1px solid var(--pyn-border);
+  }
+
+  @include m.row-hover;
+}
+
+.icon {
+  flex: none;
+  margin-top: var(--pyn-space-half);
+}
+
+.open {
+  color: var(--pyn-success);
+}
+
+.merged {
+  color: light-dark(#8250df, #ab7df8);
+}
+
+.closed {
+  color: var(--pyn-danger);
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--pyn-space-1) var(--pyn-space-2);
+  min-width: 0;
+}
+
+.title {
+  color: var(--pyn-text);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+a.title:hover {
+  color: var(--pyn-accent);
+}
+
+.locked {
+  @include m.status-label(var(--pyn-locked), var(--pyn-locked-bg));
+  gap: var(--pyn-space-1);
+}
+
+.meta {
+  @include m.muted;
+  flex: 1 1 100%;
+  font-size: var(--pyn-text-xs);
+
+  code {
+    font-family: var(--pyn-font-mono);
+  }
+}
+
+.review {
+  @include m.label;
+  flex: none;
+}
+
+.approved {
+  color: var(--pyn-success);
+}
+
+.changes_requested {
+  color: var(--pyn-danger);
+}
+
+.requested {
+  color: var(--pyn-attention);
+}
+
+.comments {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--pyn-space-1);
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-sm);
+}
+
+.hidden {
+  @include m.visually-hidden;
+}
+
+@include m.narrow {
+  .row {
+    flex-wrap: wrap;
+  }
+}
