@@ -34,5 +34,7 @@ export const Default: Story = {}
 export const WithProfile: Story = { args: { displayName: 'Alice Anders' } }
 export const OrganizationAccount: Story = { args: { currentOrg: 'studio' } }
 export const InRepository: Story = { args: { current: '', currentRepo: 'alice/pyn-web' } }
+/** For the navigation drawer, where the top bar already switches owner. */
+export const WithoutAccountSwitcher: Story = { args: { hideAccount: true } }
 export const FewRepositories: Story = { args: { repos: repos.slice(0, 3) } }
 export const NoRepositories: Story = { args: { repos: [], orgs: [] } }

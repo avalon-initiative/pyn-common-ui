@@ -5788,6 +5788,15 @@ describe('PynSideRail', () => {
     expect(w.text()).toContain('Personal account')
   })
 
+  it('hides the account switcher but keeps the repositories with hideAccount', () => {
+    const w = mountRail({ hideAccount: true })
+    expect(w.text()).not.toContain('Personal account')
+    expect(w.find('button[aria-label="Switch account"]').exists()).toBe(false)
+    expect(w.text()).toContain('Top repositories')
+    expect(repoLinks(w)).toHaveLength(10)
+    expect(mountRail().find('button[aria-label="Switch account"]').exists()).toBe(true)
+  })
+
   it('caps the repositories and expands on Show more', async () => {
     const w = mountRail()
     expect(repoLinks(w)).toHaveLength(10)

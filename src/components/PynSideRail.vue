@@ -29,6 +29,8 @@ const props = withDefaults(
     maxRepos?: number
     createOrgHref?: string
     personalHref?: string
+    /** Drops the account block, for a drawer whose top bar already has the owner switcher. */
+    hideAccount?: boolean
   }>(),
   { maxRepos: 10, createOrgHref: '/_/orgs/new', personalHref: '/' },
 )
@@ -79,7 +81,7 @@ const hasBadge = (item: NavItem) =>
 
 <template>
   <nav :class="styles.rail" aria-label="Main">
-    <div :class="styles.account">
+    <div v-if="!hideAccount" :class="styles.account">
       <PynAvatar
         :username="currentOrg || account"
         :name="currentOrg ? null : displayName"
