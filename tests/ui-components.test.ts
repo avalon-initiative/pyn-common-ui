@@ -4738,6 +4738,35 @@ describe('PynProfileForm', () => {
     ])
   })
 
+  it('hides the Visibility section without a visibility prop', () => {
+    const w = mount(PynProfileForm, { props: { profile } })
+    expect(w.findAll('input[role="switch"]')).toHaveLength(0)
+    expect(w.text()).not.toContain('Visibility')
+  })
+
+  it('shows one switch per flag and emits them all with the save', async () => {
+    const w = mount(PynProfileForm, {
+      props: { profile, visibility: { starred: false, bio: false } },
+    })
+    const switches = w.findAll('input[role="switch"]')
+    expect(switches).toHaveLength(7)
+    expect(w.text()).toContain('Starred repositories')
+    const starred = switches[6]
+    expect((starred.element as HTMLInputElement).checked).toBe(false)
+    await starred.setValue(true)
+    await w.find('form').trigger('submit')
+    const sent = w.emitted('save')?.[0][0] as { visibility: Record<string, boolean> }
+    expect(sent.visibility).toEqual({
+      avatar: true,
+      display_name: true,
+      bio: false,
+      location: true,
+      company: true,
+      links: true,
+      starred: true,
+    })
+  })
+
   it('refuses a link that is not http or https', async () => {
     const w = mount(PynProfileForm, { props: { profile } })
     await w.find('textarea[placeholder]').setValue('ftp://x.example')

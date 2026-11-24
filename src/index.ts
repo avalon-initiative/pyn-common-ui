@@ -465,7 +465,12 @@ export { commitSubject, commitBody } from './utils/commit-message'
 export { default as PynProfileForm } from './components/PynProfileForm.vue'
 export { default as PynEmailAddresses } from './components/PynEmailAddresses.vue'
 export { default as PynUsernameChange } from './components/PynUsernameChange.vue'
-export type { AccountEmail, ProfileValues, RenameForm } from './types/account.types'
+export type {
+  AccountEmail,
+  ProfileValues,
+  ProfileVisibility,
+  RenameForm,
+} from './types/account.types'
 export {
   AVATAR_MAX_BYTES,
   AVATAR_TYPES,
