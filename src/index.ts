@@ -46,6 +46,9 @@ export { default as PynRepoSocial } from './components/PynRepoSocial.vue'
 export { default as PynRepoAbout } from './components/PynRepoAbout.vue'
 export { default as PynFileList } from './components/PynFileList.vue'
 export { default as PynDialog } from './components/PynDialog.vue'
+export { default as PynConfirmDialog } from './components/PynConfirmDialog.vue'
+export { default as PynBranchDialog } from './components/PynBranchDialog.vue'
+export { pickerBranch } from './state/branch-picker.state'
 export { default as PynDrawer } from './components/PynDrawer.vue'
 export { default as PynFilterList } from './components/PynFilterList.vue'
 export { default as PynEmptyState } from './components/PynEmptyState.vue'
@@ -355,6 +358,7 @@ export {
 export { splitPath, groupByTopLevel } from './state/files.state'
 export {
   activityVerb,
+  ancestorFolders,
   breadcrumbs,
   encodeSegments,
   folderParam,

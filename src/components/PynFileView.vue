@@ -48,6 +48,8 @@ const props = withDefaults(
     branchesHref?: string
     /** Offers creating a branch from the picker. */
     creatable?: boolean
+    /** Adds a New branch button beside the picker; it emits `newBranch`. */
+    newBranchButton?: boolean
     /** The panel's collapsed state; omitted lets it keep its own. */
     collapsed?: boolean
   }>(),
@@ -60,6 +62,7 @@ const emit = defineEmits<{
   toggleFolder: [path: string]
   selectBranch: [name: string]
   createBranch: [name: string]
+  newBranch: []
   search: [query: string]
   open: [path: string]
   'update:collapsed': [value: boolean]
@@ -92,11 +95,13 @@ onBeforeUnmount(() => clearTimeout(timer))
       :branches-error="branchesError"
       :branches-href="branchesHref"
       :creatable="creatable"
+      :new-branch-button="newBranchButton"
       :collapsed="collapsed"
       :now="now"
       @toggle="emit('toggleFolder', $event)"
       @select-branch="emit('selectBranch', $event)"
       @create-branch="emit('createBranch', $event)"
+      @new-branch="emit('newBranch')"
       @search="emit('search', $event)"
       @open="emit('open', $event)"
       @update:collapsed="emit('update:collapsed', $event)"

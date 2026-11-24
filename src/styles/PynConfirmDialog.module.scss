@@ -1,0 +1,25 @@
+@use 'mixins' as m;
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-3);
+}
+
+.error {
+  @include m.error;
+  margin: var(--pyn-space-3) 0 0;
+}
+
+.cancel {
+  @include m.button;
+}
+
+.confirm {
+  @include m.button-primary;
+  align-self: auto;
+}
+
+.danger {
+  @include m.button-danger;
+}

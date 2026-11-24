@@ -1,10 +1,26 @@
 @use 'mixins' as m;
 
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-2);
+  max-width: 100%;
+}
+
 .picker {
   position: relative;
   display: inline-block;
   width: var(--pyn-branch-picker-width, 14rem);
+  min-width: 0;
   max-width: 100%;
+}
+
+.tool {
+  @include m.button;
+  flex: none;
+  min-width: var(--pyn-control-md);
+  padding: 0;
+  color: var(--pyn-text-muted);
 }
 
 // Fixed footprint: the name truncates, so a branch change never moves neighbours.

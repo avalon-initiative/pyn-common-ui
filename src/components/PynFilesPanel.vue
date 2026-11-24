@@ -5,6 +5,7 @@ import PynFileTree from './PynFileTree.vue'
 import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynFilesPanel.module.scss'
 import { blobPath } from '../state/blob.state'
+import { pickerBranch } from '../state/branch-picker.state'
 import { matchFiles } from '../state/tree.state'
 import type { BranchOption } from '../types/branch.types'
 import type { TreeEntry } from '../types/tree.types'
@@ -23,6 +24,8 @@ const props = withDefaults(
     branchesError?: string
     branchesHref?: string
     creatable?: boolean
+    /** Adds a New branch button beside the picker; it emits `newBranch`. */
+    newBranchButton?: boolean
     /** Shrinks the panel to its toggle; omitted starts open, or closed on a narrow screen. */
     collapsed?: boolean
     now?: Date
@@ -33,6 +36,7 @@ const emit = defineEmits<{
   toggle: [path: string]
   selectBranch: [name: string]
   createBranch: [name: string]
+  newBranch: []
   search: [query: string]
   open: [path: string]
   'update:collapsed': [value: boolean]
@@ -42,6 +46,8 @@ const narrow = typeof matchMedia === 'function' && matchMedia('(max-width: 40rem
 const local = ref(narrow)
 const shut = computed(() => props.collapsed ?? local.value)
 const query = ref('')
+const goto = ref<HTMLInputElement | null>(null)
+const pickerName = computed(() => pickerBranch(props.branch, props.branches ?? []))
 const found = computed(() => matchFiles(props.entries, query.value))
 
 function flip() {
@@ -77,20 +83,25 @@ function enter() {
     </div>
     <div v-if="!shut" :class="styles.body">
       <PynBranchPicker
-        v-if="branches && branch"
+        v-if="branches && pickerName"
         :branches="branches"
-        :current="branch"
+        :current="pickerName"
         :loading="branchesLoading"
         :error="branchesError"
         :all-href="branchesHref"
         :creatable="creatable"
+        :new-branch-button="newBranchButton"
+        search-button
         :now="now"
         @select="emit('selectBranch', $event)"
         @create="emit('createBranch', $event)"
+        @new-branch="emit('newBranch')"
+        @search="goto?.focus()"
       />
       <label :class="styles.goto">
         <PynIcon name="search" :class="styles.icon" />
         <input
+          ref="goto"
           :value="query"
           type="search"
           :class="styles.input"
