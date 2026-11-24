@@ -49,26 +49,34 @@ const rescope = (rule: RuleRef, e: Event) =>
 </script>
 
 <template>
-  <PynSettingsSection
-    title="Repository creation"
-    description="Owners can always create repositories. Rules refine what other members may create; a deny beats an allow."
-    plain
-  >
-    <section :class="styles.page">
-      <label :class="styles.field"
-        >Members may create
-        <select
-          :class="styles.input"
-          :value="policy.member_creation"
-          :disabled="busy || readonly"
-          @change="emit('setBase', ($event.target as HTMLSelectElement).value as MemberCreation)"
-        >
-          <option v-for="o in MEMBER_CREATION" :key="o.value" :value="o.value">
-            {{ o.label }}
-          </option>
-        </select>
-      </label>
+  <div :class="styles.page">
+    <PynSettingsSection
+      title="Repository creation"
+      description="Owners can always create repositories. Rules refine what other members may create; a deny beats an allow."
+      plain
+    >
+      <div :class="styles.box">
+        <label :class="styles.field"
+          >Members may create
+          <select
+            :class="styles.input"
+            :value="policy.member_creation"
+            :disabled="busy || readonly"
+            @change="emit('setBase', ($event.target as HTMLSelectElement).value as MemberCreation)"
+          >
+            <option v-for="o in MEMBER_CREATION" :key="o.value" :value="o.value">
+              {{ o.label }}
+            </option>
+          </select>
+        </label>
+      </div>
+    </PynSettingsSection>
 
+    <PynSettingsSection
+      title="Rules"
+      description="A rule allows or denies one team or member, for one scope."
+      plain
+    >
       <ul v-if="policy.rules.length" :class="styles.list">
         <li v-for="r in policy.rules" :key="ruleKey(r)" :class="styles.item">
           <span :class="styles.subject">
@@ -99,10 +107,11 @@ const rescope = (rule: RuleRef, e: Event) =>
           </span>
         </li>
       </ul>
-      <p v-else :class="styles.note">No rules.</p>
+      <p v-else :class="styles.note" data-no-rules>No rules.</p>
+    </PynSettingsSection>
 
-      <form v-if="!readonly" :class="styles.form" @submit.prevent="add">
-        <h4 :class="styles.subheading">Add a rule</h4>
+    <PynSettingsSection v-if="!readonly" title="Add a rule" plain>
+      <form :class="styles.form" @submit.prevent="add">
         <div :class="styles.row">
           <label :class="styles.field"
             >Effect
@@ -133,6 +142,7 @@ const rescope = (rule: RuleRef, e: Event) =>
         <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
         <button type="submit" :class="styles.primary" :disabled="busy">Add rule</button>
       </form>
-    </section>
-  </PynSettingsSection>
+    </PynSettingsSection>
+    <p v-else-if="error" :class="styles.error" role="alert">{{ error }}</p>
+  </div>
 </template>

@@ -55,27 +55,29 @@ function state(i: InviteInfo): string {
         </button>
       </li>
     </ul>
-    <p v-else :class="styles.empty">No invitations.</p>
+    <p v-else :class="styles.empty" data-empty>No invitations.</p>
 
     <form :class="styles.form" @submit.prevent="create">
       <h3 :class="styles.subheading">New invitation</h3>
-      <label :class="styles.field"
-        >Role
-        <select v-model="role" :class="styles.input" :disabled="readonly">
-          <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
-        </select>
-      </label>
-      <label :class="styles.field"
-        >Valid for (hours)
-        <input
-          v-model="hours"
-          :class="styles.input"
-          type="number"
-          min="1"
-          required
-          :disabled="readonly"
-        />
-      </label>
+      <div :class="styles.row">
+        <label :class="styles.field"
+          >Role
+          <select v-model="role" :class="styles.input" :disabled="readonly">
+            <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
+          </select>
+        </label>
+        <label :class="styles.field"
+          >Valid for (hours)
+          <input
+            v-model="hours"
+            :class="styles.input"
+            type="number"
+            min="1"
+            required
+            :disabled="readonly"
+          />
+        </label>
+      </div>
       <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
       <button type="submit" :class="styles.primary" :disabled="busy || readonly">
         Create invitation

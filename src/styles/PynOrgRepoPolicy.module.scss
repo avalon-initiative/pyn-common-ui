@@ -3,7 +3,15 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--pyn-space-3);
+}
+
+.box {
+  @include m.flat-box;
+  padding: var(--pyn-space-4);
+
+  .field {
+    max-width: 24rem;
+  }
 }
 
 .heading,
@@ -14,6 +22,7 @@
 
 .note {
   @include m.muted;
+  margin: 0;
 }
 
 .list {
@@ -47,6 +56,9 @@
 
 .form {
   @include m.form;
+  @include m.flat-box;
+  max-width: none;
+  padding: var(--pyn-space-4);
 }
 
 .row {

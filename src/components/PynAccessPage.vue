@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import PynAvatar from './PynAvatar.vue'
 import PynButton from './PynButton.vue'
 import PynFilterList from './PynFilterList.vue'
 import PynIcon from './PynIcon.vue'
@@ -186,10 +187,19 @@ const change = (name: string, e: Event) =>
         </template>
         <li v-for="r in rows" :key="`${r.kind}:${r.name}`" :class="styles.row">
           <span :class="styles.who">
+            <PynAvatar
+              :username="r.name"
+              :name="r.identity?.display_name"
+              :src="r.identity?.avatar_url"
+              size="sm"
+              data-avatar
+            />
             <a v-if="r.href" :href="r.href" :class="styles.name"
-              ><PynPerson :name="r.name" :identity="r.identity"
+              ><PynPerson :name="r.name" :identity="r.identity" :avatar="false"
             /></a>
-            <strong v-else><PynPerson :name="r.name" :identity="r.identity" /></strong>
+            <strong v-else
+              ><PynPerson :name="r.name" :identity="r.identity" :avatar="false"
+            /></strong>
             <span :class="styles.muted" data-kind>{{ r.kind === 'team' ? 'Team' : 'Person' }}</span>
             <span v-if="sourceNote(r.source)" :class="styles.muted" data-source>{{
               sourceNote(r.source)

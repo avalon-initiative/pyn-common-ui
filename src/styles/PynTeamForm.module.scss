@@ -4,6 +4,20 @@
   @include m.form;
 }
 
+.boxed {
+  @include m.flat-box;
+  max-width: none;
+  padding: var(--pyn-space-4);
+
+  .field {
+    max-width: 40rem;
+  }
+
+  .primary {
+    align-self: flex-start;
+  }
+}
+
 .subheading {
   margin: 0;
   font-size: 1rem;

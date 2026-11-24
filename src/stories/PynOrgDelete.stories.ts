@@ -15,6 +15,13 @@ export const NotEmpty: Story = {
   args: { error: 'Delete the repositories the organization owns first.' },
 }
 export const ReadOnly: Story = { args: { readonly: true } }
+export const InPlainDangerZone: Story = {
+  render: (args) => ({
+    components: { PynOrgDelete, PynSettingsSection },
+    setup: () => ({ args }),
+    template: `<PynSettingsSection title="Danger zone" danger plain><PynOrgDelete v-bind="args" /></PynSettingsSection>`,
+  }),
+}
 export const InDangerZone: Story = {
   render: (args) => ({
     components: { PynOrgDelete, PynSettingsSection },
