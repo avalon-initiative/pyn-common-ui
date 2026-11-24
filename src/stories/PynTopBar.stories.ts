@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynTopBar from '../components/PynTopBar.vue'
+import PynSideRail from '../components/PynSideRail.vue'
 import { owners } from './dashboard-data'
+import { searchResults } from './global-search-data'
 
 const meta: Meta<typeof PynTopBar> = {
   title: 'Shell/PynTopBar',
@@ -73,6 +75,22 @@ export const NavigationDrawerWithExtraContent: Story = {
   }),
   play: openMenu('Open navigation'),
 }
+/** The rail drops its own account switcher: the top bar already has the owner switcher. */
+export const NavigationDrawerWithRepositories: Story = {
+  render: (args) => ({
+    components: { PynTopBar, PynSideRail },
+    setup: () => ({
+      args,
+      repos: ['game', 'tools', 'castle-quest'].map((name) => ({ owner: 'alice', name })),
+    }),
+    template: `<PynTopBar v-bind="args"><template #drawer><PynSideRail hide-account account="alice" :items="[{ id: 'home', label: 'Home', href: '/', icon: 'home' }]" current="home" :repos="repos" /></template></PynTopBar>`,
+  }),
+  play: openMenu('Open navigation'),
+}
+export const NarrowDrawerWithRepositories: Story = {
+  ...NavigationDrawerWithRepositories,
+  parameters: narrow,
+}
 export const AccountMenuOpen: Story = { args: { admin: true }, play: openMenu('Account menu') }
 export const Narrow: Story = { parameters: narrow }
 export const RepositoryPage: Story = { args: { currentOwner: 'studio', repo: 'castle-quest' } }
@@ -105,6 +123,18 @@ export const NarrowMenuOpen: Story = { parameters: narrow, play: openMenu('Open 
 export const NarrowSearchOpen: Story = {
   parameters: narrow,
   play: openMenu('Search'),
+}
+export const NarrowSearchResults: Story = {
+  args: { searchResults },
+  parameters: narrow,
+  play: async (ctx) => {
+    await openMenu('Search')(ctx)
+    const input = ctx.canvasElement.querySelector('input')!
+    input.focus()
+    input.value = 'co'
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+    await tick()
+  },
 }
 export const NarrowSignedOut: Story = {
   parameters: narrow,

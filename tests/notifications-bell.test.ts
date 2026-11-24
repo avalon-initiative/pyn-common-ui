@@ -33,16 +33,15 @@ describe('PynNotificationsBell entries', () => {
     expect(make({ count: 4 }).find('[data-badge]').text()).toBe('4')
   })
 
-  it('lists entries above the Work in progress state with time and link', async () => {
+  it('lists entries with time and link, without the Work in progress state or footer', async () => {
     const w = await opened({ entries })
     const items = w.findAll('[data-entry]')
     expect(items).toHaveLength(2)
     expect(items[0]!.find('a').attributes('href')).toBe('/_/settings')
     expect(items[0]!.text()).toContain('3 hours ago')
     expect(items[1]!.find('a').exists()).toBe(false)
-    const wip = w.find('[role=dialog]').element.querySelector('h3')!
-    const before = items[0]!.element.compareDocumentPosition(wip) & Node.DOCUMENT_POSITION_FOLLOWING
-    expect(before).toBeTruthy()
+    expect(w.text()).not.toContain('Work in progress')
+    expect(w.find('[data-pending]').exists()).toBe(false)
   })
 
   it('shows dismiss on a notice and Accept and Decline on an invitation, and emits ids', async () => {
@@ -70,6 +69,14 @@ describe('PynNotificationsBell entries', () => {
     const w = await opened({ entries: [] })
     expect(w.find('[data-entry]').exists()).toBe(false)
     expect(w.text()).toContain('Work in progress')
+  })
+})
+
+describe('PynNotificationsBell count only', () => {
+  it('keeps the Work in progress state and the waiting link without entries', async () => {
+    const w = await opened({ count: 3, href: '/_/invitations' })
+    expect(w.text()).toContain('Work in progress')
+    expect(w.find('[data-pending]').text()).toContain('3 notifications waiting')
   })
 })
 

@@ -12,7 +12,7 @@ import type { BellEntry } from '../types/top-bar.types'
 const props = defineProps<{
   /** Pending items; the badge hides at zero while the bell stays. Ignored when `entries` is given. */
   count?: number
-  /** Notices and invitations listed above the Work in progress state; their number drives the badge. */
+  /** Notices and invitations listed in the panel instead of the Work in progress state; their number drives the badge. */
   entries?: BellEntry[]
   now?: Date
   /** Where pending items are listed; the panel links there when the count is above zero. */
@@ -114,13 +114,19 @@ onBeforeUnmount(stop)
         </li>
       </ul>
       <PynEmptyState
+        v-else
         kind="wip"
         compact
         :heading-level="3"
         icon="bell"
         description="Notifications will appear here once the server keeps an inbox."
       />
-      <a v-if="href && countText(total)" :href="href" :class="styles.link" data-pending>
+      <a
+        v-if="href && countText(total) && !entries?.length"
+        :href="href"
+        :class="styles.link"
+        data-pending
+      >
         {{ notificationsText(total) }} waiting
       </a>
     </div>
