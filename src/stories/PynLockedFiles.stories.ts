@@ -12,3 +12,12 @@ type Story = StoryObj<typeof PynLockedFiles>
 
 export const Default: Story = {}
 export const None: Story = { args: { locks: [] } }
+export const NextToExpire: Story = {
+  args: {
+    locks: Array.from({ length: 8 }, (_, i) => ({
+      ...summary.locks[0]!,
+      path: `Content/Maps/Level${i + 1}.umap`,
+      expires_at: new Date(now.getTime() + (8 - i) * 45 * 60_000).toISOString(),
+    })),
+  },
+}

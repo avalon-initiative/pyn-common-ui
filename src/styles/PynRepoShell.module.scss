@@ -45,9 +45,9 @@
   gap: var(--pyn-space-1);
 }
 
-.repoIcon {
+.avatar {
+  flex: none;
   margin-right: var(--pyn-space-1);
-  color: var(--pyn-text-muted);
 }
 
 .owner,
@@ -64,6 +64,11 @@
 
 .name {
   font-weight: 600;
+}
+
+.path .name:first-of-type:last-child,
+.avatar + .name {
+  color: var(--pyn-text);
 }
 
 .sep {
@@ -98,6 +103,10 @@
 
   &:empty {
     display: none;
+  }
+
+  @include m.narrow {
+    flex: 1 1 100%;
   }
 }
 

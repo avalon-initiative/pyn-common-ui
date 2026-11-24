@@ -75,3 +75,55 @@
 .error {
   @include m.error;
 }
+
+.heading {
+  margin: 0;
+  font-size: var(--pyn-text-sm);
+  font-weight: 600;
+}
+
+.tabs {
+  display: flex;
+  gap: var(--pyn-space-1);
+  border-bottom: 1px solid var(--pyn-border);
+}
+
+.tab {
+  @include m.control;
+  padding-inline: var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font: inherit;
+  font-size: var(--pyn-text-sm);
+  cursor: pointer;
+
+  &[aria-selected='true'] {
+    color: var(--pyn-text);
+    border-bottom-color: var(--pyn-accent);
+    font-weight: 600;
+  }
+
+  @include m.focus-ring;
+}
+
+.download {
+  @include m.control;
+  justify-content: flex-start;
+  gap: var(--pyn-space-2);
+  padding-inline: var(--pyn-space-2);
+  color: var(--pyn-text);
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--pyn-border);
+  border-radius: 0;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
+
+  @include m.focus-ring;
+}

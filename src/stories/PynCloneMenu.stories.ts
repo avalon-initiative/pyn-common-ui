@@ -18,3 +18,11 @@ type Story = StoryObj<typeof PynCloneMenu>
 
 export const Default: Story = {}
 export const WithSsh: Story = { args: { sshUrl: 'ssh://git@pyn.example.com/acme/game.pyn' } }
+export const SshAndDownload: Story = {
+  args: {
+    sshUrl: 'ssh://git@pyn.example.com/acme/game.pyn',
+    sshCommand: 'pyn clone ssh://git@pyn.example.com/acme/game.pyn',
+    downloadZip: true,
+  },
+}
+export const Neutral: Story = { args: { variant: 'default', label: 'Clone' } }

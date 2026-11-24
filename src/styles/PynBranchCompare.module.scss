@@ -1,8 +1,10 @@
 @use 'mixins' as m;
 
 .compare {
-  @include m.card;
   padding: var(--pyn-space-3) var(--pyn-space-4);
+  background: var(--pyn-bg-subtle);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
 }
 
 .sentence {

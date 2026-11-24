@@ -17,7 +17,7 @@ afterEach(() => {
 describe('PynCloneMenu', () => {
   it('shows the trigger closed, then the address and command read-only', async () => {
     const w = make()
-    expect(w.find('button').text()).toBe('Clone')
+    expect(w.find('button').text()).toBe('Code')
     expect(w.find('[role=dialog]').exists()).toBe(false)
     await w.find('button').trigger('click')
     const inputs = w.findAll('input')
@@ -74,11 +74,12 @@ describe('PynCloneMenu', () => {
     vi.stubGlobal('navigator', { clipboard: { writeText } })
     const w = make({ sshUrl: 'ssh://h/a/b' })
     await w.find('button').trigger('click')
-    for (const [label, value] of [
-      ['Copy HTTPS', props.httpsUrl],
-      ['Copy SSH', 'ssh://h/a/b'],
-      ['Copy pyn', props.command],
-    ]) {
+    for (const [tab, label, value] of [
+      [0, 'Copy HTTPS', props.httpsUrl],
+      [1, 'Copy SSH', 'ssh://h/a/b'],
+      [1, 'Copy pyn', props.command],
+    ] as const) {
+      await w.findAll('[role=tab]')[tab]!.trigger('click')
       await w.find(`button[aria-label="${label}"]`).trigger('click')
       await flushPromises()
       expect(writeText).toHaveBeenLastCalledWith(value)
@@ -121,8 +122,28 @@ describe('PynCloneMenu', () => {
     const without = make()
     await without.find('button').trigger('click')
     expect(without.find('button[aria-label="Copy SSH"]').exists()).toBe(false)
-    const withSsh = make({ sshUrl: 'ssh://h/a/b' })
+    expect(without.find('[role=tablist]').exists()).toBe(false)
+    const withSsh = make({ sshUrl: 'ssh://h/a/b', sshCommand: 'pyn clone ssh://h/a/b' })
     await withSsh.find('button').trigger('click')
-    expect(withSsh.find('button[aria-label="Copy SSH"]').exists()).toBe(true)
+    expect(withSsh.findAll('[role=tab]').map((t) => t.text())).toEqual(['HTTPS', 'SSH'])
+    expect(withSsh.find('button[aria-label="Copy SSH"]').exists()).toBe(false)
+    await withSsh.findAll('[role=tab]')[1]!.trigger('click')
+    const values = withSsh.findAll('input').map((i) => (i.element as HTMLInputElement).value)
+    expect(values).toEqual(['ssh://h/a/b', 'pyn clone ssh://h/a/b'])
+    expect(withSsh.find('[role=tab][aria-selected=true]').text()).toBe('SSH')
+    await withSsh.find('[role=tablist]').trigger('keydown', { key: 'ArrowLeft' })
+    expect(withSsh.find('[role=tab][aria-selected=true]').text()).toBe('HTTPS')
+  })
+
+  it('adds a Download ZIP row that emits download and closes the panel', async () => {
+    const none = make()
+    await none.find('button').trigger('click')
+    expect(none.text()).not.toContain('Download ZIP')
+    const w = make({ downloadZip: true })
+    await w.find('button').trigger('click')
+    const row = w.findAll('button').find((b) => b.text().includes('Download ZIP'))!
+    await row.trigger('click')
+    expect(w.emitted('download')).toHaveLength(1)
+    expect(w.find('[role=dialog]').exists()).toBe(false)
   })
 })

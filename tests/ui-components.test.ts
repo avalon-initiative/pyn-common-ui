@@ -1430,9 +1430,9 @@ describe('PynRepoLanding', () => {
   })
 
   it('renders About only with data', () => {
-    expect(landing().find('#about-title').exists()).toBe(false)
+    expect(landing().find('section[aria-label=About]').exists()).toBe(false)
     const w = landing({ about: { description: 'A game', topics: ['unreal'] } })
-    expect(w.find('#about-title').exists()).toBe(true)
+    expect(w.find('section[aria-label=About]').exists()).toBe(true)
     expect(w.text()).toContain('A game')
     expect(w.text()).toContain('unreal')
   })
@@ -4430,7 +4430,6 @@ describe('repository shell and settings', () => {
       slots: { actions: '<button>Clone</button>', default: '<p>body</p>' },
     })
     expect(w.find('[data-visibility]').text()).toBe('Public')
-    expect(w.find('a[href="/alice"]').text()).toBe('alice')
     expect(w.find('a[href="/alice/game"]').text()).toBe('game')
     expect(w.find('button').text()).toBe('Clone')
     expect(w.find('nav[aria-label="Repository"]').exists()).toBe(true)

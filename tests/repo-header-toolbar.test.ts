@@ -73,11 +73,15 @@ describe('PynRepoShell header band', () => {
     expect(w.find('header > div > div:last-child').text()).toBe('watchforkstarclone')
   })
 
-  it('shows the repository icon, owner link and bold repository link', () => {
+  it('shows the owner avatar and the repository link, and the owner link with showOwner', () => {
     const w = make(PynRepoShell, { props: shell })
     const nav = w.find('nav[aria-label="Repository path"]')
-    expect(nav.find('svg').exists()).toBe(true)
-    expect(nav.findAll('a').map((a) => a.attributes('href'))).toEqual(['/a', '/a/b'])
+    expect(nav.find('[role=img]').attributes('aria-label')).toBe("a's avatar")
+    expect(nav.findAll('a').map((a) => a.attributes('href'))).toEqual(['/a/b'])
+    const full = make(PynRepoShell, { props: { ...shell, showOwner: true } })
+    expect(
+      full.findAll('nav[aria-label="Repository path"] a').map((a) => a.attributes('href')),
+    ).toEqual(['/a', '/a/b'])
   })
 
   it('reserves the lock strip and the Locks count while pending, and nothing otherwise', () => {
@@ -200,6 +204,6 @@ describe('PynCloneMenu variant', () => {
     const neutral = make(PynCloneMenu, { props: { ...props, variant: 'default' } })
     expect(primary.find('button').classes().length).toBe(2)
     expect(neutral.find('button').classes().length).toBe(1)
-    expect(primary.find('button').text()).toBe('Clone')
+    expect(primary.find('button').text()).toBe('Code')
   })
 })
