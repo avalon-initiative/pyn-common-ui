@@ -62,6 +62,27 @@ export const InvalidUserName: Story = {
   args: { registration: 'open', nameMessage: 'That user name is not allowed.' },
 }
 
+const showRegister = ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const link = [...canvasElement.querySelectorAll('button')].find((b) =>
+    /Create an account|I have an invitation/.test(b.textContent ?? ''),
+  )
+  link?.click()
+}
+/** Mail can be sent: the email is required. */
+export const RegisterEmailRequired: Story = {
+  args: { registration: 'open', emailVerification: true },
+  play: showRegister,
+}
+/** No mail can be sent: an optional email with a line on what it is for. */
+export const RegisterEmailOptional: Story = {
+  args: { registration: 'open', emailVerification: false },
+  play: showRegister,
+}
+export const RegisterInviteOnly: Story = {
+  args: { registration: 'invite', emailVerification: false },
+  play: showRegister,
+}
+
 export const WithPasskeys: Story = { args: { registration: 'open', passkeys: true } }
 
 const tick = () => new Promise((resolve) => setTimeout(resolve))

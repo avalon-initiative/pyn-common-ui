@@ -2628,7 +2628,7 @@ describe('PynSignIn', () => {
   it('offers an invitation field on invite-only servers and not on open ones', async () => {
     const invite = mount(PynSignIn, { props: { registration: 'invite' } })
     await click(invite, 'I have an invitation')
-    expect(invite.findAll('input')).toHaveLength(4)
+    expect(invite.findAll('input')).toHaveLength(5)
     await fill(invite, ['wendy', 'a long password', 'a long password', 'pyni_x'])
     await invite.find('form').trigger('submit')
     expect(invite.emitted('register')?.[0]).toEqual([
@@ -2637,7 +2637,58 @@ describe('PynSignIn', () => {
 
     const open = mount(PynSignIn, { props: { registration: 'open' } })
     await click(open, 'Create an account')
-    expect(open.findAll('input')).toHaveLength(3)
+    expect(open.findAll('input')).toHaveLength(4)
+    expect(open.find('input[autocomplete=off]').exists()).toBe(false)
+  })
+
+  it('makes the email required when the server verifies addresses and optional otherwise', async () => {
+    const field = async (props: {
+      registration: 'open' | 'invite'
+      emailVerification?: boolean
+    }) => {
+      const w = mount(PynSignIn, { props })
+      await click(w, props.registration === 'invite' ? 'I have an invitation' : 'Create an account')
+      return w
+    }
+    const required = await field({ registration: 'open', emailVerification: true })
+    expect(required.find('input[type=email]').attributes('required')).toBeDefined()
+    expect(required.text()).toContain('Email address')
+    expect(required.find('[data-email-hint]').exists()).toBe(false)
+    for (const props of [
+      { registration: 'open', emailVerification: false },
+      { registration: 'open' },
+      { registration: 'invite', emailVerification: true },
+      { registration: 'invite' },
+    ] as const) {
+      const w = await field(props)
+      expect(w.find('input[type=email]').attributes('required')).toBeUndefined()
+      expect(w.text()).toContain('Email (optional)')
+      expect(w.find('[data-email-hint]').text()).toContain('password reset')
+    }
+  })
+
+  it('sends an optional email only when one is typed', async () => {
+    const w = mount(PynSignIn, { props: { registration: 'open', emailVerification: false } })
+    await click(w, 'Create an account')
+    await fill(w, ['wendy', 'a long password', 'a long password'])
+    await w.find('form').trigger('submit')
+    expect(w.emitted('register')?.[0]![0]).toMatchObject({ username: 'wendy', email: undefined })
+    await fill(w, ['wendy', 'a long password', 'a long password', ' w@example.com '])
+    await w.find('form').trigger('submit')
+    expect(w.emitted('register')?.[1]![0]).toMatchObject({ email: 'w@example.com' })
+  })
+
+  it('keeps the email after the invitation code on invite-only servers', async () => {
+    const w = mount(PynSignIn, { props: { registration: 'invite' } })
+    await click(w, 'I have an invitation')
+    await fill(w, ['wendy', 'a long password', 'a long password', 'pyni_x', 'w@example.com'])
+    await w.find('form').trigger('submit')
+    expect(w.emitted('register')?.[0]![0]).toEqual({
+      username: 'wendy',
+      password: 'a long password',
+      invite: 'pyni_x',
+      email: 'w@example.com',
+    })
   })
 
   it('has no confirm field when signing in', () => {

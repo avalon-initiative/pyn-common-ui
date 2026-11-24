@@ -18,6 +18,9 @@ export const NOTICE_TEXT: Record<BlockedStatus, string> = {
 export const VERIFICATION_GUIDANCE =
   'The email can take a few minutes. Check your spam folder. If it still does not arrive, ask a server administrator.'
 
+export const EMAIL_OPTIONAL_HINT =
+  'Used for password reset and notifications once the server can send mail.'
+
 export const NO_EMAIL_NOTE =
   'This server does not send a confirmation email: your account is active as soon as you sign up (or after approval).'
 
