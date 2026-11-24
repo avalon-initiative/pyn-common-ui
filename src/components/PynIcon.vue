@@ -33,6 +33,12 @@ const paths: Record<string, string> = {
   book: 'M3 5c3-1 6-1 9 1v14c-3-2-6-2-9-1zM21 5c-3-1-6-1-9 1v14c3-2 6-2 9-1z',
   tag: 'M3 12V4h8l10 10-8 8zM7.5 8v.01',
   download: 'M12 4v11M7 11l5 5 5-5M5 20h14',
+  sidebar: 'M4 5h16v14H4zM9 5v14',
+  'chevron-right': 'm9 6 6 6-6 6',
+  calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+  users:
+    'M9 5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM2 20c.8-3.5 3.5-5 7-5s6.2 1.5 7 5M17 6a3 3 0 0 1 0 6M19 15c1.5.6 2.6 2.2 3 5',
+  commit: 'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM3 12h6M15 12h6',
 }
 
 defineProps<{ name: string }>()

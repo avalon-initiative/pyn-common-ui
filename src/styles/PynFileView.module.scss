@@ -53,3 +53,59 @@
     color: var(--pyn-accent);
   }
 }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--pyn-space-4);
+  align-items: start;
+
+  &[data-panel] {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  &[data-panel] > :first-child {
+    width: var(--pyn-files-panel-width, 20rem);
+    max-width: 100%;
+  }
+
+  &[data-panel] > :first-child[data-collapsed] {
+    width: auto;
+  }
+
+  @include m.narrow {
+    &[data-panel] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &[data-panel] > :first-child {
+      width: auto;
+    }
+  }
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2) var(--pyn-space-3);
+}
+
+.copy {
+  @include m.control;
+  justify-content: center;
+  min-width: var(--pyn-control-sm);
+  padding: 0;
+  color: var(--pyn-text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--pyn-radius);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
+
+  @include m.touch-target($square: true);
+  @include m.focus-ring;
+}
