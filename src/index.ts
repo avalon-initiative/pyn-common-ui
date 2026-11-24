@@ -47,6 +47,7 @@ export { default as PynRepoAbout } from './components/PynRepoAbout.vue'
 export { default as PynFileList } from './components/PynFileList.vue'
 export { default as PynDialog } from './components/PynDialog.vue'
 export { default as PynDrawer } from './components/PynDrawer.vue'
+export { default as PynFilterList } from './components/PynFilterList.vue'
 export { default as PynEmptyState } from './components/PynEmptyState.vue'
 export { default as PynMultiSelect } from './components/PynMultiSelect.vue'
 export { default as PynSecurityNotice } from './components/PynSecurityNotice.vue'
@@ -318,6 +319,8 @@ export {
   repoShellTabs,
   repoTabs,
 } from './state/repo.state'
+export { rowCountText, pageCount, pageWindow, rangeText } from './state/filter-list.state'
+export type { FilterListControl, FilterListOption } from './types/filter-list.types'
 export type { RepoShellTab, RepoTab } from './state/repo.state'
 export {
   MEMBER_CREATION,

@@ -1,0 +1,151 @@
+@use 'mixins' as m;
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-4);
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.search {
+  position: relative;
+  display: flex;
+  flex: 1 1 14rem;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  left: var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  pointer-events: none;
+}
+
+.input {
+  @include m.input;
+  width: 100%;
+  padding-left: var(--pyn-space-8);
+  background: var(--pyn-surface);
+}
+
+.control {
+  @include m.input;
+  background-color: var(--pyn-control-bg);
+  font-weight: 500;
+  cursor: pointer;
+
+  @include m.narrow {
+    flex: 1 1 8rem;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-2);
+  margin-left: auto;
+}
+
+.box {
+  @include m.flat-box;
+}
+
+.header {
+  @include m.list-header;
+}
+
+.heading {
+  font-weight: 600;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-3);
+  color: var(--pyn-text-muted);
+  font-weight: 400;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  > * {
+    padding: var(--pyn-space-3) var(--pyn-space-4);
+  }
+
+  > * + * {
+    border-top: 1px solid var(--pyn-border);
+  }
+}
+
+.state {
+  padding: var(--pyn-space-6) var(--pyn-space-4);
+}
+
+.error {
+  @include m.error;
+  margin: 0;
+  padding: var(--pyn-space-6) var(--pyn-space-4);
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pyn-space-2) var(--pyn-space-4);
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  background: var(--pyn-surface-raised);
+  border-top: 1px solid var(--pyn-border);
+}
+
+.range {
+  @include m.muted;
+  font-size: var(--pyn-text-sm);
+}
+
+.pages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pyn-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page {
+  @include m.button;
+  min-width: var(--pyn-control-md);
+  background: transparent;
+  border-color: transparent;
+
+  &[aria-current='page'] {
+    color: var(--pyn-on-accent);
+    background: var(--pyn-accent-fill);
+    border-color: var(--pyn-accent-fill);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  @include m.touch-target($square: true);
+}
+
+.gap {
+  @include m.muted;
+  display: inline-flex;
+  align-items: center;
+  min-width: var(--pyn-control-md);
+  justify-content: center;
+}
