@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import PynFilesPanel from '../components/PynFilesPanel.vue'
 import { treeEntries } from './file-data'
+import { pickerTags } from './tags-page-data'
 
 const meta: Meta<typeof PynFilesPanel> = {
   title: 'File/PynFilesPanel',
@@ -30,3 +31,9 @@ export const Collapsed: Story = { args: { collapsed: true } }
 export const WithoutBranches: Story = { args: { branches: undefined } }
 export const OnDefaultBranch: Story = { args: { branch: undefined } }
 export const WithBranchButtons: Story = { args: { newBranchButton: true } }
+export const WithTags: Story = {
+  args: { tags: pickerTags, tagsHref: '/acme/castle-quest/tags' },
+}
+export const OnATag: Story = {
+  args: { ...WithTags.args, branch: 'v0.1.1', currentKind: 'tag' },
+}

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import PynFileView from '../components/PynFileView.vue'
 import { codeText, fileEntry, imageSrc, lockedEntry, readmeText, treeEntries } from './file-data'
 import { now } from './landing-data'
+import { pickerTags } from './tags-page-data'
 
 const meta: Meta<typeof PynFileView> = {
   title: 'File/PynFileView',
@@ -71,5 +72,14 @@ export const PanelWithLockedFile: Story = {
     entry: { ...lockedEntry, path: 'Content/Level02.umap', name: 'Level02.umap' },
     body: { kind: 'binary' },
     creatable: true,
+  },
+}
+export const PanelOnATag: Story = {
+  args: {
+    ...panel,
+    branch: 'v0.1.1',
+    currentKind: 'tag',
+    tags: pickerTags,
+    tagsHref: '/acme/castle-quest/tags',
   },
 }

@@ -5,6 +5,7 @@ import PynRepoShell from '../components/PynRepoShell.vue'
 import { repoShellTabs } from '../state/repo.state'
 import { readmeText } from './file-data'
 import { folderListing, now, repo, rootListing, summary } from './landing-data'
+import { pickerTags } from './tags-page-data'
 
 const meta: Meta<typeof PynRepoLanding> = {
   title: 'Browse/PynRepoLanding',
@@ -180,4 +181,19 @@ export const WholePage: Story = {
       <PynRepoLanding v-bind="args" />
     </PynRepoShell>`,
   }),
+}
+
+/** The toolbar picker with its Tags tab open. */
+export const ToolbarTagsTab: Story = {
+  args: { ...toolbarArgs, tags: pickerTags, tagsHref: '/acme/castle-quest/tags', tagCount: 3 },
+  parameters: { docs: { story: { height: '420px' } } },
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLButtonElement>('button')!.click()
+    await tick()
+    canvasElement.querySelector<HTMLButtonElement>('[data-tab=tags]')!.click()
+    await tick()
+  },
+}
+export const ToolbarOnATag: Story = {
+  args: { ...ToolbarTagsTab.args, branch: 'v0.1.1', currentKind: 'tag' },
 }

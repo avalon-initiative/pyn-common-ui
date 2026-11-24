@@ -8,6 +8,7 @@ import { blobPath } from '../state/blob.state'
 import { pickerBranch } from '../state/branch-picker.state'
 import { matchFiles } from '../state/tree.state'
 import type { BranchOption } from '../types/branch.types'
+import type { RefKind, TagOption } from '../types/tag.types'
 import type { TreeEntry } from '../types/tree.types'
 
 const props = withDefaults(
@@ -23,6 +24,14 @@ const props = withDefaults(
     branchesLoading?: boolean
     branchesError?: string
     branchesHref?: string
+    /** Tags for the picker's Tags tab; omitted keeps the not-supported state there. */
+    tags?: TagOption[]
+    tagsLoading?: boolean
+    tagsError?: string
+    /** Where "View all tags" in the picker goes. */
+    tagsHref?: string
+    /** Whether the ref in view is a branch or a tag; omitted is a branch. */
+    currentKind?: RefKind
     creatable?: boolean
     /** Adds a New branch button beside the picker; it emits `newBranch`. */
     newBranchButton?: boolean
@@ -34,7 +43,7 @@ const props = withDefaults(
 )
 const emit = defineEmits<{
   toggle: [path: string]
-  selectBranch: [name: string]
+  selectBranch: [name: string, kind: RefKind]
   createBranch: [name: string]
   newBranch: []
   search: [query: string]
@@ -89,11 +98,16 @@ function enter() {
         :loading="branchesLoading"
         :error="branchesError"
         :all-href="branchesHref"
+        :tags="tags"
+        :tags-loading="tagsLoading"
+        :tags-error="tagsError"
+        :tags-href="tagsHref"
+        :current-kind="currentKind"
         :creatable="creatable"
         :new-branch-button="newBranchButton"
         search-button
         :now="now"
-        @select="emit('selectBranch', $event)"
+        @select="(name, kind) => emit('selectBranch', name, kind)"
         @create="emit('createBranch', $event)"
         @new-branch="emit('newBranch')"
         @search="goto?.focus()"

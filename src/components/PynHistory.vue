@@ -12,6 +12,7 @@ import { pickerBranch } from '../state/branch-picker.state'
 import { FILTER_DEBOUNCE_MS, HISTORY_RANGES, groupByDay } from '../state/history.state'
 import type { HistoryRange } from '../state/history.state'
 import type { BranchOption } from '../types/branch.types'
+import type { RefKind, TagOption } from '../types/tag.types'
 import type { Revision } from '../types/repo.types'
 
 const props = defineProps<{
@@ -30,6 +31,14 @@ const props = defineProps<{
   branchesLoading?: boolean
   branchesError?: string
   branchesHref?: string
+  /** Tags for the picker's Tags tab; omitted keeps the not-supported state there. */
+  tags?: TagOption[]
+  tagsLoading?: boolean
+  tagsError?: string
+  /** Where "View all tags" in the picker goes. */
+  tagsHref?: string
+  /** Whether the ref in view is a branch or a tag; omitted is a branch. */
+  currentKind?: RefKind
   /** Adds a New branch button beside the picker; it emits `newBranch`. */
   newBranchButton?: boolean
   /** Authors offered by the user filter; omitted hides it. */
@@ -48,7 +57,7 @@ const emit = defineEmits<{
   filter: [string]
   more: []
   clearPath: []
-  selectBranch: [name: string]
+  selectBranch: [name: string, kind: RefKind]
   newBranch: []
   selectUser: [user: string]
   selectRange: [range: HistoryRange]
@@ -92,9 +101,14 @@ const pick = (e: Event) => (e.target as HTMLSelectElement).value
         :loading="branchesLoading"
         :error="branchesError"
         :all-href="branchesHref"
+        :tags="tags"
+        :tags-loading="tagsLoading"
+        :tags-error="tagsError"
+        :tags-href="tagsHref"
+        :current-kind="currentKind"
         :new-branch-button="newBranchButton"
         :now="now"
-        @select="emit('selectBranch', $event)"
+        @select="(name, kind) => emit('selectBranch', name, kind)"
         @new-branch="emit('newBranch')"
       />
       <span :class="styles.filters">

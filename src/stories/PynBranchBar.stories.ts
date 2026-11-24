@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import PynBranchBar from '../components/PynBranchBar.vue'
 import PynBreadcrumb from '../components/PynBreadcrumb.vue'
 import PynCloneMenu from '../components/PynCloneMenu.vue'
+import { pickerTags } from './tags-page-data'
 
 const meta: Meta<typeof PynBranchBar> = {
   title: 'Browse/PynBranchBar',
@@ -50,5 +51,15 @@ export const TagsPlaceholder: Story = {
 }
 export const TagsLink: Story = {
   args: { ...TagsPlaceholder.args, tagsHref: '/studio/game/tags', tagCount: 9 },
+  render: Toolbar.render,
+}
+
+/** Tags in the selector's Tags tab; its View all tags shares `tagsHref`. */
+export const WithTags: Story = {
+  args: { ...TagsLink.args, tags: pickerTags },
+  render: Toolbar.render,
+}
+export const OnATag: Story = {
+  args: { ...WithTags.args, branch: 'v0.1.1', currentKind: 'tag' },
   render: Toolbar.render,
 }

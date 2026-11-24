@@ -1469,8 +1469,8 @@ describe('PynRepoLanding', () => {
     it('lets branchCount override and relays select', async () => {
       const w = landing({ branches, branchCount: 7 })
       expect(bar(w).props('branchCount')).toBe(7)
-      bar(w).vm.$emit('select', 'dev')
-      expect(w.emitted('select')).toEqual([['dev']])
+      bar(w).vm.$emit('select', 'dev', 'branch')
+      expect(w.emitted('select')).toEqual([['dev', 'branch']])
     })
 
     it('shows the current branch when it is not the default', () => {
