@@ -112,3 +112,6 @@ export const WithVerified: Story = { args: { ...Timeline.args, verified: [4, 3] 
 export const TimelineOneFile: Story = {
   args: { ...Timeline.args, revisions: revisions.slice(3), path: 'Content/Maps/Main.umap' },
 }
+export const OnDefaultBranch: Story = {
+  args: { ...Timeline.args, branch: undefined, newBranchButton: true },
+}

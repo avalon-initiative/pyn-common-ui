@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import PynAvatar from './PynAvatar.vue'
+import PynBranchDialog from './PynBranchDialog.vue'
 import PynEmptyState from './PynEmptyState.vue'
 import PynIcon from './PynIcon.vue'
 import PynListSearch from './PynListSearch.vue'
@@ -27,13 +28,20 @@ const props = withDefaults(
     stale?: string[]
     canCreate?: boolean
     canDelete?: boolean
+    /** Adds a Rename action to each branch row; the dialog and `rename` event are built in. */
+    canRename?: boolean
     loading?: boolean
     error?: string
     now?: Date
   }>(),
   { view: 'branches', canCreate: true },
 )
-const emit = defineEmits<{ newBranch: []; delete: [name: string]; copy: [name: string] }>()
+const emit = defineEmits<{
+  newBranch: []
+  delete: [name: string]
+  rename: [name: string, newName: string]
+  copy: [name: string]
+}>()
 const query = defineModel<string>('query', { default: '' })
 
 const LABELS: Record<BranchView, [string, string]> = {
@@ -57,6 +65,7 @@ const groups = computed(() =>
 )
 const searching = computed(() => query.value.trim() !== '')
 const copied = ref('')
+const renaming = ref('')
 
 async function copy(name: string) {
   if (await copyText(name)) {
@@ -67,8 +76,19 @@ async function copy(name: string) {
 const ago = (iso: string) => formatAgo(iso, props.now ?? new Date())
 const menuItems = (b: BranchListItem) => [
   ...(b.compareHref ? [{ id: 'compare', label: 'Compare', href: b.compareHref }] : []),
+  ...(props.canRename ? [{ id: 'rename', label: 'Rename' }] : []),
   { id: 'copy', label: 'Copy name' },
 ]
+
+function pick(id: string, name: string) {
+  if (id === 'copy') void copy(name)
+  else if (id === 'rename') renaming.value = name
+}
+
+function rename(name: string, newName: string) {
+  renaming.value = ''
+  emit('rename', name, newName)
+}
 </script>
 
 <template>
@@ -169,7 +189,7 @@ const menuItems = (b: BranchListItem) => [
                     :label="`More actions for ${b.name}`"
                     :items="menuItems(b)"
                     fixed
-                    @select="(id) => id === 'copy' && copy(b.name)"
+                    @select="(id) => pick(id, b.name)"
                     ><PynIcon name="more" /></PynMenu
                 ></span>
               </td>
@@ -178,5 +198,14 @@ const menuItems = (b: BranchListItem) => [
         </table>
       </div>
     </section>
+    <PynBranchDialog
+      v-if="canRename"
+      :open="!!renaming"
+      mode="rename"
+      :name="renaming"
+      :branches="branches"
+      @close="renaming = ''"
+      @rename="rename"
+    />
   </PynSettingsLayout>
 </template>

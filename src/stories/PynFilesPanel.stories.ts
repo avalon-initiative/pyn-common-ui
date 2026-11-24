@@ -28,3 +28,5 @@ type Story = StoryObj<typeof PynFilesPanel>
 export const Default: Story = { args: { collapsed: false } }
 export const Collapsed: Story = { args: { collapsed: true } }
 export const WithoutBranches: Story = { args: { branches: undefined } }
+export const OnDefaultBranch: Story = { args: { branch: undefined } }
+export const WithBranchButtons: Story = { args: { newBranchButton: true } }
