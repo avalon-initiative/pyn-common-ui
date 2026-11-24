@@ -153,3 +153,42 @@ export function commitDays(commits: PullCommit[]): { day: string; commits: PullC
   }
   return out
 }
+
+export interface PullQuery {
+  text: string
+  /** `is:open`, `is:closed` or `is:merged`. */
+  is?: 'open' | 'closed' | 'merged'
+  author?: string
+  head?: string
+  base?: string
+}
+
+/** Splits a search into its `is:`, `author:`, `head:` and `base:` qualifiers and the free text. */
+export function parsePullQuery(input: string): PullQuery {
+  const q: PullQuery = { text: '' }
+  const text: string[] = []
+  for (const word of input.trim().split(/\s+/).filter(Boolean)) {
+    const m = /^(is|author|head|base):(.+)$/i.exec(word)
+    const key = m?.[1]!.toLowerCase()
+    const value = m?.[2]
+    if (key === 'is' && value && ['open', 'closed', 'merged'].includes(value.toLowerCase()))
+      q.is = value.toLowerCase() as PullQuery['is']
+    else if (key === 'author' || key === 'head' || key === 'base') q[key] = value
+    else text.push(word)
+  }
+  q.text = text.join(' ')
+  return q
+}
+
+/** Whether a pull request matches a search; `is:closed` includes merged ones, as the Closed tab does. */
+export function matchesPullQuery(pr: PullRequestSummary, input: string): boolean {
+  const q = parsePullQuery(input)
+  if (q.is === 'open' && pr.state !== 'open') return false
+  if (q.is === 'closed' && pr.state === 'open') return false
+  if (q.is === 'merged' && pr.state !== 'merged') return false
+  if (q.author && pr.author.user.toLowerCase() !== q.author.toLowerCase()) return false
+  if (q.head && pr.head !== q.head) return false
+  if (q.base && pr.base !== q.base) return false
+  const t = q.text.toLowerCase()
+  return !t || pr.title.toLowerCase().includes(t) || `#${pr.number}` === t
+}

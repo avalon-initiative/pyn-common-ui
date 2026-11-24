@@ -655,3 +655,6 @@ export type {
   PullReviewState,
   PullTab,
 } from './types/pull-request.types'
+export { default as PynPullRequestList } from './components/PynPullRequestList.vue'
+export { matchesPullQuery, parsePullQuery } from './state/pull-request.state'
+export type { PullQuery } from './state/pull-request.state'
