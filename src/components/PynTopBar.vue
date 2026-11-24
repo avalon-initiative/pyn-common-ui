@@ -20,7 +20,7 @@ import {
 } from '../state/top-bar.state'
 import type { ThemeChoice } from '../state/theme.state'
 import type { MenuItem } from '../types/shell.types'
-import type { OwnerOption, TopBarHrefs, TopBarLink } from '../types/top-bar.types'
+import type { BellEntry, OwnerOption, TopBarHrefs, TopBarLink } from '../types/top-bar.types'
 
 const props = withDefaults(
   defineProps<{
@@ -52,6 +52,10 @@ const props = withDefaults(
     locksExpiring?: boolean
     /** Pending invitations and notices; the bell stays and opens a placeholder panel, its count hides at zero. */
     notifications?: number
+    /** Notices and invitations listed in the bell panel; their number replaces `notifications`. */
+    notificationEntries?: BellEntry[]
+    /** Reference time for the entries' relative times; defaults to the current time. */
+    now?: Date
     /** Overrides for the link destinations. */
     hrefs?: Partial<TopBarHrefs>
     /** Set false to leave the search box off (signed-out pages without public browsing). */
@@ -70,6 +74,9 @@ const emit = defineEmits<{
   signOut: []
   account: [id: string]
   shortcuts: []
+  dismissNotification: [id: string]
+  acceptNotification: [id: string]
+  declineNotification: [id: string]
 }>()
 
 const links = computed(() => ({ ...defaultHrefs(props.user), ...props.hrefs }))
@@ -279,7 +286,15 @@ onBeforeUnmount(() => document.removeEventListener('keydown', slash))
         <span aria-hidden="true">{{ locks }}</span>
         <span :class="styles.hidden">{{ locksText(locksHeld ?? 0, locksExpiring) }}</span>
       </a>
-      <PynNotificationsBell :count="notifications" :href="links.notifications" />
+      <PynNotificationsBell
+        :count="notifications"
+        :entries="notificationEntries"
+        :now="now"
+        :href="links.notifications"
+        @dismiss="emit('dismissNotification', $event)"
+        @accept="emit('acceptNotification', $event)"
+        @decline="emit('declineNotification', $event)"
+      />
       <PynMenu label="Account menu" :items="account" @select="pick">
         <template #header>
           <p :class="styles.who">
