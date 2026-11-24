@@ -50,7 +50,6 @@ describe('top bar counts', () => {
     const w = make({ notifications: 2 })
     expect(w.find('[data-badge]').text()).toBe('2')
     expect(w.find('[data-bell]').text()).toContain('2 notifications')
-    expect(w.find('[data-bell]').attributes('href')).toBe('/_/invitations')
   })
 
   it('takes destinations from the hrefs prop', () => {
@@ -155,18 +154,21 @@ describe('top bar shortcuts and explore', () => {
     expect(w.emitted('shortcuts')).toHaveLength(1)
   })
 
-  it('emits shortcuts from the narrow main menu', async () => {
+  it('emits shortcuts from the navigation drawer', async () => {
     const w = make()
-    await trigger(w, 'Main menu').trigger('click')
-    await pickItem(w, 'Keyboard shortcuts')
+    await trigger(w, 'Open navigation').trigger('click')
+    await w
+      .findAll('nav[aria-label="Main"] button')
+      .find((b) => b.text().includes('Keyboard shortcuts'))!
+      .trigger('click')
     expect(w.emitted('shortcuts')).toHaveLength(1)
   })
 
   it('links Explore in the signed-out bar and narrow menu, with an override', async () => {
     const w = make({ signedOut: true, user: undefined })
     expect(w.find('[data-explore]').attributes('href')).toBe('/_/explore')
-    await trigger(w, 'Main menu').trigger('click')
-    expect(w.find('[role=menu] a[href="/_/explore"]').text()).toBe('Explore')
+    await trigger(w, 'Open navigation').trigger('click')
+    expect(w.find('nav a[href="/_/explore"]').text()).toBe('Explore')
     const o = make({ signedOut: true, user: undefined, hrefs: { explore: '/pub' } })
     expect(o.find('[data-explore]').attributes('href')).toBe('/pub')
   })
@@ -174,8 +176,8 @@ describe('top bar shortcuts and explore', () => {
   it('shows Explore in the signed-in wide bar and narrow menu, once', async () => {
     const w = make({ extraLinks: [{ id: 'x', label: 'Discover', href: '/_/explore' }] })
     expect(w.find('[data-explore]').attributes('href')).toBe('/_/explore')
-    await trigger(w, 'Main menu').trigger('click')
-    expect(w.findAll('[role=menu] a[href="/_/explore"]')).toHaveLength(1)
+    await trigger(w, 'Open navigation').trigger('click')
+    expect(w.findAll('nav a[href="/_/explore"]')).toHaveLength(1)
     expect(
       make({ hrefs: { explore: '/pub' } })
         .find('[data-explore]')
@@ -185,8 +187,8 @@ describe('top bar shortcuts and explore', () => {
 
   it('keeps other extra links beside Explore', async () => {
     const w = make({ extraLinks: [{ id: 'docs', label: 'Docs', href: '/docs' }] })
-    await trigger(w, 'Main menu').trigger('click')
-    expect(w.find('[role=menu] a[href="/docs"]').exists()).toBe(true)
+    await trigger(w, 'Open navigation').trigger('click')
+    expect(w.find('nav a[href="/docs"]').exists()).toBe(true)
   })
 })
 
@@ -299,20 +301,20 @@ describe('top bar search', () => {
   })
 })
 
-describe('top bar narrow menu', () => {
-  it('lists the global links with the notification count', async () => {
+describe('top bar navigation drawer', () => {
+  it('lists the global links', async () => {
     const w = make({ notifications: 4, locksHeld: 1 })
-    await trigger(w, 'Main menu').trigger('click')
-    const text = w.find('[role=menu][aria-label="Main menu"]').text()
-    for (const t of ['Dashboard', 'Your locks', 'Notifications (4)', 'New repository']) {
+    await trigger(w, 'Open navigation').trigger('click')
+    const text = w.find('nav[aria-label="Main"]').text()
+    for (const t of ['Dashboard', 'Repositories', 'Your locks', 'New repository']) {
       expect(text).toContain(t)
     }
   })
 
   it('lists sign in and theme choices when signed out', async () => {
     const w = make({ signedOut: true, user: undefined })
-    await trigger(w, 'Main menu').trigger('click')
-    const menu = w.find('[role=menu][aria-label="Main menu"]')
+    await trigger(w, 'Open navigation').trigger('click')
+    const menu = w.find('nav[aria-label="Main"]')
     expect(menu.find('a[href="/_/sign-in"]').exists()).toBe(true)
     expect(menu.text()).toContain('Dark theme')
   })
@@ -320,7 +322,7 @@ describe('top bar narrow menu', () => {
 
 describe('top bar named destinations', () => {
   const hrefsIn = (w: ReturnType<typeof mount>) =>
-    w.findAll('[role=menu] a[role=menuitem]').map((a) => a.attributes('href'))
+    w.findAll('[role=menu] a[role=menuitem], nav a').map((a) => a.attributes('href'))
 
   it('shows People and Organizations in the account menu and the narrow main menu', async () => {
     const w = make()
@@ -328,15 +330,15 @@ describe('top bar named destinations', () => {
     expect(hrefsIn(w)).toEqual(expect.arrayContaining(['/_/people', '/_/orgs']))
     document.body.click()
     await tick()
-    await trigger(w, 'Main menu').trigger('click')
+    await trigger(w, 'Open navigation').trigger('click')
     expect(hrefsIn(w)).toEqual(expect.arrayContaining(['/_/people', '/_/orgs']))
-    expect(w.find('[role=menu]').text()).toContain('People')
-    expect(w.find('[role=menu]').text()).toContain('Organizations')
+    expect(w.find('nav').text()).toContain('People')
+    expect(w.find('nav').text()).toContain('Organizations')
   })
 
   it('takes the destinations from hrefs', async () => {
     const w = make({ hrefs: { people: '/p', orgs: '/o' } })
-    await trigger(w, 'Main menu').trigger('click')
+    await trigger(w, 'Open navigation').trigger('click')
     expect(hrefsIn(w)).toEqual(expect.arrayContaining(['/p', '/o']))
     expect(hrefsIn(w)).not.toContain('/_/people')
   })
@@ -354,18 +356,18 @@ describe('top bar named destinations', () => {
     expect(hrefs).toContain('/docs')
   })
 
-  it('lists extraLinks in the narrow menu only, without repeating a named one', async () => {
+  it('lists extraLinks in the drawer only, without repeating a named one', async () => {
     const w = make({
       extraLinks: [
         { id: 'docs', label: 'Documentation', href: '/docs' },
         { id: 'orgs2', label: 'Orgs', href: '/_/orgs' },
       ],
     })
-    await trigger(w, 'Main menu').trigger('click')
+    await trigger(w, 'Open navigation').trigger('click')
     const hrefs = hrefsIn(w)
     expect(hrefs).toContain('/docs')
     expect(hrefs.filter((h) => h === '/_/orgs')).toHaveLength(1)
-    document.body.click()
+    await w.find('button[aria-label="Close"]').trigger('click')
     await tick()
     await trigger(w, 'Account menu').trigger('click')
     expect(hrefsIn(w)).not.toContain('/docs')

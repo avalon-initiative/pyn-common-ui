@@ -4,9 +4,10 @@ import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynDrawer.module.scss'
 import { trapTarget } from '../state/drawer.state'
 
-const props = withDefaults(defineProps<{ open: boolean; title: string; width?: string }>(), {
-  width: '32rem',
-})
+const props = withDefaults(
+  defineProps<{ open: boolean; title: string; width?: string; side?: 'start' | 'end' }>(),
+  { width: '32rem', side: 'end' },
+)
 const emit = defineEmits<{ close: [] }>()
 
 const titleId = useId()
@@ -68,7 +69,7 @@ function onKeydown(e: KeyboardEvent) {
     :enter-from-class="styles.hidden"
     :leave-to-class="styles.hidden"
   >
-    <div v-if="open" :class="styles.root" @keydown="onKeydown">
+    <div v-if="open" :class="[styles.root, side === 'start' && styles.start]" @keydown="onKeydown">
       <div :class="styles.backdrop" data-test="backdrop" @click="emit('close')" />
       <aside
         ref="panel"

@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import PynBreadcrumbs from './PynBreadcrumbs.vue'
-import PynIcon from './PynIcon.vue'
 import PynPage from './PynPage.vue'
 import styles from '../styles/PynShell.module.scss'
 import { MAIN_ID } from '../state/top-bar.state'
@@ -20,28 +18,14 @@ withDefaults(
   }>(),
   { mainId: MAIN_ID },
 )
-const open = ref(false)
-const closeOnLink = (e: MouseEvent) => {
-  if ((e.target as HTMLElement).closest('a')) open.value = false
-}
 </script>
 
 <template>
   <div :class="[styles.shell, !$slots.side && styles.noSide]">
     <header :class="styles.top">
-      <button
-        v-if="$slots.side"
-        type="button"
-        :class="styles.toggle"
-        aria-label="Toggle navigation"
-        :aria-expanded="open"
-        @click="open = !open"
-      >
-        <PynIcon name="menu" />
-      </button>
       <slot name="top" />
     </header>
-    <aside v-if="$slots.side" :class="[styles.side, open && styles.open]" @click="closeOnLink">
+    <aside v-if="$slots.side" :class="styles.side">
       <slot name="side" />
     </aside>
     <main :id="mainId" tabindex="-1" :class="styles.main">

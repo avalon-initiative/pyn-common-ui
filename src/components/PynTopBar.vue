@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import PynAvatar from './PynAvatar.vue'
+import PynDrawer from './PynDrawer.vue'
 import PynGlobalSearch from './PynGlobalSearch.vue'
 import PynIcon from './PynIcon.vue'
 import PynMenu from './PynMenu.vue'
+import PynNotificationsBell from './PynNotificationsBell.vue'
 import styles from '../styles/PynTopBar.module.scss'
 import { matchRepos } from '../state/shell.state'
 import { themeChoices } from '../state/theme.state'
@@ -12,7 +14,6 @@ import {
   countText,
   defaultHrefs,
   locksText,
-  notificationsText,
   ownerItems,
   withoutNamed,
 } from '../state/top-bar.state'
@@ -34,17 +35,19 @@ const props = withDefaults(
     signInHref?: string
     admin?: boolean
     extraAccount?: MenuItem[]
-    /** Extra destinations for the narrow-screen main menu, after Explore, People and Organizations. */
+    /** Extra destinations for the navigation drawer, after Explore, People and Organizations. */
     extraLinks?: TopBarLink[]
     /** The person's account and organizations, listed in the owner switcher. */
     owners?: OwnerOption[]
     /** Owner shown in the switcher; defaults to `user`. */
     currentOwner?: string
+    /** Repository name shown after the owner as `owner / repo`, on repository pages. */
+    repo?: string
     /** Locks the person holds; the pill is hidden at zero. */
     locksHeld?: number
     /** True when one of those locks expires within the hour. */
     locksExpiring?: boolean
-    /** Pending invitations and notices; the bell stays, its count hides at zero. */
+    /** Pending invitations and notices; the bell stays and opens a placeholder panel, its count hides at zero. */
     notifications?: number
     /** Overrides for the link destinations. */
     hrefs?: Partial<TopBarHrefs>
@@ -68,7 +71,6 @@ const emit = defineEmits<{
 const links = computed(() => ({ ...defaultHrefs(props.user), ...props.hrefs }))
 const owner = computed(() => props.currentOwner ?? props.user ?? '')
 const locks = computed(() => countText(props.locksHeld))
-const bell = computed(() => countText(props.notifications))
 
 const themeItems = computed<MenuItem[]>(() =>
   themeChoices.map((t) => ({
@@ -91,22 +93,29 @@ const exploreItem = computed<MenuItem>(() => ({
   label: 'Explore',
   href: links.value.explore,
 }))
+const named = computed<MenuItem[]>(() => [
+  { id: 'profile', label: 'Profile', href: links.value.profile },
+  { id: 'repositories', label: 'Repositories', href: links.value.repositories },
+  { id: 'settings', label: 'Settings', href: links.value.settings },
+])
 const account = computed<MenuItem[]>(() => [
-  { id: 'profile', label: 'Your profile', href: links.value.profile },
-  { id: 'settings', label: 'Account settings', href: links.value.settings },
+  named.value[0]!,
+  named.value[1]!,
+  { id: 'organizations', label: 'Organizations', href: links.value.orgs },
+  { id: 'people', label: 'People', href: links.value.people },
+  { id: 'sep-settings', label: '', separator: true },
+  named.value[2]!,
   ...(props.admin
     ? [{ id: 'admin', label: 'Server administration', href: links.value.admin }]
     : []),
-  ...directory.value,
-  ...withoutNamed(props.extraAccount ?? [], directory.value),
+  ...withoutNamed(props.extraAccount ?? [], [...directory.value, ...named.value]),
   { id: 'shortcuts', label: 'Keyboard shortcuts' },
   { id: 'sep-theme', label: '', separator: true },
   ...themeItems.value,
   { id: 'sep-out', label: '', separator: true },
   { id: 'sign-out', label: 'Sign out' },
 ])
-const globalLinks = computed<MenuItem[]>(() => {
-  const n = props.notifications ?? 0
+const drawerItems = computed<MenuItem[]>(() => {
   const items: MenuItem[] = [{ id: 'home', label: 'Dashboard', href: links.value.home }]
   if (props.signedOut) {
     return [
@@ -119,12 +128,9 @@ const globalLinks = computed<MenuItem[]>(() => {
   }
   return [
     ...items,
+    { id: 'repositories', label: 'Repositories', href: links.value.repositories },
     { id: 'locks', label: 'Your locks', href: links.value.locks },
-    {
-      id: 'notifications',
-      label: n > 0 ? `Notifications (${countText(n)})` : 'Notifications',
-      href: links.value.notifications,
-    },
+    { id: 'sep-browse', label: '', separator: true },
     exploreItem.value,
     ...directory.value,
     ...withoutNamed(props.extraLinks ?? [], [...directory.value, exploreItem.value]),
@@ -137,6 +143,15 @@ const globalLinks = computed<MenuItem[]>(() => {
     { id: 'shortcuts', label: 'Keyboard shortcuts' },
   ]
 })
+
+const drawer = ref(false)
+function drawerClick(e: MouseEvent) {
+  if ((e.target as HTMLElement).closest('a')) drawer.value = false
+}
+function drawerPick(id: string) {
+  drawer.value = false
+  pick(id)
+}
 
 function pick(id: string) {
   if (id === 'sign-out') emit('signOut')
@@ -182,26 +197,35 @@ onBeforeUnmount(() => document.removeEventListener('keydown', slash))
 <template>
   <div :class="styles.bar">
     <a :href="`#${mainId}`" :class="styles.skip" data-skip>Skip to content</a>
-    <PynMenu
-      label="Main menu"
-      :items="globalLinks"
-      align="start"
-      :class="styles.narrowOnly"
-      @select="pick"
+    <button
+      type="button"
+      :class="[styles.iconButton, styles.menuButton]"
+      aria-label="Open navigation"
+      aria-haspopup="dialog"
+      :aria-expanded="drawer"
+      data-menu-button
+      @click="drawer = true"
     >
       <PynIcon name="menu" />
-    </PynMenu>
-    <a :href="links.home" :class="styles.brand">PYN</a>
-    <PynMenu
-      v-if="!signedOut && owner"
-      :label="`Switch owner, ${owner}`"
-      :items="switcher"
-      align="start"
-      :class="styles.wideOnly"
-    >
-      <span :class="styles.owner" :title="owner" data-owner>{{ owner }}</span>
-      <PynIcon name="chevron" :class="styles.chevron" />
-    </PynMenu>
+    </button>
+    <a :href="links.home" :class="[styles.brand, repo && styles.compactBrand]">PYN</a>
+    <div v-if="!signedOut && owner" :class="[styles.crumb, !repo && styles.wideOnly]">
+      <PynMenu :label="`Switch owner, ${owner}`" :items="switcher" align="start">
+        <span :class="styles.owner" :title="owner" data-owner>{{ owner }}</span>
+        <PynIcon name="chevron" :class="styles.chevron" />
+      </PynMenu>
+      <template v-if="repo">
+        <span :class="styles.slash" aria-hidden="true">/</span>
+        <a
+          :href="`/${owner}/${repo}`"
+          :class="styles.repoName"
+          :title="repo"
+          aria-current="page"
+          data-repo
+          >{{ repo }}</a
+        >
+      </template>
+    </div>
     <div
       v-if="showSearch"
       :class="[styles.searchWrap, searching && styles.searching]"
@@ -235,8 +259,8 @@ onBeforeUnmount(() => document.removeEventListener('keydown', slash))
       <a :href="signInHref ?? '/_/sign-in'" :class="styles.signIn" data-sign-in>Sign in</a>
     </template>
     <template v-else>
-      <PynMenu label="Create" :items="create" :class="styles.wideOnly">
-        <PynIcon name="plus" /><PynIcon name="chevron" :class="styles.chevron" />
+      <PynMenu label="Create" :items="create">
+        <PynIcon name="plus" /><PynIcon name="chevron" :class="[styles.chevron, styles.wideOnly]" />
       </PynMenu>
       <a
         v-if="locks"
@@ -249,11 +273,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', slash))
         <span aria-hidden="true">{{ locks }}</span>
         <span :class="styles.hidden">{{ locksText(locksHeld ?? 0, locksExpiring) }}</span>
       </a>
-      <a :href="links.notifications" :class="[styles.iconButton, styles.wideOnly]" data-bell>
-        <PynIcon name="bell" />
-        <span v-if="bell" :class="styles.badge" aria-hidden="true" data-badge>{{ bell }}</span>
-        <span :class="styles.hidden">{{ notificationsText(notifications) }}</span>
-      </a>
+      <PynNotificationsBell :count="notifications" :href="links.notifications" />
       <PynMenu label="Account menu" :items="account" @select="pick">
         <template #header>
           <p :class="styles.who">
@@ -271,5 +291,26 @@ onBeforeUnmount(() => document.removeEventListener('keydown', slash))
         <span v-else :class="styles.avatar">{{ (user ?? '').slice(0, 1).toUpperCase() }}</span>
       </PynMenu>
     </template>
+    <PynDrawer :open="drawer" title="PYN" side="start" width="20rem" @close="drawer = false">
+      <nav :class="styles.drawerNav" aria-label="Main" @click="drawerClick">
+        <template v-for="item in drawerItems" :key="item.id">
+          <hr v-if="item.separator" :class="styles.drawerRule" />
+          <p v-else-if="item.heading" :class="styles.drawerHeading">{{ item.label }}</p>
+          <a v-else-if="item.href" :href="item.href" :class="styles.drawerItem">
+            <span v-if="item.checked !== undefined" :class="styles.drawerCheck">{{
+              item.checked ? '✓' : ''
+            }}</span>{{ item.label }}
+          </a>
+          <button v-else type="button" :class="styles.drawerItem" @click.stop="drawerPick(item.id)">
+            <span v-if="item.checked !== undefined" :class="styles.drawerCheck">{{
+              item.checked ? '✓' : ''
+            }}</span>{{ item.label }}
+          </button>
+        </template>
+      </nav>
+      <div v-if="$slots.drawer" :class="styles.drawerExtra" @click="drawerClick">
+        <slot name="drawer" />
+      </div>
+    </PynDrawer>
   </div>
 </template>
