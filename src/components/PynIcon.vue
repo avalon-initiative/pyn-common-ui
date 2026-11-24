@@ -39,6 +39,8 @@ const paths: Record<string, string> = {
   database:
     'M12 3c4.4 0 8 1.1 8 2.5S16.4 8 12 8 4 6.9 4 5.5 7.6 3 12 3zM4 5.5v13C4 19.9 7.6 21 12 21s8-1.1 8-2.5v-13M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5',
   download: 'M12 4v11M7 11l5 5 5-5M5 20h14',
+  trash: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3',
+  more: 'M5 12h.01M12 12h.01M19 12h.01',
 }
 
 defineProps<{ name: string }>()

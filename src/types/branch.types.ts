@@ -25,4 +25,9 @@ export interface BranchSummary {
 export interface BranchListItem extends BranchSummary {
   href?: string
   compareHref?: string
+  /** Who made the last change, shown beside the updated time. */
+  updatedBy?: { username: string; name?: string | null; avatarUrl?: string | null }
 }
+
+/** Views of the branches page; the first and last always show, the others need their name list. */
+export type BranchView = 'branches' | 'yours' | 'active' | 'stale' | 'all'
