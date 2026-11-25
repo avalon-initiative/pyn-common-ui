@@ -8,6 +8,7 @@ import PynSettingsRow from '../components/PynSettingsRow.vue'
 import PynSettingsSection from '../components/PynSettingsSection.vue'
 import PynSettingsToggle from '../components/PynSettingsToggle.vue'
 import PynRepoForm from '../components/PynRepoForm.vue'
+import PynTextField from '../components/PynTextField.vue'
 import PynOrgSettings from '../components/PynOrgSettings.vue'
 
 const meta: Meta<typeof PynSettingsSection> = {
@@ -117,6 +118,21 @@ export const General: StoryObj<typeof PynSettingsGeneral> = {
         <PynButton label="Upload new picture" variant="secondary" />
       </template>
     </PynSettingsGeneral>`,
+  }),
+}
+
+export const PlainFormWidthWithActions: Story = {
+  render: () => ({
+    components: { PynSettingsSection, PynButton, PynTextField },
+    setup: () => ({ name: ref('game') }),
+    template: `<PynSettingsSection title="Repository" plain form-width>
+      <PynTextField v-model="name" label="Repository name" />
+      <PynButton label="Save changes" />
+      <template #footer>
+        <PynButton label="Save changes" />
+        <PynButton label="Cancel" variant="secondary" />
+      </template>
+    </PynSettingsSection>`,
   }),
 }
 

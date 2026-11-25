@@ -49,6 +49,22 @@ export interface RepoSettings {
   max_locks_per_user?: number | null
   /** Present only when the form shows the description field. */
   description?: string
+  /** Present only when the form shows the website field. */
+  website?: string
+  /** Present only when the form shows the topics field. */
+  topics?: string[]
+}
+
+/** Bytes of one language at the default branch head. */
+export interface LanguageBytes {
+  name: string
+  bytes: number
+}
+
+/** A language's share of the breakdown, as drawn in About. */
+export interface LanguageShare extends LanguageBytes {
+  percent: number
+  color: string
 }
 
 /** What the create-fork form submits. */

@@ -115,7 +115,7 @@ $icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' v
 }
 
 @mixin form {
-  max-width: 40rem;
+  max-width: var(--pyn-form-max, 40rem);
   display: flex;
   flex-direction: column;
   gap: var(--pyn-space-4);

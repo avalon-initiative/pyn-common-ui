@@ -11,6 +11,8 @@ const props = defineProps<{
   danger?: boolean
   /** Renders the default slot bare, without the bordered card of rows. */
   plain?: boolean
+  /** Caps the content at the form width (`--pyn-form-max`), so fields line up with `PynRepoForm`. */
+  formWidth?: boolean
 }>()
 
 provide(DANGER_ZONE, toRef(props, 'danger'))
@@ -25,6 +27,9 @@ const id = useId()
     </div>
     <h3 v-else :id="id" :class="styles.title">{{ title }}</h3>
     <p v-if="description" :class="styles.description">{{ description }}</p>
-    <div :class="plain ? styles.plain : styles.rows"><slot /></div>
+    <div :class="[plain ? styles.plain : styles.rows, formWidth && styles.formWidth]">
+      <slot />
+      <div v-if="$slots.footer" :class="styles.footer" data-footer><slot name="footer" /></div>
+    </div>
   </section>
 </template>

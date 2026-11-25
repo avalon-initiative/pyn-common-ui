@@ -19,6 +19,27 @@ export const Full: Story = {
     stars: 12,
     watching: 3,
     forks: 1,
+    languages: [
+      { name: 'C++', bytes: 812000 },
+      { name: 'C#', bytes: 96000 },
+      { name: 'HLSL', bytes: 31000 },
+      { name: 'Python', bytes: 9000 },
+      { name: 'Shell', bytes: 2000 },
+    ],
+  },
+}
+export const ManyLanguages: Story = {
+  args: {
+    topics: [],
+    languages: [
+      { name: 'Rust', bytes: 978000 },
+      { name: 'Shell', bytes: 19000 },
+      { name: 'TypeScript', bytes: 1200 },
+      { name: 'Vue', bytes: 900 },
+      { name: 'SCSS', bytes: 400 },
+      { name: 'Makefile', bytes: 300 },
+      { name: 'Dockerfile', bytes: 200 },
+    ],
   },
 }
 export const CountsOnly: Story = { args: { topics: [], stars: 0, watching: 0, forks: 0 } }

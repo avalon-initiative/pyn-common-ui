@@ -113,6 +113,7 @@
   --pyn-page-max: 80rem;
   --pyn-page-gutter: 1rem;
   --pyn-side-width: 18.5rem;
+  --pyn-form-max: 40rem;
 }
 
 @media (min-width: 63.25rem) {

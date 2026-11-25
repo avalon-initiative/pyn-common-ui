@@ -1,0 +1,92 @@
+@use 'mixins' as m;
+
+@include m.text-field;
+
+// The box draws the input frame; the inner input is bare.
+.box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-1);
+  box-sizing: border-box;
+  min-height: var(--pyn-control-md);
+  padding: var(--pyn-space-1) var(--pyn-space-2);
+  background: var(--pyn-bg);
+  border: 1px solid var(--pyn-border-strong);
+  border-radius: var(--pyn-radius);
+  cursor: text;
+
+  &:focus-within {
+    border-color: var(--pyn-accent);
+    outline: 2px solid var(--pyn-accent);
+    outline-offset: -1px;
+  }
+
+  &[data-invalid] {
+    border-color: var(--pyn-danger);
+  }
+}
+
+.disabled {
+  background: var(--pyn-surface-raised);
+  cursor: not-allowed;
+}
+
+.chips {
+  display: contents;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-1);
+  padding: 0 var(--pyn-space-1) 0 var(--pyn-space-3);
+  color: var(--pyn-accent);
+  background: var(--pyn-selected);
+  border-radius: var(--pyn-radius-pill);
+  font-size: var(--pyn-text-xs);
+  font-weight: 500;
+  line-height: 1.5rem;
+}
+
+.remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--pyn-hover);
+  }
+
+  @include m.focus-ring;
+}
+
+.box .input {
+  flex: 1 1 8rem;
+  width: auto;
+  min-width: 6rem;
+  min-height: 1.75rem;
+  padding: 0 var(--pyn-space-1);
+  background: transparent;
+  border: 0;
+  outline: none;
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:disabled {
+    background: transparent;
+  }
+}
