@@ -6,6 +6,9 @@ import { orgPath } from './org.state'
 export const teamPath = (org: string, team = ''): string =>
   orgPath(org, team ? `teams/${encodeURIComponent(team)}` : 'teams')
 
+/** The slug the server derives from a team name: trimmed, whitespace runs to `-`, lowercased. */
+export const teamSlug = (name: string): string => name.trim().replace(/\s+/g, '-').toLowerCase()
+
 export const personGrantees = (members: Member[]): Grantee[] =>
   members.map((m) => ({ name: m.user, role: m.role, source: m.source, identity: m.identity }))
 

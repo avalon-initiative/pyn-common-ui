@@ -43,7 +43,7 @@ describe('readonly mode', () => {
     expect(sent(w)).toEqual([])
   })
 
-  it('PynInvites keeps the list, disables the form and drops revoke', async () => {
+  it('PynInvites keeps the list, disables New invitation and drops revoke', async () => {
     const invites = [
       {
         id: 'a',
@@ -53,11 +53,11 @@ describe('readonly mode', () => {
         expires_at: '2026-10-11T09:00:00Z',
       },
     ]
-    const w = mount(PynInvites, { props: { invites, roles, readonly: true } })
+    const w = mount(PynInvites, { props: { invites, roles, readonly: true, adding: true } })
     expect(w.text()).toContain('writer')
+    expect(w.find('form').exists()).toBe(false)
     expect(w.findAll('button').every((b) => b.attributes('disabled') !== undefined)).toBe(true)
     expect(enabled(w)).toEqual([])
-    await w.find('form').trigger('submit')
     expect(sent(w)).toEqual([])
   })
 

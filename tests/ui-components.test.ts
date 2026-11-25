@@ -2088,7 +2088,7 @@ describe('PynInvites', () => {
 
   it('shows the one-time code, revokes only open invitations and creates', async () => {
     const w = mount(PynInvites, {
-      props: { invites, roles: ['reader', 'writer'], code: 'pyni_x' },
+      props: { invites, roles: ['reader', 'writer'], code: 'pyni_x', adding: true },
     })
     expect(w.find('[role=status]').text()).toContain('pyni_x')
     expect(w.text()).toContain('used by wendy')
@@ -2255,7 +2255,7 @@ describe('PynOrgMembers', () => {
   })
 
   it('lets an owner add a member with a role', async () => {
-    const w = mount(PynOrgMembers, { props })
+    const w = mount(PynOrgMembers, { props: { ...props, adding: true } })
     const form = w.findAll('form').at(-1)!
     await form.find('input').setValue(' dave ')
     await form.find('select').setValue('owner')
@@ -2471,12 +2471,12 @@ describe('PynTeamList', () => {
 })
 
 describe('PynTeamForm', () => {
-  it('emits the slug, name and description when creating', async () => {
-    const w = mount(PynTeamForm, { props: { error: 'taken' } })
-    await w.find('input').setValue(' qa ')
+  it('emits only the name and description when creating', async () => {
+    const w = mount(PynTeamForm, { props: { error: 'taken', adding: true } })
+    await w.find('input').setValue(' QA team ')
     await w.find('textarea').setValue('testers')
     await w.find('form').trigger('submit')
-    expect(w.emitted('submit')?.[0]).toEqual([{ slug: 'qa', name: '', description: 'testers' }])
+    expect(w.emitted('submit')?.[0]).toEqual([{ name: 'QA team', description: 'testers' }])
     expect(w.find('[role=alert]').text()).toBe('taken')
   })
 

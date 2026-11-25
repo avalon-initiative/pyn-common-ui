@@ -17,6 +17,14 @@
   @include m.input;
 }
 
+.actions {
+  @include m.form-actions;
+}
+
+.cancel {
+  @include m.button;
+}
+
 .primary {
   @include m.button-primary;
 }

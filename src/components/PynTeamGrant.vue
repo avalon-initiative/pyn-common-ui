@@ -9,8 +9,10 @@ const props = defineProps<{
   /** Disables every control that writes. */
   readonly?: boolean
   error?: string
+  /** Adds a Cancel button with this label, emitting `cancel`. */
+  cancelLabel?: string
 }>()
-const emit = defineEmits<{ grant: [{ name: string; role: string }] }>()
+const emit = defineEmits<{ grant: [{ name: string; role: string }]; cancel: [] }>()
 
 const form = reactive({ team: props.teams[0] ?? '', role: props.roles[0] ?? 'reader' })
 watch(
@@ -47,8 +49,18 @@ const grant = () => !props.readonly && emit('grant', { name: form.team, role: fo
       </label>
     </template>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-    <button v-if="teams.length" type="submit" :class="styles.primary" :disabled="busy || readonly">
-      Grant
-    </button>
+    <div :class="styles.actions">
+      <button
+        v-if="teams.length"
+        type="submit"
+        :class="styles.primary"
+        :disabled="busy || readonly"
+      >
+        Grant
+      </button>
+      <button v-if="cancelLabel" type="button" :class="styles.cancel" @click="emit('cancel')">
+        {{ cancelLabel }}
+      </button>
+    </div>
   </form>
 </template>

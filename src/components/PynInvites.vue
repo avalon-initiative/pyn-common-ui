@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import styles from '../styles/PynInvites.module.scss'
 import { formatDate } from '../utils/datetime'
+import { useReveal } from '../state/reveal.state'
 import type { InviteInfo } from '../types/repo.types'
 
 const props = defineProps<{
@@ -17,13 +18,27 @@ const props = defineProps<{
 const emit = defineEmits<{
   create: [{ role: string; hours: number }]
   revoke: [string]
+  cancel: []
 }>()
+/** Create form open; New invitation shows while closed. The app closes it after a success. */
+const adding = defineModel<boolean>('adding', { default: false })
 
 const role = ref(props.roles[0] ?? 'reader')
 const hours = ref(72)
+const field = ref<HTMLSelectElement | null>(null)
+const button = ref<HTMLButtonElement | null>(null)
+useReveal(adding, field, button, () => {
+  role.value = props.roles[0] ?? 'reader'
+  hours.value = 72
+})
 
 function create() {
   if (!props.readonly) emit('create', { role: role.value, hours: Number(hours.value) })
+}
+
+function cancel() {
+  adding.value = false
+  emit('cancel')
 }
 
 function state(i: InviteInfo): string {
@@ -57,31 +72,36 @@ function state(i: InviteInfo): string {
     </ul>
     <p v-else :class="styles.empty" data-empty>No invitations.</p>
 
-    <form :class="styles.form" @submit.prevent="create">
+    <p v-if="error && !adding" :class="styles.error" role="alert">{{ error }}</p>
+    <form v-if="adding && !readonly" :class="styles.form" @submit.prevent="create">
       <h3 :class="styles.subheading">New invitation</h3>
       <div :class="styles.row">
         <label :class="styles.field"
           >Role
-          <select v-model="role" :class="styles.input" :disabled="readonly">
+          <select ref="field" v-model="role" :class="styles.input">
             <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
           </select>
         </label>
         <label :class="styles.field"
           >Valid for (hours)
-          <input
-            v-model="hours"
-            :class="styles.input"
-            type="number"
-            min="1"
-            required
-            :disabled="readonly"
-          />
+          <input v-model="hours" :class="styles.input" type="number" min="1" required />
         </label>
       </div>
       <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-      <button type="submit" :class="styles.primary" :disabled="busy || readonly">
-        Create invitation
-      </button>
+      <div :class="styles.actions">
+        <button type="submit" :class="styles.primary" :disabled="busy">Create invitation</button>
+        <button type="button" :class="styles.cancel" @click="cancel">Cancel</button>
+      </div>
     </form>
+    <button
+      v-else
+      ref="button"
+      type="button"
+      :class="styles.primary"
+      :disabled="readonly"
+      @click="adding = true"
+    >
+      New invitation
+    </button>
   </section>
 </template>

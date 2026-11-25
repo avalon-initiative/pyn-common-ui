@@ -426,6 +426,7 @@ export {
   teamCandidates,
   teamGrantees,
   teamPath,
+  teamSlug,
   ungrantedTeams,
 } from './state/team.state'
 export { myLockKey } from './state/my-locks.state'

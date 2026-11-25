@@ -4,8 +4,16 @@
   @include m.list;
 }
 
+// The name link covers the row; inner links and buttons sit above it.
 .item {
   @include m.item;
+  @include m.row-hover;
+  position: relative;
+
+  :where(a, button):not(.link) {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 .who {
@@ -20,11 +28,24 @@
   font-weight: 600;
   text-decoration: none;
 
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
   &:hover {
     text-decoration: underline;
   }
 
-  @include m.focus-ring;
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible::after {
+    outline: 2px solid var(--pyn-accent);
+    outline-offset: -2px;
+  }
 }
 
 .slug {

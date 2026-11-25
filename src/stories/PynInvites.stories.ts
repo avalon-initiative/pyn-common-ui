@@ -37,6 +37,7 @@ const invites = [
 ]
 
 export const Invitations: Story = { args: { invites, roles } }
+export const Creating: Story = { args: { invites, roles, adding: true } }
 export const JustCreated: Story = {
   args: { invites, roles, code: 'pyni_8d2f0c91' },
 }

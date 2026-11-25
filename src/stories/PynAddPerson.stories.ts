@@ -13,4 +13,5 @@ export const Default: Story = {}
 export const UserExists: Story = {
   args: { error: 'that user name is already taken' },
 }
+export const Cancelable: Story = { args: { cancelLabel: 'Cancel' } }
 export const ReadOnly: Story = { args: { readonly: true } }

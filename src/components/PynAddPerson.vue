@@ -9,8 +9,10 @@ const props = defineProps<{
   /** Disables every control that writes; reading stays visible. */
   readonly?: boolean
   error?: string
+  /** Adds a Cancel button with this label, emitting `cancel`. */
+  cancelLabel?: string
 }>()
-const emit = defineEmits<{ addUser: [NewUser] }>()
+const emit = defineEmits<{ addUser: [NewUser]; cancel: [] }>()
 
 const form = reactive<NewUser>({
   username: '',
@@ -58,6 +60,11 @@ function add() {
       </select>
     </label>
     <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-    <button type="submit" :class="styles.primary" :disabled="busy || readonly">Add</button>
+    <div :class="styles.actions">
+      <button type="submit" :class="styles.primary" :disabled="busy || readonly">Add</button>
+      <button v-if="cancelLabel" type="button" :class="styles.cancel" @click="emit('cancel')">
+        {{ cancelLabel }}
+      </button>
+    </div>
   </form>
 </template>

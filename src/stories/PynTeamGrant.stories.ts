@@ -14,4 +14,5 @@ export const AllGranted: Story = { args: { teams: [] } }
 export const Forbidden: Story = {
   args: { error: 'You lack a permission that role grants.' },
 }
+export const Cancelable: Story = { args: { cancelLabel: 'Cancel' } }
 export const ReadOnly: Story = { args: { readonly: true } }

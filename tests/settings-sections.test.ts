@@ -212,7 +212,7 @@ describe('settings polish', () => {
   it('renders Edit team as a settings section and Create a team without one', () => {
     const edit = mount(PynTeamForm, { props: { team: teams[0] } })
     expect(edit.find('section h3').text()).toBe('Edit team')
-    const create = mount(PynTeamForm)
+    const create = mount(PynTeamForm, { props: { adding: true } })
     expect(create.find('section').exists()).toBe(false)
     expect(create.find('h3').text()).toBe('Create a team')
   })
@@ -247,7 +247,9 @@ describe('settings polish', () => {
   })
 
   it('shows an empty invitations card and the new-invitation form', () => {
-    const w = mount(PynInvites, { props: { invites: [], roles: ['reader', 'writer'] } })
+    const w = mount(PynInvites, {
+      props: { invites: [], roles: ['reader', 'writer'], adding: true },
+    })
     expect(w.find('[data-empty]').text()).toBe('No invitations.')
     expect(w.find('form h3').text()).toBe('New invitation')
   })

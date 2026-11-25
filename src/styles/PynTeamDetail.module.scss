@@ -112,6 +112,10 @@
   align-self: auto;
 }
 
+.cancel {
+  @include m.button;
+}
+
 .danger {
   @include m.button-danger;
 }

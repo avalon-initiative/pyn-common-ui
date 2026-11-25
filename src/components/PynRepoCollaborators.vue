@@ -30,8 +30,19 @@ const emit = defineEmits<{
 const tab = defineModel<AccessTab>('tab', { default: 'direct' })
 const query = defineModel<string>('query', { default: '' })
 const adding = defineModel<AccessAdd | undefined>('adding')
+/** New invitation form open; the app closes it after a success. */
+const inviting = defineModel<boolean>('inviting', { default: false })
 
-const OWN = ['teams', 'invites', 'inviteCode', 'addPersonError', 'grantError', 'inviteError']
+const OWN = [
+  'teams',
+  'invites',
+  'inviteCode',
+  'addPersonError',
+  'grantError',
+  'inviteError',
+  'inviting',
+  'invitingModifiers',
+]
 const access = computed(
   () =>
     Object.fromEntries(
@@ -49,7 +60,9 @@ const readonly = computed(() => !props.canManage)
         :busy="busy"
         :readonly="readonly"
         :error="addPersonError"
+        cancel-label="Cancel"
         @add-user="emit('addUser', $event)"
+        @cancel="adding = undefined"
       />
     </template>
     <template #addTeams>
@@ -59,7 +72,9 @@ const readonly = computed(() => !props.canManage)
         :busy="busy"
         :readonly="readonly"
         :error="grantError"
+        cancel-label="Cancel"
         @grant="emit('grant', $event)"
+        @cancel="adding = undefined"
       />
     </template>
     <template v-if="invites" #invites>
@@ -70,6 +85,7 @@ const readonly = computed(() => !props.canManage)
         :busy="busy"
         :readonly="readonly"
         :error="inviteError"
+        v-model:adding="inviting"
         @create="emit('createInvite', $event)"
         @revoke="emit('revokeInvite', $event)"
       />
