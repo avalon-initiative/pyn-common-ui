@@ -5,15 +5,11 @@ import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynRepoRow.module.scss'
 import { formatAgo } from '../utils/ago'
 import { formatDate } from '../utils/datetime'
-import { repoPath } from '../state/repo.state'
+import { repoIconSrc, repoPath } from '../state/repo.state'
 import type { RepoListItem } from '../types/repo.types'
 
 const props = defineProps<{ repo: RepoListItem; now?: Date }>()
-const icon = computed(() =>
-  props.repo.icon_url !== undefined || props.repo.owner_avatar_url !== undefined
-    ? props.repo.icon_url || props.repo.owner_avatar_url || null
-    : undefined,
-)
+const icon = computed(() => repoIconSrc(props.repo.icon_url, props.repo.owner_avatar_url))
 </script>
 
 <template>

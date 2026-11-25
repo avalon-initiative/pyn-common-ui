@@ -5,12 +5,12 @@ import PynIcon from './PynIcon.vue'
 import PynMenu from './PynMenu.vue'
 import styles from '../styles/PynSideRail.module.scss'
 import { orgPath } from '../state/org.state'
-import { repoPath, repoSlug } from '../state/repo.state'
+import { repoIconSrc, repoPath, repoSlug } from '../state/repo.state'
 import { filterRepos } from '../state/shell.state'
 import type { NavItem } from '../state/shell.state'
 import type { MenuItem } from '../types/shell.types'
 import type { OrgRef } from '../types/org.types'
-import type { RepoRef } from '../types/repo.types'
+import type { RailRepo } from '../types/repo.types'
 
 const props = withDefaults(
   defineProps<{
@@ -23,7 +23,7 @@ const props = withDefaults(
     orgs?: OrgRef[]
     items: NavItem[]
     current: string
-    repos: RepoRef[]
+    repos: RailRepo[]
     currentRepo?: string
     /** Repositories listed before "Show more". */
     maxRepos?: number
@@ -69,7 +69,14 @@ async function toggleFilter() {
 
 const matches = computed(() => filterRepos(props.repos, query.value))
 const shown = computed(() =>
-  query.value.trim() || expanded.value ? matches.value : matches.value.slice(0, props.maxRepos),
+  (query.value.trim() || expanded.value
+    ? matches.value
+    : matches.value.slice(0, props.maxRepos)
+  ).map((repo) => ({
+    repo,
+    slug: repoSlug(repo),
+    icon: repoIconSrc(repo.iconUrl, repo.ownerAvatarUrl),
+  })),
 )
 const canExpand = computed(
   () => !query.value.trim() && !expanded.value && props.repos.length > props.maxRepos,
@@ -136,15 +143,22 @@ const hasBadge = (item: NavItem) =>
         @keydown.esc.stop="toggleFilter"
       />
       <ul v-if="shown.length" :class="styles.list">
-        <li v-for="repo in shown" :key="repoSlug(repo)">
+        <li v-for="{ repo, slug, icon } in shown" :key="slug">
           <a
             :href="repoPath(repo)"
             :class="styles.link"
-            :aria-current="repoSlug(repo) === currentRepo ? 'true' : undefined"
+            :aria-current="slug === currentRepo ? 'true' : undefined"
           >
-            <PynIcon name="repo" /><span :class="styles.repo" :title="repoSlug(repo)">{{
-              repoSlug(repo)
-            }}</span>
+            <PynAvatar
+              v-if="icon !== undefined"
+              :username="repo.owner"
+              :src="icon"
+              size="xs"
+              aria-hidden="true"
+              data-repo-icon
+            />
+            <PynIcon v-else name="repo" />
+            <span :class="styles.repo" :title="slug">{{ slug }}</span>
           </a>
         </li>
       </ul>

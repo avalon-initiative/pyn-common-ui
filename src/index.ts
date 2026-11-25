@@ -309,7 +309,7 @@ export type {
   RuleRef,
   RuleScope,
 } from './types/org.types'
-export type { RepoFact, RepoRef, Visibility } from './types/repo.types'
+export type { RailRepo, RepoFact, RepoIcon, RepoRef, Visibility } from './types/repo.types'
 export type {
   BranchChange,
   BranchChangeKind,
@@ -332,6 +332,7 @@ export {
   PERMISSIONS,
   parseLockLimit,
   BRANCH_SECTIONS,
+  repoIconSrc,
   repoPath,
   withBranch,
   repoSlug,

@@ -30,6 +30,15 @@ export const AUDIT_ACTIONS = [
 
 export const repoSlug = (r: { owner: string; name: string }) => `${r.owner}/${r.name}`
 
+/** Image a repository picture shows: the icon, else the owner's avatar, null for initials; undefined when neither is given. */
+export function repoIconSrc(
+  iconUrl?: string | null,
+  ownerAvatarUrl?: string | null,
+): string | null | undefined {
+  if (iconUrl === undefined && ownerAvatarUrl === undefined) return undefined
+  return iconUrl || ownerAvatarUrl || null
+}
+
 /** A URL with `branch` kept as a query parameter; none leaves it unchanged. */
 export function withBranch(url: string, branch?: string): string {
   if (!branch) return url

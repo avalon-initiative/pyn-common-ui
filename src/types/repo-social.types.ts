@@ -1,4 +1,4 @@
-import type { RepoRef } from './repo.types'
+import type { RepoIcon, RepoRef } from './repo.types'
 import type { MenuItem } from './shell.types'
 
 export type SocialKind = 'watch' | 'fork' | 'star'
@@ -13,12 +13,9 @@ export interface SocialButton {
   menu?: MenuItem[]
 }
 
-/** A fork in the Fork caret menu; `href` defaults to `/<owner>/<name>`. */
-export interface ForkLink extends RepoRef {
+/** A fork in the Fork caret menu; `href` defaults to `/<owner>/<name>`, a given picture replaces the fork glyph. */
+export interface ForkLink extends RepoRef, RepoIcon {
   href?: string
-  /** The fork's icon; given (even null), the menu shows it, or the owner's avatar, in place of the fork glyph. */
-  iconUrl?: string | null
-  ownerAvatarUrl?: string | null
 }
 
 export interface RepoSocial {
