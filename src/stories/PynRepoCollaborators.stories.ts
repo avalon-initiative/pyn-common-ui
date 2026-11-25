@@ -27,5 +27,6 @@ type Story = StoryObj<typeof PynRepoCollaborators>
 export const Default: Story = {}
 export const AddingPeople: Story = { args: { adding: 'people' } }
 export const AddingTeams: Story = { args: { adding: 'teams' } }
+export const Inviting: Story = { args: { inviting: true } }
 export const InviteCreated: Story = { args: { inviteCode: 'pyn-invite-3f9a1c' } }
 export const ReadOnly: Story = { args: { canManage: false, canManageVisibility: false } }

@@ -21,9 +21,8 @@ export interface TeamInfo {
   slug: string
 }
 
-/** What the team form emits; `slug` is only present when creating. */
+/** What the team form emits; the server derives a new team's slug from `name`. */
 export interface TeamFormValue {
-  slug?: string
   name: string
   description: string
 }

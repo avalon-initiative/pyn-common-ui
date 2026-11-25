@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import styles from '../styles/PynKeys.module.scss'
 import { formatDate } from '../utils/datetime'
+import { useReveal } from '../state/reveal.state'
 import type { SshKey } from '../types/auth.types'
 
 defineProps<{
@@ -13,15 +14,26 @@ defineProps<{
 const emit = defineEmits<{
   add: [{ key: string; title: string }]
   remove: [string]
+  cancel: []
 }>()
+/** Add form open; New SSH key shows while closed. The app closes it after a success. */
+const adding = defineModel<boolean>('adding', { default: false })
 
 const title = ref('')
 const key = ref('')
+const field = ref<HTMLInputElement | null>(null)
+const button = ref<HTMLButtonElement | null>(null)
+useReveal(adding, field, button, () => {
+  key.value = ''
+  title.value = ''
+})
 
 function submit() {
   emit('add', { key: key.value.trim(), title: title.value })
-  key.value = ''
-  title.value = ''
+}
+function cancel() {
+  adding.value = false
+  emit('cancel')
 }
 </script>
 
@@ -51,11 +63,12 @@ function submit() {
     </ul>
     <p v-else :class="styles.empty">No keys yet.</p>
 
-    <form :class="styles.form" @submit.prevent="submit">
+    <p v-if="error && !adding" :class="styles.error" role="alert">{{ error }}</p>
+    <form v-if="adding" :class="styles.form" @submit.prevent="submit">
       <h3 :class="styles.subheading">Add a key</h3>
       <label :class="styles.field"
         >Title (optional)
-        <input v-model="title" :class="styles.input" placeholder="work laptop" />
+        <input ref="field" v-model="title" :class="styles.input" placeholder="work laptop" />
       </label>
       <label :class="styles.field"
         >Public key
@@ -68,7 +81,13 @@ function submit() {
         />
       </label>
       <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-      <button type="submit" :class="styles.primary" :disabled="busy">Add key</button>
+      <div :class="styles.actions">
+        <button type="submit" :class="styles.primary" :disabled="busy">Add key</button>
+        <button type="button" :class="styles.cancel" @click="cancel">Cancel</button>
+      </div>
     </form>
+    <button v-else ref="button" type="button" :class="styles.primary" @click="adding = true">
+      New SSH key
+    </button>
   </section>
 </template>

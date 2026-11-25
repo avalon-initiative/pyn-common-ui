@@ -12,10 +12,6 @@
   .field {
     max-width: 40rem;
   }
-
-  .primary {
-    align-self: flex-start;
-  }
 }
 
 .subheading {
@@ -31,8 +27,20 @@
   @include m.input;
 }
 
+.hint {
+  @include m.help;
+}
+
+.actions {
+  @include m.form-actions;
+}
+
 .primary {
   @include m.button-primary;
+}
+
+.cancel {
+  @include m.button;
 }
 
 .error {

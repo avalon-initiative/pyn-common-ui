@@ -2088,7 +2088,7 @@ describe('PynInvites', () => {
 
   it('shows the one-time code, revokes only open invitations and creates', async () => {
     const w = mount(PynInvites, {
-      props: { invites, roles: ['reader', 'writer'], code: 'pyni_x' },
+      props: { invites, roles: ['reader', 'writer'], code: 'pyni_x', adding: true },
     })
     expect(w.find('[role=status]').text()).toContain('pyni_x')
     expect(w.text()).toContain('used by wendy')
@@ -2255,7 +2255,7 @@ describe('PynOrgMembers', () => {
   })
 
   it('lets an owner add a member with a role', async () => {
-    const w = mount(PynOrgMembers, { props })
+    const w = mount(PynOrgMembers, { props: { ...props, adding: true } })
     const form = w.findAll('form').at(-1)!
     await form.find('input').setValue(' dave ')
     await form.find('select').setValue('owner')
@@ -2471,12 +2471,12 @@ describe('PynTeamList', () => {
 })
 
 describe('PynTeamForm', () => {
-  it('emits the slug, name and description when creating', async () => {
-    const w = mount(PynTeamForm, { props: { error: 'taken' } })
-    await w.find('input').setValue(' qa ')
+  it('emits only the name and description when creating', async () => {
+    const w = mount(PynTeamForm, { props: { error: 'taken', adding: true } })
+    await w.find('input').setValue(' QA team ')
     await w.find('textarea').setValue('testers')
     await w.find('form').trigger('submit')
-    expect(w.emitted('submit')?.[0]).toEqual([{ slug: 'qa', name: '', description: 'testers' }])
+    expect(w.emitted('submit')?.[0]).toEqual([{ name: 'QA team', description: 'testers' }])
     expect(w.find('[role=alert]').text()).toBe('taken')
   })
 
@@ -3028,12 +3028,14 @@ describe('PynKeys', () => {
     expect(mount(PynKeys, { props: { keys: [] } }).text()).toContain('No keys yet')
   })
 
-  it('emits the pasted key and title, then clears the form', async () => {
-    const w = mount(PynKeys, { props: { keys: [] } })
+  it('emits the pasted key and title, then clears the form once closed', async () => {
+    const w = mount(PynKeys, { props: { keys: [], adding: true } })
     await w.find('input').setValue('laptop')
     await w.find('textarea').setValue('  ssh-ed25519 AAAA  ')
     await w.find('form').trigger('submit')
     expect(w.emitted('add')?.[0]).toEqual([{ key: 'ssh-ed25519 AAAA', title: 'laptop' }])
+    await w.setProps({ adding: false })
+    await w.setProps({ adding: true })
     expect((w.find('textarea').element as HTMLTextAreaElement).value).toBe('')
   })
 
@@ -4852,20 +4854,27 @@ describe('PynEmailAddresses', () => {
     expect(w.emitted('remove')?.[0]).toEqual(['c@x.example'])
   })
 
-  it('adds a trimmed address and clears the field', async () => {
-    const w = mount(PynEmailAddresses, { props: { emails } })
-    const input = w.find('input[type="email"]')
-    await input.setValue('  new@x.example ')
+  it('adds a trimmed address and clears the field once closed', async () => {
+    const w = mount(PynEmailAddresses, { props: { emails, adding: true } })
+    await w.find('input[type="email"]').setValue('  new@x.example ')
     await w.find('form').trigger('submit')
     expect(w.emitted('add')?.[0]).toEqual(['new@x.example'])
-    expect((input.element as HTMLInputElement).value).toBe('')
+    await w.setProps({ adding: false })
+    await w.setProps({ adding: true })
+    expect((w.find('input[type="email"]').element as HTMLInputElement).value).toBe('')
   })
 
   it('stops adding at the limit and shows the error and the sent note', () => {
     const w = mount(PynEmailAddresses, {
-      props: { emails, max: 3, error: 'Not available.', sent: 'c@x.example' },
+      props: { emails, max: 3, error: 'Not available.', sent: 'c@x.example', adding: true },
     })
-    expect(w.find('input[type="email"]').attributes('disabled')).toBeDefined()
+    expect(w.find('input[type="email"]').exists()).toBe(false)
+    expect(
+      w
+        .findAll('button')
+        .find((b) => b.text() === 'Add email address')
+        ?.attributes('disabled'),
+    ).toBeDefined()
     expect(w.text()).toContain('at most 3')
     expect(w.text()).toContain('link sent')
     expect(w.find('[role="alert"]').text()).toBe('Not available.')
@@ -5745,7 +5754,9 @@ describe('PynWebhookDetail event types', () => {
 
 describe('PynServerInvitations', () => {
   const mountIt = (props = {}) =>
-    mount(PynServerInvitations, { props: { invitations, targets, roles, ...props } })
+    mount(PynServerInvitations, {
+      props: { invitations, targets, roles, adding: true, ...props },
+    })
 
   it('labels every status with text and hides revoke for used and revoked', () => {
     const w = mountIt()
@@ -5851,7 +5862,7 @@ describe('PynServerInvitations', () => {
 
 describe('PynAddAccount', () => {
   it('emits the trimmed name and password, then clears the password', async () => {
-    const w = mount(PynAddAccount)
+    const w = mount(PynAddAccount, { props: { adding: true } })
     const [name, pass] = w.findAll('input')
     expect(pass.attributes('type')).toBe('password')
     expect(pass.attributes('minlength')).toBe('10')
@@ -5864,7 +5875,7 @@ describe('PynAddAccount', () => {
   })
 
   it('shows the error and disables while busy', () => {
-    const w = mount(PynAddAccount, { props: { error: 'taken', busy: true } })
+    const w = mount(PynAddAccount, { props: { error: 'taken', busy: true, adding: true } })
     expect(w.find('[role="alert"]').text()).toBe('taken')
     expect(w.find('button[type="submit"]').attributes('disabled')).toBeDefined()
   })

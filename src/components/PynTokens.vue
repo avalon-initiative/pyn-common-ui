@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
 import styles from '../styles/PynTokens.module.scss'
 import { formatDate } from '../utils/datetime'
 import { describeAccess, describeExpiry, describeGrant } from '../state/token.state'
@@ -22,7 +22,8 @@ const emit = defineEmits<{
   'owner-change': [string]
 }>()
 
-const creating = ref(false)
+/** Create form open; Generate new token shows while closed. A new `secret` closes it. */
+const creating = defineModel<boolean>('adding', { default: false })
 
 watch(
   () => props.secret,
@@ -80,6 +81,7 @@ watch(
     </ul>
     <p v-else :class="styles.empty">No tokens yet.</p>
 
+    <p v-if="error && !creating" :class="styles.error" role="alert">{{ error }}</p>
     <PynTokenForm
       v-if="creating"
       :owners="owners"

@@ -58,6 +58,10 @@
   @include m.pill;
 }
 
+.formActions {
+  @include m.form-actions;
+}
+
 .primary {
   @include m.button-primary;
 }

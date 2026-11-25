@@ -75,3 +75,11 @@
 .error {
   @include m.error;
 }
+
+.actions {
+  @include m.form-actions;
+}
+
+.cancel {
+  @include m.button;
+}

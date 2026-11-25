@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import styles from '../styles/PynEmailAddresses.module.scss'
 import { formatDate } from '../utils/datetime'
+import { useReveal } from '../state/reveal.state'
 import type { AccountEmail } from '../types/account.types'
 
 const props = withDefaults(
@@ -16,16 +17,30 @@ const props = withDefaults(
   }>(),
   { max: 10 },
 )
-const emit = defineEmits<{ add: [string]; resend: [string]; primary: [string]; remove: [string] }>()
+const emit = defineEmits<{
+  add: [string]
+  resend: [string]
+  primary: [string]
+  remove: [string]
+  cancel: []
+}>()
+/** Add form open; Add email address shows while closed. The app closes it after a success. */
+const adding = defineModel<boolean>('adding', { default: false })
 
 const address = ref('')
 const full = computed(() => props.emails.length >= props.max)
+const field = ref<HTMLInputElement | null>(null)
+const button = ref<HTMLButtonElement | null>(null)
+useReveal(adding, field, button, () => (address.value = ''))
 
 function add() {
   const value = address.value.trim()
   if (!value || full.value || props.busy) return
   emit('add', value)
-  address.value = ''
+}
+function cancel() {
+  adding.value = false
+  emit('cancel')
 }
 </script>
 
@@ -82,21 +97,36 @@ function add() {
     </ul>
     <p v-else :class="styles.note">No addresses yet.</p>
 
-    <form :class="styles.form" @submit.prevent="add">
+    <p v-if="full" :class="styles.note">An account holds at most {{ max }} addresses.</p>
+    <p v-if="error && !(adding && !full)" :class="styles.error" role="alert">{{ error }}</p>
+    <form v-if="adding && !full" :class="styles.form" @submit.prevent="add">
       <label :class="styles.field"
         >Add an address
         <input
+          ref="field"
           v-model="address"
           :class="styles.input"
           type="email"
           autocomplete="email"
           required
-          :disabled="busy || full"
+          :disabled="busy"
         />
       </label>
-      <p v-if="full" :class="styles.note">An account holds at most {{ max }} addresses.</p>
       <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-      <button type="submit" :class="styles.button" :disabled="busy || full">Add address</button>
+      <div :class="styles.actions">
+        <button type="submit" :class="styles.button" :disabled="busy">Add address</button>
+        <button type="button" :class="styles.cancel" @click="cancel">Cancel</button>
+      </div>
     </form>
+    <button
+      v-else
+      ref="button"
+      type="button"
+      :class="styles.button"
+      :disabled="full"
+      @click="adding = true"
+    >
+      Add email address
+    </button>
   </section>
 </template>

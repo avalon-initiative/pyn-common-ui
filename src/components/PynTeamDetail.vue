@@ -82,6 +82,7 @@ function removeChosen() {
               </select>
             </label>
             <button type="submit" :class="styles.primary" :disabled="busy">Add</button>
+            <button type="button" :class="styles.cancel" @click="adding = false">Cancel</button>
           </form>
         </div>
         <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>

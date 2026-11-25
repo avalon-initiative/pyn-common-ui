@@ -539,6 +539,14 @@ $icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' v
   line-height: var(--pyn-leading-body);
 }
 
+// Submit and Cancel side by side under a form.
+@mixin form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
 // Red-bordered box for irreversible actions.
 @mixin danger-zone {
   display: flex;

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive, ref, useId } from 'vue'
+import { computed, reactive, ref, useId, watch } from 'vue'
 import styles from '../styles/PynServerInvitations.module.scss'
 import { formatDate } from '../utils/datetime'
+import { useReveal } from '../state/reveal.state'
 import {
   canRevoke,
   EXPIRY_DEFAULT_DAYS,
@@ -35,11 +36,30 @@ const props = defineProps<{
   busy?: boolean
   error?: string
 }>()
-const emit = defineEmits<{ create: [ServerInvitationCreate]; revoke: [string]; dismiss: [] }>()
+const emit = defineEmits<{
+  create: [ServerInvitationCreate]
+  revoke: [string]
+  dismiss: []
+  cancel: []
+}>()
+/** Create form open; New invitation shows while closed. A new `created` code closes it. */
+const adding = defineModel<boolean>('adding', { default: false })
 
 const id = useId()
 const form = reactive({ email: '', days: EXPIRY_DEFAULT_DAYS, target: '', role: '' })
 const tried = ref(false)
+const field = ref<HTMLInputElement | null>(null)
+const button = ref<HTMLButtonElement | null>(null)
+useReveal(adding, field, button, () => {
+  Object.assign(form, { email: '', days: EXPIRY_DEFAULT_DAYS, target: '', role: '' })
+  tried.value = false
+})
+watch(
+  () => props.created,
+  (code) => {
+    if (code) adding.value = false
+  },
+)
 
 const target = computed(() => props.targets?.find((t) => targetKey(t) === form.target))
 const roleChoices = computed(() =>
@@ -71,6 +91,11 @@ function create() {
   emit('create', out)
 }
 
+function cancel() {
+  adding.value = false
+  emit('cancel')
+}
+
 function state(i: ServerInvitation): string {
   if (i.status === 'used') return `used${i.used_by ? ` by ${i.used_by}` : ''}`
   if (i.status === 'revoked') return 'revoked'
@@ -92,11 +117,13 @@ function state(i: ServerInvitation): string {
       >, or enters it in the sign-up form.
     </PynSecretReveal>
 
-    <form :class="styles.form" novalidate @submit.prevent="create">
+    <p v-if="error && !adding" :class="styles.error" role="alert">{{ error }}</p>
+    <form v-if="adding" :class="styles.form" novalidate @submit.prevent="create">
       <h3 :class="styles.subheading">New invitation</h3>
       <label :class="styles.field"
         >Email (optional)
         <input
+          ref="field"
           v-model="form.email"
           :class="styles.input"
           type="email"
@@ -148,8 +175,14 @@ function state(i: ServerInvitation): string {
         </label>
       </template>
       <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-      <button type="submit" :class="styles.primary" :disabled="busy">Create invitation</button>
+      <div :class="styles.actions">
+        <button type="submit" :class="styles.primary" :disabled="busy">Create invitation</button>
+        <button type="button" :class="styles.cancel" @click="cancel">Cancel</button>
+      </div>
     </form>
+    <button v-else ref="button" type="button" :class="styles.primary" @click="adding = true">
+      New invitation
+    </button>
 
     <ul v-if="invitations.length" :class="styles.list" aria-label="Invitations">
       <li v-for="i in invitations" :key="i.id" :class="styles.item">

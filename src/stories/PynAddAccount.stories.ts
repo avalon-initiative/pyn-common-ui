@@ -9,5 +9,6 @@ export default meta
 type Story = StoryObj<typeof PynAddAccount>
 
 export const Default: Story = {}
-export const Busy: Story = { args: { busy: true } }
-export const Failed: Story = { args: { error: 'That user name is taken.' } }
+export const Adding: Story = { args: { adding: true } }
+export const Busy: Story = { args: { adding: true, busy: true } }
+export const Failed: Story = { args: { adding: true, error: 'That user name is taken.' } }

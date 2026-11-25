@@ -81,3 +81,11 @@
 .danger {
   @include m.button-danger;
 }
+
+.actions {
+  @include m.form-actions;
+}
+
+.cancel {
+  @include m.button;
+}

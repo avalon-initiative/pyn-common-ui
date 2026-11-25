@@ -3,6 +3,7 @@ import { reactive, ref } from 'vue'
 import PynPerson from './PynPerson.vue'
 import styles from '../styles/PynOrgMembers.module.scss'
 import { canRemove, ORG_ROLES } from '../state/org.state'
+import { useReveal } from '../state/reveal.state'
 import type { NewOrgMember, OrgMember, OrgRole } from '../types/org.types'
 
 defineProps<{
@@ -19,14 +20,26 @@ const emit = defineEmits<{
   setRole: [{ user: string; role: OrgRole }]
   remove: [user: string]
   add: [NewOrgMember]
+  cancel: []
 }>()
+/** Add form open; Add member shows while closed. The app closes it after a success. */
+const adding = defineModel<boolean>('adding', { default: false })
 
 const form = reactive<NewOrgMember>({ user: '', role: 'member' })
 const confirming = ref('')
+const field = ref<HTMLInputElement | null>(null)
+const button = ref<HTMLButtonElement | null>(null)
+useReveal(adding, field, button, () => {
+  form.user = ''
+  form.role = 'member'
+})
 
 function add() {
   emit('add', { user: form.user.trim(), role: form.role })
-  form.user = ''
+}
+function cancel() {
+  adding.value = false
+  emit('cancel')
 }
 
 function remove() {
@@ -79,13 +92,19 @@ const change = (user: string, e: Event) =>
     </ul>
     <p v-else :class="styles.empty">No members.</p>
     <p v-if="notice" :class="styles.notice" role="status">{{ notice }}</p>
-    <p v-if="error && !owner" :class="styles.error" role="alert">{{ error }}</p>
+    <p v-if="error && !(owner && adding)" :class="styles.error" role="alert">{{ error }}</p>
 
-    <form v-if="owner" :class="styles.form" @submit.prevent="add">
+    <form v-if="owner && adding" :class="styles.form" @submit.prevent="add">
       <h3 :class="styles.subheading">Add an existing account</h3>
       <label :class="styles.field"
         >User name
-        <input v-model="form.user" :class="styles.input" required autocapitalize="none" />
+        <input
+          ref="field"
+          v-model="form.user"
+          :class="styles.input"
+          required
+          autocapitalize="none"
+        />
       </label>
       <label :class="styles.field"
         >Role
@@ -94,7 +113,19 @@ const change = (user: string, e: Event) =>
         </select>
       </label>
       <p v-if="error" :class="styles.error" role="alert">{{ error }}</p>
-      <button type="submit" :class="styles.primary" :disabled="busy">Add</button>
+      <div :class="styles.formActions">
+        <button type="submit" :class="styles.primary" :disabled="busy">Add</button>
+        <button type="button" :class="styles.quiet" @click="cancel">Cancel</button>
+      </div>
     </form>
+    <button
+      v-else-if="owner"
+      ref="button"
+      type="button"
+      :class="styles.primary"
+      @click="adding = true"
+    >
+      Add member
+    </button>
   </section>
 </template>
