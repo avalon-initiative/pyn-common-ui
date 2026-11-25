@@ -1,0 +1,49 @@
+@use 'mixins' as m;
+
+.row {
+  @include m.danger-zone;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+
+  &[data-bare] {
+    padding-bottom: var(--pyn-space-4);
+    border-bottom: 1px solid var(--pyn-border);
+  }
+}
+
+.text {
+  display: flex;
+  flex: 1 1 16rem;
+  flex-direction: column;
+  gap: var(--pyn-space-1);
+  min-width: 0;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--pyn-text-md);
+  font-weight: 600;
+}
+
+.note {
+  @include m.muted;
+  margin: 0;
+}
+
+.effects {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pyn-space-2);
+  margin: 0;
+  padding-left: var(--pyn-space-6);
+}
+
+.danger {
+  @include m.button-danger;
+}
+
+.error {
+  @include m.error;
+}

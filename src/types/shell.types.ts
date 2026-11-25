@@ -14,6 +14,8 @@ export interface MenuItem {
   note?: boolean
   /** `PynIcon` name shown before the label, in place of the check mark. */
   icon?: string
+  /** A small avatar shown before the label in place of `icon`; initials of `name` stand in without `src`. */
+  avatar?: { name: string; src?: string | null }
 }
 
 /** A titled run of side navigation items; the heading is omitted for an untitled group. */

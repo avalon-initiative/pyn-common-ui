@@ -16,6 +16,9 @@ export interface SocialButton {
 /** A fork in the Fork caret menu; `href` defaults to `/<owner>/<name>`. */
 export interface ForkLink extends RepoRef {
   href?: string
+  /** The fork's icon; given (even null), the menu shows it, or the owner's avatar, in place of the fork glyph. */
+  iconUrl?: string | null
+  ownerAvatarUrl?: string | null
 }
 
 export interface RepoSocial {

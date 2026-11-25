@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import PynAvatar from './PynAvatar.vue'
 import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynMenu.module.scss'
 import type { MenuItem } from '../types/shell.types'
@@ -146,7 +147,12 @@ function choose(id: string) {
           :aria-current="item.checked ? 'true' : undefined"
           @click="open = false"
           ><span :class="styles.check"
-            ><PynIcon v-if="item.icon" :name="item.icon" /><template v-else>{{
+            ><PynAvatar
+              v-if="item.avatar"
+              :username="item.avatar.name"
+              :src="item.avatar.src"
+              size="xs"
+            /><PynIcon v-else-if="item.icon" :name="item.icon" /><template v-else>{{
               item.checked ? '✓' : ''
             }}</template></span
           >{{ item.label }}</a
@@ -161,7 +167,12 @@ function choose(id: string) {
           @click="choose(item.id)"
         >
           <span :class="styles.check"
-            ><PynIcon v-if="item.icon" :name="item.icon" /><template v-else>{{
+            ><PynAvatar
+              v-if="item.avatar"
+              :username="item.avatar.name"
+              :src="item.avatar.src"
+              size="xs"
+            /><PynIcon v-else-if="item.icon" :name="item.icon" /><template v-else>{{
               item.checked ? '✓' : ''
             }}</template></span
           >{{ item.label }}

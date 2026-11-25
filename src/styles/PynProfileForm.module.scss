@@ -7,57 +7,6 @@
   max-width: 40rem;
 }
 
-.avatarRow {
-  display: flex;
-  align-items: center;
-  gap: var(--pyn-space-4);
-}
-
-.avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 5rem;
-  height: 5rem;
-  object-fit: cover;
-  color: var(--pyn-text-muted);
-  background: var(--pyn-surface);
-  border: 1px solid var(--pyn-border);
-  border-radius: 50%;
-  font-size: 2rem;
-}
-
-.avatarActions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--pyn-space-2);
-}
-
-.upload {
-  @include m.button;
-  position: relative;
-}
-
-.file {
-  @include m.visually-hidden;
-}
-
-.upload:focus-within {
-  outline: 2px solid var(--pyn-accent);
-  outline-offset: 2px;
-}
-
-.remove {
-  @include m.button-danger;
-}
-
-.note {
-  @include m.muted;
-  flex-basis: 100%;
-}
-
 .form {
   @include m.form;
 }

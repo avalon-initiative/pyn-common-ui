@@ -81,6 +81,8 @@ export { MAX_TOPICS, MAX_TOPIC_LENGTH, addTopics, splitTopics } from './state/to
 export { languageColor, languageShares } from './utils/languages'
 export { default as PynRepoList } from './components/PynRepoList.vue'
 export { default as PynRepoDelete } from './components/PynRepoDelete.vue'
+export { default as PynRepoVisibility } from './components/PynRepoVisibility.vue'
+export { default as PynRepoIconUpload } from './components/PynRepoIconUpload.vue'
 export { default as PynMembers } from './components/PynMembers.vue'
 export { default as PynAddAccount } from './components/PynAddAccount.vue'
 export { default as PynEmailStatus } from './components/PynEmailStatus.vue'
@@ -472,6 +474,7 @@ export type {
 export { focusableIn, trapTarget } from './state/drawer.state'
 export { commitSubject, commitBody } from './utils/commit-message'
 export { default as PynProfileForm } from './components/PynProfileForm.vue'
+export { default as PynAvatarUpload } from './components/PynAvatarUpload.vue'
 export { default as PynEmailAddresses } from './components/PynEmailAddresses.vue'
 export { default as PynUsernameChange } from './components/PynUsernameChange.vue'
 export type {
@@ -486,6 +489,7 @@ export {
   PROFILE_LIMITS,
   avatarProblem,
   cleanProfile,
+  imageProblem,
   profileProblem,
   usernameProblem,
 } from './state/account-settings.state'
@@ -559,7 +563,7 @@ export { default as PynSettingsRow } from './components/PynSettingsRow.vue'
 export { default as PynSettingsToggle } from './components/PynSettingsToggle.vue'
 export { default as PynSettingsGeneral } from './components/PynSettingsGeneral.vue'
 export { default as PynRepoBranches } from './components/PynRepoBranches.vue'
-export { aheadBehind, groupSections, railBranches, splitTabs } from './state/tabs.state'
+export { aheadBehind, fitTabs, groupSections, railBranches } from './state/tabs.state'
 export { NO_EMAIL_NOTE } from './state/account.state'
 export type { SettingsGroup, SettingsSection, TabItem } from './types/tabs.types'
 export type { BranchSummary } from './types/branch.types'

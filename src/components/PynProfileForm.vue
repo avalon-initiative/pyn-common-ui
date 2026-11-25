@@ -3,12 +3,12 @@ import { computed, ref, watch } from 'vue'
 import styles from '../styles/PynProfileForm.module.scss'
 import {
   PROFILE_LIMITS,
-  avatarProblem,
   VISIBILITY_FIELDS,
   cleanProfile,
   fullVisibility,
   profileProblem,
 } from '../state/account-settings.state'
+import PynAvatarUpload from './PynAvatarUpload.vue'
 import PynSettingsSection from './PynSettingsSection.vue'
 import PynSettingsToggle from './PynSettingsToggle.vue'
 import type { ProfileValues, ProfileVisibility } from '../types/account.types'
@@ -39,7 +39,6 @@ const fields = (p: ProfileValues) => ({
 const form = ref(fields(props.profile))
 const flags = ref(fullVisibility(props.visibility ?? {}))
 const tried = ref(false)
-const localAvatarError = ref('')
 
 watch(
   () => props.visibility,
@@ -58,55 +57,25 @@ watch(
 
 const value = computed(() => cleanProfile(form.value))
 const problem = computed(() => profileProblem(value.value))
-const initial = computed(() => (props.user || props.profile.display_name || '?')[0].toUpperCase())
 
 function save() {
   tried.value = true
   if (problem.value || props.busy) return
   emit('save', props.visibility ? { ...value.value, visibility: { ...flags.value } } : value.value)
 }
-
-function pick(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  input.value = ''
-  if (!file) return
-  localAvatarError.value = avatarProblem(file)
-  if (!localAvatarError.value) emit('avatar', file)
-}
 </script>
 
 <template>
   <section :class="styles.page">
-    <div :class="styles.avatarRow">
-      <img v-if="avatarUrl" :src="avatarUrl" alt="Your avatar" :class="styles.avatar" />
-      <span v-else :class="styles.avatar" aria-hidden="true">{{ initial }}</span>
-      <div :class="styles.avatarActions">
-        <label :class="styles.upload"
-          >{{ avatarBusy ? 'Uploading…' : 'Change avatar' }}
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            :class="styles.file"
-            :disabled="avatarBusy"
-            @change="pick"
-          />
-        </label>
-        <button
-          v-if="avatarUrl"
-          type="button"
-          :class="styles.remove"
-          :disabled="avatarBusy"
-          @click="emit('removeAvatar')"
-        >
-          Remove avatar
-        </button>
-        <p :class="styles.note">PNG, JPEG or WebP, at most 1 MiB.</p>
-      </div>
-    </div>
-    <p v-if="localAvatarError || avatarError" :class="styles.error" role="alert">
-      {{ localAvatarError || avatarError }}
-    </p>
+    <PynAvatarUpload
+      :name="user || profile.display_name || ''"
+      :src="avatarUrl"
+      alt="Your avatar"
+      :busy="avatarBusy"
+      :error="avatarError"
+      @upload="emit('avatar', $event)"
+      @remove="emit('removeAvatar')"
+    />
 
     <form :class="styles.form" novalidate @submit.prevent="save">
       <label :class="styles.field"

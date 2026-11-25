@@ -22,3 +22,11 @@ export const Full: Story = {
     url: 'https://studio.example',
   },
 }
+export const NarrowOwner: Story = {
+  args: { role: 'owner', current: 'settings' },
+  render: (args) => ({
+    components: { PynOrgHeader },
+    setup: () => ({ args }),
+    template: `<div style="max-width: 22rem"><PynOrgHeader v-bind="args" /></div>`,
+  }),
+}

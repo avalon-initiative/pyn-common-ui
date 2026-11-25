@@ -13,6 +13,7 @@ export const Create: Story = { args: { owner: 'alice' } }
 export const OwnerPicker: Story = {
   args: { owner: 'studio', owners: ['alice', 'studio', 'modding-club'] },
 }
+/** Editing has no visibility field; `PynRepoVisibility` in the Danger zone changes it. */
 export const Edit: Story = {
   args: {
     owner: 'alice',

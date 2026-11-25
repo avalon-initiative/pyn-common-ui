@@ -66,13 +66,15 @@ export function profileProblem(p: ProfileValues): string {
   return ''
 }
 
-/** The reason an image cannot be an avatar, or '' when it can. */
-export function avatarProblem(f: { type: string; size: number }): string {
-  if (!AVATAR_TYPES.includes(f.type)) return 'The avatar must be a PNG, JPEG or WebP image.'
-  if (f.size > AVATAR_MAX_BYTES) return 'The avatar must be at most 1 MiB.'
+/** The reason an image cannot be an avatar (or the given `noun`, such as "icon"), or '' when it can. */
+export function imageProblem(f: { type: string; size: number }, noun = 'avatar'): string {
+  if (!AVATAR_TYPES.includes(f.type)) return `The ${noun} must be a PNG, JPEG or WebP image.`
+  if (f.size > AVATAR_MAX_BYTES) return `The ${noun} must be at most 1 MiB.`
   if (f.size === 0) return 'The image is empty.'
   return ''
 }
+
+export const avatarProblem = (f: { type: string; size: number }): string => imageProblem(f)
 
 /** The first problem with a new user name, or '' when it can be submitted. */
 export function usernameProblem(next: string, current: string): string {

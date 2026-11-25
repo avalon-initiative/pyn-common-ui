@@ -12,8 +12,10 @@ import type { ForkLink, RepoSocial, SocialKind } from '../types/repo-social.type
 
 const props = defineProps<{
   owner: string
-  /** Owner picture shown before the name; initials stand in without it. */
+  /** Owner picture shown before the name when there is no `iconUrl`; initials stand in without either. */
   ownerAvatarUrl?: string | null
+  /** The repository's own icon, shown before the name in place of the owner picture. */
+  iconUrl?: string | null
   /** Shows the owner link before the name; the top bar crumb normally carries it. */
   showOwner?: boolean
   /** Watch, Fork and Star group; a member is hidden unless given, and the group without any. */
@@ -34,8 +36,6 @@ const props = defineProps<{
   lockedCount?: number
   /** Names of the accounts holding locks; the first few show in the lock strip. */
   lockHolders?: string[]
-  /** Most tabs shown before the rest move into a More menu. */
-  maxTabs?: number
   /** Hides the lock strip; the Locks tab keeps its count. */
   hideLockStrip?: boolean
   /** Small labels after the visibility badge (lease, role, organization); the `labels` slot replaces them. */
@@ -98,7 +98,12 @@ const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.v
         <div :class="styles.heading">
           <component :is="hidePath ? 'div' : 'h1'" :class="styles.title">
             <nav v-if="!hidePath" :class="styles.path" aria-label="Repository path">
-              <PynAvatar :username="owner" :src="ownerAvatarUrl" size="sm" :class="styles.avatar" />
+              <PynAvatar
+                :username="owner"
+                :src="iconUrl || ownerAvatarUrl"
+                size="sm"
+                :class="styles.avatar"
+              />
               <template v-if="showOwner">
                 <a :href="ownerHref ?? `/${encodeURIComponent(owner)}`" :class="styles.owner">{{
                   owner
@@ -160,7 +165,7 @@ const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.v
           <slot name="actions" />
         </div>
       </div>
-      <PynTabs v-if="tabs" :items="tabItems" label="Repository" :max="maxTabs" />
+      <PynTabs v-if="tabs" :items="tabItems" label="Repository" />
     </header>
     <p v-if="lockedCount && !hideLockStrip" :class="styles.strip" data-lock-strip>
       <PynIcon name="lock" :class="styles.stripIcon" />

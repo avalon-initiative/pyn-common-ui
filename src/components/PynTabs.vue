@@ -3,15 +3,13 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import PynIcon from './PynIcon.vue'
 import PynMenu from './PynMenu.vue'
 import styles from '../styles/PynTabs.module.scss'
-import { fitTabs, splitTabs, tabCountLabel } from '../state/tabs.state'
+import { fitTabs, tabCountLabel } from '../state/tabs.state'
 import type { TabItem } from '../types/tabs.types'
 
 const props = defineProps<{
   items: TabItem[]
   /** Accessible name of the navigation. */
   label: string
-  /** Most tabs shown; the rest move into a More menu. Tabs that do not fit the container width move there regardless. */
-  max?: number
 }>()
 
 const nav = ref<HTMLElement>()
@@ -49,8 +47,8 @@ watch(
 
 const split = computed(() => {
   const m = measured.value
-  if (!m || m.widths.length !== props.items.length) return splitTabs(props.items, props.max)
-  return fitTabs(props.items, m.widths, m.avail, m.more, m.gap, props.max)
+  if (!m || m.widths.length !== props.items.length) return { shown: props.items, more: [] }
+  return fitTabs(props.items, m.widths, m.avail, m.more, m.gap)
 })
 const icons = computed(() => props.items.length > 0 && props.items.every((t) => t.icon))
 const menuItems = computed(() =>

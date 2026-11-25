@@ -1,18 +1,9 @@
 import type { BranchSummary } from '../types/branch.types'
 import type { SettingsGroup, SettingsSection, TabItem } from '../types/tabs.types'
 
-/** Splits tabs into those shown and those in the More menu; the current tab stays shown. */
-export function splitTabs(items: TabItem[], max?: number): { shown: TabItem[]; more: TabItem[] } {
-  if (!max || max < 1 || items.length <= max) return { shown: items, more: [] }
-  const at = items.findIndex((t) => t.current)
-  const keep = new Set(items.slice(0, at >= max ? max - 1 : max))
-  if (at >= max) keep.add(items[at]!)
-  return { shown: items.filter((t) => keep.has(t)), more: items.filter((t) => !keep.has(t)) }
-}
-
 /**
  * Splits tabs by measured width: `widths[i]` is tab i, `more` the More trigger, `gap` the space between items.
- * The current tab always stays shown; `max` still caps the shown count.
+ * The current tab always stays shown.
  */
 export function fitTabs(
   items: TabItem[],
@@ -20,11 +11,9 @@ export function fitTabs(
   avail: number,
   more: number,
   gap: number,
-  max?: number,
 ): { shown: TabItem[]; more: TabItem[] } {
-  const cap = max && max >= 1 ? max : items.length
   const total = widths.reduce((a, w) => a + w, 0) + gap * Math.max(0, items.length - 1)
-  if (items.length <= cap && total <= avail) return { shown: items, more: [] }
+  if (total <= avail) return { shown: items, more: [] }
   const cur = items.findIndex((t) => t.current)
   const keep = new Set<number>()
   let used = more + gap
@@ -35,7 +24,7 @@ export function fitTabs(
   for (let i = 0; i < items.length; i++) {
     if (i === cur) continue
     const w = (widths[i] ?? 0) + gap
-    if (keep.size >= cap || used + w > avail + gap) break
+    if (used + w > avail + gap) break
     keep.add(i)
     used += w
   }

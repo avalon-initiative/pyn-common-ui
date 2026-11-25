@@ -71,3 +71,22 @@
   background: var(--pyn-accent);
   border-radius: 50%;
 }
+
+.icon {
+  flex: none;
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pyn-space-1);
+}
+
+.countIcon {
+  flex: none;
+  font-size: 0.875rem;
+}
+
+.hidden {
+  @include m.visually-hidden;
+}

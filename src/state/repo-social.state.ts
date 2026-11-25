@@ -14,7 +14,9 @@ export function forkMenu(
         id: `fork:${f.owner}/${f.name}`,
         label: `${f.owner}/${f.name}`,
         href: f.href ?? `/${encodeURIComponent(f.owner)}/${encodeURIComponent(f.name)}`,
-        icon: 'fork',
+        ...(f.iconUrl !== undefined || f.ownerAvatarUrl !== undefined
+          ? { avatar: { name: f.owner, src: f.iconUrl || f.ownerAvatarUrl } }
+          : { icon: 'fork' }),
       }))
     : [{ id: 'forks-empty', label: empty, note: true }]
   const create: MenuItem[] = fork.disabled

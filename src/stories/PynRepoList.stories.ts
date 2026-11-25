@@ -83,3 +83,37 @@ export const BoxedPaged: Story = {
   render: boxedRender,
 }
 export const BoxedEmpty: Story = { args: { boxed: true, repos: [] }, render: boxedRender }
+
+const icon =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="%23c84"/></svg>'
+const owner =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="%234a7"/></svg>'
+
+/** Explore: description, language, topics, stars, forks, last updated and the repository icon. */
+export const Explore: Story = {
+  args: {
+    now,
+    repos: [
+      {
+        ...rows[0]!,
+        star_count: 12,
+        fork_count: 3,
+        icon_url: icon,
+        owner_avatar_url: owner,
+      },
+      { ...rows[1]!, star_count: 0, fork_count: 0, icon_url: null, owner_avatar_url: owner },
+      {
+        ...repo('studio', 'engine', '', 'public'),
+        description: 'Shared engine plugins and build tooling.',
+        language: 'C++',
+        topics: ['engine', 'tools', 'plugins'],
+        updated_at: '2026-11-12T09:00:00Z',
+        star_count: 1,
+        fork_count: 1,
+        icon_url: null,
+        owner_avatar_url: null,
+      },
+    ],
+    empty: 'No public repositories yet.',
+  },
+}
