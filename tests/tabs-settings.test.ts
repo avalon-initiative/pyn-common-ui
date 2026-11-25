@@ -20,8 +20,8 @@ import {
   orgSettingsNav,
   orgSettingsPath,
   railBranches,
-  splitTabs,
 } from '../src'
+import { mockTabWidths } from './tab-observer'
 import { repo, rootListing, summary } from '../src/stories/landing-data'
 
 const items = ['Code', 'Locks', 'History', 'Audit', 'Settings'].map((label, i) => ({
@@ -52,25 +52,13 @@ describe('PynTabs', () => {
     expect(w.find('[data-more]').exists()).toBe(false)
   })
 
-  it('keeps every tab when max is omitted or not exceeded', () => {
-    expect(splitTabs(items).more).toEqual([])
-    expect(splitTabs(items, 5).more).toEqual([])
-  })
-
-  it('moves the overflow into a More menu that keeps the current tab shown', () => {
-    const { shown, more } = splitTabs(
-      items.map((t) => ({ ...t, current: t.label === 'Settings' })),
-      3,
-    )
-    expect(shown.map((t) => t.label)).toEqual(['Code', 'Locks', 'Settings'])
-    expect(more.map((t) => t.label)).toEqual(['History', 'Audit'])
-  })
-
   it('opens the More menu with aria state and closes on Escape and outside click', async () => {
+    const layout = mockTabWidths({ avail: 260, tab: 60, more: 60 })
     const w = mount(PynTabs, {
-      props: { label: 'Repository', items, max: 3 },
+      props: { label: 'Repository', items },
       attachTo: document.body,
     })
+    await w.vm.$nextTick()
     expect(w.findAll('nav > ul > li > a')).toHaveLength(3)
     const button = w.find('[data-more] button')
     expect(button.attributes('aria-haspopup')).toBe('menu')
@@ -89,6 +77,7 @@ describe('PynTabs', () => {
     await w.vm.$nextTick()
     expect(w.find('[role=menu]').exists()).toBe(false)
     w.unmount()
+    layout.restore()
   })
 })
 
@@ -248,11 +237,17 @@ describe('PynRepoShell lock strip', () => {
     expect(w.find('[data-lock-strip]').exists()).toBe(true)
   })
 
-  it('moves tabs into More with maxTabs', () => {
-    const w = mount(PynRepoShell, {
-      props: { ...props, tabs: [...tabs, { section: 'history', label: 'History' }], maxTabs: 2 },
-    })
+  it('moves tabs into More only when they do not fit', async () => {
+    const more = { ...props, tabs: [...tabs, { section: 'history', label: 'History' }] }
+    const layout = mockTabWidths({ avail: 1000, tab: 60, more: 60 })
+    const w = mount(PynRepoShell, { props: more, attachTo: document.body })
+    await w.vm.$nextTick()
+    expect(w.find('[data-more]').exists()).toBe(false)
+    layout.resize(100)
+    await w.vm.$nextTick()
     expect(w.find('[data-more]').exists()).toBe(true)
+    w.unmount()
+    layout.restore()
   })
 })
 

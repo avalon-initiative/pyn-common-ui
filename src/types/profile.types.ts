@@ -1,4 +1,4 @@
-export type AvatarSize = 'sm' | 'md' | 'lg' | 'xl'
+export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 /** The public, user-edited part of an account (the server's `Profile`). */
 export interface ProfileInfo {

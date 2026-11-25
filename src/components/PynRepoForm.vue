@@ -79,7 +79,8 @@ const submit = () => {
   }
   const settings: RepoSettings = {
     name: name.value.trim(),
-    visibility: visibility.value,
+    // Editing keeps the current visibility; `PynRepoVisibility` in the danger zone changes it.
+    visibility: props.repo?.visibility ?? visibility.value,
     lease_hours: Number(leaseHours.value),
   }
   const max = parseLockLimit(maxLocks.value) ?? (props.repo ? null : undefined)
@@ -300,7 +301,7 @@ const submit = () => {
         >Will be created as: {{ nameCanonical }}</span
       >
     </label>
-    <label :class="styles.field"
+    <label v-if="!repo" :class="styles.field"
       >Visibility
       <select v-model="visibility" :class="styles.input" :disabled="readonly">
         <option value="private">private</option>

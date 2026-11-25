@@ -72,7 +72,35 @@ export const HiddenLockStrip: Story = {
   args: { lockedCount: 2, lockHolders: ['jamie'], hideLockStrip: true },
 }
 export const OneLock: Story = { args: { lockedCount: 1, lockHolders: ['jamie'] } }
-export const MoreMenu: Story = { args: { maxTabs: 3, current: 'settings' } }
+/** Only the tabs that do not fit the width move into More; the current one stays shown. */
+export const MoreMenu: Story = {
+  args: { current: 'settings' },
+  render: (args) => ({
+    components: { PynRepoShell },
+    setup: () => ({ args }),
+    template: `<div style="max-width: 24rem"><PynRepoShell v-bind="args"><p>Page content</p></PynRepoShell></div>`,
+  }),
+}
+/** Every tab inline on a wide page; at mid and narrow widths the ones that do not fit move into More. */
+export const ManyTabs: Story = {
+  args: {
+    tabs: [
+      { section: '', label: 'Code' },
+      { section: 'pulls', label: 'Pull requests' },
+      { section: 'locks', label: 'Locks' },
+      { section: 'branches', label: 'Branches' },
+      { section: 'history', label: 'History' },
+      { section: 'insights', label: 'Insights' },
+      { section: 'audit', label: 'Audit log', icon: 'file' },
+      { section: 'settings', label: 'Settings' },
+    ],
+    pullCount: 4,
+    lockedCount: 2,
+    hideLockStrip: true,
+    current: 'insights',
+    social: { watch: { count: 2 }, fork: { count: 1 }, star: { count: 12 } },
+  },
+}
 export const LockPending: Story = { args: { lockPending: true } }
 
 export const HeaderActions: Story = {
@@ -96,6 +124,15 @@ export const SocialOnly: Story = {
   args: { social: { star: { count: 2, active: true } } },
 }
 export const WithOwner: Story = { args: { showOwner: true } }
+export const WithIcon: Story = {
+  args: {
+    iconUrl:
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="%23c84"/></svg>',
+    ownerAvatarUrl:
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="%234a7"/></svg>',
+    showOwner: true,
+  },
+}
 
 const branches = [
   { name: 'main', isDefault: true, updatedAt: '2026-10-08T10:00:00Z' },

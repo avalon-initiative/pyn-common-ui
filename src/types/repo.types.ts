@@ -24,6 +24,12 @@ export interface RepoRowExtras {
   language?: string | null
   topics?: string[]
   updated_at?: string | null
+  star_count?: number
+  fork_count?: number
+  /** The repository's icon; given (even null), the row shows it, or the owner's avatar without one. */
+  icon_url?: string | null
+  /** Stands in for a missing `icon_url`; given (even null), the row shows the icon. */
+  owner_avatar_url?: string | null
 }
 
 /** The repository fields the pages show; the rest are filled by the server's repository listing. */

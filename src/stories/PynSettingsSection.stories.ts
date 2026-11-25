@@ -7,7 +7,10 @@ import PynSettingsLayout from '../components/PynSettingsLayout.vue'
 import PynSettingsRow from '../components/PynSettingsRow.vue'
 import PynSettingsSection from '../components/PynSettingsSection.vue'
 import PynSettingsToggle from '../components/PynSettingsToggle.vue'
+import PynRepoDelete from '../components/PynRepoDelete.vue'
 import PynRepoForm from '../components/PynRepoForm.vue'
+import PynRepoIconUpload from '../components/PynRepoIconUpload.vue'
+import PynRepoVisibility from '../components/PynRepoVisibility.vue'
 import PynTextField from '../components/PynTextField.vue'
 import PynOrgSettings from '../components/PynOrgSettings.vue'
 
@@ -145,18 +148,22 @@ export const RepositorySettings: StoryObj<typeof PynSettingsLayout> = {
       PynSettingsRow,
       PynSettingsToggle,
       PynRepoForm,
-      PynButton,
+      PynRepoIconUpload,
+      PynRepoVisibility,
+      PynRepoDelete,
     },
     setup: () => ({ sections: repoSections, on: ref(true) }),
     template: `<PynSettingsLayout :sections="sections" current="settings" label="Repository settings" title="General">
       <PynSettingsSection title="Repository" plain>
         <PynRepoForm owner="studio" :repo="{ name: 'game', visibility: 'private', lease_hours: 8 }" />
       </PynSettingsSection>
+      <PynRepoIconUpload owner="studio" />
       <PynSettingsSection title="Exclusive files">
         <PynSettingsToggle v-model="on" title="Read-only until locked" help="Exclusive files stay read-only in work trees until their lock is taken." />
       </PynSettingsSection>
-      <PynSettingsSection title="Danger zone" danger>
-        <PynSettingsRow title="Delete this repository" help="Removes its files, history and locks. The audit log is kept."><PynButton label="Delete repository" variant="danger" /></PynSettingsRow>
+      <PynSettingsSection title="Danger zone" danger plain>
+        <PynRepoVisibility slug="studio/game" visibility="private" />
+        <PynRepoDelete slug="studio/game" />
       </PynSettingsSection>
     </PynSettingsLayout>`,
   }),

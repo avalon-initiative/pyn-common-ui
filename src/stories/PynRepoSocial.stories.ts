@@ -45,3 +45,25 @@ export const ForksOpen: Story = {
   play: openFork,
 }
 export const NoForksOpen: Story = { args: { fork: { count: 0 }, forks: [] }, play: openFork }
+export const ForksWithIcons: Story = {
+  args: {
+    fork: { count: 2 },
+    forks: [
+      {
+        owner: 'bob',
+        name: 'game',
+        iconUrl:
+          'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="%23c84"/></svg>',
+      },
+      {
+        owner: 'modding-club',
+        name: 'game-mods',
+        iconUrl: null,
+        ownerAvatarUrl:
+          'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="%234a7"/></svg>',
+      },
+      { owner: 'sam', name: 'game', iconUrl: null, ownerAvatarUrl: null },
+    ],
+  },
+  play: openFork,
+}

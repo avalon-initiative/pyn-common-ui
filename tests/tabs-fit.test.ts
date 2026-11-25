@@ -1,7 +1,9 @@
 import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 import { PynRepoShell, PynSecurityNotice, PynTabs } from '../src/index'
 import { fitTabs } from '../src/state/tabs.state'
+import { mockTabWidths } from './tab-observer'
 
 const items = ['A', 'B', 'C', 'D', 'E'].map((label, i) => ({
   label,
@@ -22,10 +24,6 @@ describe('fitTabs', () => {
     expect(r.more.map((t) => t.label)).toEqual(['C', 'D'])
   })
 
-  it('still caps the shown count with max', () => {
-    expect(fitTabs(items, widths, 1000, 60, 8, 2).shown).toHaveLength(2)
-  })
-
   it('never shows fewer than one tab', () => {
     expect(fitTabs(items, widths, 10, 60, 8).shown).toHaveLength(1)
   })
@@ -37,6 +35,24 @@ describe('PynTabs measurement', () => {
     expect(w.findAll('a')).toHaveLength(5)
     expect(w.find('[data-probe]').attributes('aria-hidden')).toBe('true')
     expect(w.find('[data-probe] a').exists()).toBe(false)
+  })
+
+  it('shows every tab inline while they fit and moves the rest into More as the bar narrows', async () => {
+    const layout = mockTabWidths({ avail: 400, tab: 50, more: 60 })
+    const w = mount(PynTabs, { props: { items, label: 'Repository' }, attachTo: document.body })
+    await nextTick()
+    expect(layout.observers).toHaveLength(1)
+    expect(w.findAll('nav > ul > li > a')).toHaveLength(5)
+    expect(w.find('[data-more]').exists()).toBe(false)
+    layout.resize(200)
+    await nextTick()
+    expect(w.findAll('nav > ul > li > a').map((a) => a.text())).toEqual(['A', 'B'])
+    expect(w.find('[data-more]').exists()).toBe(true)
+    layout.resize(400)
+    await nextTick()
+    expect(w.find('[data-more]').exists()).toBe(false)
+    w.unmount()
+    layout.restore()
   })
 })
 

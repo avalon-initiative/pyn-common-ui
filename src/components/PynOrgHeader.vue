@@ -19,8 +19,6 @@ const props = defineProps<{
   avatarUrl?: string | null
   /** Only an http(s) URL is shown, as an external link. */
   url?: string | null
-  /** Most tabs shown before the rest move into a More menu. */
-  maxTabs?: number
 }>()
 
 const tabs = computed(() =>
@@ -65,6 +63,6 @@ const tabs = computed(() =>
       </div>
       <div v-if="$slots.actions" :class="styles.actions"><slot name="actions" /></div>
     </div>
-    <PynTabs :items="tabs" label="Organization" :max="maxTabs" />
+    <PynTabs :items="tabs" label="Organization" />
   </header>
 </template>
