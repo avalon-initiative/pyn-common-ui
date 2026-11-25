@@ -22,7 +22,8 @@ const buttons = computed(() =>
       const b = props[kind] as SocialButton
       const menu =
         kind === 'fork' && props.forks ? forkMenu(b, props.forks, props.forksEmpty) : b.menu
-      return { kind, ...b, menu, ...META[kind], text: b.active ? META[kind].on : META[kind].label }
+      const text = b.text ?? (b.active ? META[kind].on : META[kind].label)
+      return { kind, ...b, menu, ...META[kind], text }
     }),
 )
 </script>
@@ -40,7 +41,7 @@ const buttons = computed(() =>
         <PynIcon :name="b.icon" :class="styles.icon" /><span :class="styles.label">{{
           b.text
         }}</span>
-        <span :class="styles.count" data-count>{{ b.count }}</span>
+        <span v-if="b.count !== undefined" :class="styles.count" data-count>{{ b.count }}</span>
       </button>
       <PynMenu
         v-if="b.menu?.length"

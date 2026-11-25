@@ -150,7 +150,14 @@ describe('PynTopBar navigation drawer and bell', () => {
     const w = bar({ admin: true })
     await w.find('button[aria-label="Account menu"]').trigger('click')
     const labels = w.findAll('[role=menu] [role^=menuitem]').map((e) => e.text())
-    expect(labels.slice(0, 4)).toEqual(['Profile', 'Repositories', 'Organizations', 'People'])
+    expect(labels.slice(0, 6)).toEqual([
+      'Profile',
+      'Repositories',
+      'Your stars',
+      'Watching',
+      'Organizations',
+      'People',
+    ])
     expect(labels).toContain('Settings')
     expect(labels).toContain('Server administration')
     expect(labels.at(-1)).toBe('Sign out')

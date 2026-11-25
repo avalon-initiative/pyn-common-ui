@@ -25,6 +25,10 @@
   overflow-wrap: anywhere;
 }
 
+.actions {
+  margin-left: auto;
+}
+
 .pill {
   @include m.pill;
   text-transform: capitalize;

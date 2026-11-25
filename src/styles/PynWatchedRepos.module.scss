@@ -1,0 +1,26 @@
+@use 'mixins' as m;
+
+.wrap {
+  min-width: 0;
+}
+
+// Not flat-list: its overflow clip would cut off the watch menu.
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--pyn-surface);
+  border: 1px solid var(--pyn-border);
+  border-radius: var(--pyn-radius);
+}
+
+.error {
+  @include m.error;
+  margin: var(--pyn-space-3) 0;
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+  padding: var(--pyn-space-4);
+}

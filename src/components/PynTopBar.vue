@@ -107,15 +107,16 @@ const exploreItem = computed<MenuItem>(() => ({
 const named = computed<MenuItem[]>(() => [
   { id: 'profile', label: 'Profile', href: links.value.profile },
   { id: 'repositories', label: 'Repositories', href: links.value.repositories },
+  { id: 'stars', label: 'Your stars', href: links.value.stars },
+  { id: 'watching', label: 'Watching', href: links.value.watching },
   { id: 'settings', label: 'Settings', href: links.value.settings },
 ])
 const account = computed<MenuItem[]>(() => [
-  named.value[0]!,
-  named.value[1]!,
+  ...named.value.slice(0, 4),
   { id: 'organizations', label: 'Organizations', href: links.value.orgs },
   { id: 'people', label: 'People', href: links.value.people },
   { id: 'sep-settings', label: '', separator: true },
-  named.value[2]!,
+  named.value[4]!,
   ...(props.admin
     ? [{ id: 'admin', label: 'Server administration', href: links.value.admin }]
     : []),

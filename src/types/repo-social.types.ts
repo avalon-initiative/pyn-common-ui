@@ -1,13 +1,16 @@
-import type { RepoIcon, RepoRef } from './repo.types'
+import type { RepoIcon, RepoListItem, RepoRef } from './repo.types'
 import type { MenuItem } from './shell.types'
 
 export type SocialKind = 'watch' | 'fork' | 'star'
 
 /** One button of the Watch, Fork and Star group; a group member is shown only when given. */
 export interface SocialButton {
-  count: number
+  /** Omitted leaves the count off. */
+  count?: number
   /** Watching or starred; the label reads "Watching" or "Starred". */
   active?: boolean
+  /** Replaces the label. */
+  text?: string
   disabled?: boolean
   /** Items of the caret menu; without them there is no caret. */
   menu?: MenuItem[]
@@ -29,4 +32,15 @@ export interface RepoSocial {
   forks?: ForkLink[]
   /** Text of an empty forks list. */
   forksEmpty?: string
+}
+
+/** What a watcher hears about: every event, only lock events, or nothing. */
+export type WatchLevel = 'all' | 'locks' | 'ignore'
+
+/** A repository in the person's watched list, with their level. */
+export interface WatchedRepoItem {
+  repo: RepoListItem
+  level: WatchLevel
+  /** Disables the watch control while a request for this repository runs. */
+  busy?: boolean
 }
