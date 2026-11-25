@@ -48,7 +48,7 @@ describe('PynTabs', () => {
     const locks = w.findAll('a')[1]!
     expect(locks.find('[data-count]').attributes('aria-hidden')).toBe('true')
     expect(locks.text()).toContain('3 locked')
-    expect(w.findAll('a')[2]!.text()).toContain('1 items')
+    expect(w.findAll('a')[2]!.text()).toContain('1 item')
     expect(w.find('[data-more]').exists()).toBe(false)
   })
 

@@ -27,6 +27,27 @@ describe('teamSlug', () => {
     expect(teamSlug('QA')).toBe('qa')
     expect(teamSlug('   ')).toBe('')
   })
+
+  it('follows the server rule on the shared cases', () => {
+    const cases: [string, string][] = [
+      ['Art & Sound', 'art-sound'],
+      ['Équipe Son', 'equipe-son'],
+      ['Straße', 'strasse'],
+      ['Smørrebrød', 'smorrebrod'],
+      ['Łódź Team', 'lodz-team'],
+      ['  Ünïcödé  ', 'unicode'],
+      ['日本', ''],
+    ]
+    for (const [name, slug] of cases) expect(teamSlug(name), name).toBe(slug)
+  })
+
+  it('keeps underscores, collapses dashes and is empty past 39 characters', () => {
+    expect(teamSlug('QA_Team 2')).toBe('qa_team-2')
+    expect(teamSlug('--Ops--')).toBe('ops')
+    expect(teamSlug('ÆTHER Þing Œuvre Đorđe')).toBe('aether-thing-oeuvre-dorde')
+    expect(teamSlug('x'.repeat(39))).toBe('x'.repeat(39))
+    expect(teamSlug('x'.repeat(40))).toBe('')
+  })
 })
 
 describe('PynTeamForm create', () => {

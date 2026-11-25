@@ -3,6 +3,7 @@ import type { FetchedContent, FileBody } from '../types/blob.types'
 import { fileExtension, languageFor } from './code.state'
 import { repoPath, withBranch } from './repo.state'
 import { encodeSegments, treePath } from './tree.state'
+import { pluralize } from '../utils/plural'
 
 type Repo = { owner: string; name: string }
 
@@ -108,5 +109,5 @@ export function formatSize(bytes: number): string {
 export function textStats(text: string): string {
   const lines = text === '' ? 0 : text.replace(/\n$/, '').split('\n').length
   const size = formatSize(new TextEncoder().encode(text).length)
-  return `${lines} ${lines === 1 ? 'line' : 'lines'} · ${size}`
+  return `${pluralize(lines, 'line')} · ${size}`
 }

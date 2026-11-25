@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import styles from '../styles/PynBranchCompare.module.scss'
+import { pluralize } from '../utils/plural'
 import type { BranchChange, BranchChangeKind, BranchCompareStatus } from '../types/branch.types'
 
 const props = defineProps<{
@@ -53,7 +54,7 @@ const sentence = computed(() => {
       <p :class="styles.sentence">{{ sentence }}</p>
       <details v-if="changes && changes.length > 0" :class="styles.changes">
         <summary :class="styles.toggle">
-          {{ changes.length }} changed {{ changes.length === 1 ? 'path' : 'paths' }}
+          {{ pluralize(changes.length, 'changed path') }}
         </summary>
         <ul :class="styles.list" :aria-label="`Changed paths on ${head}`">
           <li v-for="change in changes" :key="change.path" :class="styles.item">
@@ -67,7 +68,7 @@ const sentence = computed(() => {
           </li>
         </ul>
         <p v-if="truncated" :class="styles.note">
-          Showing the first {{ changes.length }} changed paths
+          Showing the first {{ pluralize(changes.length, 'changed path') }}
         </p>
       </details>
     </template>

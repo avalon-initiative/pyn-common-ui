@@ -7,6 +7,7 @@ import PynModeChip from './PynModeChip.vue'
 import styles from '../styles/PynDiffFile.module.scss'
 import { diffAnchor, markedLines, segments, splitRows } from '../state/diff.state'
 import { copyText } from '../utils/copy'
+import { pluralize } from '../utils/plural'
 import type { DiffExpand, DiffFile, DiffLayout, DiffLine } from '../types/diff.types'
 
 const props = withDefaults(
@@ -126,7 +127,7 @@ const expand = (
                   <button
                     v-if="i > 0"
                     type="button"
-                    :aria-label="`Expand ${hunk.hiddenBefore} hidden lines down`"
+                    :aria-label="`Expand ${pluralize(hunk.hiddenBefore, 'hidden line')} down`"
                     data-expand="down"
                     @click="expand(i, 'down')"
                   >
@@ -134,7 +135,7 @@ const expand = (
                   </button>
                   <button
                     type="button"
-                    :aria-label="`Expand ${hunk.hiddenBefore} hidden lines up`"
+                    :aria-label="`Expand ${pluralize(hunk.hiddenBefore, 'hidden line')} up`"
                     data-expand="up"
                     @click="expand(i, 'up')"
                   >
@@ -188,7 +189,7 @@ const expand = (
               <td :class="styles.expand" :colspan="layout === 'split' ? 1 : 2">
                 <button
                   type="button"
-                  :aria-label="`Expand ${lastHidden} hidden lines down`"
+                  :aria-label="`Expand ${pluralize(lastHidden, 'hidden line')} down`"
                   data-expand="after"
                   @click="expand(hunks.length - 1, 'down', 'after')"
                 >

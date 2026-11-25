@@ -6,6 +6,7 @@ import PynSubNav from './PynSubNav.vue'
 import styles from '../styles/PynPullRequestList.module.scss'
 import { PULL_STATE_LABEL, REVIEW_LABEL, isDraft, pullWhen } from '../state/pull-request.state'
 import { formatAgo } from '../utils/ago'
+import { pluralize } from '../utils/plural'
 import type { FilterListControl } from '../types/filter-list.types'
 import type { PullRequestSummary } from '../types/pull-request.types'
 import type { NavGroup } from '../types/shell.types'
@@ -42,8 +43,8 @@ const emit = defineEmits<{
 }>()
 
 const ICON = { open: 'pull-request', merged: 'merge', closed: 'pull-closed' } as const
-const comments = (n: number) => `${n} ${n === 1 ? 'comment' : 'comments'}`
-const lockedText = (n: number) => `${n} ${n === 1 ? 'path' : 'paths'} locked`
+const comments = (n: number) => pluralize(n, 'comment')
+const lockedText = (n: number) => `${pluralize(n, 'path')} locked`
 </script>
 
 <template>
