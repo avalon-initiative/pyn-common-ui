@@ -1,3 +1,4 @@
+import { repoIconSrc } from './repo.state'
 import type { ForkLink, SocialButton } from '../types/repo-social.types'
 import type { MenuItem } from '../types/shell.types'
 
@@ -10,14 +11,15 @@ export function forkMenu(
   empty = 'This repository has no forks yet.',
 ): MenuItem[] {
   const list: MenuItem[] = forks.length
-    ? forks.map((f) => ({
-        id: `fork:${f.owner}/${f.name}`,
-        label: `${f.owner}/${f.name}`,
-        href: f.href ?? `/${encodeURIComponent(f.owner)}/${encodeURIComponent(f.name)}`,
-        ...(f.iconUrl !== undefined || f.ownerAvatarUrl !== undefined
-          ? { avatar: { name: f.owner, src: f.iconUrl || f.ownerAvatarUrl } }
-          : { icon: 'fork' }),
-      }))
+    ? forks.map((f) => {
+        const src = repoIconSrc(f.iconUrl, f.ownerAvatarUrl)
+        return {
+          id: `fork:${f.owner}/${f.name}`,
+          label: `${f.owner}/${f.name}`,
+          href: f.href ?? `/${encodeURIComponent(f.owner)}/${encodeURIComponent(f.name)}`,
+          ...(src !== undefined ? { avatar: { name: f.owner, src } } : { icon: 'fork' }),
+        }
+      })
     : [{ id: 'forks-empty', label: empty, note: true }]
   const create: MenuItem[] = fork.disabled
     ? []

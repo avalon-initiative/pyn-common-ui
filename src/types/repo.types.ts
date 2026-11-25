@@ -18,6 +18,15 @@ export interface RepoRef {
   name: string
 }
 
+/** A repository's picture; given (even null), it shows the icon, else the owner's avatar, else initials. */
+export interface RepoIcon {
+  iconUrl?: string | null
+  ownerAvatarUrl?: string | null
+}
+
+/** A repository in the side rail; without `iconUrl` and `ownerAvatarUrl` it shows the repository glyph. */
+export interface RailRepo extends RepoRef, RepoIcon {}
+
 /** Optional extras a boxed repository row shows when the app has them. */
 export interface RepoRowExtras {
   description?: string | null

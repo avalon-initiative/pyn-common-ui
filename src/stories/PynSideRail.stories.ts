@@ -38,3 +38,18 @@ export const InRepository: Story = { args: { current: '', currentRepo: 'alice/py
 export const WithoutAccountSwitcher: Story = { args: { hideAccount: true } }
 export const FewRepositories: Story = { args: { repos: repos.slice(0, 3) } }
 export const NoRepositories: Story = { args: { repos: [], orgs: [] } }
+
+const square = (fill: string) =>
+  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="%23${fill}"/></svg>`
+
+/** Repository icon, else the owner's avatar, else initials; entries without either keep the glyph. */
+export const WithRepositoryIcons: Story = {
+  args: {
+    repos: [
+      { owner: 'alice', name: 'pyn', iconUrl: square('c84'), ownerAvatarUrl: square('4a7') },
+      { owner: 'alice', name: 'pyn-web', iconUrl: null, ownerAvatarUrl: square('4a7') },
+      { owner: 'studio', name: 'worldzero', iconUrl: null, ownerAvatarUrl: null },
+      { owner: 'alice', name: 'nova' },
+    ],
+  },
+}

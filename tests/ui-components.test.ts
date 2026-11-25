@@ -6010,6 +6010,25 @@ describe('PynSideRail', () => {
   it('says so when there are no repositories', () => {
     expect(mountRail({ repos: [] }).text()).toContain('None yet.')
   })
+
+  it('shows the repository icon, the owner avatar or initials when given, else the glyph', () => {
+    const w = mountRail({
+      repos: [
+        { owner: 'alice', name: 'icon', iconUrl: '/i.png', ownerAvatarUrl: '/o.png' },
+        { owner: 'alice', name: 'owner', iconUrl: null, ownerAvatarUrl: '/o.png' },
+        { owner: 'alice', name: 'initials', iconUrl: null },
+        { owner: 'alice', name: 'plain' },
+      ],
+    })
+    const [icon, owner, initials, plain] = repoLinks(w)
+    expect(icon.find('[data-repo-icon] img').attributes('src')).toBe('/i.png')
+    expect(owner.find('[data-repo-icon] img').attributes('src')).toBe('/o.png')
+    expect(initials.find('[data-repo-icon] [data-initials]').text()).toBe('A')
+    expect(initials.find('[data-repo-icon]').attributes('data-size')).toBe('xs')
+    expect(plain.find('[data-repo-icon]').exists()).toBe(false)
+    expect(plain.find('svg').exists()).toBe(true)
+    expect(icon.text()).toBe('alice/icon')
+  })
 })
 
 describe('PynSubNav', () => {
