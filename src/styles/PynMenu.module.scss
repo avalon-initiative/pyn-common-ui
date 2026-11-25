@@ -68,6 +68,13 @@
   font-weight: 600;
 }
 
+.note {
+  margin: 0;
+  padding: var(--pyn-space-2) var(--pyn-space-4);
+  color: var(--pyn-text-muted);
+  font-size: var(--pyn-text-sm);
+}
+
 .footer {
   margin-top: var(--pyn-space-2);
   padding: var(--pyn-space-2) var(--pyn-space-4) 0;
@@ -98,6 +105,13 @@
   color: var(--pyn-text);
   font-size: var(--pyn-text-xs);
   text-align: center;
+
+  > svg {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    color: var(--pyn-text-muted);
+  }
 }
 
 .separator {

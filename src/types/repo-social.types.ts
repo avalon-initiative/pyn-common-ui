@@ -1,3 +1,4 @@
+import type { RepoRef } from './repo.types'
 import type { MenuItem } from './shell.types'
 
 export type SocialKind = 'watch' | 'fork' | 'star'
@@ -12,8 +13,20 @@ export interface SocialButton {
   menu?: MenuItem[]
 }
 
+/** A fork in the Fork caret menu; `href` defaults to `/<owner>/<name>`. */
+export interface ForkLink extends RepoRef {
+  href?: string
+}
+
 export interface RepoSocial {
   watch?: SocialButton
   fork?: SocialButton
   star?: SocialButton
+  /**
+   * Existing forks; given, the Fork caret lists them (or `forksEmpty`) under "Existing forks", then
+   * "Create a new fork" (menu id `create`, left out while the Fork button is disabled), then `fork.menu`.
+   */
+  forks?: ForkLink[]
+  /** Text of an empty forks list. */
+  forksEmpty?: string
 }

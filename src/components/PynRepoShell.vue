@@ -8,7 +8,7 @@ import styles from '../styles/PynRepoShell.module.scss'
 import { BRANCH_SECTIONS, TAB_ICONS, repoPath } from '../state/repo.state'
 import type { RepoShellTab } from '../state/repo.state'
 import type { RepoFact, Visibility } from '../types/repo.types'
-import type { RepoSocial, SocialKind } from '../types/repo-social.types'
+import type { ForkLink, RepoSocial, SocialKind } from '../types/repo-social.types'
 
 const props = defineProps<{
   owner: string
@@ -44,6 +44,8 @@ const props = defineProps<{
   lockPending?: boolean
   /** Open pull requests; the `pulls` tab gets this count unless it has its own. */
   pullCount?: number
+  /** Source of a fork; shows a "forked from owner/name" line under the title. */
+  forkOf?: ForkLink | null
 }>()
 
 const emit = defineEmits<{
@@ -93,34 +95,47 @@ const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.v
   <div :class="styles.shell">
     <header :class="styles.header">
       <div :class="styles.top">
-        <component :is="hidePath ? 'div' : 'h1'" :class="styles.title">
-          <nav v-if="!hidePath" :class="styles.path" aria-label="Repository path">
-            <PynAvatar :username="owner" :src="ownerAvatarUrl" size="sm" :class="styles.avatar" />
-            <template v-if="showOwner">
-              <a :href="ownerHref ?? `/${encodeURIComponent(owner)}`" :class="styles.owner">{{
-                owner
-              }}</a>
-              <span :class="styles.sep" aria-hidden="true">/</span>
-            </template>
-            <a :href="repoPath({ owner, name }, '', branch)" :class="styles.name">{{ name }}</a>
-          </nav>
-          <span :class="styles.badge" data-visibility>{{
-            visibility === 'public' ? 'Public' : 'Private'
-          }}</span>
-          <slot name="labels">
-            <span
-              v-for="(fact, i) in facts ?? []"
-              :key="i"
-              :class="styles.fact"
-              :title="fact.title"
-              data-fact
+        <div :class="styles.heading">
+          <component :is="hidePath ? 'div' : 'h1'" :class="styles.title">
+            <nav v-if="!hidePath" :class="styles.path" aria-label="Repository path">
+              <PynAvatar :username="owner" :src="ownerAvatarUrl" size="sm" :class="styles.avatar" />
+              <template v-if="showOwner">
+                <a :href="ownerHref ?? `/${encodeURIComponent(owner)}`" :class="styles.owner">{{
+                  owner
+                }}</a>
+                <span :class="styles.sep" aria-hidden="true">/</span>
+              </template>
+              <a :href="repoPath({ owner, name }, '', branch)" :class="styles.name">{{ name }}</a>
+            </nav>
+            <span :class="styles.badge" data-visibility>{{
+              visibility === 'public' ? 'Public' : 'Private'
+            }}</span>
+            <slot name="labels">
+              <span
+                v-for="(fact, i) in facts ?? []"
+                :key="i"
+                :class="styles.fact"
+                :title="fact.title"
+                data-fact
+              >
+                <template v-if="fact.label"
+                  ><span :class="styles.factLabel">{{ fact.label }}</span></template
+                >{{ fact.value }}
+              </span>
+            </slot>
+          </component>
+          <p v-if="forkOf" :class="styles.forkOf" data-fork-of>
+            forked from
+            <a
+              :href="
+                forkOf.href ??
+                `/${encodeURIComponent(forkOf.owner)}/${encodeURIComponent(forkOf.name)}`
+              "
+              :class="styles.forkLink"
+              >{{ forkOf.owner }}/{{ forkOf.name }}</a
             >
-              <template v-if="fact.label"
-                ><span :class="styles.factLabel">{{ fact.label }}</span></template
-              >{{ fact.value }}
-            </span>
-          </slot>
-        </component>
+          </p>
+        </div>
         <div
           v-if="
             social?.watch ||
@@ -132,6 +147,7 @@ const otherHolders = computed(() => (props.lockHolders ?? []).length - holders.v
             $slots.actions
           "
           :class="styles.actions"
+          data-actions
         >
           <PynRepoSocial
             v-bind="social"

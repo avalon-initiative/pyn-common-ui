@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynMenu.module.scss'
 import type { MenuItem } from '../types/shell.types'
 
@@ -133,6 +134,9 @@ function choose(id: string) {
         <p v-else-if="item.heading" :class="styles.heading" role="presentation">
           {{ item.label }}
         </p>
+        <p v-else-if="item.note" :class="styles.note" role="presentation" data-note>
+          {{ item.label }}
+        </p>
         <a
           v-else-if="item.href"
           :href="item.href"
@@ -141,7 +145,10 @@ function choose(id: string) {
           tabindex="-1"
           :aria-current="item.checked ? 'true' : undefined"
           @click="open = false"
-          ><span :class="styles.check">{{ item.checked ? '✓' : '' }}</span
+          ><span :class="styles.check"
+            ><PynIcon v-if="item.icon" :name="item.icon" /><template v-else>{{
+              item.checked ? '✓' : ''
+            }}</template></span
           >{{ item.label }}</a
         >
         <button
@@ -153,7 +160,11 @@ function choose(id: string) {
           tabindex="-1"
           @click="choose(item.id)"
         >
-          <span :class="styles.check">{{ item.checked ? '✓' : '' }}</span>{{ item.label }}
+          <span :class="styles.check"
+            ><PynIcon v-if="item.icon" :name="item.icon" /><template v-else>{{
+              item.checked ? '✓' : ''
+            }}</template></span
+          >{{ item.label }}
         </button>
       </template>
       <div v-if="$slots.footer" :class="styles.footer"><slot name="footer" /></div>

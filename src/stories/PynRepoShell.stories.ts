@@ -156,3 +156,16 @@ export const FactsWithEmptyActions: Story = {
     ...Facts.args,
   },
 }
+
+export const Fork: Story = {
+  args: {
+    owner: 'alice',
+    forkOf: { owner: 'studio', name: 'game' },
+    social: {
+      watch: { count: 1 },
+      fork: { count: 0 },
+      star: { count: 0 },
+      forks: [],
+    },
+  },
+}

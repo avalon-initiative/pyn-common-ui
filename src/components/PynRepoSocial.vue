@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import PynIcon from './PynIcon.vue'
 import PynMenu from './PynMenu.vue'
 import styles from '../styles/PynRepoSocial.module.scss'
+import { forkMenu } from '../state/repo-social.state'
 import type { RepoSocial, SocialButton, SocialKind } from '../types/repo-social.types'
 
 const props = defineProps<RepoSocial>()
@@ -19,7 +20,9 @@ const buttons = computed(() =>
     .filter((kind) => props[kind])
     .map((kind) => {
       const b = props[kind] as SocialButton
-      return { kind, ...b, ...META[kind], text: b.active ? META[kind].on : META[kind].label }
+      const menu =
+        kind === 'fork' && props.forks ? forkMenu(b, props.forks, props.forksEmpty) : b.menu
+      return { kind, ...b, menu, ...META[kind], text: b.active ? META[kind].on : META[kind].label }
     }),
 )
 </script>
