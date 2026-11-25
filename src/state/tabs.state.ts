@@ -1,3 +1,5 @@
+import { pluralize } from '../utils/plural'
+import { branchCount } from './branch-list.state'
 import type { BranchSummary } from '../types/branch.types'
 import type { SettingsGroup, SettingsSection, TabItem } from '../types/tabs.types'
 
@@ -35,7 +37,7 @@ export function fitTabs(
   }
 }
 
-export const tabCountLabel = (t: TabItem): string => t.countLabel ?? `${t.count} items`
+export const tabCountLabel = (t: TabItem): string => t.countLabel ?? pluralize(t.count ?? 0, 'item')
 
 /** Groups consecutive sections that share a `group` label. */
 export function groupSections(sections: SettingsSection[]): SettingsGroup[] {
@@ -60,7 +62,7 @@ export function railBranches(branches: BranchSummary[], defaultBranch?: string):
 
 export function aheadBehind(b: BranchSummary): string {
   const parts: string[] = []
-  if (b.ahead) parts.push(`${b.ahead} ahead`)
-  if (b.behind) parts.push(`${b.behind} behind`)
+  if (b.ahead) parts.push(`${branchCount(b.ahead, b.countsCapped)} ahead`)
+  if (b.behind) parts.push(`${branchCount(b.behind, b.countsCapped)} behind`)
   return parts.join(', ')
 }

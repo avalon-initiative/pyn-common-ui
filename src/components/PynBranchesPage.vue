@@ -10,6 +10,7 @@ import PynMenu from './PynMenu.vue'
 import PynSettingsLayout from './PynSettingsLayout.vue'
 import styles from '../styles/PynBranchesPage.module.scss'
 import { availableViews, branchGroups } from '../state/branches-page.state'
+import { branchCount } from '../state/branch-list.state'
 import { copyText } from '../utils/copy'
 import { formatAgo } from '../utils/ago'
 import type { BranchListItem, BranchView } from '../types/branch.types'
@@ -170,8 +171,12 @@ function rename(name: string, newName: string) {
                 <td colspan="2" :class="styles.num"><span :class="styles.badge">Default</span></td>
               </template>
               <template v-else>
-                <td :class="styles.num" data-behind>{{ b.behind ?? '-' }}</td>
-                <td :class="styles.num" data-ahead>{{ b.ahead ?? '-' }}</td>
+                <td :class="styles.num" data-behind>
+                  {{ b.behind === undefined ? '-' : branchCount(b.behind, b.countsCapped) }}
+                </td>
+                <td :class="styles.num" data-ahead>
+                  {{ b.ahead === undefined ? '-' : branchCount(b.ahead, b.countsCapped) }}
+                </td>
               </template>
               <td :class="styles.actions">
                 <span :class="styles.tools">

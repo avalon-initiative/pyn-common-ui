@@ -18,6 +18,8 @@ export interface BranchSummary {
   isDefault?: boolean
   ahead?: number
   behind?: number
+  /** The server stopped counting at 1000 (`counts_capped`); a count at the cap reads "1000+". */
+  countsCapped?: boolean
   updatedAt?: string | null
 }
 

@@ -1,10 +1,9 @@
 import type { FilterListControl } from '../types/filter-list.types'
 import type { AccessTab } from '../types/team.types'
-
-const plural = (n: number, one: string, many: string): string => `${n} ${n === 1 ? one : many}`
+import { pluralize } from '../utils/plural'
 
 export const accessCounts = (people: number, teams: number): string =>
-  `${plural(people, 'person', 'people')} and ${plural(teams, 'team', 'teams')}`
+  `${pluralize(people, 'person', 'people')} and ${pluralize(teams, 'team')}`
 
 export const ACCESS_TABS: { id: AccessTab; label: string }[] = [
   { id: 'direct', label: 'Direct access' },

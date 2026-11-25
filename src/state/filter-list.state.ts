@@ -1,3 +1,5 @@
+import { pluralize } from '../utils/plural'
+
 export const pageCount = (count: number, pageSize: number): number =>
   pageSize > 0 ? Math.max(1, Math.ceil(count / pageSize)) : 1
 
@@ -23,6 +25,4 @@ export function pageWindow(page: number, pages: number, around = 1): (number | n
   return out
 }
 
-/** "1 repository" or "75 repositories". */
-export const rowCountText = (count: number, singular: string, plural = `${singular}s`): string =>
-  `${count} ${count === 1 ? singular : plural}`
+export const rowCountText = pluralize

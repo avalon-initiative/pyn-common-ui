@@ -6,8 +6,32 @@ import { orgPath } from './org.state'
 export const teamPath = (org: string, team = ''): string =>
   orgPath(org, team ? `teams/${encodeURIComponent(team)}` : 'teams')
 
-/** The slug the server derives from a team name: trimmed, whitespace runs to `-`, lowercased. */
-export const teamSlug = (name: string): string => name.trim().replace(/\s+/g, '-').toLowerCase()
+const LETTERS: Record<string, string> = {
+  ß: 'ss',
+  æ: 'ae',
+  œ: 'oe',
+  ø: 'o',
+  ł: 'l',
+  đ: 'd',
+  þ: 'th',
+}
+const TEAM_SLUG_MAX = 39
+
+/** The slug the server derives from a team name (NFD, marks dropped, `LETTERS` spelled out, then the hyphen rule);
+ *  empty when the server would refuse it. */
+export function teamSlug(name: string): string {
+  const slug = name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[ßæœøłđþ]/g, (c) => LETTERS[c]!)
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9_-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^[-_]+|[-_]+$/g, '')
+  return slug.length <= TEAM_SLUG_MAX ? slug : ''
+}
 
 export const personGrantees = (members: Member[]): Grantee[] =>
   members.map((m) => ({ name: m.user, role: m.role, source: m.source, identity: m.identity }))

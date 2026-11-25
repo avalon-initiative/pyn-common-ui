@@ -41,6 +41,15 @@ export const DefaultByName: Story = {
 export const Empty: Story = { args: { branches: [] } }
 export const Loading: Story = { args: { loading: true } }
 export const Failed: Story = { args: { error: 'Could not load branches.' } }
+/** The server stopped counting at 1000, so the capped count reads "1000+". */
+export const CappedCounts: Story = {
+  args: {
+    branches: [
+      { name: 'main', isDefault: true, href: '/alice/game' },
+      { name: 'rewrite', ahead: 1000, behind: 7, countsCapped: true, href: '#', compareHref: '#' },
+    ],
+  },
+}
 export const LongNames: Story = {
   args: {
     branches: [

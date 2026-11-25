@@ -2,6 +2,7 @@
 import styles from '../styles/PynTeamList.module.scss'
 import { formatDate } from '../utils/datetime'
 import { teamPath } from '../state/team.state'
+import { pluralize } from '../utils/plural'
 import type { TeamInfo } from '../types/team.types'
 
 defineProps<{ org: string; teams: TeamInfo[] }>()
@@ -16,8 +17,8 @@ defineProps<{ org: string; teams: TeamInfo[] }>()
         <span v-if="t.description" :class="styles.description">{{ t.description }}</span>
       </span>
       <span :class="styles.meta">
-        <span data-members>{{ t.members.length }} members</span>
-        <span data-repos>{{ t.repos.length }} repositories</span>
+        <span data-members>{{ pluralize(t.members.length, 'member') }}</span>
+        <span data-repos>{{ pluralize(t.repos.length, 'repository', 'repositories') }}</span>
         <span>created {{ formatDate(t.created_at) }}</span>
       </span>
     </li>

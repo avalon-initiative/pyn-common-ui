@@ -48,7 +48,8 @@ export const branchesPageBranches: BranchListItem[] = [
   {
     name: 'old-experiment',
     ahead: 3,
-    behind: 80,
+    behind: 1000,
+    countsCapped: true,
     updatedAt: '2026-06-01T09:00:00Z',
     updatedBy: alice,
     href: '#',

@@ -3,6 +3,7 @@ import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynRepoDetails.module.scss'
 import { formatDate, formatDateTime } from '../utils/datetime'
 import { formatAgo } from '../utils/ago'
+import { pluralize, pluralWord } from '../utils/plural'
 import type { Visibility } from '../types/repo.types'
 
 defineProps<{
@@ -27,7 +28,7 @@ defineProps<{
         <PynIcon name="eye" /><strong>{{ visibility }}</strong>
       </li>
       <li>
-        <PynIcon name="file" /><strong>{{ files }}</strong> files
+        <PynIcon name="file" /><strong>{{ files }}</strong> {{ pluralWord(files, 'file') }}
       </li>
       <li>
         <PynIcon name="lock" /><strong>{{ exclusiveFiles }}</strong> exclusive
@@ -36,7 +37,7 @@ defineProps<{
         <PynIcon name="repo" /><strong>{{ sharedFiles }}</strong> shared
       </li>
       <li>
-        <PynIcon name="key" /><strong>{{ leaseHours }} hours</strong> lease
+        <PynIcon name="key" /><strong>{{ pluralize(leaseHours, 'hour') }}</strong> lease
       </li>
       <li :title="updatedAt ? formatDateTime(updatedAt) : undefined">
         <PynIcon name="history" />Last revision

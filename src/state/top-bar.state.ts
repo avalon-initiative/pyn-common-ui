@@ -1,3 +1,4 @@
+import { pluralize } from '../utils/plural'
 import type { MenuItem } from '../types/shell.types'
 import type { OwnerOption, TopBarHrefs } from '../types/top-bar.types'
 
@@ -25,13 +26,11 @@ export function countText(n: number | undefined): string {
   return n > 99 ? '99+' : String(n)
 }
 
-const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
-
 export const locksText = (n: number, expiring?: boolean) =>
-  `${plural(n, 'lock', 'locks')} held${expiring ? ', one expires soon' : ''}`
+  `${pluralize(n, 'lock')} held${expiring ? ', one expires soon' : ''}`
 
 export const notificationsText = (n: number | undefined) =>
-  n && n > 0 ? plural(n, 'notification', 'notifications') : 'Notifications'
+  n && n > 0 ? pluralize(n, 'notification') : 'Notifications'
 
 /** Owner switcher entries: the person first, then organizations, then create. */
 export function ownerItems(owners: OwnerOption[], current: string, newOrg: string): MenuItem[] {

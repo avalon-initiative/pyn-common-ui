@@ -2,6 +2,7 @@
 import styles from '../styles/PynOwnerUsage.module.scss'
 import PynUsageMeter from './PynUsageMeter.vue'
 import { formatBytes } from '../utils/bytes'
+import { pluralize } from '../utils/plural'
 import type { OwnerUsage, RepoUsage } from '../types/usage.types'
 
 defineProps<{ usage: OwnerUsage }>()
@@ -45,7 +46,9 @@ const repoOwner = (r: RepoUsage) => r.repository.slice(0, r.repository.length - 
           <button type="button" :class="styles.name" @click="emit('open', repo)">
             <span :class="styles.owner">{{ repoOwner(repo) }}</span>{{ repoName(repo) }}
           </button>
-          <span :class="styles.meta">{{ repo.files }} files · {{ repo.revisions }} revisions</span>
+          <span :class="styles.meta">{{
+            `${pluralize(repo.files, 'file')} · ${pluralize(repo.revisions, 'revision')}`
+          }}</span>
         </div>
         <PynUsageMeter
           :class="styles.repoMeter"

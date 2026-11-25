@@ -3,7 +3,7 @@ export interface TabItem {
   href: string
   /** A number shown as a badge beside the label. */
   count?: number
-  /** Read by assistive technology in place of the badge; defaults to "<count> items". */
+  /** Read by assistive technology in place of the badge; defaults to "<count> items", singular for one. */
   countLabel?: string
   current?: boolean
   /** PynIcon name; icons show only when every tab has one. */

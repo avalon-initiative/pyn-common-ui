@@ -5,6 +5,7 @@ import PynModeChip from './PynModeChip.vue'
 import PynPerson from './PynPerson.vue'
 import { dirOf, folderOptions, inFolder } from '../state/policy.state'
 import { formatDateTime } from '../utils/datetime'
+import { pluralize } from '../utils/plural'
 import type { Mode } from '../types/lock.types'
 import type { LockableDisagreementKind, PolicyPreview } from '../types/policy.types'
 
@@ -71,7 +72,6 @@ const disagreementGroups = computed(() =>
   })).filter((g) => g.paths.length),
 )
 const empty = computed(() => !rows.value.length)
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
 </script>
 
 <template>
@@ -88,10 +88,10 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
         <template v-else>
           <p :class="styles.counts">
             <span :data-direction="'to_exclusive'"
-              >{{ plural(preview.to_exclusive.length, 'path') }} become exclusive</span
+              >{{ pluralize(preview.to_exclusive.length, 'path') }} become exclusive</span
             >
             <span :data-direction="'to_shared'"
-              >{{ plural(preview.to_shared.length, 'path') }} become shared</span
+              >{{ pluralize(preview.to_shared.length, 'path') }} become shared</span
             >
           </p>
           <div v-if="filtering" :class="styles.filters" data-section="filters">
@@ -128,7 +128,7 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
             <tbody v-for="[dir, group] in groups" :key="dir">
               <tr :class="styles.folder" data-group>
                 <th scope="rowgroup" colspan="3">
-                  {{ dir }} <span :class="styles.muted">{{ plural(group.length, 'path') }}</span>
+                  {{ dir }} <span :class="styles.muted">{{ pluralize(group.length, 'path') }}</span>
                 </th>
               </tr>
               <tr v-for="r in group" :key="r.path">
@@ -145,7 +145,7 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
         </template>
 
         <div v-if="locks.length" :class="styles.group" data-section="locks">
-          <h4 :class="styles.subtitle">{{ plural(locks.length, 'lock') }} would be released</h4>
+          <h4 :class="styles.subtitle">{{ pluralize(locks.length, 'lock') }} would be released</h4>
           <ul :class="styles.list">
             <li v-for="l in locks" :key="l.path">
               <button type="button" :class="styles.path" @click="emit('selectPath', l.path)">
@@ -160,7 +160,7 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
         </div>
         <div v-if="stranded.length" :class="styles.group" data-section="stranded">
           <h4 :class="styles.subtitle">
-            {{ plural(stranded.length, 'branch version') }} would be stranded
+            {{ pluralize(stranded.length, 'branch version') }} would be stranded
           </h4>
           <ul :class="styles.list">
             <li v-for="s in stranded" :key="`${s.path}@${s.branch}`">
@@ -173,7 +173,7 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
         </div>
         <div v-if="disagreements.length" :class="styles.group" data-section="disagreements">
           <h4 :class="styles.subtitle">
-            {{ plural(disagreements.length, 'path') }} where lockable and mode disagree
+            {{ pluralize(disagreements.length, 'path') }} where lockable and mode disagree
           </h4>
           <div
             v-for="g in disagreementGroups"

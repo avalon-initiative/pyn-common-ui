@@ -15,6 +15,12 @@ type Story = StoryObj<typeof PynTeamList>
 
 export const Default: Story = {}
 export const Empty: Story = { args: { teams: [] } }
+/** Counts of one read in the singular. */
+export const OneEach: Story = {
+  args: {
+    teams: [{ ...teams[0]!, members: ['bob'], repos: [{ repo: 'studio/game', role: 'writer' }] }],
+  },
+}
 
 const page = (open: boolean): Story => ({
   render: (args) => ({

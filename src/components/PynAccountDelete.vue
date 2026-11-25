@@ -2,6 +2,7 @@
 import { computed, ref, inject } from 'vue'
 import styles from '../styles/PynAccountDelete.module.scss'
 import { DANGER_ZONE } from '../state/settings-section.state'
+import { pluralize } from '../utils/plural'
 import type { AccountDeleteBlockers } from '../types/auth.types'
 
 const props = defineProps<{
@@ -30,9 +31,9 @@ function submit() {
     <h3 :class="styles.heading">Delete this account</h3>
     <p :class="styles.note">
       The account is disabled and deleted after
-      {{ recoveryDays ? `${recoveryDays} days` : 'the recovery window' }}; sign in before then to
-      restore it. Its keys, tokens and memberships are removed. History keeps your name on past
-      commits and the audit log.
+      {{ recoveryDays ? pluralize(recoveryDays, 'day') : 'the recovery window' }}; sign in before
+      then to restore it. Its keys, tokens and memberships are removed. History keeps your name on
+      past commits and the audit log.
     </p>
     <div v-if="blocked" :class="styles.blockers" role="alert">
       <p>Transfer or delete what this account owns first.</p>
