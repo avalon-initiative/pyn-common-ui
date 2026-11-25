@@ -46,6 +46,19 @@ export const LinksOpen: Story = {
   play: open,
 }
 
+export const NoteAndIconsOpen: Story = {
+  args: {
+    label: 'Fork',
+    items: [
+      { id: 'h', label: 'Existing forks', heading: true },
+      { id: 'n', label: 'This repository has no forks yet.', note: true },
+      { id: 's', label: '', separator: true },
+      { id: 'create', label: 'Create a new fork', icon: 'plus' },
+    ],
+  },
+  play: open,
+}
+
 export const ChoicesOpen: Story = {
   args: { ...Choices.args, label: 'Theme' },
   play: open,

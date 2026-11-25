@@ -5,6 +5,9 @@ import {
   PynBranchBar,
   PynRepoBranches,
   PynCommandBlock,
+  PynForkForm,
+  FORK_CREATE,
+  forkMenu,
   PynLockedFiles,
   PynQuickSetup,
   PynReadme,
@@ -90,7 +93,108 @@ describe('PynRepoShell title row', () => {
   it('has no actions container without the group or slots', () => {
     const w = make(PynRepoShell, { props: shell })
     expect(w.find('[role=group]').exists()).toBe(false)
-    expect(w.find('header > div > div').exists()).toBe(false)
+    expect(w.find('[data-actions]').exists()).toBe(false)
+  })
+})
+
+describe('Fork in the browser', () => {
+  const fork = { count: 2 }
+
+  it('lists existing forks, then Create a new fork, in the Fork caret', async () => {
+    const w = make(PynRepoSocial, {
+      props: {
+        fork,
+        forks: [
+          { owner: 'bob', name: 'game' },
+          { owner: 'c', name: 'd', href: '/x' },
+        ],
+      },
+    })
+    await w.find('button[aria-label="Fork options"]').trigger('click')
+    const links = w.findAll('[role=menu] a')
+    expect(links.map((a) => [a.text(), a.attributes('href')])).toEqual([
+      ['bob/game', '/bob/game'],
+      ['c/d', '/x'],
+    ])
+    expect(w.find('[role=menu]').text()).toContain('Existing forks')
+    const create = w.findAll('[role=menuitem]').find((b) => b.text() === 'Create a new fork')
+    expect(create!.find('svg').exists()).toBe(true)
+    await create!.trigger('click')
+    expect(w.emitted('menu')).toEqual([['fork', FORK_CREATE]])
+  })
+
+  it('shows the empty note and drops Create while the button is disabled', async () => {
+    const w = make(PynRepoSocial, {
+      props: { fork: { count: 0, disabled: true }, forks: [], forksEmpty: 'None yet' },
+    })
+    await w.find('button[aria-label="Fork options"]').trigger('click')
+    expect(w.find('[data-note]').text()).toBe('None yet')
+    expect(w.find('[role=menu]').text()).not.toContain('Create a new fork')
+  })
+
+  it('keeps the fork menu items without forks', () => {
+    expect(forkMenu({ count: 0, menu: [{ id: 'x', label: 'X' }] }, []).map((i) => i.id)).toEqual([
+      'forks-heading',
+      'forks-empty',
+      'forks-sep',
+      FORK_CREATE,
+      'fork-menu-sep',
+      'x',
+    ])
+  })
+
+  it('shows the forked-from line only for a fork', () => {
+    expect(make(PynRepoShell, { props: shell }).find('[data-fork-of]').exists()).toBe(false)
+    const w = make(PynRepoShell, { props: { ...shell, forkOf: { owner: 'up', name: 'game' } } })
+    expect(w.find('[data-fork-of]').text()).toBe('forked from up/game')
+    expect(w.find('[data-fork-of] a').attributes('href')).toBe('/up/game')
+  })
+
+  it('submits the fork form with the source name and the branch option checked', async () => {
+    const w = make(PynForkForm, {
+      props: { source: { owner: 'up', name: 'game' }, owner: 'me', nameCanonical: 'game' },
+    })
+    expect((w.find('[data-name]').element as HTMLInputElement).value).toBe('game')
+    expect(w.find('[data-canonical]').text()).toBe('Will be created as: game')
+    expect((w.find('[data-branch-only]').element as HTMLInputElement).checked).toBe(true)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')).toEqual([
+      [{ owner: 'me', name: 'game', default_branch_only: true }],
+    ])
+  })
+
+  it('picks an owner, sends a description and the unchecked option, and emits nameInput', async () => {
+    const w = make(PynForkForm, {
+      props: { source: { owner: 'up', name: 'game' }, owner: 'me', owners: ['me', 'org'] },
+    })
+    await w.find('select[data-owner]').setValue('org')
+    expect(w.emitted('update:owner')).toEqual([['org']])
+    await w.find('[data-name]').setValue(' mine ')
+    expect(w.emitted('nameInput')!.at(-1)).toEqual(['mine'])
+    await w.find('input[maxlength="350"]').setValue(' A copy ')
+    await w.find('[data-branch-only]').setValue(false)
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')![0]).toEqual([
+      { owner: 'me', name: 'mine', description: 'A copy', default_branch_only: false },
+    ])
+  })
+
+  it('shows busy and the error, and does not submit while busy', async () => {
+    const w = make(PynForkForm, {
+      props: {
+        source: { owner: 'up', name: 'game' },
+        owner: 'me',
+        busy: true,
+        error: 'Fork limit reached',
+      },
+    })
+    expect(w.find('[role=alert]').text()).toBe('Fork limit reached')
+    expect(w.find('button[type=submit]').attributes('disabled')).toBeDefined()
+    expect(w.find('button[type=submit]').text()).toBe('Creating fork…')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('submit')).toBeUndefined()
+    await w.find('button[type=button]').trigger('click')
+    expect(w.emitted('cancel')).toHaveLength(1)
   })
 })
 

@@ -51,6 +51,15 @@ export interface RepoSettings {
   description?: string
 }
 
+/** What the create-fork form submits. */
+export interface ForkFormValue {
+  owner: string
+  name: string
+  /** Omitted when left empty. */
+  description?: string
+  default_branch_only: boolean
+}
+
 /** What the repository form edits: the settings plus the lock-limit state the server reports. */
 export type RepoFormValue = RepoSettings &
   Partial<Pick<RepoInfo, 'max_locks_per_user_setting' | 'max_locks_set_by_policy'>>

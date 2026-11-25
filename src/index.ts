@@ -75,6 +75,7 @@ export { default as PynRepoLanding } from './components/PynRepoLanding.vue'
 export { default as PynRepoDetails } from './components/PynRepoDetails.vue'
 export { default as PynCheckoutCard } from './components/PynCheckoutCard.vue'
 export { default as PynRepoForm } from './components/PynRepoForm.vue'
+export { default as PynForkForm } from './components/PynForkForm.vue'
 export { default as PynRepoList } from './components/PynRepoList.vue'
 export { default as PynRepoDelete } from './components/PynRepoDelete.vue'
 export { default as PynMembers } from './components/PynMembers.vue'
@@ -150,7 +151,8 @@ export { default as PynViewStack } from './components/PynViewStack.vue'
 export { default as PynViewSummary } from './components/PynViewSummary.vue'
 export type { PynButtonProps, PynButtonVariant } from './types/PynButton.types'
 export type { CloneKind } from './types/clone-menu.types'
-export type { RepoSocial, SocialButton, SocialKind } from './types/repo-social.types'
+export type { ForkLink, RepoSocial, SocialButton, SocialKind } from './types/repo-social.types'
+export { FORK_CREATE, forkMenu } from './state/repo-social.state'
 export type { MultiSelectOption } from './types/multi-select.types'
 export { applyTheme, loadTheme, saveTheme, themeChoices } from './state/theme.state'
 export type { ThemeChoice } from './state/theme.state'
@@ -441,6 +443,7 @@ export type {
 export type {
   AuditEntry,
   AuditFilter,
+  ForkFormValue,
   InviteInfo,
   Member,
   NewUser,

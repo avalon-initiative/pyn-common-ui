@@ -29,3 +29,19 @@ export const Active: Story = {
 }
 export const OnlyStar: Story = { args: { watch: undefined, fork: undefined } }
 export const Disabled: Story = { args: { fork: { count: 1, disabled: true } } }
+
+const openFork = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  canvasElement.querySelector<HTMLElement>('button[aria-label="Fork options"]')!.click()
+  await new Promise((resolve) => setTimeout(resolve))
+}
+export const ForksOpen: Story = {
+  args: {
+    fork: { count: 2 },
+    forks: [
+      { owner: 'bob', name: 'game' },
+      { owner: 'modding-club', name: 'game-mods' },
+    ],
+  },
+  play: openFork,
+}
+export const NoForksOpen: Story = { args: { fork: { count: 0 }, forks: [] }, play: openFork }
