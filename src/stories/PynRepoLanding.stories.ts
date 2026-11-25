@@ -138,6 +138,12 @@ export const FullPage: Story = {
       stars: 12,
       watching: 3,
       forks: 1,
+      topics: ['unreal', 'game'],
+      languages: [
+        { name: 'C++', bytes: 812000 },
+        { name: 'C#', bytes: 96000 },
+        { name: 'Shell', bytes: 2000 },
+      ],
     },
   },
 }

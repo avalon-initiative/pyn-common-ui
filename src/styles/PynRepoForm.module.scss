@@ -177,6 +177,10 @@
   @include m.link-button;
 }
 
+.topics {
+  font-size: var(--pyn-text-sm);
+}
+
 .counter {
   @include m.help;
 }

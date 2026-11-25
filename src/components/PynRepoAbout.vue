@@ -2,6 +2,8 @@
 import { computed } from 'vue'
 import PynIcon from './PynIcon.vue'
 import styles from '../styles/PynRepoAbout.module.scss'
+import { languageShares } from '../utils/languages'
+import type { LanguageBytes } from '../types/repo.types'
 
 const props = defineProps<{
   description?: string | null
@@ -12,7 +14,11 @@ const props = defineProps<{
   stars?: number
   watching?: number
   forks?: number
+  /** Bytes per language; shown as a bar and a list of shares, hidden when omitted or empty. */
+  languages?: LanguageBytes[]
 }>()
+
+const shares = computed(() => languageShares(props.languages ?? []))
 
 const counts = computed(() =>
   [
@@ -42,5 +48,23 @@ const counts = computed(() =>
         <PynIcon :name="c.icon" /><strong>{{ c.n }}</strong> {{ c.unit(c.n) }}
       </li>
     </ul>
+    <div v-if="shares.length" :class="styles.languages" data-languages>
+      <h3 :class="styles.subtitle">Languages</h3>
+      <div :class="styles.bar" aria-hidden="true">
+        <span
+          v-for="l in shares"
+          :key="l.name"
+          :class="styles.segment"
+          :style="{ flexGrow: l.bytes, backgroundColor: l.color }"
+        />
+      </div>
+      <ul :class="styles.languageList" aria-label="Languages">
+        <li v-for="l in shares" :key="l.name" :class="styles.language" data-language>
+          <span :class="styles.dot" :style="{ backgroundColor: l.color }" aria-hidden="true" />
+          <strong>{{ l.name }}</strong>
+          <span :class="styles.percent">{{ l.percent < 0.1 ? '<0.1' : l.percent }}%</span>
+        </li>
+      </ul>
+    </div>
   </section>
 </template>

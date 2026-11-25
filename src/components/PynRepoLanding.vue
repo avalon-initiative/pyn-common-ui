@@ -17,7 +17,7 @@ import { breadcrumbs, treePath } from '../state/tree.state'
 import type { BranchSummary } from '../types/branch.types'
 import type { RefKind, TagOption } from '../types/tag.types'
 import type { ReadmeDoc } from '../types/blob.types'
-import type { RepoInfo } from '../types/repo.types'
+import type { LanguageBytes, RepoInfo } from '../types/repo.types'
 import type { RepoSummary, TreeListing } from '../types/tree.types'
 
 const props = defineProps<{
@@ -77,6 +77,7 @@ const props = defineProps<{
     stars?: number
     watching?: number
     forks?: number
+    languages?: LanguageBytes[]
   }
 }>()
 

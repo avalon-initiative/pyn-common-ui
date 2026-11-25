@@ -76,6 +76,9 @@ export { default as PynRepoDetails } from './components/PynRepoDetails.vue'
 export { default as PynCheckoutCard } from './components/PynCheckoutCard.vue'
 export { default as PynRepoForm } from './components/PynRepoForm.vue'
 export { default as PynForkForm } from './components/PynForkForm.vue'
+export { default as PynTopicsInput } from './components/PynTopicsInput.vue'
+export { MAX_TOPICS, MAX_TOPIC_LENGTH, addTopics, splitTopics } from './state/topics.state'
+export { languageColor, languageShares } from './utils/languages'
 export { default as PynRepoList } from './components/PynRepoList.vue'
 export { default as PynRepoDelete } from './components/PynRepoDelete.vue'
 export { default as PynMembers } from './components/PynMembers.vue'
@@ -445,6 +448,8 @@ export type {
   AuditFilter,
   ForkFormValue,
   InviteInfo,
+  LanguageBytes,
+  LanguageShare,
   Member,
   NewUser,
   RepoFormValue,

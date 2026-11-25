@@ -43,6 +43,29 @@
   display: flex;
   flex-direction: column;
   gap: var(--pyn-space-4);
+
+  // A lone button keeps its own width instead of stretching across the column.
+  > :is(button, a) {
+    align-self: flex-start;
+  }
+}
+
+.formWidth {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--pyn-form-max);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pyn-space-2);
+}
+
+.rows > .footer {
+  padding: var(--pyn-space-3) var(--pyn-space-4);
+  border-top: 1px solid var(--pyn-border);
 }
 
 .danger {

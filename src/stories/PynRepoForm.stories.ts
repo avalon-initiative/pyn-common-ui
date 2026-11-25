@@ -87,6 +87,9 @@ const steps = {
   describable: true,
 }
 export const Steps: Story = { args: steps }
+export const StepsWithWebsiteAndTopics: Story = {
+  args: { ...steps, websiteField: true, topicsField: true },
+}
 export const StepsSingleOwner: Story = { args: { ...steps, owners: ['alice'] } }
 export const StepsWithPolicyOption: Story = {
   args: steps,

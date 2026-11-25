@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue'
 import PynSettingsRow from './PynSettingsRow.vue'
+import PynTopicsInput from './PynTopicsInput.vue'
 import styles from '../styles/PynRepoForm.module.scss'
 import { MAX_LOCKS_MAX, MAX_LOCKS_MIN, parseLockLimit } from '../state/repo.state'
 import type { RepoFormValue, RepoSettings, Visibility } from '../types/repo.types'
@@ -35,6 +36,10 @@ const props = defineProps<{
   describable?: boolean
   /** Character limit of the description. */
   descriptionMax?: number
+  /** Shows a website field (steps layout) whose value is sent as `website`. */
+  websiteField?: boolean
+  /** Shows a topics input (steps layout) whose topics are sent as `topics`. */
+  topicsField?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -47,6 +52,9 @@ const emit = defineEmits<{
 const id = useId()
 const name = ref(props.repo?.name ?? '')
 const description = ref('')
+const website = ref('')
+const topics = ref<string[]>([])
+const topicsInput = ref<InstanceType<typeof PynTopicsInput> | null>(null)
 const limit = computed(() => props.descriptionMax ?? 350)
 const visibility = ref<Visibility>(props.repo?.visibility ?? 'private')
 const leaseHours = ref(props.repo?.lease_hours ?? 8)
@@ -65,6 +73,10 @@ const suggest = () => {
 // Empty clears the setting when editing and takes the server default when creating.
 const submit = () => {
   if (props.readonly) return
+  if (props.steps && props.topicsField && topicsInput.value && !topicsInput.value.commit()) {
+    topicsInput.value.focus()
+    return
+  }
   const settings: RepoSettings = {
     name: name.value.trim(),
     visibility: visibility.value,
@@ -73,6 +85,8 @@ const submit = () => {
   const max = parseLockLimit(maxLocks.value) ?? (props.repo ? null : undefined)
   if (!byPolicy && max !== undefined) settings.max_locks_per_user = max
   if (props.steps && props.describable) settings.description = description.value.trim()
+  if (props.steps && props.websiteField) settings.website = website.value.trim()
+  if (props.steps && props.topicsField) settings.topics = [...topics.value]
   emit('submit', settings)
 }
 </script>
@@ -151,6 +165,26 @@ const submit = () => {
             >{{ description.length }} / {{ limit }} characters</span
           >
         </div>
+        <div v-if="websiteField" :class="styles.cell">
+          <label :class="styles.label" :for="`${id}-website`">Website</label>
+          <input
+            :id="`${id}-website`"
+            v-model="website"
+            :class="styles.input"
+            type="url"
+            placeholder="https://example.com"
+            :disabled="readonly"
+            autocomplete="url"
+            data-website
+          />
+        </div>
+        <PynTopicsInput
+          v-if="topicsField"
+          ref="topicsInput"
+          v-model="topics"
+          :class="styles.topics"
+          :disabled="readonly"
+        />
       </li>
       <li :class="styles.step" :aria-labelledby="`${id}-configuration`">
         <span :class="styles.num" aria-hidden="true">2</span>
