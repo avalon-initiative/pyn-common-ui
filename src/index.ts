@@ -50,6 +50,7 @@ export { default as PynLatestChange } from './components/PynLatestChange.vue'
 export { default as PynQuickSetup } from './components/PynQuickSetup.vue'
 export { default as PynCommandBlock } from './components/PynCommandBlock.vue'
 export { default as PynRepoSocial } from './components/PynRepoSocial.vue'
+export { default as PynWatchedRepos } from './components/PynWatchedRepos.vue'
 export { default as PynRepoAbout } from './components/PynRepoAbout.vue'
 export { default as PynFileList } from './components/PynFileList.vue'
 export { default as PynDialog } from './components/PynDialog.vue'
@@ -156,8 +157,23 @@ export { default as PynViewStack } from './components/PynViewStack.vue'
 export { default as PynViewSummary } from './components/PynViewSummary.vue'
 export type { PynButtonProps, PynButtonVariant } from './types/PynButton.types'
 export type { CloneKind } from './types/clone-menu.types'
-export type { ForkLink, RepoSocial, SocialButton, SocialKind } from './types/repo-social.types'
-export { FORK_CREATE, forkMenu } from './state/repo-social.state'
+export type {
+  ForkLink,
+  RepoSocial,
+  SocialButton,
+  SocialKind,
+  WatchedRepoItem,
+  WatchLevel,
+} from './types/repo-social.types'
+export {
+  FORK_CREATE,
+  UNWATCH,
+  WATCH_LEVELS,
+  forkMenu,
+  isWatchLevel,
+  watchMenu,
+  watchedButton,
+} from './state/repo-social.state'
 export type { MultiSelectOption } from './types/multi-select.types'
 export { applyTheme, loadTheme, saveTheme, themeChoices } from './state/theme.state'
 export type { ThemeChoice } from './state/theme.state'

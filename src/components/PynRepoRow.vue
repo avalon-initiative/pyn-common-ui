@@ -26,6 +26,9 @@ const icon = computed(() => repoIconSrc(props.repo.icon_url, props.repo.owner_av
       <a :href="repoPath(repo)" :class="styles.link"> {{ repo.owner }}/{{ repo.name }} </a>
       <span :class="styles.pill" data-visibility>{{ repo.visibility }}</span>
       <span v-if="repo.role" :class="styles.pill" data-role>{{ repo.role }}</span>
+      <span v-if="$slots.actions" :class="styles.actions" data-actions
+        ><slot name="actions"
+      /></span>
     </span>
     <p v-if="repo.description" :class="styles.description" data-description>
       {{ repo.description }}

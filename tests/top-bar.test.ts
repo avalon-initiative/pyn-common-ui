@@ -336,6 +336,18 @@ describe('top bar named destinations', () => {
     expect(w.find('nav').text()).toContain('Organizations')
   })
 
+  it('lists Your stars and Watching in the account menu, from hrefs', async () => {
+    const w = make()
+    await trigger(w, 'Account menu').trigger('click')
+    expect(hrefsIn(w)).toEqual(expect.arrayContaining(['/alice/-/stars', '/_/watching']))
+    expect(w.find('[role=menu]').text()).toContain('Your stars')
+    const custom = make({ hrefs: { stars: '/s', watching: '/w' } })
+    await trigger(custom, 'Account menu').trigger('click')
+    const menu = custom.find('[role=menu]')
+    expect(menu.find('a[href="/s"]').text()).toContain('Your stars')
+    expect(menu.find('a[href="/w"]').text()).toContain('Watching')
+  })
+
   it('takes the destinations from hrefs', async () => {
     const w = make({ hrefs: { people: '/p', orgs: '/o' } })
     await trigger(w, 'Open navigation').trigger('click')
