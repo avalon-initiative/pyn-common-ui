@@ -20,8 +20,8 @@ const props = defineProps<{
   current?: ProfileView
   /** Adds the Usage tab, for the viewer's own profile. */
   self?: boolean
-  /** Adds the Stars tab with this count; the tab is hidden without it. */
-  stars?: number
+  /** Adds the Stars tab with this count, or without a count when null; the tab is hidden when omitted. */
+  stars?: number | null
   /** Rows of the Stars tab; the `starred` slot replaces them. */
   starredRepos?: RepoListItem[]
   /** Shown in the repositories lists; the `repositories` slot replaces them. */

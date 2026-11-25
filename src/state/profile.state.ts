@@ -24,10 +24,10 @@ export function isWebLink(url: string): boolean {
 
 export type ProfileView = '' | 'repositories' | 'stars' | 'usage'
 
-/** Profile tabs; Stars shows only when `stars` is a number, Usage only on the viewer's own profile. */
+/** Profile tabs; Stars shows when `stars` is given (null: no count), Usage only on the viewer's own profile. */
 export function profileTabs(
   user: string,
-  o: { current?: ProfileView; repos?: number; stars?: number; self?: boolean } = {},
+  o: { current?: ProfileView; repos?: number; stars?: number | null; self?: boolean } = {},
 ): TabItem[] {
   const tab = (section: ProfileView, label: string, icon: string, count?: number): TabItem => ({
     label,
@@ -37,7 +37,7 @@ export function profileTabs(
     current: section === (o.current ?? ''),
   })
   const tabs = [tab('', 'Overview', 'book'), tab('repositories', 'Repositories', 'repo', o.repos)]
-  if (o.stars !== undefined) tabs.push(tab('stars', 'Stars', 'star', o.stars))
+  if (o.stars !== undefined) tabs.push(tab('stars', 'Stars', 'star', o.stars ?? undefined))
   if (o.self) tabs.push(tab('usage', 'Usage', 'insights'))
   return tabs
 }

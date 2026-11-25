@@ -128,6 +128,30 @@ describe('PynProfileLayout', () => {
     expect(mount(PynProfileLayout, { props: { repos } }).find('nav').exists()).toBe(false)
   })
 
+  it('shows the Stars count for a number, no count for null, and no tab when undefined', () => {
+    const stars = (props: object) =>
+      mount(PynProfileLayout, { props: { username: 'alice', ...props } })
+        .findAll('nav a')
+        .find((a) => a.text().startsWith('Stars'))
+    expect(stars({})).toBeUndefined()
+    expect(stars({ stars: undefined })).toBeUndefined()
+    expect(stars({ stars: 0 })?.find('[data-count]').text()).toBe('0')
+    expect(stars({ stars: 4 })?.find('[data-count]').text()).toBe('4')
+    const none = stars({ stars: null })
+    expect(none?.text()).toBe('Stars')
+    expect(none?.find('[data-count]').exists()).toBe(false)
+  })
+
+  it('shows the starred slot in place of the list on a Stars tab without a count', () => {
+    const w = mount(PynProfileLayout, {
+      props: { username: 'alice', stars: null, current: 'stars' },
+      slots: { starred: '<div role="alert" data-error>Could not load</div>' },
+    })
+    expect(w.find('[data-error]').exists()).toBe(true)
+    expect(w.text()).not.toContain('No starred repositories.')
+    expect(w.find('[aria-current="page"]').text()).toBe('Stars')
+  })
+
   it('shows the README slot, pinned placeholder and repositories on the overview', () => {
     const w = mount(PynProfileLayout, {
       props: { username: 'alice', repos },
@@ -202,6 +226,9 @@ describe('profile and repository list helpers', () => {
     expect(tabs.map((t) => t.label)).toEqual(['Overview', 'Repositories', 'Stars', 'Usage'])
     expect(tabs.find((t) => t.current)?.label).toBe('Stars')
     expect(tabs[2].count).toBe(0)
+    const noCount = profileTabs('alice', { stars: null }).find((t) => t.label === 'Stars')
+    expect(noCount?.href).toBe('/alice/-/stars')
+    expect(noCount?.count).toBeUndefined()
   })
 
   it('filters, types and sorts repositories', () => {
