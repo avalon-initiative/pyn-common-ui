@@ -13,4 +13,7 @@ type Story = StoryObj<typeof PynTokens>
 export const WithTokens: Story = { args: { tokens: tokenList } }
 export const NoTokens: Story = { args: { tokens: [] } }
 export const JustCreated: Story = { args: { tokens: tokenList, secret: 'pyn_3f9c0d5b7a1e48d2' } }
-export const Refused: Story = { args: { tokens: tokenList, error: 'unknown repository acme/nope' } }
+export const Creating: Story = { args: { tokens: tokenList, adding: true } }
+export const Refused: Story = {
+  args: { tokens: tokenList, adding: true, error: 'unknown repository acme/nope' },
+}

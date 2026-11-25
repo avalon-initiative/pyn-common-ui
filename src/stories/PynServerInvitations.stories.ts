@@ -16,6 +16,9 @@ export const CodeShown: Story = { args: { created: 'pynv_a1b2c3d4e5f6' + '0'.rep
 export const CodeShownAndEmailed: Story = {
   args: { created: 'pynv_a1b2c3d4e5f6' + '0'.repeat(8), emailed: true },
 }
-export const NoGrantOptions: Story = { args: { targets: [], roles: [] } }
-export const Busy: Story = { args: { busy: true } }
-export const Failed: Story = { args: { error: 'repository alice/site does not exist.' } }
+export const Creating: Story = { args: { adding: true } }
+export const NoGrantOptions: Story = { args: { adding: true, targets: [], roles: [] } }
+export const Busy: Story = { args: { adding: true, busy: true } }
+export const Failed: Story = {
+  args: { adding: true, error: 'repository alice/site does not exist.' },
+}

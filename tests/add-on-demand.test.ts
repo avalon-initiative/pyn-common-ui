@@ -1,7 +1,12 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import {
+  PynAddAccount,
   PynAddPerson,
+  PynEmailAddresses,
+  PynKeys,
+  PynServerInvitations,
+  PynTokens,
   PynInvites,
   PynOrgMembers,
   PynRepoCollaborators,
@@ -161,5 +166,50 @@ describe('Cancel on the access panels', () => {
     })
     await byText(w, 'Cancel')!.trigger('click')
     expect(w.emitted('update:adding')?.at(-1)).toEqual([false])
+  })
+})
+
+describe('account and administrator forms', () => {
+  it.each([
+    ['PynKeys', PynKeys, { keys: [] }, 'New SSH key'],
+    ['PynEmailAddresses', PynEmailAddresses, { emails: [] }, 'Add email address'],
+    ['PynAddAccount', PynAddAccount, {}, 'Add account'],
+    ['PynServerInvitations', PynServerInvitations, { invitations: [] }, 'New invitation'],
+  ] as const)('%s shows its button until pressed; Cancel closes', async (_, c, props, label) => {
+    const w = mount(c as never, { props: props as never, attachTo: document.body })
+    expect(w.find('form').exists()).toBe(false)
+    await byText(w, label)!.trigger('click')
+    await flushPromises()
+    expect(w.find('form').exists()).toBe(true)
+    expect(document.activeElement?.tagName).toBe('INPUT')
+    await byText(w, 'Cancel')!.trigger('click')
+    await flushPromises()
+    expect(w.find('form').exists()).toBe(false)
+    expect(w.emitted('cancel')).toHaveLength(1)
+    expect(document.activeElement).toBe(byText(w, label)!.element)
+    w.unmount()
+  })
+
+  it('shows a remove error with the key form closed', () => {
+    const w = mount(PynKeys, { props: { keys: [], error: 'gone' } })
+    expect(w.find('[role=alert]').text()).toBe('gone')
+  })
+
+  it('PynServerInvitations closes once the new code arrives', async () => {
+    const w = mount(PynServerInvitations, { props: { invitations: [], adding: true } })
+    await w.setProps({ created: 'pyni_x' })
+    expect(w.emitted('update:adding')?.at(-1)).toEqual([false])
+  })
+
+  it('PynTokens opens from v-model:adding and shows errors while closed', () => {
+    const props = { tokens: [], owners: [], repos: [] }
+    expect(
+      mount(PynTokens, { props: { ...props, adding: true } })
+        .find('form')
+        .exists(),
+    ).toBe(true)
+    const closed = mount(PynTokens, { props: { ...props, error: 'nope' } })
+    expect(closed.find('form').exists()).toBe(false)
+    expect(closed.find('[role=alert]').text()).toBe('nope')
   })
 })

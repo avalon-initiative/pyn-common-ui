@@ -31,9 +31,11 @@ const keys = [
 
 export const WithKeys: Story = { args: { keys } }
 export const NoKeys: Story = { args: { keys: [] } }
+export const Adding: Story = { args: { keys, adding: true } }
 export const KeyRefused: Story = {
   args: {
     keys,
+    adding: true,
     error: 'RSA keys must be at least 2048 bits; this one is 1024',
   },
 }

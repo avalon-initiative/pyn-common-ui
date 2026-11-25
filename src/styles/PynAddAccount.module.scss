@@ -28,3 +28,11 @@
 .note {
   @include m.muted;
 }
+
+.actions {
+  @include m.form-actions;
+}
+
+.cancel {
+  @include m.button;
+}

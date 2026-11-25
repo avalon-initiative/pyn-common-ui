@@ -36,5 +36,8 @@ export const Default: Story = {}
 export const LinkSent: Story = { args: { sent: 'alice@new.example' } }
 export const Empty: Story = { args: { emails: [] } }
 export const AtLimit: Story = { args: { max: 3 } }
-export const Refused: Story = { args: { error: 'That address is not available.' } }
-export const Busy: Story = { args: { busy: true } }
+export const Adding: Story = { args: { adding: true } }
+export const Refused: Story = {
+  args: { adding: true, error: 'That address is not available.' },
+}
+export const Busy: Story = { args: { adding: true, busy: true } }
